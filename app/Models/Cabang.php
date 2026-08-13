@@ -11,6 +11,7 @@ class Cabang extends Model
     protected $fillable = [
         'name',
         'address',
+        'phone',
     ];
 
     public function mobils()
