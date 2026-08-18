@@ -7,28 +7,17 @@
 
     <title>@yield('title', 'Rentalku - Rental Mobil Terpercaya')</title>
 
-    <meta
-        name="description"
-        content="Rentalku menyediakan layanan rental mobil mudah, aman dan terpercaya."
-    >
+    <meta name="description" content="Rentalku menyediakan layanan rental mobil mudah, aman dan terpercaya.">
 
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-    >
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <link
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
+        rel="stylesheet">
 
     <style>
-
         :root {
             --primary: #16a34a;
             --primary-dark: #15803d;
@@ -50,7 +39,12 @@
             background: #fff;
         }
 
-        h1, h2, h3, h4, h5, h6 {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
@@ -59,9 +53,9 @@
         }
 
         .navbar {
-            background: rgba(255,255,255,.96);
+            background: rgba(255, 255, 255, .96);
             backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(0,0,0,.05);
+            border-bottom: 1px solid rgba(0, 0, 0, .05);
             padding: 16px 0;
         }
 
@@ -103,14 +97,11 @@
         .hero {
             min-height: 680px;
             background:
-                linear-gradient(
-                    90deg,
-                    rgba(10,20,15,.92) 0%,
-                    rgba(10,20,15,.75) 42%,
-                    rgba(10,20,15,.15) 100%
-                ),
-                url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=2000&q=85')
-                center/cover;
+                linear-gradient(90deg,
+                    rgba(10, 20, 15, .92) 0%,
+                    rgba(10, 20, 15, .75) 42%,
+                    rgba(10, 20, 15, .15) 100%),
+                url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=2000&q=85') center/cover;
             display: flex;
             align-items: center;
             position: relative;
@@ -125,8 +116,8 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(255,255,255,.12);
-            border: 1px solid rgba(255,255,255,.2);
+            background: rgba(255, 255, 255, .12);
+            border: 1px solid rgba(255, 255, 255, .2);
             padding: 8px 14px;
             border-radius: 50px;
             margin-bottom: 25px;
@@ -147,7 +138,7 @@
 
         .hero p {
             font-size: 18px;
-            color: rgba(255,255,255,.78);
+            color: rgba(255, 255, 255, .78);
             max-width: 590px;
             margin-top: 20px;
             line-height: 1.7;
@@ -178,8 +169,8 @@
 
         .btn-hero-outline {
             color: white;
-            border: 1px solid rgba(255,255,255,.35);
-            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255, 255, 255, .35);
+            background: rgba(255, 255, 255, .08);
         }
 
         .btn-hero-outline:hover {
@@ -197,7 +188,7 @@
             background: white;
             border-radius: 18px;
             padding: 24px;
-            box-shadow: 0 15px 50px rgba(0,0,0,.12);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, .12);
         }
 
         .search-label {
@@ -245,7 +236,7 @@
 
         .car-card:hover {
             transform: translateY(-6px);
-            box-shadow: 0 18px 40px rgba(0,0,0,.09);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, .09);
         }
 
         .car-image {
@@ -463,7 +454,7 @@
         }
 
         .cta p {
-            color: rgba(255,255,255,.8);
+            color: rgba(255, 255, 255, .8);
             max-width: 650px;
         }
 
@@ -524,7 +515,6 @@
             }
 
         }
-
     </style>
 
     @stack('styles')
@@ -538,9 +528,7 @@
 
     @include('layouts.partials.footer')
 
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     @stack('scripts')
 
