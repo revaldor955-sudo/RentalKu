@@ -12,8 +12,11 @@ class MetodePembayaran extends Model
         'nomor_akun',
     ];
 
-    public function pembayaran()
-    {
-        return $this->hasMany(Pembayaran::class, 'metode_id');
-    }
+   public function pembayaran()
+{
+    return $this->hasMany(
+        Pembayaran::class,
+        'metode_pembayaran_id'
+    );
+}
 }

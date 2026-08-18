@@ -13,12 +13,31 @@ return new class extends Migration
     {
         Schema::create('pembayarans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade');
-            $table->foreignId('metode_id')->constrained('metode_pembayarans')->onDelete('cascade');
+
+            // Relasi ke rental
+            $table->foreignId('rental_id')
+                ->constrained('rentals')
+                ->cascadeOnDelete();
+
+            // Relasi ke metode pembayaran
+            $table->foreignId('metode_pembayaran_id')
+                ->constrained('metode_pembayarans')
+                ->restrictOnDelete();
+
             $table->date('tanggal_bayar');
-            $table->decimal('jumlah', 12, 2);
-            $table->string('bukti')->nullable();
-            $table->enum('status', ['pending', 'sukses', 'gagal'])->default('pending');
+
+            $table->decimal('jumlah', 15, 2);
+
+            $table->string('bukti_pembayaran')->nullable();
+
+            $table->enum('status', [
+                'Menunggu',
+                'Diverifikasi',
+                'Ditolak'
+            ])->default('Menunggu');
+
+            $table->text('catatan')->nullable();
+
             $table->timestamps();
         });
     }

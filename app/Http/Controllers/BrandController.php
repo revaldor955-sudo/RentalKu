@@ -8,102 +8,126 @@ use Illuminate\Http\Request;
 class BrandController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan semua brand
      */
     public function index()
     {
-        $brands = Brand::all();
+        $brands = Brand::latest()->get();
+
         return view('brands.index', compact('brands'));
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Menyimpan brand baru
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:50',
-            'logo' => 'nullable|mimes:jpeg,png,jpg,svg|max:2048',
-            'description' => 'nullable|string',
+            'name' => 'required|string|max:50|unique:brands,name',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
+            'description' => 'nullable|string|max:1000',
         ], [
-            'name.required' => 'Nama brand wajib diisi',
-            'logo.mimes' => 'Logo harus berupa gambar (jpg, png, svg)',
-            'logo.max' => 'Ukuran logo maksimal 2MB',
+            'name.required' => 'Nama brand wajib diisi.',
+            'name.unique' => 'Nama brand sudah digunakan.',
+            'name.max' => 'Nama brand maksimal 50 karakter.',
+            'logo.image' => 'Logo harus berupa gambar.',
+            'logo.mimes' => 'Logo harus berformat JPG, JPEG, PNG, atau SVG.',
+            'logo.max' => 'Ukuran logo maksimal 2 MB.',
+            'description.max' => 'Deskripsi maksimal 1000 karakter.',
         ]);
 
         if ($request->hasFile('logo')) {
+
             $image = $request->file('logo');
+
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('images/brands'), $imageName);
+
+            $image->move(
+                public_path('images/brands'),
+                $imageName
+            );
+
             $validated['logo'] = 'images/brands/' . $imageName;
         }
 
         Brand::create($validated);
 
-        return redirect()->route('brands.index')
+        return redirect()
+            ->route('brands.index')
             ->with('success', 'Brand berhasil ditambahkan.');
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Brand $brand)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Brand $brand)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
+     * Memperbarui brand
      */
     public function update(Request $request, Brand $brand)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'logo' => 'nullable|mimes:jpeg,png,jpg,svg|max:2048',
-            'description' => 'nullable|string',
+            'name' => 'required|string|max:50|unique:brands,name,' . $brand->id,
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
+            'description' => 'nullable|string|max:1000',
         ], [
-            'name.required' => 'Nama brand wajib diisi',
-            'logo.mimes' => 'Logo harus berupa gambar (jpg, png, svg)',
-            'logo.max' => 'Ukuran logo maksimal 2MB',
+            'name.required' => 'Nama brand wajib diisi.',
+            'name.unique' => 'Nama brand sudah digunakan.',
+            'name.max' => 'Nama brand maksimal 50 karakter.',
+            'logo.image' => 'Logo harus berupa gambar.',
+            'logo.mimes' => 'Logo harus berformat JPG, JPEG, PNG, atau SVG.',
+            'logo.max' => 'Ukuran logo maksimal 2 MB.',
+            'description.max' => 'Deskripsi maksimal 1000 karakter.',
         ]);
 
         if ($request->hasFile('logo')) {
+
+            // Hapus logo lama
+            if (
+                $brand->logo &&
+                file_exists(public_path($brand->logo))
+            ) {
+                unlink(public_path($brand->logo));
+            }
+
             $image = $request->file('logo');
+
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('images/brands'), $imageName);
+
+            $image->move(
+                public_path('images/brands'),
+                $imageName
+            );
+
             $validated['logo'] = 'images/brands/' . $imageName;
         }
 
         $brand->update($validated);
 
-        return redirect()->route('brands.index')
+        return redirect()
+            ->route('brands.index')
             ->with('success', 'Brand berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Menghapus brand
      */
     public function destroy(Brand $brand)
     {
+        // Cegah penghapusan jika masih digunakan mobil
+        if ($brand->mobils()->exists()) {
+            return redirect()
+                ->route('brands.index')
+                ->with('error', 'Brand tidak dapat dihapus karena masih digunakan oleh mobil.');
+        }
+
+        if (
+            $brand->logo &&
+            file_exists(public_path($brand->logo))
+        ) {
+            unlink(public_path($brand->logo));
+        }
+
         $brand->delete();
 
-        return redirect()->route('brands.index')
+        return redirect()
+            ->route('brands.index')
             ->with('success', 'Brand berhasil dihapus.');
     }
 }

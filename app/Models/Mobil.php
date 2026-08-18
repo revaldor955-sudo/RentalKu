@@ -51,4 +51,9 @@ class Mobil extends Model
             'fasilitas_id'
         );
     }
+    public function rentals()
+{
+    return $this->hasMany(Rental::class, 'mobil_id');
+}
+
 }
