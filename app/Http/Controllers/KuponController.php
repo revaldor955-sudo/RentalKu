@@ -7,101 +7,72 @@ use Illuminate\Http\Request;
 
 class KuponController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $kupons = Kupon::all();
+        $kupons = Kupon::latest()->get();
+
         return view('kupons.index', compact('kupons'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'code' => 'required|string|max:255|unique:kupons,code',
+            'code' => 'required|string|max:50|unique:kupons,code',
             'jenis' => 'required|in:persen,nominal',
-            'value' => 'required|numeric|min:0',
-            'kuota' => 'nullable|integer|min:0',
-            'minimal_pembelian' => 'nullable|numeric|min:0',
-            'active_at' => 'nullable|date',
-            'expired_at' => 'nullable|date',
+            'value' => 'required|numeric|min:1',
+            'kuota' => 'required|integer|min:1',
+            'minimal_pembelian' => 'required|numeric|min:0',
+            'active_at' => 'required|date',
+            'expired_at' => 'required|date|after_or_equal:active_at',
         ], [
-            'code.required' => 'Kode kupon wajib diisi',
-            'code.unique' => 'Kode kupon sudah dipakai',
-            'jenis.required' => 'Jenis kupon wajib diisi',
-            'value.required' => 'Nilai kupon wajib diisi',
-            'value.numeric' => 'Nilai kupon harus berupa angka',
+            'code.required' => 'Kode promo wajib diisi.',
+            'code.unique' => 'Kode promo sudah digunakan.',
+            'jenis.required' => 'Jenis promo wajib dipilih.',
+            'jenis.in' => 'Jenis promo tidak valid.',
+            'value.required' => 'Nilai promo wajib diisi.',
+            'value.min' => 'Nilai promo minimal 1.',
+            'kuota.required' => 'Kuota wajib diisi.',
+            'kuota.min' => 'Kuota minimal 1.',
+            'minimal_pembelian.required' => 'Minimal pembelian wajib diisi.',
+            'active_at.required' => 'Tanggal mulai wajib diisi.',
+            'expired_at.required' => 'Tanggal berakhir wajib diisi.',
+            'expired_at.after_or_equal' => 'Tanggal berakhir harus setelah tanggal mulai.',
         ]);
+
+        $validated['terpakai'] = 0;
 
         Kupon::create($validated);
 
-        return redirect()->route('kupons.index')
-            ->with('success', 'Kupon berhasil ditambahkan.');
+        return redirect()
+            ->route('kupons.index')
+            ->with('success', 'Promo berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Kupon $kupon)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Kupon $kupon)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Kupon $kupon)
     {
         $validated = $request->validate([
-            'code' => 'required|string|max:255|unique:kupons,code,' . $kupon->id,
+            'code' => 'required|string|max:50|unique:kupons,code,' . $kupon->id,
             'jenis' => 'required|in:persen,nominal',
-            'value' => 'required|numeric|min:0',
-            'kuota' => 'nullable|integer|min:0',
-            'minimal_pembelian' => 'nullable|numeric|min:0',
-            'active_at' => 'nullable|date',
-            'expired_at' => 'nullable|date',
-        ], [
-            'code.required' => 'Kode kupon wajib diisi',
-            'code.unique' => 'Kode kupon sudah dipakai',
-            'jenis.required' => 'Jenis kupon wajib diisi',
-            'value.required' => 'Nilai kupon wajib diisi',
-            'value.numeric' => 'Nilai kupon harus berupa angka',
+            'value' => 'required|numeric|min:1',
+            'kuota' => 'required|integer|min:1',
+            'minimal_pembelian' => 'required|numeric|min:0',
+            'active_at' => 'required|date',
+            'expired_at' => 'required|date|after_or_equal:active_at',
         ]);
 
         $kupon->update($validated);
 
-        return redirect()->route('kupons.index')
-            ->with('success', 'Kupon berhasil diperbarui.');
+        return redirect()
+            ->route('kupons.index')
+            ->with('success', 'Promo berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Kupon $kupon)
     {
         $kupon->delete();
 
-        return redirect()->route('kupons.index')
-            ->with('success', 'Kupon berhasil dihapus.');
+        return redirect()
+            ->route('kupons.index')
+            ->with('success', 'Promo berhasil dihapus.');
     }
 }

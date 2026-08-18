@@ -19,8 +19,12 @@ class Kupon extends Model
         'expired_at',
     ];
 
-    public function booking()
-    {
-        return $this->hasMany(Booking::class, 'kupon_id');
-    }
+    protected $casts = [
+        'active_at' => 'datetime',
+        'expired_at' => 'datetime',
+        'value' => 'decimal:2',
+        'minimal_pembelian' => 'decimal:2',
+    ];
+
+    public $timestamps = true;
 }

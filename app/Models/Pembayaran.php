@@ -7,22 +7,31 @@ use Illuminate\Database\Eloquent\Model;
 class Pembayaran extends Model
 {
     protected $table = 'pembayarans';
+
     protected $fillable = [
-        'booking_id',
-        'metode_id',
+        'rental_id',
+        'metode_pembayaran_id',
         'tanggal_bayar',
         'jumlah',
         'bukti',
         'status',
     ];
 
-    public function booking()
+    protected $casts = [
+        'tanggal_bayar' => 'date',
+        'jumlah' => 'decimal:2',
+    ];
+
+    public function rental()
     {
-        return $this->belongsTo(Booking::class, 'booking_id');
+        return $this->belongsTo(Rental::class);
     }
 
-    public function metode()
+    public function metodePembayaran()
     {
-        return $this->belongsTo(MetodePembayaran::class, 'metode_id');
+        return $this->belongsTo(
+            MetodePembayaran::class,
+            'metode_pembayaran_id'
+        );
     }
 }
