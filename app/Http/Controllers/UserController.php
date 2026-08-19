@@ -154,9 +154,9 @@ class UserController extends Controller
 
         User::create($validated);
 
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'Pengguna berhasil ditambahkan.');
+        return response()->json([
+            'message' => 'Pengguna berhasil ditambahkan.',
+        ], 201);
     }
 
     public function update(Request $request, User $user)
@@ -200,17 +200,17 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'Pengguna berhasil diperbarui.');
+        return response()->json([
+            'message' => 'Pengguna berhasil diperbarui.',
+        ]);
     }
 
     public function destroy(User $user)
     {
-        if ($user->id == auth()->id()) {
-            return redirect()
-                ->route('users.index')
-                ->with('error', 'Akun yang sedang digunakan tidak dapat dihapus.');
+        if ($user->id === auth()->id()) {
+            return response()->json([
+                'message' => 'Akun yang sedang digunakan tidak dapat dihapus.',
+            ], 422);
         }
 
         if ($user->photo && File::exists(public_path($user->photo))) {
@@ -219,8 +219,8 @@ class UserController extends Controller
 
         $user->delete();
 
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'Pengguna berhasil dihapus.');
+        return response()->json([
+            'message' => 'Pengguna berhasil dihapus.',
+        ]);
     }
 }
