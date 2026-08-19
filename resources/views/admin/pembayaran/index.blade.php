@@ -19,6 +19,11 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     >
 
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/css/dataTables.bootstrap5.min.css"
+    >
+
     <style>
 
         body {
@@ -224,282 +229,173 @@
 
     <div class="page-card">
 
-        @if($pembayarans->count())
+        <div class="table-responsive">
 
-            <div class="table-responsive">
+            <table class="table align-middle mb-0" id="pembayaran-table">
 
-                <table class="table align-middle mb-0">
+                <thead>
 
-                    <thead>
+                    <tr>
 
-                        <tr>
+                        <th class="px-4 py-3">
+                            #
+                        </th>
 
-                            <th class="px-4 py-3">
-                                #
-                            </th>
+                        <th>
+                            Pelanggan
+                        </th>
 
-                            <th>
-                                Pelanggan
-                            </th>
+                        <th>
+                            Mobil
+                        </th>
 
-                            <th>
-                                Mobil
-                            </th>
+                        <th>
+                            Metode
+                        </th>
 
-                            <th>
-                                Metode
-                            </th>
+                        <th>
+                            Tanggal
+                        </th>
 
-                            <th>
-                                Tanggal
-                            </th>
+                        <th>
+                            Jumlah
+                        </th>
 
-                            <th>
-                                Jumlah
-                            </th>
+                        <th>
+                            Bukti
+                        </th>
 
-                            <th>
-                                Bukti
-                            </th>
+                        <th>
+                            Status
+                        </th>
 
-                            <th>
-                                Status
-                            </th>
+                        <th class="text-end pe-4">
+                            Aksi
+                        </th>
 
-                            <th>
-                                Aksi
-                            </th>
+                    </tr>
 
-                        </tr>
+                </thead>
 
-                    </thead>
+                <tbody>
+                    {{-- Diisi oleh DataTables (server-side) --}}
+                </tbody>
 
+            </table>
 
-                    <tbody>
+        </div>
 
-                        @foreach($pembayarans as $pembayaran)
+    </div>
 
-                            <tr>
+</div>
 
-                                <td class="px-4">
 
-                                    {{ $loop->iteration }}
+{{-- MODAL DETAIL PEMBAYARAN --}}
+<div
+    class="modal fade"
+    id="detailPembayaranModal"
+    tabindex="-1"
+    aria-labelledby="detailPembayaranModalLabel"
+    aria-hidden="true"
+>
 
-                                </td>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
 
+        <div class="modal-content">
 
-                                {{-- PELANGGAN --}}
+            <div class="modal-header bg-success text-white">
 
-                                <td>
-
-                                    <strong>
-                                        {{ $pembayaran->rental->user->name ?? '-' }}
-                                    </strong>
-
-                                </td>
-
-
-                                {{-- MOBIL --}}
-
-                                <td>
-
-                                    {{ $pembayaran->rental->mobil->name ?? '-' }}
-
-                                </td>
-
-
-                                {{-- METODE --}}
-
-                                <td>
-
-                                  {{ $pembayaran->metodePembayaran->name ?? '-' }}
-
-                                </td>
-
-
-                                {{-- TANGGAL --}}
-
-                                <td>
-
-                                    {{ $pembayaran->tanggal_bayar?->format('d/m/Y') ?? '-' }}
-
-                                </td>
-
-
-                                {{-- JUMLAH --}}
-
-                                <td>
-
-                                    <strong>
-                                        Rp {{ number_format($pembayaran->jumlah, 0, ',', '.') }}
-                                    </strong>
-
-                                </td>
-
-
-                                {{-- BUKTI --}}
-
-                                <td>
-
-                                    @if($pembayaran->bukti)
-
-                                        <a
-                                            href="{{ asset('storage/' . $pembayaran->bukti) }}"
-                                            target="_blank"
-                                        >
-
-                                            <img
-                                                src="{{ asset('storage/' . $pembayaran->bukti) }}"
-                                                class="proof-image"
-                                                alt="Bukti pembayaran"
-                                            >
-
-                                        </a>
-
-                                    @else
-
-                                        <span class="text-muted">
-                                            Tidak ada
-                                        </span>
-
-                                    @endif
-
-                                </td>
-
-
-                                {{-- STATUS --}}
-
-                                <td>
-
-                                    @if($pembayaran->status === 'Menunggu')
-
-                                        <span class="badge-status status-menunggu">
-                                            Menunggu
-                                        </span>
-
-                                    @elseif($pembayaran->status === 'Disetujui')
-
-                                        <span class="badge-status status-disetujui">
-                                            Disetujui
-                                        </span>
-
-                                    @else
-
-                                        <span class="badge-status status-ditolak">
-                                            Ditolak
-                                        </span>
-
-                                    @endif
-
-                                </td>
-
-
-                                {{-- AKSI --}}
-
-                                <td>
-
-                                    @if($pembayaran->status === 'Menunggu')
-
-                                        <div class="d-flex gap-2">
-
-                                            {{-- SETUJUI --}}
-
-                                            <form
-                                                action="{{ route('pembayarans.updateStatus', $pembayaran->id) }}"
-                                                method="POST"
-                                            >
-
-                                                @csrf
-
-                                                @method('PUT')
-
-                                                <input
-                                                    type="hidden"
-                                                    name="status"
-                                                    value="Disetujui"
-                                                >
-
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-success btn-sm"
-                                                    onclick="return confirm('Setujui pembayaran ini?')"
-                                                >
-
-                                                    <i class="bi bi-check-lg"></i>
-
-                                                </button>
-
-                                            </form>
-
-
-                                            {{-- TOLAK --}}
-
-                                            <form
-                                                action="{{ route('pembayarans.updateStatus', $pembayaran->id) }}"
-                                                method="POST"
-                                            >
-
-                                                @csrf
-
-                                                @method('PUT')
-
-                                                <input
-                                                    type="hidden"
-                                                    name="status"
-                                                    value="Ditolak"
-                                                >
-
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-danger btn-sm"
-                                                    onclick="return confirm('Tolak pembayaran ini?')"
-                                                >
-
-                                                    <i class="bi bi-x-lg"></i>
-
-                                                </button>
-
-                                            </form>
-
-                                        </div>
-
-                                    @else
-
-                                        <span class="text-muted small">
-                                            Sudah diverifikasi
-                                        </span>
-
-                                    @endif
-
-                                </td>
-
-                            </tr>
-
-                        @endforeach
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        @else
-
-            <div class="text-center py-5">
-
-                <i class="bi bi-credit-card fs-1 text-muted"></i>
-
-                <h5 class="fw-bold mt-3">
-                    Belum ada pembayaran
+                <h5 class="modal-title" id="detailPembayaranModalLabel">
+                    <i class="bi bi-credit-card me-2"></i>
+                    Detail Pembayaran
                 </h5>
 
-                <p class="text-muted mb-0">
-                    Data pembayaran pelanggan akan muncul di sini.
-                </p>
+                <button
+                    type="button"
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="modal"
+                    aria-label="Tutup"
+                ></button>
 
             </div>
 
-        @endif
+            <div class="modal-body p-4">
+
+                {{-- LOADING --}}
+                <div id="pembayaranDetailLoading" class="text-center py-5">
+                    <div class="spinner-border text-success" role="status"></div>
+                    <p class="text-muted mt-3 mb-0">
+                        Memuat detail pembayaran...
+                    </p>
+                </div>
+
+                {{-- ERROR --}}
+                <div id="pembayaranDetailError" class="alert alert-danger d-none" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span id="pembayaranDetailErrorMessage">
+                        Gagal memuat detail pembayaran.
+                    </span>
+                </div>
+
+                {{-- KONTEN --}}
+                <div id="pembayaranDetailContent" class="d-none">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <div class="border rounded-3 p-3 h-100">
+                                <small class="text-muted fw-bold text-uppercase">Pelanggan</small>
+                                <h6 class="fw-bold mb-1" id="pd-pelanggan">-</h6>
+                                <small class="text-muted" id="pd-email">-</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="border rounded-3 p-3 h-100">
+                                <small class="text-muted fw-bold text-uppercase">Mobil</small>
+                                <h6 class="fw-bold mb-1" id="pd-mobil">-</h6>
+                                <small class="text-muted" id="pd-plat">-</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="border rounded-3 p-3">
+                                <small class="text-muted fw-bold text-uppercase">Metode & Tanggal</small>
+                                <div class="fw-semibold" id="pd-metode">-</div>
+                                <small class="text-muted" id="pd-tanggal">-</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="border rounded-3 p-3">
+                                <small class="text-muted fw-bold text-uppercase">Jumlah</small>
+                                <h5 class="fw-bold text-success mb-0" id="pd-jumlah">-</h5>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="border rounded-3 p-3">
+                                <small class="text-muted fw-bold text-uppercase">Status</small>
+                                <div id="pd-status">-</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="border rounded-3 p-3">
+                                <small class="text-muted fw-bold text-uppercase">Bukti Pembayaran</small>
+                                <div id="pd-bukti">
+                                    <span class="text-muted">Tidak ada</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
@@ -510,6 +406,276 @@
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
 </script>
 
-</body>
+<script
+    src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+</script>
 
+<script
+    src="https://code.jquery.com/jquery-3.7.1.min.js">
+</script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js">
+</script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/js/dataTables.bootstrap5.min.js">
+</script>
+
+<script>
+
+    const CSRF_TOKEN = '{{ csrf_token() }}';
+
+    function confirmAction(event, message) {
+        event.preventDefault();
+
+        const form = event.target.closest('form');
+
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
+
+    function formatRupiah(value) {
+        return 'Rp ' + Number(value).toLocaleString('id-ID');
+    }
+
+    function statusBadge(status) {
+        const map = {
+            'Menunggu': 'status-menunggu',
+            'Disetujui': 'status-disetujui',
+            'Ditolak': 'status-ditolak',
+        };
+
+        const cls = map[status] || 'bg-secondary text-white';
+
+        return '<span class="badge-status ' + cls + '">' + status + '</span>';
+    }
+
+    function pembayaranActions(data) {
+        const baseUrl = '{{ route('pembayarans.updateStatus', '__ID__') }}'.replace('__ID__', data.id);
+
+        let html = '<div class="d-flex gap-2 justify-content-end">';
+
+        html += '<button type="button" class="btn btn-outline-primary btn-sm" ' +
+            'onclick="openPembayaranDetail(' + data.id + ')">' +
+            '<i class="bi bi-eye me-1"></i>Detail</button>';
+
+        if (data.status === 'Menunggu') {
+
+            html += '<form action="' + baseUrl + '" method="POST">' +
+                '<input type="hidden" name="_token" value="' + CSRF_TOKEN + '">' +
+                '<input type="hidden" name="_method" value="PUT">' +
+                '<input type="hidden" name="status" value="Disetujui">' +
+                '<button type="submit" class="btn btn-success btn-sm" title="Setujui" ' +
+                'onclick="confirmAction(event, \'Setujui pembayaran ini?\')">' +
+                '<i class="bi bi-check-lg"></i></button></form>';
+
+            html += '<form action="' + baseUrl + '" method="POST">' +
+                '<input type="hidden" name="_token" value="' + CSRF_TOKEN + '">' +
+                '<input type="hidden" name="_method" value="PUT">' +
+                '<input type="hidden" name="status" value="Ditolak">' +
+                '<button type="submit" class="btn btn-danger btn-sm" title="Tolak" ' +
+                'onclick="confirmAction(event, \'Tolak pembayaran ini?\')">' +
+                '<i class="bi bi-x-lg"></i></button></form>';
+
+        }
+
+        html += '</div>';
+
+        return html;
+    }
+
+    $(document).ready(function () {
+
+        $('#pembayaran-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{{ route('pembayarans.data') }}',
+                type: 'GET',
+            },
+            columns: [
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    className: 'px-4',
+                    render: function (data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    },
+                },
+                {
+                    data: 'user_name',
+                    orderable: true,
+                    searchable: false,
+                    render: function (data) {
+                        return '<strong>' + data + '</strong>';
+                    },
+                },
+                {
+                    data: 'mobil_name',
+                    orderable: true,
+                    searchable: false,
+                    render: function (data) {
+                        return data;
+                    },
+                },
+                {
+                    data: 'metode_name',
+                    orderable: true,
+                    searchable: false,
+                    render: function (data) {
+                        return data;
+                    },
+                },
+                {
+                    data: 'tanggal_bayar',
+                    orderable: true,
+                    searchable: false,
+                    render: function (data) {
+                        return data;
+                    },
+                },
+                {
+                    data: 'jumlah',
+                    orderable: true,
+                    searchable: false,
+                    render: function (data) {
+                        return '<strong>' + formatRupiah(data) + '</strong>';
+                    },
+                },
+                {
+                    data: 'bukti',
+                    orderable: false,
+                    searchable: false,
+                    render: function (data) {
+                        if (!data) {
+                            return '<span class="text-muted">Tidak ada</span>';
+                        }
+
+                        const url = '{{ asset('storage/__BUKTI__') }}'.replace('__BUKTI__', data);
+
+                        return '<a href="' + url + '" target="_blank">' +
+                            '<img src="' + url + '" class="proof-image" alt="Bukti pembayaran"></a>';
+                    },
+                },
+                {
+                    data: 'status',
+                    orderable: true,
+                    searchable: false,
+                    render: function (data) {
+                        return statusBadge(data);
+                    },
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-end pe-4',
+                    render: function (data) {
+                        return pembayaranActions(data);
+                    },
+                },
+            ],
+            order: [[4, 'desc']],
+            language: {
+                processing: 'Memproses...',
+                search: 'Cari:',
+                lengthMenu: 'Tampilkan _MENU_ data',
+                info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                infoEmpty: 'Tidak ada data',
+                infoFiltered: '(difilter dari _MAX_ total data)',
+                infoPostFix: '',
+                loadingRecords: 'Memuat...',
+                zeroRecords: 'Tidak ditemukan data yang cocok',
+                emptyTable: 'Belum ada pembayaran',
+                paginate: {
+                    first: 'Pertama',
+                    previous: 'Sebelumnya',
+                    next: 'Berikutnya',
+                    last: 'Terakhir',
+                },
+                aria: {
+                    sortAscending: ': aktifkan untuk urut naik',
+                    sortDescending: ': aktifkan untuk urut turun',
+                },
+            },
+        });
+
+    });
+
+    function openPembayaranDetail(id) {
+
+        const modalEl = document.getElementById('detailPembayaranModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+        const loading = document.getElementById('pembayaranDetailLoading');
+        const error = document.getElementById('pembayaranDetailError');
+        const content = document.getElementById('pembayaranDetailContent');
+
+        loading.classList.remove('d-none');
+        error.classList.add('d-none');
+        content.classList.add('d-none');
+
+        modal.show();
+
+        fetch('{{ route('pembayarans.detail', '__ID__') }}'.replace('__ID__', id), {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Server mengembalikan status ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('pd-pelanggan').textContent = data.pelanggan;
+                document.getElementById('pd-email').textContent = data.email;
+                document.getElementById('pd-mobil').textContent = data.mobil;
+                document.getElementById('pd-plat').textContent = data.plat;
+                document.getElementById('pd-metode').textContent = data.metode;
+                document.getElementById('pd-tanggal').textContent = data.tanggal_bayar;
+                document.getElementById('pd-jumlah').textContent = formatRupiah(data.jumlah);
+                document.getElementById('pd-status').innerHTML = statusBadge(data.status);
+
+                const bukti = document.getElementById('pd-bukti');
+
+                if (data.bukti_url) {
+                    bukti.innerHTML = '<a href="' + data.bukti_url + '" target="_blank">' +
+                        '<img src="' + data.bukti_url +
+                        '" class="proof-image" alt="Bukti pembayaran" ' +
+                        'style="width:120px;height:90px;object-fit:cover;border-radius:8px;">' +
+                        '</a>';
+                } else {
+                    bukti.innerHTML = '<span class="text-muted">Tidak ada</span>';
+                }
+
+                loading.classList.add('d-none');
+                content.classList.remove('d-none');
+            })
+            .catch(err => {
+                loading.classList.add('d-none');
+                document.getElementById('pembayaranDetailErrorMessage').textContent =
+                    'Gagal memuat detail pembayaran: ' + err.message;
+                error.classList.remove('d-none');
+            });
+
+    }
+
+</script>
+
+</body>
 </html>
