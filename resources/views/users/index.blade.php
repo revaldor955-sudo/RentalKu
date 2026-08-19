@@ -17,6 +17,11 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     >
 
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/css/dataTables.bootstrap5.min.css"
+    >
+
     <style>
         body {
             background: #f5f7f6;
@@ -292,421 +297,359 @@
     {{-- TABLE --}}
     <div class="page-card">
 
-        @if($users->count())
+        <div class="table-responsive">
 
-            <div class="table-responsive">
+            <table class="table align-middle mb-0" id="users-table">
 
-                <table class="table align-middle mb-0">
+                <thead>
 
-                    <thead>
+                    <tr>
 
-                        <tr>
+                        <th class="px-4 py-3">
+                            #
+                        </th>
 
-                            <th class="px-4 py-3">
-                                #
-                            </th>
+                        <th>
+                            Pengguna
+                        </th>
 
-                            <th>
-                                Pengguna
-                            </th>
+                        <th>
+                            Email
+                        </th>
 
-                            <th>
-                                Email
-                            </th>
+                        <th>
+                            Role
+                        </th>
 
-                            <th>
-                                Role
-                            </th>
+                        <th>
+                            Telepon
+                        </th>
 
-                            <th>
-                                Telepon
-                            </th>
+                        <th>
+                            Alamat
+                        </th>
 
-                            <th>
-                                Alamat
-                            </th>
+                        <th class="text-center">
+                            Aksi
+                        </th>
 
-                            <th class="text-center">
-                                Aksi
-                            </th>
+                    </tr>
 
-                        </tr>
+                </thead>
 
-                    </thead>
+                <tbody>
+                    {{-- Diisi oleh DataTables (server-side) --}}
+                </tbody>
 
-                    <tbody>
+            </table>
 
-                        @foreach($users as $user)
+        </div>
 
-                            <tr>
+    </div>
 
-                                {{-- NO --}}
-                                <td class="px-4">
-                                    {{ $loop->iteration }}
-                                </td>
+</div>
 
 
-                                {{-- PENGGUNA --}}
-                                <td>
+{{-- MODAL EDIT (reusabel, diisi via AJAX) --}}
+<div
+    class="modal fade"
+    id="editUserModal"
+    tabindex="-1"
+>
 
-                                    <div class="d-flex align-items-center gap-3">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
 
-                                        @if($user->photo)
+        <div class="modal-content">
 
-                                            <img
-                                                src="{{ asset($user->photo) }}"
-                                                class="user-photo"
-                                                alt="Foto {{ $user->name }}"
-                                            >
+            <div class="modal-header">
 
-                                        @else
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil-square me-2"></i>
+                    Edit Pengguna
+                </h5>
 
-                                            <div class="photo-placeholder">
-                                                <i class="bi bi-person-fill"></i>
-                                            </div>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                ></button>
 
-                                        @endif
+            </div>
 
-                                        <div>
+            <form
+                id="editUserForm"
+                action=""
+                method="POST"
+                enctype="multipart/form-data"
+            >
 
-                                            <strong>
-                                                {{ $user->name }}
-                                            </strong>
+                @csrf
+                @method('PUT')
 
-                                            <div class="small text-muted">
-                                                ID #{{ $user->id }}
-                                            </div>
+                <div class="modal-body">
 
-                                        </div>
+                    <div id="editUserLoading" class="text-center py-4">
+                        <div class="spinner-border text-success" role="status"></div>
+                        <p class="text-muted mt-2 mb-0">
+                            Memuat data pengguna...
+                        </p>
+                    </div>
 
-                                    </div>
+                    <div id="editUserError" class="alert alert-danger d-none" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <span id="editUserErrorMessage">Gagal memuat data pengguna.</span>
+                    </div>
 
-                                </td>
+                    <div id="editUserFields" class="d-none">
 
+                        <div class="row g-3">
 
-                                {{-- EMAIL --}}
-                                <td>
-                                    {{ $user->email }}
-                                </td>
+                            <div class="col-md-6">
 
+                                <label class="form-label">
+                                    Nama
+                                </label>
 
-                                {{-- ROLE --}}
-                                <td>
-
-                                    @if($user->roles_id == 1)
-
-                                        <span class="role-badge role-admin">
-                                            Admin
-                                        </span>
-
-                                    @elseif($user->roles_id == 2)
-
-                                        <span class="role-badge role-staff">
-                                            Staff
-                                        </span>
-
-                                    @elseif($user->roles_id == 3)
-
-                                        <span class="role-badge role-customer">
-                                            Customer
-                                        </span>
-
-                                    @else
-
-                                        <span class="badge bg-secondary">
-                                            Belum Ada Role
-                                        </span>
-
-                                    @endif
-
-                                </td>
-
-
-                                {{-- TELEPON --}}
-                                <td>
-                                    {{ $user->phone ?? '-' }}
-                                </td>
-
-
-                                {{-- ALAMAT --}}
-                                <td>
-                                    {{ $user->address ?? '-' }}
-                                </td>
-
-
-                                {{-- AKSI --}}
-                                <td>
-
-                                    <div class="d-flex justify-content-center gap-2">
-
-                                        {{-- EDIT --}}
-                                        <button
-                                            type="button"
-                                            class="btn btn-warning btn-sm"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editUser{{ $user->id }}"
-                                            title="Edit"
-                                        >
-                                            <i class="bi bi-pencil-square"></i>
-                                        </button>
-
-
-                                        {{-- HAPUS --}}
-                                        @if($user->id != auth()->id())
-
-                                            <form
-                                                action="{{ route('users.destroy', $user->id) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('Yakin ingin menghapus pengguna ini?')"
-                                            >
-
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-danger btn-sm"
-                                                    title="Hapus"
-                                                >
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-
-                                            </form>
-
-                                        @endif
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-
-                            {{-- MODAL EDIT --}}
-                            <div
-                                class="modal fade"
-                                id="editUser{{ $user->id }}"
-                                tabindex="-1"
-                            >
-
-                                <div class="modal-dialog modal-lg modal-dialog-centered">
-
-                                    <div class="modal-content">
-
-                                        <div class="modal-header">
-
-                                            <h5 class="modal-title">
-                                                <i class="bi bi-pencil-square me-2"></i>
-                                                Edit Pengguna
-                                            </h5>
-
-                                            <button
-                                                type="button"
-                                                class="btn-close"
-                                                data-bs-dismiss="modal"
-                                            ></button>
-
-                                        </div>
-
-                                        <form
-                                            action="{{ route('users.update', $user->id) }}"
-                                            method="POST"
-                                            enctype="multipart/form-data"
-                                        >
-
-                                            @csrf
-                                            @method('PUT')
-
-                                            <div class="modal-body">
-
-                                                <div class="row g-3">
-
-                                                    <div class="col-md-6">
-
-                                                        <label class="form-label">
-                                                            Nama
-                                                        </label>
-
-                                                        <input
-                                                            type="text"
-                                                            name="name"
-                                                            class="form-control"
-                                                            value="{{ $user->name }}"
-                                                            required
-                                                        >
-
-                                                    </div>
-
-
-                                                    <div class="col-md-6">
-
-                                                        <label class="form-label">
-                                                            Email
-                                                        </label>
-
-                                                        <input
-                                                            type="email"
-                                                            name="email"
-                                                            class="form-control"
-                                                            value="{{ $user->email }}"
-                                                            required
-                                                        >
-
-                                                    </div>
-
-
-                                                    <div class="col-md-6">
-
-                                                        <label class="form-label">
-                                                            Role
-                                                        </label>
-
-                                                        <select
-                                                            name="roles_id"
-                                                            class="form-select"
-                                                            required
-                                                        >
-
-                                                            <option value="1"
-                                                                {{ $user->roles_id == 1 ? 'selected' : '' }}>
-                                                                Admin
-                                                            </option>
-
-                                                            <option value="2"
-                                                                {{ $user->roles_id == 2 ? 'selected' : '' }}>
-                                                                Staff
-                                                            </option>
-
-                                                            <option value="3"
-                                                                {{ $user->roles_id == 3 ? 'selected' : '' }}>
-                                                                Customer
-                                                            </option>
-
-                                                        </select>
-
-                                                    </div>
-
-
-                                                    <div class="col-md-6">
-
-                                                        <label class="form-label">
-                                                            Password Baru
-                                                        </label>
-
-                                                        <input
-                                                            type="password"
-                                                            name="password"
-                                                            class="form-control"
-                                                            placeholder="Kosongkan jika tidak diubah"
-                                                        >
-
-                                                    </div>
-
-
-                                                    <div class="col-md-6">
-
-                                                        <label class="form-label">
-                                                            Nomor Telepon
-                                                        </label>
-
-                                                        <input
-                                                            type="text"
-                                                            name="phone"
-                                                            class="form-control"
-                                                            value="{{ $user->phone }}"
-                                                        >
-
-                                                    </div>
-
-
-                                                    <div class="col-md-6">
-
-                                                        <label class="form-label">
-                                                            Foto
-                                                        </label>
-
-                                                        <input
-                                                            type="file"
-                                                            name="photo"
-                                                            class="form-control"
-                                                            accept=".jpg,.jpeg,.png"
-                                                        >
-
-                                                    </div>
-
-
-                                                    <div class="col-12">
-
-                                                        <label class="form-label">
-                                                            Alamat
-                                                        </label>
-
-                                                        <textarea
-                                                            name="address"
-                                                            class="form-control"
-                                                            rows="3"
-                                                        >{{ $user->address }}</textarea>
-
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-
-
-                                            <div class="modal-footer">
-
-                                                <button
-                                                    type="button"
-                                                    class="btn btn-secondary"
-                                                    data-bs-dismiss="modal"
-                                                >
-                                                    Batal
-                                                </button>
-
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-green"
-                                                >
-                                                    <i class="bi bi-save me-1"></i>
-                                                    Simpan Perubahan
-                                                </button>
-
-                                            </div>
-
-                                        </form>
-
-                                    </div>
-
-                                </div>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    id="edit-name"
+                                    class="form-control"
+                                    required
+                                >
 
                             </div>
 
-                        @endforeach
 
-                    </tbody>
+                            <div class="col-md-6">
 
-                </table>
+                                <label class="form-label">
+                                    Email
+                                </label>
 
-            </div>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    id="edit-email"
+                                    class="form-control"
+                                    required
+                                >
 
-        @else
+                            </div>
 
-            <div class="text-center py-5">
 
-                <i class="bi bi-people fs-1 text-muted"></i>
+                            <div class="col-md-6">
 
-                <h5 class="fw-bold mt-3">
-                    Belum ada pengguna
+                                <label class="form-label">
+                                    Role
+                                </label>
+
+                                <select
+                                    name="roles_id"
+                                    id="edit-roles-id"
+                                    class="form-select"
+                                    required
+                                >
+
+                                    @foreach($roles as $role)
+                                        <option value="{{ $role->id }}">
+                                            {{ $role->name }}
+                                        </option>
+                                    @endforeach
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Password Baru
+                                </label>
+
+                                <input
+                                    type="password"
+                                    name="password"
+                                    class="form-control"
+                                    placeholder="Kosongkan jika tidak diubah"
+                                >
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Nomor Telepon
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="phone"
+                                    id="edit-phone"
+                                    class="form-control"
+                                >
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Foto
+                                </label>
+
+                                <input
+                                    type="file"
+                                    name="photo"
+                                    class="form-control"
+                                    accept=".jpg,.jpeg,.png"
+                                >
+
+                            </div>
+
+
+                            <div class="col-12">
+
+                                <label class="form-label">
+                                    Alamat
+                                </label>
+
+                                <textarea
+                                    name="address"
+                                    id="edit-address"
+                                    class="form-control"
+                                    rows="3"
+                                ></textarea>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Batal
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn btn-green"
+                        id="editUserSubmit"
+                    >
+                        <i class="bi bi-save me-1"></i>
+                        Simpan Perubahan
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{{-- MODAL DETAIL PENGGUNA --}}
+<div
+    class="modal fade"
+    id="detailUserModal"
+    tabindex="-1"
+    aria-labelledby="detailUserModalLabel"
+    aria-hidden="true"
+>
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-success text-white">
+
+                <h5 class="modal-title" id="detailUserModalLabel">
+                    <i class="bi bi-person-badge me-2"></i>
+                    Detail Pengguna
                 </h5>
 
-                <p class="text-muted mb-0">
-                    Silakan tambahkan pengguna baru.
-                </p>
+                <button
+                    type="button"
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="modal"
+                    aria-label="Tutup"
+                ></button>
 
             </div>
 
-        @endif
+            <div class="modal-body p-4">
+
+                {{-- LOADING --}}
+                <div id="userDetailLoading" class="text-center py-5">
+                    <div class="spinner-border text-success" role="status"></div>
+                    <p class="text-muted mt-3 mb-0">
+                        Memuat detail pengguna...
+                    </p>
+                </div>
+
+                {{-- ERROR --}}
+                <div id="userDetailError" class="alert alert-danger d-none" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span id="userDetailErrorMessage">
+                        Gagal memuat detail pengguna.
+                    </span>
+                </div>
+
+                {{-- KONTEN --}}
+                <div id="userDetailContent" class="d-none text-center">
+
+                    <div id="ud-photo"></div>
+
+                    <h5 class="fw-bold mt-3 mb-1" id="ud-name">-</h5>
+
+                    <div class="text-muted mb-1" id="ud-email">-</div>
+
+                    <div class="mb-3" id="ud-role">-</div>
+
+                    <div class="row g-2 text-start">
+
+                        <div class="col-6">
+                            <div class="border rounded-3 p-3 h-100">
+                                <small class="text-muted fw-bold text-uppercase">Telepon</small>
+                                <div class="fw-semibold" id="ud-phone">-</div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="border rounded-3 p-3 h-100">
+                                <small class="text-muted fw-bold text-uppercase">ID Pengguna</small>
+                                <div class="fw-semibold" id="ud-id">-</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="border rounded-3 p-3">
+                                <small class="text-muted fw-bold text-uppercase">Alamat</small>
+                                <div class="fw-semibold" id="ud-address">-</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
@@ -917,6 +860,304 @@
 
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+</script>
+
+<script
+    src="https://code.jquery.com/jquery-3.7.1.min.js">
+</script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js">
+</script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/js/dataTables.bootstrap5.min.js">
+</script>
+
+<script>
+
+    const CSRF_TOKEN = '{{ csrf_token() }}';
+    const CURRENT_USER_ID = {{ auth()->id() }};
+
+    function confirmSubmit(event, message) {
+        event.preventDefault();
+
+        const form = event.target;
+
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+
+        return false;
+    }
+
+    function roleBadge(rolesId, roleName) {
+        const map = {
+            1: 'role-admin',
+            2: 'role-staff',
+            3: 'role-customer',
+        };
+
+        const cls = map[rolesId] || 'bg-secondary text-white';
+
+        return '<span class="role-badge ' + cls + '">' + roleName + '</span>';
+    }
+
+    function userPhoto(photo) {
+        if (photo) {
+            return '<img src="' + '{{ asset('__PHOTO__') }}'.replace('__PHOTO__', photo) +
+                '" class="user-photo" alt="Foto pengguna">';
+        }
+
+        return '<div class="photo-placeholder"><i class="bi bi-person-fill"></i></div>';
+    }
+
+    function userActions(data) {
+        let html = '<div class="d-flex justify-content-center gap-2">';
+
+        html += '<button type="button" class="btn btn-outline-primary btn-sm" title="Detail" ' +
+            'onclick="openUserDetail(' + data.id + ')">' +
+            '<i class="bi bi-eye"></i></button>';
+
+        html += '<button type="button" class="btn btn-warning btn-sm" title="Edit" ' +
+            'onclick="openEditUser(' + data.id + ')">' +
+            '<i class="bi bi-pencil-square"></i></button>';
+
+        if (data.id != CURRENT_USER_ID) {
+
+            html += '<form action="' + '{{ route('users.destroy', '__ID__') }}'.replace('__ID__', data.id) +
+                '" method="POST" onsubmit="return confirmSubmit(event, \'Yakin ingin menghapus pengguna ini?\')">' +
+                '<input type="hidden" name="_token" value="' + CSRF_TOKEN + '">' +
+                '<input type="hidden" name="_method" value="DELETE">' +
+                '<button type="submit" class="btn btn-danger btn-sm" title="Hapus">' +
+                '<i class="bi bi-trash"></i></button></form>';
+
+        }
+
+        html += '</div>';
+
+        return html;
+    }
+
+    $(document).ready(function () {
+
+        $('#users-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{{ route('users.data') }}',
+                type: 'GET',
+            },
+            columns: [
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    className: 'px-4',
+                    render: function (data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    },
+                },
+                {
+                    data: null,
+                    orderable: true,
+                    searchable: false,
+                    render: function (data) {
+                        return '<div class="d-flex align-items-center gap-3">' +
+                            userPhoto(data.photo) +
+                            '<div><strong>' + data.name + '</strong>' +
+                            '<div class="small text-muted">ID #' + data.id + '</div></div></div>';
+                    },
+                },
+                {
+                    data: 'email',
+                    orderable: true,
+                    searchable: false,
+                    render: function (data) {
+                        return data;
+                    },
+                },
+                {
+                    data: null,
+                    orderable: true,
+                    searchable: false,
+                    render: function (data) {
+                        return roleBadge(data.roles_id, data.role_name);
+                    },
+                },
+                {
+                    data: 'phone',
+                    orderable: true,
+                    searchable: false,
+                    render: function (data) {
+                        return data;
+                    },
+                },
+                {
+                    data: 'address',
+                    orderable: true,
+                    searchable: false,
+                    render: function (data) {
+                        return data;
+                    },
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center',
+                    render: function (data) {
+                        return userActions(data);
+                    },
+                },
+            ],
+            order: [[1, 'asc']],
+            language: {
+                processing: 'Memproses...',
+                search: 'Cari:',
+                lengthMenu: 'Tampilkan _MENU_ data',
+                info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                infoEmpty: 'Tidak ada data',
+                infoFiltered: '(difilter dari _MAX_ total data)',
+                infoPostFix: '',
+                loadingRecords: 'Memuat...',
+                zeroRecords: 'Tidak ditemukan data yang cocok',
+                emptyTable: 'Belum ada pengguna',
+                paginate: {
+                    first: 'Pertama',
+                    previous: 'Sebelumnya',
+                    next: 'Berikutnya',
+                    last: 'Terakhir',
+                },
+                aria: {
+                    sortAscending: ': aktifkan untuk urut naik',
+                    sortDescending: ': aktifkan untuk urut turun',
+                },
+            },
+        });
+
+    });
+
+    function openUserDetail(id) {
+
+        const modalEl = document.getElementById('detailUserModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+        const loading = document.getElementById('userDetailLoading');
+        const error = document.getElementById('userDetailError');
+        const content = document.getElementById('userDetailContent');
+
+        loading.classList.remove('d-none');
+        error.classList.add('d-none');
+        content.classList.add('d-none');
+
+        modal.show();
+
+        fetch('{{ route('users.detail', '__ID__') }}'.replace('__ID__', id), {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Server mengembalikan status ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('ud-photo').innerHTML =
+                    data.photo_url
+                        ? '<img src="' + data.photo_url + '" class="user-photo" ' +
+                            'style="width:90px;height:90px;" alt="Foto pengguna">'
+                        : '<div class="photo-placeholder" ' +
+                            'style="width:90px;height:90px;font-size:36px;margin:0 auto;">' +
+                            '<i class="bi bi-person-fill"></i></div>';
+                document.getElementById('ud-name').textContent = data.name;
+                document.getElementById('ud-email').textContent = data.email;
+                document.getElementById('ud-role').innerHTML = roleBadge(data.roles_id, data.role_name);
+                document.getElementById('ud-phone').textContent = data.phone;
+                document.getElementById('ud-id').textContent = '#' + data.id;
+                document.getElementById('ud-address').textContent = data.address;
+
+                loading.classList.add('d-none');
+                content.classList.remove('d-none');
+            })
+            .catch(err => {
+                loading.classList.add('d-none');
+                document.getElementById('userDetailErrorMessage').textContent =
+                    'Gagal memuat detail pengguna: ' + err.message;
+                error.classList.remove('d-none');
+            });
+
+    }
+
+    function openEditUser(id) {
+
+        const modalEl = document.getElementById('editUserModal');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+        const loading = document.getElementById('editUserLoading');
+        const error = document.getElementById('editUserError');
+        const fields = document.getElementById('editUserFields');
+        const submitBtn = document.getElementById('editUserSubmit');
+
+        loading.classList.remove('d-none');
+        error.classList.add('d-none');
+        fields.classList.add('d-none');
+        submitBtn.disabled = true;
+
+        modal.show();
+
+        fetch('{{ route('users.detail', '__ID__') }}'.replace('__ID__', id), {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Server mengembalikan status ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('edit-name').value = data.name;
+                document.getElementById('edit-email').value = data.email;
+                document.getElementById('edit-roles-id').value = data.roles_id;
+                document.getElementById('edit-phone').value = data.phone === '-' ? '' : data.phone;
+                document.getElementById('edit-address').value = data.address === '-' ? '' : data.address;
+
+                document.getElementById('editUserForm').action =
+                    '{{ route('users.update', '__ID__') }}'.replace('__ID__', id);
+
+                loading.classList.add('d-none');
+                fields.classList.remove('d-none');
+                submitBtn.disabled = false;
+            })
+            .catch(err => {
+                loading.classList.add('d-none');
+                document.getElementById('editUserErrorMessage').textContent =
+                    'Gagal memuat data pengguna: ' + err.message;
+                error.classList.remove('d-none');
+                submitBtn.disabled = false;
+            });
+
+    }
+
 </script>
 
 </body>
