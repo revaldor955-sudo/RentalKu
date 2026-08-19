@@ -371,7 +371,7 @@
                                         <form
                                             action="{{ route('staff.mobils.destroy', $mobil->id) }}"
                                             method="POST"
-                                            onsubmit="return confirm('Yakin ingin menghapus mobil ini?')"
+                                            onsubmit="return confirmSubmit(event, 'Yakin ingin menghapus mobil ini?')"
                                         >
 
                                             @csrf
@@ -793,6 +793,35 @@
 
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+</script>
+
+<script>
+
+    function confirmSubmit(event, message) {
+        event.preventDefault();
+
+        const form = event.target;
+
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+
+        return false;
+    }
+
 </script>
 
 </body>

@@ -397,7 +397,7 @@
                                                 <button
                                                     type="submit"
                                                     class="btn btn-danger btn-sm btn-action"
-                                                    onclick="return confirm('Yakin ingin menghapus fasilitas {{ $item->name }}?')">
+                                                    onclick="confirmAction(event, 'Yakin ingin menghapus fasilitas {{ $item->name }}?')">
 
                                                     <i class="bi bi-trash"></i>
 
@@ -525,6 +525,33 @@
 
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+</script>
+
+<script>
+
+    function confirmAction(event, message) {
+        event.preventDefault();
+
+        const form = event.target.closest('form');
+
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
+
 </script>
 
 </body>
