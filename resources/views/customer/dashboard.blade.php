@@ -29,10 +29,6 @@
             font-family: Arial, Helvetica, sans-serif;
         }
 
-        /* =========================
-           NAVBAR
-        ========================= */
-
         .navbar {
             background: rgba(255,255,255,.95);
             border-bottom: 1px solid #e9ecef;
@@ -71,10 +67,6 @@
             color: white;
             font-size: 16px;
         }
-
-        /* =========================
-           HERO
-        ========================= */
 
         .hero {
             position: relative;
@@ -219,10 +211,6 @@
             font-size: 14px;
         }
 
-        /* =========================
-           STATISTIC
-        ========================= */
-
         .stats {
             margin-top: -30px;
             position: relative;
@@ -262,10 +250,6 @@
             margin: 0;
         }
 
-        /* =========================
-           SECTION
-        ========================= */
-
         .section {
             padding-top: 70px;
             padding-bottom: 30px;
@@ -291,10 +275,6 @@
             color: #6b7280;
             margin-bottom: 0;
         }
-
-        /* =========================
-           CAR CARD
-        ========================= */
 
         .car-card {
             background: white;
@@ -338,22 +318,6 @@
             border-radius: 50px;
             font-size: 12px;
             font-weight: 700;
-        }
-
-        .favorite-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: none;
-            background: rgba(255,255,255,.92);
-            color: #198754;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 17px;
         }
 
         .car-body {
@@ -416,10 +380,6 @@
             color: white;
         }
 
-        /* =========================
-           EMPTY
-        ========================= */
-
         .empty-card {
             background: white;
             border: 1px solid #edf0ee;
@@ -440,10 +400,6 @@
             font-size: 30px;
             margin: auto;
         }
-
-        /* =========================
-           FOOTER
-        ========================= */
 
         footer {
             background: #17211d;
@@ -468,10 +424,6 @@
         .footer-line {
             border-color: rgba(255,255,255,.1);
         }
-
-        /* =========================
-           RESPONSIVE
-        ========================= */
 
         @media (max-width: 991px) {
 
@@ -515,15 +467,15 @@
 
         }
 
+        .car-card[data-mobil-id] {
+            cursor: pointer;
+        }
+
     </style>
 </head>
 
 <body>
 
-
-{{-- =========================
-     NAVBAR
-========================= --}}
 
 <nav class="navbar navbar-expand-lg sticky-top">
 
@@ -569,10 +521,6 @@
 
 <div class="container">
 
-
-{{-- =========================
-     HERO
-========================= --}}
 
 <section class="hero">
 
@@ -671,10 +619,6 @@
 </section>
 
 
-{{-- =========================
-     STATISTIK
-========================= --}}
-
 <div class="row g-3 stats">
 
     <div class="col-md-4">
@@ -766,16 +710,8 @@
 </div>
 
 
-{{-- =========================
-     MOBIL
-========================= --}}
-
 <section id="mobil" class="section">
-    {{-- =========================
-     RENTAL SAYA
-========================= --}}
-
-<section class="section pt-4">
+    <section class="section pt-4">
 
     <div class="mb-4">
 
@@ -1029,7 +965,7 @@
 
             <div class="col-md-6 col-lg-4">
 
-                <div class="car-card">
+                <div class="car-card" data-mobil-id="{{ $mobil->id }}" role="button" title="Lihat detail {{ $mobil->name }}">
 
                     {{-- FOTO --}}
 
@@ -1063,13 +999,6 @@
         @endif
 
     </div>
-
-    <button
-        type="button"
-        class="favorite-btn"
-    >
-        <i class="bi bi-heart"></i>
-    </button>
 
 </div>
 
@@ -1111,12 +1040,12 @@
 
         </div>
 
-        <a
-            href="{{ route('mobils.show', $mobil->id) }}"
+        <button
+            type="button"
             class="btn btn-rental"
         >
             Sewa
-        </a>
+        </button>
 
     </div>
 
@@ -1157,10 +1086,6 @@
 
 </section>
 
-
-{{-- =========================
-     INFORMASI
-========================= --}}
 
 <section id="informasi" class="py-5">
 
@@ -1244,10 +1169,6 @@
 </div>
 
 
-{{-- =========================
-     FOOTER
-========================= --}}
-
 <footer>
 
     <div class="container py-5">
@@ -1293,6 +1214,199 @@
     </div>
 
 </footer>
+
+
+{{-- MODAL DETAIL MOBIL (diisi via AJAX, tanpa reload halaman) --}}
+<div
+    class="modal fade"
+    id="mobilDetailModal"
+    tabindex="-1"
+    aria-labelledby="mobilDetailModalLabel"
+    aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+
+        <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+
+            <div class="modal-header border-0 pb-0">
+
+                <h5 class="modal-title fw-bold" id="mobilDetailModalLabel">
+                    Detail Mobil
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Tutup"></button>
+
+            </div>
+
+            <div class="modal-body p-0" id="mobilDetailModalBody"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+    // Buka modal detail mobil via AJAX — tanpa reload halaman.
+    const mobilDetailModalEl = document.getElementById('mobilDetailModal');
+
+    const mobilDetailModalBody = document.getElementById('mobilDetailModalBody');
+
+    async function openMobilDetail(mobilId) {
+
+        mobilDetailModalBody.innerHTML = `
+
+            <div class="text-center py-5">
+
+                <div class="spinner-border text-success" role="status"></div>
+
+            </div>`;
+
+        try {
+
+            const response = await fetch(`/mobils/${mobilId}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Respon tidak valid.');
+            }
+
+            const html = await response.text();
+
+            mobilDetailModalBody.innerHTML = html;
+
+            bootstrap.Modal.getOrCreateInstance(mobilDetailModalEl).show();
+
+        } catch (error) {
+
+            mobilDetailModalBody.innerHTML = `
+
+                <div class="alert alert-danger m-3 mb-0">
+
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+
+                    Gagal memuat detail mobil. Silakan coba lagi.
+
+                </div>`;
+
+        }
+
+    }
+
+    // Klik kartu mobil (atau tombol "Sewa") di dashboard → buka modal
+    document.querySelectorAll('[data-mobil-id]').forEach(function (card) {
+
+        card.addEventListener('click', function () {
+
+            openMobilDetail(card.dataset.mobilId);
+
+        });
+
+    });
+
+    // Popup form sewa (SweetAlert) — template di-inject dari konten modal
+    function openSewaPopup() {
+
+        const template = document.getElementById('sewaFormTemplate');
+
+        if (!template) return;
+
+        const carTitle = document.querySelector('.mobil-modal .mm-title');
+
+        Swal.fire({
+            title: carTitle ? carTitle.textContent.trim() : 'Sewa Mobil',
+            html: template.innerHTML,
+            width: 600,
+            showConfirmButton: false,
+            didOpen: () => {
+
+                const form = document.querySelector('#swal2-html-container form');
+
+                if (!form) return;
+
+                form.addEventListener('submit', async function (event) {
+
+                    event.preventDefault();
+
+                    const formData = new FormData(form);
+
+                    Swal.showLoading();
+
+                    try {
+
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: formData
+                        });
+
+                        const data = await response.json();
+
+                        Swal.hideLoading();
+
+                        if (!response.ok) {
+
+                            const firstError = data.errors
+                                ? Object.values(data.errors).flat()[0]
+                                : (data.message ?? 'Terjadi kesalahan.');
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: firstError,
+                            });
+
+                            return;
+                        }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: data.message ?? 'Pengajuan sewa mobil berhasil dibuat.',
+                            confirmButtonText: 'OK',
+                        }).then(() => {
+                            window.location.reload();
+                        });
+
+                    } catch (error) {
+
+                        Swal.hideLoading();
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Terjadi kesalahan. Silakan coba lagi.',
+                        });
+
+                    }
+
+                });
+
+            }
+        });
+
+    }
+
+</script>
 
 
 </body>
