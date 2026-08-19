@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('dendas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade');
+            $table->foreignId('rental_id')->constrained('rentals')->onDelete('cascade');
             $table->enum('jenis', ['keterlambatan', 'kerusakan', 'kehilangan']);
             $table->decimal('nominal', 12, 2);
             $table->string('foto_bukti')->nullable();
