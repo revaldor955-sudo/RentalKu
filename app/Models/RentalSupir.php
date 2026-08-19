@@ -4,19 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class BookingSupir extends Model
+class RentalSupir extends Model
 {
-    protected $table = 'booking_supir';
+    protected $table = 'rental_supir';
+
     protected $fillable = [
-        'booking_id',
+        'rental_id',
         'supir_id',
         'tarif_perhari',
         'sub_total',
     ];
 
-    public function booking()
+    public function rental()
     {
-        return $this->belongsTo(Booking::class, 'booking_id');
+        return $this->belongsTo(Rental::class, 'rental_id');
     }
 
     public function supir()

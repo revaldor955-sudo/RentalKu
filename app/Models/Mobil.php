@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Brand;
-use App\Models\Cabang;
-use App\Models\TipeMobil;
 use Illuminate\Database\Eloquent\Model;
 
 class Mobil extends Model
 {
     protected $table = 'mobils';
+
     protected $fillable = [
         'brand_id',
         'tipe_mobil_id',
@@ -24,7 +22,7 @@ class Mobil extends Model
         'deposit',
         'image',
         'status',
-        'description'
+        'description',
     ];
 
     public function brand()
@@ -51,9 +49,14 @@ class Mobil extends Model
             'fasilitas_id'
         );
     }
-    public function rentals()
-{
-    return $this->hasMany(Rental::class, 'mobil_id');
-}
 
+    public function fotoMobils()
+    {
+        return $this->hasMany(FotoMobil::class, 'mobil_id');
+    }
+
+    public function rentals()
+    {
+        return $this->hasMany(Rental::class, 'mobil_id');
+    }
 }

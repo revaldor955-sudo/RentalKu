@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class PemeriksaanMobil extends Model
 {
     protected $table = 'pemeriksaan_mobils';
+
     protected $fillable = [
-        'booking_id',
+        'rental_id',
         'mobil_id',
         'jenis',
         'kondisi',
@@ -17,9 +18,9 @@ class PemeriksaanMobil extends Model
         'tanggal',
     ];
 
-    public function booking()
+    public function rental()
     {
-        return $this->belongsTo(Booking::class, 'booking_id');
+        return $this->belongsTo(Rental::class, 'rental_id');
     }
 
     public function mobil()
