@@ -132,9 +132,6 @@ Route::get('/customer/dashboard', [CustomerDashboardController::class, 'index'])
     ->middleware('customer')
     ->name('customer.dashboard');
 Route::middleware('customer')->group(function () {
-    Route::get('/customer/rental/{mobil}/create', [RentalController::class, 'create'])
-        ->name('rentals.create');
-
     Route::post('/customer/rental/{mobil}', [RentalController::class, 'store'])
         ->name('rentals.store');
 
@@ -149,11 +146,23 @@ Route::middleware('adminstaff')->group(function () {
     Route::get('/rentals', [RentalController::class, 'index'])
         ->name('rentals.index');
 
+    Route::get('/rentals/data', [RentalController::class, 'data'])
+        ->name('rentals.data');
+
+    Route::get('/rentals/{rental}/detail', [RentalController::class, 'detail'])
+        ->name('rentals.detail');
+
     Route::put('/rentals/{rental}/status', [RentalController::class, 'updateStatus'])
         ->name('rentals.updateStatus');
 
     Route::get('/pembayaran', [PembayaranController::class, 'index'])
         ->name('pembayarans.index');
+
+    Route::get('/pembayaran/data', [PembayaranController::class, 'data'])
+        ->name('pembayarans.data');
+
+    Route::get('/pembayaran/{pembayaran}/detail', [PembayaranController::class, 'detail'])
+        ->name('pembayarans.detail');
 
     Route::put('/pembayaran/{pembayaran}/status', [PembayaranController::class, 'updateStatus'])
         ->name('pembayarans.updateStatus');
@@ -161,6 +170,14 @@ Route::middleware('adminstaff')->group(function () {
 Route::resource('users', UserController::class)
     ->except(['create', 'edit', 'show'])
     ->middleware('adminstaff');
+
+Route::middleware('adminstaff')->group(function () {
+    Route::get('/users/data', [UserController::class, 'data'])
+        ->name('users.data');
+
+    Route::get('/users/{user}/detail', [UserController::class, 'detail'])
+        ->name('users.detail');
+});
 
 Route::resource('pengembalian', PengembalianController::class)
     ->only(['index']);
