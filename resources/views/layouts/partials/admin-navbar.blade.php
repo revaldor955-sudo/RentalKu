@@ -1,9 +1,7 @@
 {{-- NAVBAR ADMIN --}}
-{{-- Partial self-contained: memuat CSS Bootstrap, style navbar, dan markup navbar. --}}
+{{-- Partial self-contained: memuat style navbar dan markup navbar. --}}
+{{-- Bootstrap CSS/JS TIDAK dimuat di sini — setiap halaman memuatnya sendiri di <head>. --}}
 {{-- Dipakai oleh SEMUA halaman admin via @include('layouts.partials.admin-navbar'). --}}
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
     .navbar {
