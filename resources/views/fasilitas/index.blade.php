@@ -106,6 +106,11 @@
         align-items: center;
         justify-content: center;
     }
+
+    .modal-footer .btn {
+        padding: 6px 14px;
+        min-width: 100px;
+    }
 </style>
 
 </head>
@@ -134,21 +139,7 @@
 {{-- SUCCESS --}}
 
 @if(session('success'))
-
-    <div class="alert alert-success alert-dismissible fade show">
-
-        <i class="bi bi-check-circle-fill me-2"></i>
-
-        {{ session('success') }}
-
-        <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="alert">
-        </button>
-
-    </div>
-
+    <span id="flashSuccess" class="d-none">{{ session('success') }}</span>
 @endif
 
 
@@ -179,70 +170,9 @@
 
 <div class="row g-4">
 
-    {{-- FORM TAMBAH --}}
-
-    <div class="col-lg-4">
-
-        <div class="page-card p-4">
-
-            <h5 class="fw-bold mb-1">
-                <i class="bi bi-plus-circle text-success me-2"></i>
-                Tambah Fasilitas
-            </h5>
-
-            <p class="text-muted small mb-4">
-                Tambahkan fasilitas baru untuk kendaraan.
-            </p>
-
-            <form
-                action="{{ route('fasilitas.store') }}"
-                method="POST">
-
-                @csrf
-
-                <div class="mb-3">
-
-                    <label class="form-label fw-semibold">
-                        Nama Fasilitas
-                    </label>
-
-                    <input
-                        type="text"
-                        name="name"
-                        value="{{ old('name') }}"
-                        class="form-control @error('name') is-invalid @enderror"
-                        placeholder="Contoh: AC"
-                        required>
-
-                    @error('name')
-
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-
-                    @enderror
-
-                </div>
-
-                <button
-                    type="submit"
-                    class="btn btn-green w-100">
-
-                    <i class="bi bi-save me-1"></i>
-                    Simpan Fasilitas
-
-                </button>
-
-            </form>
-
-        </div>
-
-    </div>
-
-
     {{-- DAFTAR FASILITAS --}}
 
-    <div class="col-lg-8">
+    <div class="col-lg-12">
 
         <div class="page-card">
 
@@ -262,9 +192,24 @@
 
                     </div>
 
-                    <span class="badge bg-success rounded-pill">
-                        {{ $fasilitas->count() }}
-                    </span>
+                    <div class="d-flex align-items-center gap-3">
+
+                        <span class="badge bg-success rounded-pill">
+                            {{ $fasilitas->count() }}
+                        </span>
+
+                        <button
+                            type="button"
+                            class="btn btn-green"
+                            data-bs-toggle="modal"
+                            data-bs-target="#tambahFasilitasModal">
+
+                            <i class="bi bi-plus-lg me-1"></i>
+                            Tambah Fasilitas
+
+                        </button>
+
+                    </div>
 
                 </div>
 
@@ -313,7 +258,7 @@
 
                                             <div class="facility-icon">
 
-                                                <i class="bi bi-check-circle"></i>
+                                                <i class="bi bi-tools"></i>
 
                                             </div>
 
@@ -478,6 +423,96 @@
 
 </div>
 
+
+{{-- MODAL TAMBAH --}}
+
+<div
+    class="modal fade"
+    id="tambahFasilitasModal"
+    tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-plus-circle text-success me-2"></i>
+                    Tambah Fasilitas
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <form
+                action="{{ route('fasilitas.store') }}"
+                method="POST"
+                id="formTambahFasilitas">
+
+                @csrf
+
+                <div class="modal-body">
+
+                    <label class="form-label fw-semibold">
+                        Nama Fasilitas
+                    </label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        value="{{ old('name') }}"
+                        class="form-control @error('name') is-invalid @enderror"
+                        placeholder="Contoh: AC"
+                        required>
+
+                    @error('name')
+
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+
+                    @enderror
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                        <i class="bi bi-x-circle me-1"></i>
+                        Batal
+
+                    </button>
+
+                    <button
+                        type="submit"
+                        form="formTambahFasilitas"
+                        class="btn btn-green">
+
+                        <i class="bi bi-save me-1"></i>
+                        Simpan Fasilitas
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
 </div>
 
 <script
@@ -489,6 +524,18 @@
 </script>
 
 <script>
+
+    const flashSuccess = document.getElementById('flashSuccess');
+
+    if (flashSuccess) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: flashSuccess.textContent,
+            timer: 1800,
+            showConfirmButton: false,
+        });
+    }
 
     function confirmAction(event, message) {
         event.preventDefault();
