@@ -182,15 +182,24 @@
 
         </div>
 
-        <button
-            type="button"
-            class="btn btn-green"
-            data-bs-toggle="modal"
-            data-bs-target="#tambahBrandModal"
-        >
-            <i class="bi bi-plus-lg me-1"></i>
-            Tambah Merek
-        </button>
+        <div class="d-flex gap-2">
+
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>
+                Dashboard
+            </a>
+
+            <button
+                type="button"
+                class="btn btn-green"
+                data-bs-toggle="modal"
+                data-bs-target="#tambahBrandModal"
+            >
+                <i class="bi bi-plus-lg me-1"></i>
+                Tambah Merek
+            </button>
+
+        </div>
 
     </div>
 

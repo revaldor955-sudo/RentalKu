@@ -31,11 +31,6 @@
 
             <div class="d-flex gap-2">
 
-                <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-speedometer2 me-1"></i>
-                    Dashboard
-                </a>
-
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
 

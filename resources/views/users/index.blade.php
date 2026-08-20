@@ -169,10 +169,19 @@
                 </p>
             </div>
 
-            <button type="button" class="btn btn-green" data-bs-toggle="modal" data-bs-target="#tambahUserModal">
-                <i class="bi bi-person-plus-fill me-1"></i>
-                Tambah Pengguna
-            </button>
+            <div class="d-flex gap-2">
+
+                <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Dashboard
+                </a>
+
+                <button type="button" class="btn btn-green" data-bs-toggle="modal" data-bs-target="#tambahUserModal">
+                    <i class="bi bi-person-plus-fill me-1"></i>
+                    Tambah Pengguna
+                </button>
+
+            </div>
 
         </div>
 

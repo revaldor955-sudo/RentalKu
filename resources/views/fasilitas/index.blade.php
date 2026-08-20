@@ -143,6 +143,13 @@
 
     </div>
 
+<div class="d-flex gap-2">
+
+    <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>
+        Dashboard
+    </a>
+
     <button
         type="button"
         class="btn btn-green"
@@ -153,6 +160,8 @@
         Tambah Fasilitas
 
     </button>
+
+</div>
 
 </div>
 

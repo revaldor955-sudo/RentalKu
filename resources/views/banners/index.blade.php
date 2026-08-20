@@ -164,15 +164,24 @@
 
         </div>
 
-        <button type="button"
-            class="btn btn-green"
-            data-bs-toggle="modal"
-            data-bs-target="#tambahBannerModal">
+        <div class="d-flex gap-2">
 
-            <i class="bi bi-plus-circle me-1"></i>
-            Tambah Banner
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>
+                Dashboard
+            </a>
 
-        </button>
+            <button type="button"
+                class="btn btn-green"
+                data-bs-toggle="modal"
+                data-bs-target="#tambahBannerModal">
+
+                <i class="bi bi-plus-circle me-1"></i>
+                Tambah Banner
+
+            </button>
+
+        </div>
 
     </div>
 
