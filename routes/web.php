@@ -52,6 +52,9 @@ Route::resource('metode_pembayarans', MetodePembayaranController::class)
 Route::resource('supirs', SupirController::class)
     ->except(['create', 'edit', 'show']);
 
+Route::get('/kupons/data', [KuponController::class, 'data'])
+    ->name('kupons.data');
+
 Route::resource('kupons', KuponController::class)
     ->except(['create', 'edit', 'show']);
 
