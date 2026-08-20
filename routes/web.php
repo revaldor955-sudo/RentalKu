@@ -188,11 +188,26 @@ Route::middleware('adminstaff')->group(function () {
         ->name('users.detail');
 });
 
-Route::resource('pengembalian', PengembalianController::class)
-    ->only(['index']);
+Route::middleware('adminstaff')->group(function () {
+    Route::resource('pengembalian', PengembalianController::class)
+        ->only(['index']);
 
-Route::resource('pemeriksaan-kendaraan', PemeriksaanKendaraanController::class)
-    ->only(['index']);
+    Route::resource('pemeriksaan-kendaraan', PemeriksaanKendaraanController::class)
+        ->only(['index']);
+
+    Route::get('/pemeriksaan-kendaraan/data', [PemeriksaanKendaraanController::class, 'data'])
+        ->name('pemeriksaan-kendaraan.data');
+
+    Route::post('/pemeriksaan-kendaraan', [PemeriksaanKendaraanController::class, 'store'])
+        ->name('pemeriksaan-kendaraan.store');
+
+    Route::put('/pemeriksaan-kendaraan/{pemeriksaan}', [PemeriksaanKendaraanController::class, 'update'])
+        ->name('pemeriksaan-kendaraan.update');
+
+    Route::delete('/pemeriksaan-kendaraan/{pemeriksaan}', [PemeriksaanKendaraanController::class, 'destroy'])
+        ->name('pemeriksaan-kendaraan.destroy');
+});
+
 Route::get('/laporan', [LaporanController::class, 'index'])
     ->name('laporan.index');
 
