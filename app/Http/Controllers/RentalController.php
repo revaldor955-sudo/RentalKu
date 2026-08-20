@@ -215,82 +215,38 @@ class RentalController extends Controller
 
         $status = $request->status;
 
-        /*
-        |--------------------------------------------------------------------------
-        | DITOLAK
-        |--------------------------------------------------------------------------
-        */
-
         if ($status === 'Ditolak') {
+            $rental->update(['status' => 'Ditolak']);
+            $rental->mobil->update(['status' => 'Tersedia']);
 
-            $rental->update([
-                'status' => 'Ditolak',
+            return response()->json([
+                'message' => 'Pengajuan rental berhasil ditolak.',
             ]);
-
-            // Mobil tetap tersedia
-            $rental->mobil->update([
-                'status' => 'Tersedia',
-            ]);
-
-            return back()->with(
-                'success',
-                'Pengajuan rental berhasil ditolak.'
-            );
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | DISETUJUI
-        |--------------------------------------------------------------------------
-        */
 
         if ($status === 'Disetujui') {
-
-            // Pastikan mobil masih tersedia
             if ($rental->mobil->status !== 'Tersedia') {
-
-                return back()->with(
-                    'error',
-                    'Mobil sudah tidak tersedia.'
-                );
+                return response()->json([
+                    'message' => 'Mobil sedang tidak tersedia.',
+                ], 422);
             }
 
-            $rental->update([
-                'status' => 'Disetujui',
-            ]);
+            $rental->update(['status' => 'Disetujui']);
+            $rental->mobil->update(['status' => 'Disewa']);
 
-            // Mobil menjadi disewa
-            $rental->mobil->update([
-                'status' => 'Disewa',
+            return response()->json([
+                'message' => 'Rental berhasil disetujui. Mobil sekarang berstatus "Disewa".',
             ]);
-
-            return back()->with(
-                'success',
-                'Rental berhasil disetujui. Mobil sekarang berstatus Disewa.'
-            );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | SELESAI
-        |--------------------------------------------------------------------------
-        */
 
         if ($status === 'Selesai') {
+            $rental->update(['status' => 'Selesai']);
+            $rental->mobil->update(['status' => 'Tersedia']);
 
-            $rental->update([
-                'status' => 'Selesai',
+            return response()->json([
+                'message' => 'Rental berhasil diselesaikan. Mobil sekarang berstatus "Tersedia".',
             ]);
-
-            // Mobil kembali tersedia
-            $rental->mobil->update([
-                'status' => 'Tersedia',
-            ]);
-
-            return back()->with(
-                'success',
-                'Rental telah selesai dan mobil kembali tersedia.'
-            );
         }
     }
 }

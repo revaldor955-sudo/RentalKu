@@ -120,7 +120,7 @@ class PembayaranController extends Controller
             'tanggal_bayar' => $pembayaran->tanggal_bayar?->format('d/m/Y'),
             'jumlah' => (float) $pembayaran->jumlah,
             'bukti_url' => $pembayaran->bukti
-                ? asset('storage/'.$pembayaran->bukti)
+                ? asset('storage/' . $pembayaran->bukti)
                 : null,
             'status' => $pembayaran->status,
         ]);
@@ -198,19 +198,15 @@ class PembayaranController extends Controller
     public function updateStatus(Request $request, Pembayaran $pembayaran)
     {
         $validated = $request->validate([
-            'status' => 'required|in:Disetujui,Ditolak',
+            'status' => 'required|in:Disetujui,Ditolak'
         ]);
 
         $pembayaran->update([
-            'status' => $validated['status'],
+            'status' => $validated['status']
         ]);
 
-        return redirect()
-            ->route('pembayarans.index')
-            ->with(
-                'success',
-                'Status pembayaran berhasil diperbarui menjadi '.
-                $validated['status'].'.'
-            );
+        return response()->json([
+            'message' => 'Status pembayaran berhasil diperbarui menjadi ' . $validated['status'] . '.',
+        ]);
     }
 }
