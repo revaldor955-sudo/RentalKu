@@ -107,6 +107,10 @@ class RentalController extends Controller
                 'mobils.plate_number as mobil_plate'
             );
 
+        if ($request->has('status') && $request->status) {
+            $query->where('rentals.status', $request->status);
+        }
+
         $recordsTotal = $query->count();
 
         $search = $request->input('search.value');
