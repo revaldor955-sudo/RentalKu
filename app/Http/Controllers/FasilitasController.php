@@ -17,6 +17,57 @@ class FasilitasController extends Controller
     }
 
     /**
+     * Server-side DataTables: daftar fasilitas (search, sort, pagination)
+     */
+    public function data(Request $request)
+    {
+        $query = Fasilitas::query();
+
+        $recordsTotal = $query->count();
+
+        $search = $request->input('search.value');
+
+        if ($search) {
+            $query->where('fasilitas.name', 'like', "%{$search}%");
+        }
+
+        $recordsFiltered = $query->count();
+
+        $columns = [
+            0 => null,
+            1 => 'fasilitas.name',
+        ];
+
+        $orderColumn = $request->input('order.0.column', 1);
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
+            $query->orderBy($columns[$orderColumn], $orderDir);
+        } else {
+            $query->orderBy('fasilitas.name', 'asc');
+        }
+
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $fasilitas = $query->offset($start)->limit($length)->get();
+
+        $data = $fasilitas->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+            ];
+        });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
@@ -37,6 +88,12 @@ class FasilitasController extends Controller
 
         Fasilitas::create($validated);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Fasilitas berhasil ditambahkan.',
+            ]);
+        }
+
         return redirect()->route('fasilitas.index')
             ->with('success', 'Fasilitas berhasil ditambahkan.');
     }
@@ -44,7 +101,7 @@ class FasilitasController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Fasilitas $fasilitas)
+    public function show(Fasilitas $fasilita)
     {
         //
     }
@@ -52,7 +109,7 @@ class FasilitasController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Fasilitas $fasilitas)
+    public function edit(Fasilitas $fasilita)
     {
         //
     }
@@ -60,7 +117,7 @@ class FasilitasController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Fasilitas $fasilitas)
+    public function update(Request $request, Fasilitas $fasilita)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -68,7 +125,13 @@ class FasilitasController extends Controller
             'name.required' => 'Nama fasilitas wajib diisi',
         ]);
 
-        $fasilitas->update($validated);
+        $fasilita->update($validated);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Fasilitas berhasil diperbarui.',
+            ]);
+        }
 
         return redirect()->route('fasilitas.index')
             ->with('success', 'Fasilitas berhasil diperbarui.');
@@ -77,9 +140,15 @@ class FasilitasController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Fasilitas $fasilitas)
+    public function destroy(Request $request, Fasilitas $fasilita)
     {
-        $fasilitas->delete();
+        $fasilita->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Fasilitas berhasil dihapus.',
+            ]);
+        }
 
         return redirect()->route('fasilitas.index')
             ->with('success', 'Fasilitas berhasil dihapus.');

@@ -40,6 +40,9 @@ Route::resource('tipe_mobils', TipeMobilController::class)
 Route::resource('cabangs', CabangController::class)
     ->except(['create', 'edit', 'show']);
 
+Route::get('/fasilitas/data', [FasilitasController::class, 'data'])
+    ->name('fasilitas.data');
+
 Route::resource('fasilitas', FasilitasController::class)
     ->except(['create', 'edit', 'show']);
 
