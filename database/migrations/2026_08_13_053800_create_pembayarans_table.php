@@ -32,7 +32,7 @@ return new class extends Migration
 
             $table->enum('status', [
                 'Menunggu',
-                'Diverifikasi',
+                'Disetujui',
                 'Ditolak',
             ])->default('Menunggu');
 
