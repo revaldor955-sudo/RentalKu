@@ -9,23 +9,13 @@
 
     <title>Management Pembayaran - RentalKu</title>
 
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-    >
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/css/dataTables.bootstrap5.min.css"
-    >
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/css/dataTables.bootstrap5.min.css">
 
     <style>
-
         body {
             background: #f5f7f6;
             font-family: Arial, sans-serif;
@@ -108,7 +98,6 @@
             border-radius: 8px;
             border: 1px solid #ddd;
         }
-
     </style>
 
 </head>
@@ -116,47 +105,118 @@
 <body>
 
 
-{{-- NAVBAR --}}
+    {{-- NAVBAR --}}
 
-<nav class="navbar">
+    @include('layouts.partials.admin-navbar')
 
-    <div class="container py-3">
 
-        <div class="d-flex justify-content-between align-items-center">
+    <div class="container py-5">
 
-            <a
-                href="{{ route('admin.dashboard') }}"
-                class="text-decoration-none brand"
-            >
-                Rental<span>ku</span>.
-            </a>
 
-            <div class="d-flex gap-2">
+        {{-- HEADER --}}
 
-                <a
-                    href="{{ route('admin.dashboard') }}"
-                    class="btn btn-outline-secondary btn-sm"
-                >
-                    <i class="bi bi-speedometer2"></i>
-                    Dashboard
-                </a>
+        <div class="mb-4">
 
-                <form
-                    action="{{ route('logout') }}"
-                    method="POST"
-                >
+            <h2 class="fw-bold mb-1">
+                Management Pembayaran
+            </h2>
 
-                    @csrf
+            <p class="text-muted mb-0">
+                Kelola dan verifikasi pembayaran pelanggan RentalKu.
+            </p>
 
-                    <button
-                        type="submit"
-                        class="btn btn-outline-danger btn-sm"
-                    >
-                        <i class="bi bi-box-arrow-right"></i>
-                        Keluar
-                    </button>
+        </div>
 
-                </form>
+
+        {{-- ALERT --}}
+
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show">
+
+                <i class="bi bi-check-circle me-2"></i>
+
+                {{ session('success') }}
+
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+            </div>
+        @endif
+
+
+        @if ($errors->any())
+
+            <div class="alert alert-danger">
+
+                <ul class="mb-0">
+
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+
+                </ul>
+
+            </div>
+
+        @endif
+
+
+        {{-- TABLE --}}
+
+        <div class="page-card">
+
+            <div class="table-responsive">
+
+                <table class="table align-middle mb-0" id="pembayaran-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="px-4 py-3">
+                                #
+                            </th>
+
+                            <th>
+                                Pelanggan
+                            </th>
+
+                            <th>
+                                Mobil
+                            </th>
+
+                            <th>
+                                Metode
+                            </th>
+
+                            <th>
+                                Tanggal
+                            </th>
+
+                            <th>
+                                Jumlah
+                            </th>
+
+                            <th>
+                                Bukti
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th class="text-end pe-4">
+                                Aksi
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+                        {{-- Diisi oleh DataTables (server-side) --}}
+                    </tbody>
+
+                </table>
 
             </div>
 
@@ -164,229 +224,97 @@
 
     </div>
 
-</nav>
 
+    {{-- MODAL DETAIL PEMBAYARAN --}}
+    <div class="modal fade" id="detailPembayaranModal" tabindex="-1" aria-labelledby="detailPembayaranModalLabel"
+        aria-hidden="true">
 
-<div class="container py-5">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
 
+            <div class="modal-content">
 
-    {{-- HEADER --}}
+                <div class="modal-header bg-success text-white">
 
-    <div class="mb-4">
+                    <h5 class="modal-title" id="detailPembayaranModalLabel">
+                        <i class="bi bi-credit-card me-2"></i>
+                        Detail Pembayaran
+                    </h5>
 
-        <h2 class="fw-bold mb-1">
-            Management Pembayaran
-        </h2>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Tutup"></button>
 
-        <p class="text-muted mb-0">
-            Kelola dan verifikasi pembayaran pelanggan RentalKu.
-        </p>
-
-    </div>
-
-
-    {{-- ALERT --}}
-
-    @if(session('success'))
-
-        <div class="alert alert-success alert-dismissible fade show">
-
-            <i class="bi bi-check-circle me-2"></i>
-
-            {{ session('success') }}
-
-            <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert"
-            ></button>
-
-        </div>
-
-    @endif
-
-
-    @if($errors->any())
-
-        <div class="alert alert-danger">
-
-            <ul class="mb-0">
-
-                @foreach($errors->all() as $error)
-
-                    <li>{{ $error }}</li>
-
-                @endforeach
-
-            </ul>
-
-        </div>
-
-    @endif
-
-
-    {{-- TABLE --}}
-
-    <div class="page-card">
-
-        <div class="table-responsive">
-
-            <table class="table align-middle mb-0" id="pembayaran-table">
-
-                <thead>
-
-                    <tr>
-
-                        <th class="px-4 py-3">
-                            #
-                        </th>
-
-                        <th>
-                            Pelanggan
-                        </th>
-
-                        <th>
-                            Mobil
-                        </th>
-
-                        <th>
-                            Metode
-                        </th>
-
-                        <th>
-                            Tanggal
-                        </th>
-
-                        <th>
-                            Jumlah
-                        </th>
-
-                        <th>
-                            Bukti
-                        </th>
-
-                        <th>
-                            Status
-                        </th>
-
-                        <th class="text-end pe-4">
-                            Aksi
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-                    {{-- Diisi oleh DataTables (server-side) --}}
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-{{-- MODAL DETAIL PEMBAYARAN --}}
-<div
-    class="modal fade"
-    id="detailPembayaranModal"
-    tabindex="-1"
-    aria-labelledby="detailPembayaranModalLabel"
-    aria-hidden="true"
->
-
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-
-        <div class="modal-content">
-
-            <div class="modal-header bg-success text-white">
-
-                <h5 class="modal-title" id="detailPembayaranModalLabel">
-                    <i class="bi bi-credit-card me-2"></i>
-                    Detail Pembayaran
-                </h5>
-
-                <button
-                    type="button"
-                    class="btn-close btn-close-white"
-                    data-bs-dismiss="modal"
-                    aria-label="Tutup"
-                ></button>
-
-            </div>
-
-            <div class="modal-body p-4">
-
-                {{-- LOADING --}}
-                <div id="pembayaranDetailLoading" class="text-center py-5">
-                    <div class="spinner-border text-success" role="status"></div>
-                    <p class="text-muted mt-3 mb-0">
-                        Memuat detail pembayaran...
-                    </p>
                 </div>
 
-                {{-- ERROR --}}
-                <div id="pembayaranDetailError" class="alert alert-danger d-none" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    <span id="pembayaranDetailErrorMessage">
-                        Gagal memuat detail pembayaran.
-                    </span>
-                </div>
+                <div class="modal-body p-4">
 
-                {{-- KONTEN --}}
-                <div id="pembayaranDetailContent" class="d-none">
+                    {{-- LOADING --}}
+                    <div id="pembayaranDetailLoading" class="text-center py-5">
+                        <div class="spinner-border text-success" role="status"></div>
+                        <p class="text-muted mt-3 mb-0">
+                            Memuat detail pembayaran...
+                        </p>
+                    </div>
 
-                    <div class="row g-3">
+                    {{-- ERROR --}}
+                    <div id="pembayaranDetailError" class="alert alert-danger d-none" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <span id="pembayaranDetailErrorMessage">
+                            Gagal memuat detail pembayaran.
+                        </span>
+                    </div>
 
-                        <div class="col-md-6">
-                            <div class="border rounded-3 p-3 h-100">
-                                <small class="text-muted fw-bold text-uppercase">Pelanggan</small>
-                                <h6 class="fw-bold mb-1" id="pd-pelanggan">-</h6>
-                                <small class="text-muted" id="pd-email">-</small>
-                            </div>
-                        </div>
+                    {{-- KONTEN --}}
+                    <div id="pembayaranDetailContent" class="d-none">
 
-                        <div class="col-md-6">
-                            <div class="border rounded-3 p-3 h-100">
-                                <small class="text-muted fw-bold text-uppercase">Mobil</small>
-                                <h6 class="fw-bold mb-1" id="pd-mobil">-</h6>
-                                <small class="text-muted" id="pd-plat">-</small>
-                            </div>
-                        </div>
+                        <div class="row g-3">
 
-                        <div class="col-md-6">
-                            <div class="border rounded-3 p-3">
-                                <small class="text-muted fw-bold text-uppercase">Metode & Tanggal</small>
-                                <div class="fw-semibold" id="pd-metode">-</div>
-                                <small class="text-muted" id="pd-tanggal">-</small>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="border rounded-3 p-3">
-                                <small class="text-muted fw-bold text-uppercase">Jumlah</small>
-                                <h5 class="fw-bold text-success mb-0" id="pd-jumlah">-</h5>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="border rounded-3 p-3">
-                                <small class="text-muted fw-bold text-uppercase">Status</small>
-                                <div id="pd-status">-</div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="border rounded-3 p-3">
-                                <small class="text-muted fw-bold text-uppercase">Bukti Pembayaran</small>
-                                <div id="pd-bukti">
-                                    <span class="text-muted">Tidak ada</span>
+                            <div class="col-md-6">
+                                <div class="border rounded-3 p-3 h-100">
+                                    <small class="text-muted fw-bold text-uppercase">Pelanggan</small>
+                                    <h6 class="fw-bold mb-1" id="pd-pelanggan">-</h6>
+                                    <small class="text-muted" id="pd-email">-</small>
                                 </div>
                             </div>
+
+                            <div class="col-md-6">
+                                <div class="border rounded-3 p-3 h-100">
+                                    <small class="text-muted fw-bold text-uppercase">Mobil</small>
+                                    <h6 class="fw-bold mb-1" id="pd-mobil">-</h6>
+                                    <small class="text-muted" id="pd-plat">-</small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="border rounded-3 p-3">
+                                    <small class="text-muted fw-bold text-uppercase">Metode & Tanggal</small>
+                                    <div class="fw-semibold" id="pd-metode">-</div>
+                                    <small class="text-muted" id="pd-tanggal">-</small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="border rounded-3 p-3">
+                                    <small class="text-muted fw-bold text-uppercase">Jumlah</small>
+                                    <h5 class="fw-bold text-success mb-0" id="pd-jumlah">-</h5>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="border rounded-3 p-3">
+                                    <small class="text-muted fw-bold text-uppercase">Status</small>
+                                    <div id="pd-status">-</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="border rounded-3 p-3">
+                                    <small class="text-muted fw-bold text-uppercase">Bukti Pembayaran</small>
+                                    <div id="pd-bukti">
+                                        <span class="text-muted">Tidak ada</span>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
 
                     </div>
@@ -399,283 +327,281 @@
 
     </div>
 
-</div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script
-    src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
-</script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-<script
-    src="https://code.jquery.com/jquery-3.7.1.min.js">
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
 
-<script
-    src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js">
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/js/dataTables.bootstrap5.min.js"></script>
 
-<script
-    src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/js/dataTables.bootstrap5.min.js">
-</script>
+    <script>
+        const CSRF_TOKEN = '{{ csrf_token() }}';
 
-<script>
+        function updatePembayaranStatus(id, status) {
+            const text = status === 'Disetujui' ? 'Setujui pembayaran ini?' : 'Tolak pembayaran ini?';
 
-    const CSRF_TOKEN = '{{ csrf_token() }}';
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya',
+                cancelButtonText: 'Batal',
+            }).then(function(result) {
+                if (!result.isConfirmed) return;
 
-    function confirmAction(event, message) {
-        event.preventDefault();
-
-        const form = event.target.closest('form');
-
-        Swal.fire({
-            title: 'Konfirmasi',
-            text: message,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                form.submit();
-            }
-        });
-    }
-
-    function formatRupiah(value) {
-        return 'Rp ' + Number(value).toLocaleString('id-ID');
-    }
-
-    function statusBadge(status) {
-        const map = {
-            'Menunggu': 'status-menunggu',
-            'Disetujui': 'status-disetujui',
-            'Ditolak': 'status-ditolak',
-        };
-
-        const cls = map[status] || 'bg-secondary text-white';
-
-        return '<span class="badge-status ' + cls + '">' + status + '</span>';
-    }
-
-    function pembayaranActions(data) {
-        const baseUrl = '{{ route('pembayarans.updateStatus', '__ID__') }}'.replace('__ID__', data.id);
-
-        let html = '<div class="d-flex gap-2 justify-content-end">';
-
-        html += '<button type="button" class="btn btn-outline-primary btn-sm" ' +
-            'onclick="openPembayaranDetail(' + data.id + ')">' +
-            '<i class="bi bi-eye me-1"></i>Detail</button>';
-
-        if (data.status === 'Menunggu') {
-
-            html += '<form action="' + baseUrl + '" method="POST">' +
-                '<input type="hidden" name="_token" value="' + CSRF_TOKEN + '">' +
-                '<input type="hidden" name="_method" value="PUT">' +
-                '<input type="hidden" name="status" value="Disetujui">' +
-                '<button type="submit" class="btn btn-success btn-sm" title="Setujui" ' +
-                'onclick="confirmAction(event, \'Setujui pembayaran ini?\')">' +
-                '<i class="bi bi-check-lg"></i></button></form>';
-
-            html += '<form action="' + baseUrl + '" method="POST">' +
-                '<input type="hidden" name="_token" value="' + CSRF_TOKEN + '">' +
-                '<input type="hidden" name="_method" value="PUT">' +
-                '<input type="hidden" name="status" value="Ditolak">' +
-                '<button type="submit" class="btn btn-danger btn-sm" title="Tolak" ' +
-                'onclick="confirmAction(event, \'Tolak pembayaran ini?\')">' +
-                '<i class="bi bi-x-lg"></i></button></form>';
-
+                $.ajax({
+                    url: "{{ route('pembayarans.updateStatus', '__ID__') }}".replace('__ID__', id),
+                    method: 'PUT',
+                    headers: {
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Accept': 'application/json',
+                    },
+                    data: {
+                        status: status
+                    },
+                    success: function(res) {
+                        $('#pembayaran-table').DataTable().ajax.reload();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: res.message,
+                            timer: 1500,
+                            showConfirmButton: false,
+                        });
+                    },
+                    error: function(xhr) {
+                        const res = xhr.responseJSON || {};
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: res.message || 'Terjadi kesalahan',
+                        });
+                    },
+                });
+            });
         }
 
-        html += '</div>';
-
-        return html;
-    }
-
-    $(document).ready(function () {
-
-        $('#pembayaran-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: '{{ route('pembayarans.data') }}',
-                type: 'GET',
-            },
-            columns: [
-                {
-                    data: null,
-                    orderable: false,
-                    searchable: false,
-                    className: 'px-4',
-                    render: function (data, type, row, meta) {
-                        return meta.row + meta.settings._iDisplayStart + 1;
-                    },
-                },
-                {
-                    data: 'user_name',
-                    orderable: true,
-                    searchable: false,
-                    render: function (data) {
-                        return '<strong>' + data + '</strong>';
-                    },
-                },
-                {
-                    data: 'mobil_name',
-                    orderable: true,
-                    searchable: false,
-                    render: function (data) {
-                        return data;
-                    },
-                },
-                {
-                    data: 'metode_name',
-                    orderable: true,
-                    searchable: false,
-                    render: function (data) {
-                        return data;
-                    },
-                },
-                {
-                    data: 'tanggal_bayar',
-                    orderable: true,
-                    searchable: false,
-                    render: function (data) {
-                        return data;
-                    },
-                },
-                {
-                    data: 'jumlah',
-                    orderable: true,
-                    searchable: false,
-                    render: function (data) {
-                        return '<strong>' + formatRupiah(data) + '</strong>';
-                    },
-                },
-                {
-                    data: 'bukti',
-                    orderable: false,
-                    searchable: false,
-                    render: function (data) {
-                        if (!data) {
-                            return '<span class="text-muted">Tidak ada</span>';
+                        function formatRupiah(value) {
+                            return 'Rp ' + Number(value).toLocaleString('id-ID');
                         }
 
-                        const url = '{{ asset('storage/__BUKTI__') }}'.replace('__BUKTI__', data);
+                        function statusBadge(status) {
+                            const map = {
+                                'Menunggu': 'status-menunggu',
+                                'Disetujui': 'status-disetujui',
+                                'Ditolak': 'status-ditolak',
+                            };
 
-                        return '<a href="' + url + '" target="_blank">' +
-                            '<img src="' + url + '" class="proof-image" alt="Bukti pembayaran"></a>';
-                    },
-                },
-                {
-                    data: 'status',
-                    orderable: true,
-                    searchable: false,
-                    render: function (data) {
-                        return statusBadge(data);
-                    },
-                },
-                {
-                    data: null,
-                    orderable: false,
-                    searchable: false,
-                    className: 'text-end pe-4',
-                    render: function (data) {
-                        return pembayaranActions(data);
-                    },
-                },
-            ],
-            order: [[4, 'desc']],
-            language: {
-                processing: 'Memproses...',
-                search: 'Cari:',
-                lengthMenu: 'Tampilkan _MENU_ data',
-                info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
-                infoEmpty: 'Tidak ada data',
-                infoFiltered: '(difilter dari _MAX_ total data)',
-                infoPostFix: '',
-                loadingRecords: 'Memuat...',
-                zeroRecords: 'Tidak ditemukan data yang cocok',
-                emptyTable: 'Belum ada pembayaran',
-                paginate: {
-                    first: 'Pertama',
-                    previous: 'Sebelumnya',
-                    next: 'Berikutnya',
-                    last: 'Terakhir',
-                },
-                aria: {
-                    sortAscending: ': aktifkan untuk urut naik',
-                    sortDescending: ': aktifkan untuk urut turun',
-                },
-            },
-        });
+                            const cls = map[status] || 'bg-secondary text-white';
 
-    });
+                            return '<span class="badge-status ' + cls + '">' + status + '</span>';
+                        }
 
-    function openPembayaranDetail(id) {
+                        function pembayaranActions(data) {
+                            let html = '<div class="d-flex gap-2 justify-content-end">';
 
-        const modalEl = document.getElementById('detailPembayaranModal');
-        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                            html += '<button class="btn btn-outline-primary btn-sm" ' +
+                                'onclick="openPembayaranDetail(' + data.id + ')">' +
+                                '<i class="bi bi-eye"></i> Detail</button>';
 
-        const loading = document.getElementById('pembayaranDetailLoading');
-        const error = document.getElementById('pembayaranDetailError');
-        const content = document.getElementById('pembayaranDetailContent');
+                            if (data.status === 'Menunggu') {
+                                html += '<button class="btn btn-outline-primary btn-sm" ' +
+                                    'onclick="updatePembayaranStatus(' + data.id + ', \'Disetujui\')">' +
+                                    '<i class="bi bi-check"></i></button>';
+                                html += '<button class="btn btn-outline-primary btn-sm" ' +
+                                    'onclick="updatePembayaranStatus(' + data.id + ', \'Ditolak\')">' +
+                                    '<i class="bi bi-x"></i></button>';
+                            }
 
-        loading.classList.remove('d-none');
-        error.classList.add('d-none');
-        content.classList.add('d-none');
+                            html += '</div>';
 
-        modal.show();
+                            return html;
+                        }
 
-        fetch('{{ route('pembayarans.detail', '__ID__') }}'.replace('__ID__', id), {
-            headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Server mengembalikan status ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                document.getElementById('pd-pelanggan').textContent = data.pelanggan;
-                document.getElementById('pd-email').textContent = data.email;
-                document.getElementById('pd-mobil').textContent = data.mobil;
-                document.getElementById('pd-plat').textContent = data.plat;
-                document.getElementById('pd-metode').textContent = data.metode;
-                document.getElementById('pd-tanggal').textContent = data.tanggal_bayar;
-                document.getElementById('pd-jumlah').textContent = formatRupiah(data.jumlah);
-                document.getElementById('pd-status').innerHTML = statusBadge(data.status);
+                        $(document).ready(function() {
 
-                const bukti = document.getElementById('pd-bukti');
+                            $('#pembayaran-table').DataTable({
+                                processing: true,
+                                serverSide: true,
+                                ajax: {
+                                    url: "{{ route('pembayarans.data') }}",
+                                    type: 'GET',
+                                },
+                                columns: [{
+                                        data: null,
+                                        orderable: false,
+                                        searchable: false,
+                                        className: 'px-4',
+                                        render: function(data, type, row, meta) {
+                                            return meta.row + meta.settings._iDisplayStart + 1;
+                                        },
+                                    },
+                                    {
+                                        data: 'user_name',
+                                        orderable: true,
+                                        searchable: false,
+                                        render: function(data) {
+                                            return '<strong>' + data + '</strong>';
+                                        },
+                                    },
+                                    {
+                                        data: 'mobil_name',
+                                        orderable: true,
+                                        searchable: false,
+                                        render: function(data) {
+                                            return data;
+                                        },
+                                    },
+                                    {
+                                        data: 'metode_name',
+                                        orderable: true,
+                                        searchable: false,
+                                        render: function(data) {
+                                            return data;
+                                        },
+                                    },
+                                    {
+                                        data: 'tanggal_bayar',
+                                        orderable: true,
+                                        searchable: false,
+                                        render: function(data) {
+                                            return data;
+                                        },
+                                    },
+                                    {
+                                        data: 'jumlah',
+                                        orderable: true,
+                                        searchable: false,
+                                        render: function(data) {
+                                            return '<strong>' + formatRupiah(data) + '</strong>';
+                                        },
+                                    },
+                                    {
+                                        data: 'bukti',
+                                        orderable: false,
+                                        searchable: false,
+                                        render: function(data) {
+                                            if (!data) {
+                                                return '<span class="text-muted">Tidak ada</span>';
+                                            }
 
-                if (data.bukti_url) {
-                    bukti.innerHTML = '<a href="' + data.bukti_url + '" target="_blank">' +
-                        '<img src="' + data.bukti_url +
-                        '" class="proof-image" alt="Bukti pembayaran" ' +
-                        'style="width:120px;height:90px;object-fit:cover;border-radius:8px;">' +
-                        '</a>';
-                } else {
-                    bukti.innerHTML = '<span class="text-muted">Tidak ada</span>';
-                }
+                                            const url = "{{ asset('storage/__BUKTI__') }}".replace(
+                                                '__BUKTI__', data);
 
-                loading.classList.add('d-none');
-                content.classList.remove('d-none');
-            })
-            .catch(err => {
-                loading.classList.add('d-none');
-                document.getElementById('pembayaranDetailErrorMessage').textContent =
-                    'Gagal memuat detail pembayaran: ' + err.message;
-                error.classList.remove('d-none');
-            });
+                                            return '<a href="' + url + '" target="_blank">' +
+                                                '<img src="' + url +
+                                                '" class="proof-image" alt="Bukti pembayaran"></a>';
+                                        },
+                                    },
+                                    {
+                                        data: 'status',
+                                        orderable: true,
+                                        searchable: false,
+                                        render: function(data) {
+                                            return statusBadge(data);
+                                        },
+                                    },
+                                    {
+                                        data: null,
+                                        orderable: false,
+                                        searchable: false,
+                                        className: 'text-end pe-4',
+                                        render: function(data) {
+                                            return pembayaranActions(data);
+                                        },
+                                    },
+                                ],
+                                order: [
+                                    [4, 'desc']
+                                ],
+                                language: {
+                                    processing: 'Memproses...',
+                                    search: 'Cari:',
+                                    lengthMenu: 'Tampilkan _MENU_ data',
+                                    info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                                    infoEmpty: 'Tidak ada data',
+                                    infoFiltered: '(difilter dari _MAX_ total data)',
+                                    infoPostFix: '',
+                                    loadingRecords: 'Memuat...',
+                                    zeroRecords: 'Tidak ditemukan data yang cocok',
+                                    emptyTable: 'Belum ada pembayaran',
+                                    paginate: {
+                                        previous: 'Sebelumnya',
+                                        next: 'Berikutnya'
+                                    },
+                                    aria: {
+                                        sortAscending: ': aktifkan untuk urut naik',
+                                        sortDescending: ': aktifkan untuk urut turun',
+                                    },
+                                },
+                            });
 
-    }
+                        });
 
-</script>
+                        function openPembayaranDetail(id) {
+
+                            const modalEl = document.getElementById('detailPembayaranModal');
+                            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+                            const loading = document.getElementById('pembayaranDetailLoading');
+                            const error = document.getElementById('pembayaranDetailError');
+                            const content = document.getElementById('pembayaranDetailContent');
+
+                            loading.classList.remove('d-none');
+                            error.classList.add('d-none');
+                            content.classList.add('d-none');
+
+                            modal.show();
+
+                            $.ajax({
+                                url: "{{ route('pembayarans.detail', '__ID__') }}".replace('__ID__', id),
+                                method: 'GET',
+                                success: function(data) {
+
+                                    document.getElementById('pd-pelanggan').textContent = data.pelanggan;
+                                    document.getElementById('pd-email').textContent = data.email;
+                                    document.getElementById('pd-mobil').textContent = data.mobil;
+                                    document.getElementById('pd-plat').textContent = data.plat;
+                                    document.getElementById('pd-metode').textContent = data.metode;
+                                    document.getElementById('pd-tanggal').textContent = data.tanggal_bayar;
+                                    document.getElementById('pd-jumlah').textContent = formatRupiah(data.jumlah);
+                                    document.getElementById('pd-status').innerHTML = statusBadge(data.status);
+
+                                    const buktiContainer = document.getElementById('pd-bukti');
+                                    buktiContainer.innerHTML = '';
+
+                                    if (data.bukti_url) {
+                                        const img = document.createElement('img');
+                                        img.src = data.bukti_url;
+                                        img.className = 'proof-image';
+                                        img.alt = 'Bukti pembayaran';
+                                        buktiContainer.appendChild(img);
+                                    } else {
+                                        buktiContainer.innerHTML =
+                                            '<span class="text-muted">Tidak ada</span>';
+                                    }
+
+                                    loading.classList.add('d-none');
+                                    content.classList.remove('d-none');
+
+                                },
+                                error: function(xhr) {
+                                    loading.classList.add('d-none');
+                                    error.classList.remove('d-none');
+                                    document.getElementById('pembayaranDetailErrorMessage').textContent =
+                                        'Gagal memuat detail pembayaran: ' + xhr.status + ' ' + xhr
+                                        .statusText;
+                                }
+                            });
+
+                        }
+    </script>
 
 </body>
+
 </html>

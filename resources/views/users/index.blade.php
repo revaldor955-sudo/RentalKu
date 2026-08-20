@@ -151,37 +151,7 @@
 <body>
 
     {{-- NAVBAR --}}
-    <nav class="navbar">
-        <div class="container py-3">
-
-            <div class="d-flex justify-content-between align-items-center">
-
-                <a href="{{ route('admin.dashboard') }}" class="text-decoration-none brand">
-                    Rental<span>ku</span>.
-                </a>
-
-                <div class="d-flex gap-2">
-
-                    <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-speedometer2 me-1"></i>
-                        Dashboard
-                    </a>
-
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-
-                        <button type="submit" class="btn btn-outline-danger btn-sm">
-                            <i class="bi bi-box-arrow-right me-1"></i>
-                            Keluar
-                        </button>
-                    </form>
-
-                </div>
-
-            </div>
-
-        </div>
-    </nav>
+    @include('layouts.partials.admin-navbar')
 
 
     <div class="container py-5">

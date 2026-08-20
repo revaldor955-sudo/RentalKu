@@ -263,82 +263,7 @@
 <body>
 
 
-<nav class="navbar">
-
-    <div class="container py-3">
-
-        <div class="d-flex justify-content-between align-items-center w-100">
-
-            <a
-                href="{{ route('admin.dashboard') }}"
-                class="text-decoration-none brand"
-            >
-
-                Rental<span>ku</span>.
-
-            </a>
-
-
-            <div class="d-flex align-items-center gap-3">
-
-                <div class="profile d-flex align-items-center gap-2">
-
-                    <div class="profile-icon">
-
-                        <i class="bi bi-shield-lock"></i>
-
-                    </div>
-
-
-                    <div class="d-none d-md-block">
-
-                        <div class="fw-bold small">
-
-                            {{ Auth::user()->name }}
-
-                        </div>
-
-                        <div
-                            class="text-muted"
-                            style="font-size:12px;"
-                        >
-
-                            Administrator
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <form
-                    action="{{ route('logout') }}"
-                    method="POST"
-                >
-
-                    @csrf
-
-                    <button
-                        type="submit"
-                        class="btn btn-outline-danger btn-sm"
-                    >
-
-                        <i class="bi bi-box-arrow-right"></i>
-
-                        Keluar
-
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</nav>
+@include('layouts.partials.admin-navbar')
 
 
 
@@ -641,40 +566,6 @@
 
 
     <div class="row g-4">
-
-
-        {{-- 1. DASHBOARD --}}
-
-        <div class="col-md-6 col-lg-3">
-
-            <a
-                href="{{ route('admin.dashboard') }}"
-                class="text-decoration-none text-dark"
-            >
-
-                <div class="menu-card">
-
-                    <div class="menu-icon mb-3">
-
-                        <i class="bi bi-speedometer2"></i>
-
-                    </div>
-
-                    <h5 class="fw-bold">
-                        Dashboard
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Ringkasan sistem RentalKu.
-                    </p>
-
-                </div>
-
-            </a>
-
-        </div>
-
-
         {{-- 2. MOBIL --}}
 
         <div class="col-md-6 col-lg-3">

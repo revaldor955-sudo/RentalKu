@@ -255,53 +255,7 @@
 <body>
 
 {{-- NAVBAR --}}
-<nav class="navbar">
-    <div class="container py-3">
-
-        <div class="d-flex justify-content-between align-items-center w-100">
-
-            <a href="{{ route('admin.dashboard') }}"
-               class="text-decoration-none brand">
-                Rental<span>ku</span>.
-            </a>
-
-            <div class="d-flex align-items-center gap-3">
-
-                <div class="profile d-flex align-items-center gap-2">
-
-                    <div class="profile-icon">
-                        <i class="bi bi-shield-lock"></i>
-                    </div>
-
-                    <div class="d-none d-md-block">
-
-                        <div class="fw-bold small">
-                            {{ Auth::user()->name }}
-                        </div>
-
-                        <div class="text-muted" style="font-size:12px;">
-                            Administrator
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-
-                    <button class="btn btn-outline-danger btn-sm">
-                        <i class="bi bi-box-arrow-right"></i>
-                        Keluar
-                    </button>
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-</nav>
+@include('layouts.partials.admin-navbar')
 
 
 <div class="container">
