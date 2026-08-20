@@ -874,7 +874,7 @@
             modal.show();
 
             $.ajax({
-                        url: '{{ route('user.detail', '__ID__') }}'.replace('__ID__', id),
+                        url: '{{ route('users.detail', '__ID__') }}'.replace('__ID__', id),
                         method: 'GET',
                         headers: {
                             'Accept': 'application/json'
