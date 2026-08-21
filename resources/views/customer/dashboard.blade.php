@@ -487,7 +487,10 @@
 
         <div class="d-flex align-items-center gap-3">
 
-            <div class="user-box d-none d-md-flex">
+            <div class="user-box d-none d-md-flex"
+                 data-bs-toggle="modal"
+                 data-bs-target="#profileModal"
+                 style="cursor: pointer;">
 
                 <div class="user-icon">
                     <i class="bi bi-person"></i>
@@ -498,19 +501,6 @@
                 </span>
 
             </div>
-
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-
-                <button class="btn btn-outline-danger btn-sm rounded-3 px-3">
-
-                    <i class="bi bi-box-arrow-right"></i>
-
-                    Keluar
-
-                </button>
-
-            </form>
 
         </div>
 
@@ -1253,6 +1243,9 @@
 
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+{{-- Modal profil bersama (admin/staff/customer) --}}
+@include('layouts.partials.profile-modal')
 
 <script
     src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
