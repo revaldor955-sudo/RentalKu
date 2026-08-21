@@ -18,6 +18,29 @@
     .brand span {
         color: #198754;
     }
+
+    .user-box {
+        background: #f5f8f6;
+        border-radius: 50px;
+        padding: 6px 12px 6px 7px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .user-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #198754;
+        color: white;
+        font-size: 16px;
+    }
 </style>
 
 <nav class="navbar">
@@ -29,16 +52,15 @@
                 Rental<span>ku</span>.
             </a>
 
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-2 align-items-center">
 
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-
-                    <button type="submit" class="btn btn-outline-danger btn-sm">
-                        <i class="bi bi-box-arrow-right me-1"></i>
-                        Keluar
-                    </button>
-                </form>
+                <a href="#" class="user-box d-none d-md-flex text-decoration-none text-dark"
+                   data-bs-toggle="modal" data-bs-target="#profileModal">
+                    <div class="user-icon">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <span>{{ Auth::user()->name }}</span>
+                </a>
 
             </div>
 
@@ -46,3 +68,6 @@
 
     </div>
 </nav>
+
+{{-- MODAL PROFIL (partial bersama admin/staff/customer) --}}
+@include('layouts.partials.profile-modal')
