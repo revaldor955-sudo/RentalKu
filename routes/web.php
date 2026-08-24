@@ -208,7 +208,10 @@ Route::middleware('adminstaff')->group(function () {
         ->name('pemeriksaan-kendaraan.destroy');
 });
 
-Route::get('/laporan', [LaporanController::class, 'index'])
-    ->name('laporan.index');
+Route::middleware('adminstaff')->group(function () {
+
+    Route::get('/laporan', [LaporanController::class, 'index'])
+        ->name('laporan.index');
+});
 
 require __DIR__.'/auth.php';
