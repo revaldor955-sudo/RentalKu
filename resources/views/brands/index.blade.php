@@ -24,7 +24,7 @@
         body {
             background: #f5f7f6;
             color: #1f2937;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         .navbar {
@@ -155,59 +155,17 @@
 
     </style>
 
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
 {{-- NAVBAR --}}
 
-<nav class="navbar">
-
-    <div class="container py-3">
-
-        <div class="d-flex justify-content-between align-items-center">
-
-            <a
-                href="{{ route('admin.dashboard') }}"
-                class="text-decoration-none brand"
-            >
-                Rental<span>ku</span>.
-            </a>
-
-            <div class="d-flex gap-2">
-
-                <a
-                    href="{{ route('admin.dashboard') }}"
-                    class="btn btn-outline-secondary btn-sm"
-                >
-                    <i class="bi bi-speedometer2 me-1"></i>
-                    Dashboard
-                </a>
-
-                <form
-                    action="{{ route('logout') }}"
-                    method="POST"
-                >
-
-                    @csrf
-
-                    <button
-                        type="submit"
-                        class="btn btn-outline-danger btn-sm"
-                    >
-                        <i class="bi bi-box-arrow-right me-1"></i>
-                        Keluar
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</nav>
+@include('layouts.partials.admin-navbar')
 
 
 <div class="container py-5">
@@ -228,15 +186,24 @@
 
         </div>
 
-        <button
-            type="button"
-            class="btn btn-green"
-            data-bs-toggle="modal"
-            data-bs-target="#tambahBrandModal"
-        >
-            <i class="bi bi-plus-lg me-1"></i>
-            Tambah Merek
-        </button>
+        <div class="d-flex gap-2">
+
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>
+                Dashboard
+            </a>
+
+            <button
+                type="button"
+                class="btn btn-green"
+                data-bs-toggle="modal"
+                data-bs-target="#tambahBrandModal"
+            >
+                <i class="bi bi-plus-lg me-1"></i>
+                Tambah Merek
+            </button>
+
+        </div>
 
     </div>
 
@@ -460,7 +427,7 @@
                                                 <button
                                                     type="submit"
                                                     class="btn btn-danger btn-sm"
-                                                    onclick="return confirm('Yakin ingin menghapus merek {{ $brand->name }}?')"
+                                                    onclick="confirmAction(event, 'Yakin ingin menghapus merek {{ $brand->name }}?')"
                                                 >
 
                                                     <i class="bi bi-trash"></i>
@@ -783,6 +750,33 @@
 
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+</script>
+
+<script>
+
+    function confirmAction(event, message) {
+        event.preventDefault();
+
+        const form = event.target.closest('form');
+
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
+
 </script>
 
 </body>

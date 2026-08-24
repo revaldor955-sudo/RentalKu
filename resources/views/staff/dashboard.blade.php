@@ -23,7 +23,7 @@
 
         body {
             background: #f5f7f6;
-            font-family: Arial, sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         .navbar {
@@ -195,6 +195,10 @@
 
     </style>
 
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -216,7 +220,10 @@
 
             <div class="d-flex align-items-center gap-3">
 
-                <div class="profile d-flex align-items-center gap-2">
+                <div class="profile d-flex align-items-center gap-2"
+                     data-bs-toggle="modal"
+                     data-bs-target="#profileModal"
+                     style="cursor: pointer;">
 
                     <div class="profile-icon">
 
@@ -240,26 +247,6 @@
                     </div>
 
                 </div>
-
-                <form
-                    action="{{ route('logout') }}"
-                    method="POST"
-                >
-
-                    @csrf
-
-                    <button
-                        type="submit"
-                        class="btn btn-outline-danger btn-sm"
-                    >
-
-                        <i class="bi bi-box-arrow-right"></i>
-
-                        Keluar
-
-                    </button>
-
-                </form>
 
             </div>
 
@@ -900,6 +887,10 @@
 
 </footer>
 
+{{-- Modal profil + Bootstrap JS (dibutuhkan modal) --}}
+@include('layouts.partials.profile-modal')
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 

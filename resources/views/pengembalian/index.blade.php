@@ -2,112 +2,151 @@
 <html lang="id">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Pengembalian Mobil - RentalKu</title>
 
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-    >
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/css/dataTables.bootstrap5.min.css">
 
     <style>
-
         body {
-            background: #f5f7f6;
-            font-family: Arial, sans-serif;
+            background: #f6f8f7;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
-        .navbar {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .brand {
-            font-size: 25px;
+        .page-title {
             font-weight: 800;
             color: #1f2937;
         }
 
-        .brand span {
-            color: #198754;
-        }
-
-        .page-card {
+        .card-custom {
             background: white;
-            border-radius: 20px;
-            border: 1px solid #edf0ee;
-            box-shadow: 0 8px 25px rgba(0,0,0,.04);
+            border: none;
+            border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .05);
         }
 
-        .empty-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 20px;
-            background: #e9f7ef;
-            color: #198754;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            font-size: 35px;
-            margin: auto;
+        .table th {
+            font-size: 13px;
+            color: #6b7280;
+            white-space: nowrap;
         }
 
+        .table td {
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .status-disetujui {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .btn-action {
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: 600;
+        }
     </style>
-
 </head>
 
 <body>
 
-<nav class="navbar">
+    @include('layouts.partials.admin-navbar')
 
-    <div class="container py-3">
 
-        <div class="d-flex justify-content-between align-items-center w-100">
+    <div class="container py-4">
 
-            <a
-                href="{{ route('admin.dashboard') }}"
-                class="text-decoration-none brand"
-            >
-                Rental<span>ku</span>.
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+                <h2 class="page-title mb-1">
+                    Pengembalian Mobil
+                </h2>
+
+                <p class="text-muted mb-0">
+                    Proses pengembalian kendaraan yang sedang disewa pelanggan.
+                </p>
+            </div>
+
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
+
+                <i class="bi bi-arrow-left me-1"></i>
+                Dashboard
+
             </a>
 
-            <div class="d-flex gap-2">
+        </div>
 
-                <a
-                    href="{{ route('admin.dashboard') }}"
-                    class="btn btn-outline-secondary btn-sm"
-                >
-                    <i class="bi bi-speedometer2 me-1"></i>
-                    Dashboard
-                </a>
 
-                <form
-                    action="{{ route('logout') }}"
-                    method="POST"
-                >
+        <div class="card-custom">
 
-                    @csrf
+            <div class="card-body p-0">
 
-                    <button
-                        type="submit"
-                        class="btn btn-outline-danger btn-sm"
-                    >
-                        <i class="bi bi-box-arrow-right me-1"></i>
-                        Keluar
-                    </button>
+                <div class="table-responsive">
 
-                </form>
+                    <table class="table table-hover mb-0" id="pengembalian-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th class="px-4 py-3">
+                                    #
+                                </th>
+
+                                <th>
+                                    Pelanggan
+                                </th>
+
+                                <th>
+                                    Mobil
+                                </th>
+
+                                <th>
+                                    Tanggal Sewa
+                                </th>
+
+                                <th>
+                                    Hari
+                                </th>
+
+                                <th>
+                                    Total
+                                </th>
+
+                                <th class="text-end pe-4">
+                                    Aksi
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+                            {{-- Diisi oleh DataTables (server-side) --}}
+                        </tbody>
+
+                    </table>
+
+                </div>
 
             </div>
 
@@ -115,47 +154,170 @@
 
     </div>
 
-</nav>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<div class="container py-5">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <div class="mb-4">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-        <h2 class="fw-bold mb-1">
-            Pengembalian Mobil
-        </h2>
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
 
-        <p class="text-muted mb-0">
-            Kelola proses pengembalian kendaraan pelanggan.
-        </p>
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/js/dataTables.bootstrap5.min.js"></script>
 
-    </div>
+    <script>
+        const CSRF_TOKEN = '{{ csrf_token() }}';
 
+        function formatRupiah(value) {
+            return 'Rp ' + Number(value).toLocaleString('id-ID');
+        }
 
-    <div class="page-card">
+        function prosesPengembalian(id, mobil) {
+            Swal.fire({
+                title: 'Proses Pengembalian?',
+                text: 'Mobil ' + mobil + ' akan dikembalikan dan berstatus "Tersedia".',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Kembalikan',
+                cancelButtonText: 'Batal',
+            }).then(function(result) {
+                if (!result.isConfirmed) return;
 
-        <div class="text-center py-5">
+                $.ajax({
+                    url: "{{ route('rentals.updateStatus', '__ID__') }}".replace('__ID__', id),
+                    method: 'PUT',
+                    headers: {
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Accept': 'application/json',
+                    },
+                    data: {
+                        status: 'Selesai'
+                    },
+                    success: function(res) {
+                        $('#pengembalian-table').DataTable().ajax.reload();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: res.message || 'Pengembalian berhasil diproses.',
+                        });
+                    },
+                    error: function(xhr) {
+                        const res = xhr.responseJSON || {};
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: res.message || 'Terjadi kesalahan',
+                        });
+                    },
+                });
+            });
+        }
 
-            <div class="empty-icon mb-4">
+        $(document).ready(function() {
 
-                <i class="bi bi-arrow-return-left"></i>
+            $('#pengembalian-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('rentals.data') }}",
+                    type: 'GET',
+                    data: function(d) {
+                        d.status = 'Disetujui';
+                    },
+                },
+                columns: [{
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        className: 'px-4',
+                        render: function(data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        },
+                    },
+                    {
+                        data: null,
+                        orderable: true,
+                        searchable: false,
+                        render: function(data) {
+                            return '<div class="fw-bold">' + data.user_name + '</div>' +
+                                '<small class="text-muted">' + data.user_email + '</small>';
+                        },
+                    },
+                    {
+                        data: null,
+                        orderable: true,
+                        searchable: false,
+                        render: function(data) {
+                            return '<div class="fw-bold">' + data.mobil_name + '</div>' +
+                                '<small class="text-muted">' + data.mobil_plate + '</small>';
+                        },
+                    },
+                    {
+                        data: null,
+                        orderable: true,
+                        searchable: false,
+                        render: function(data) {
+                            return data.tanggal_mulai + '<br>' +
+                                '<small class="text-muted">s/d ' + data.tanggal_selesai +
+                                '</small>';
+                        },
+                    },
+                    {
+                        data: 'jumlah_hari',
+                        orderable: true,
+                        searchable: false,
+                        render: function(data) {
+                            return data + ' hari';
+                        },
+                    },
+                    {
+                        data: 'total_harga',
+                        orderable: true,
+                        searchable: false,
+                        render: function(data) {
+                            return '<strong>' + formatRupiah(data) + '</strong>';
+                        },
+                    },
+                    {
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-end pe-4',
+                        render: function(data) {
+                            return '<button type="button" class="btn btn-primary btn-sm btn-action" ' +
+                                'onclick="prosesPengembalian(' + data.id + ', \'' +
+                                data.mobil_name.replace(/'/g, "\\'") + '\')">' +
+                                '<i class="bi bi-arrow-return-left"></i> Proses Pengembalian</button>';
+                        },
+                    },
+                ],
+                order: [
+                    [3, 'desc']
+                ],
+                language: {
+                    processing: 'Memproses...',
+                    search: 'Cari:',
+                    lengthMenu: 'Tampilkan _MENU_ data',
+                    info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                    infoEmpty: 'Tidak ada data',
+                    infoFiltered: '(difilter dari _MAX_ total data)',
+                    infoPostFix: '',
+                    loadingRecords: 'Memuat...',
+                    zeroRecords: 'Tidak ditemukan data yang cocok',
+                    emptyTable: 'Tidak ada rental yang sedang berjalan',
+                    paginate: {
+                        previous: 'Sebelumnya',
+                        next: 'Berikutnya'
+                    },
+                    aria: {
+                        sortAscending: ': aktifkan untuk urut naik',
+                        sortDescending: ': aktifkan untuk urut turun',
+                    },
+                },
+            });
 
-            </div>
-
-            <h4 class="fw-bold">
-                Belum Ada Data Pengembalian
-            </h4>
-
-            <p class="text-muted mb-0">
-                Data pengembalian mobil akan muncul di halaman ini.
-            </p>
-
-        </div>
-
-    </div>
-
-</div>
+        });
+    </script>
 
 </body>
 

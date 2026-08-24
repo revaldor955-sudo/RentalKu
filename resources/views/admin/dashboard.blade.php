@@ -24,7 +24,7 @@
 
         body {
             background: #f5f7f6;
-            font-family: Arial, sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         .navbar {
@@ -257,101 +257,22 @@
 
     </style>
 
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 
 <body>
 
 
-{{-- ========================================= --}}
-{{-- NAVBAR --}}
-{{-- ========================================= --}}
-
-<nav class="navbar">
-
-    <div class="container py-3">
-
-        <div class="d-flex justify-content-between align-items-center w-100">
-
-            <a
-                href="{{ route('admin.dashboard') }}"
-                class="text-decoration-none brand"
-            >
-
-                Rental<span>ku</span>.
-
-            </a>
-
-
-            <div class="d-flex align-items-center gap-3">
-
-                <div class="profile d-flex align-items-center gap-2">
-
-                    <div class="profile-icon">
-
-                        <i class="bi bi-shield-lock"></i>
-
-                    </div>
-
-
-                    <div class="d-none d-md-block">
-
-                        <div class="fw-bold small">
-
-                            {{ Auth::user()->name }}
-
-                        </div>
-
-                        <div
-                            class="text-muted"
-                            style="font-size:12px;"
-                        >
-
-                            Administrator
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <form
-                    action="{{ route('logout') }}"
-                    method="POST"
-                >
-
-                    @csrf
-
-                    <button
-                        type="submit"
-                        class="btn btn-outline-danger btn-sm"
-                    >
-
-                        <i class="bi bi-box-arrow-right"></i>
-
-                        Keluar
-
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</nav>
+@include('layouts.partials.admin-navbar')
 
 
 
 <div class="container">
 
-
-{{-- ========================================= --}}
-{{-- HERO --}}
-{{-- ========================================= --}}
 
 <div class="hero">
 
@@ -401,10 +322,6 @@
 </div>
 
 
-
-{{-- ========================================= --}}
-{{-- STATISTIK --}}
-{{-- ========================================= --}}
 
 <div class="row g-4 mt-2">
 
@@ -544,10 +461,6 @@
 
 
 
-{{-- ========================================= --}}
-{{-- STATUS MOBIL --}}
-{{-- ========================================= --}}
-
 <div class="row g-4 mt-2">
 
 
@@ -647,10 +560,6 @@
 
 
 
-{{-- ========================================= --}}
-{{-- MANAGEMENT SISTEM --}}
-{{-- ========================================= --}}
-
 <section class="mt-5">
 
     <h3 class="section-title mb-4">
@@ -661,40 +570,6 @@
 
 
     <div class="row g-4">
-
-
-        {{-- 1. DASHBOARD --}}
-
-        <div class="col-md-6 col-lg-3">
-
-            <a
-                href="{{ route('admin.dashboard') }}"
-                class="text-decoration-none text-dark"
-            >
-
-                <div class="menu-card">
-
-                    <div class="menu-icon mb-3">
-
-                        <i class="bi bi-speedometer2"></i>
-
-                    </div>
-
-                    <h5 class="fw-bold">
-                        Dashboard
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Ringkasan sistem RentalKu.
-                    </p>
-
-                </div>
-
-            </a>
-
-        </div>
-
-
         {{-- 2. MOBIL --}}
 
         <div class="col-md-6 col-lg-3">
@@ -886,38 +761,7 @@
 
         </div>
 
-
-      {{-- 8. BOOKING --}}
-
-<div class="col-md-6 col-lg-3">
-
-    <a
-        href="{{ route('bookings.index') }}"
-        class="text-decoration-none text-dark"
-    >
-
-        <div class="menu-card">
-
-            <div class="menu-icon mb-3">
-
-                <i class="bi bi-calendar-check"></i>
-
-            </div>
-
-            <h5 class="fw-bold">
-                Management Booking
-            </h5>
-
-            <p class="text-muted mb-0">
-                Kelola pemesanan kendaraan.
-            </p>
-
-        </div>
-
-    </a>
-
-</div>
-{{-- 9. RENTAL --}}
+        {{-- 8. RENTAL --}}
 
 <div class="col-md-6 col-lg-3">
 
@@ -1079,10 +923,6 @@
 </section>
 
 
-
-{{-- ========================================= --}}
-{{-- DATA MOBIL TERBARU --}}
-{{-- ========================================= --}}
 
 <section class="mt-5">
 
@@ -1286,10 +1126,6 @@
 
 
 
-{{-- ========================================= --}}
-{{-- PENGGUNA TERBARU --}}
-{{-- ========================================= --}}
-
 <section class="mt-5">
 
     <div class="mb-4">
@@ -1411,10 +1247,6 @@
 </div>
 
 
-
-{{-- ========================================= --}}
-{{-- FOOTER --}}
-{{-- ========================================= --}}
 
 <footer class="bg-white border-top py-4">
 

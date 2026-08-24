@@ -1,130 +1,47 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<x-guest-layout>
+    <!-- Session Status -->
+    <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <title>Masuk - RentalKu</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        body {
-            min-height: 100vh;
-            background: #f5f7f6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .login-card {
-            width: 100%;
-            max-width: 430px;
-            background: white;
-            border-radius: 18px;
-            padding: 35px;
-            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
-        }
-
-        .brand {
-            color: #198754;
-            font-weight: 700;
-            font-size: 28px;
-        }
-
-        .subtitle {
-            color: #6c757d;
-        }
-
-        .form-control {
-            padding: 12px 14px;
-            border-radius: 10px;
-        }
-
-        .btn-login {
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: 600;
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="login-card">
-
-    <div class="text-center mb-4">
-        <div class="brand">RentalKu</div>
-
-        <h4 class="mt-2 mb-1">Selamat Datang</h4>
-
-        <p class="subtitle mb-0">
-            Masuk ke akun RentalKu kamu
-        </p>
-    </div>
-
-    @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <form action="{{ route('login.store') }}" method="POST">
+    <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <div class="mb-3">
-            <label class="form-label">Email</label>
-
-            <input
-                type="email"
-                name="email"
-                class="form-control"
-                value="{{ old('email') }}"
-                placeholder="Masukkan email"
-                required
-                autofocus
-            >
+        <!-- Email Address -->
+        <div>
+            <x-input-label for="email" :value="__('Email')" />
+            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+            <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <div class="mb-4">
-            <label class="form-label">Password</label>
+        <!-- Password -->
+        <div class="mt-4">
+            <x-input-label for="password" :value="__('Password')" />
 
-            <input
-                type="password"
-                name="password"
-                class="form-control"
-                placeholder="Masukkan password"
-                required
-            >
+            <x-text-input id="password" class="block mt-1 w-full"
+                            type="password"
+                            name="password"
+                            required autocomplete="current-password" />
+
+            <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <button type="submit" class="btn btn-success w-100 btn-login">
-            Masuk
-        </button>
+        <!-- Remember Me -->
+        <div class="block mt-4">
+            <label for="remember_me" class="inline-flex items-center">
+                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-brand shadow-sm focus:ring-brand" name="remember">
+                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+            </label>
+        </div>
+
+        <div class="flex items-center justify-end mt-4">
+            @if (Route::has('password.request'))
+                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand" href="{{ route('password.request') }}">
+                    {{ __('Forgot your password?') }}
+                </a>
+            @endif
+
+            <x-primary-button class="ms-3">
+                {{ __('Log in') }}
+            </x-primary-button>
+        </div>
     </form>
-
-    <div class="text-center mt-4">
-        <span class="text-muted">Belum punya akun?</span>
-
-        <a
-            href="{{ route('register') }}"
-            class="text-success text-decoration-none fw-semibold"
-        >
-            Daftar
-        </a>
-    </div>
-
-</div>
-
-</body>
-</html>
+</x-guest-layout>

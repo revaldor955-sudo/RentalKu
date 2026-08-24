@@ -7,20 +7,20 @@
 
     <title>Management Rental - RentalKu</title>
 
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-    >
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/css/dataTables.bootstrap5.min.css">
 
     <style>
         body {
             background: #f6f8f7;
-            font-family: Arial, sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         .navbar {
@@ -48,7 +48,7 @@
             background: white;
             border: none;
             border-radius: 18px;
-            box-shadow: 0 8px 30px rgba(0,0,0,.05);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .05);
         }
 
         .table th {
@@ -106,414 +106,121 @@
 
 <body>
 
-{{-- NAVBAR --}}
-<nav class="navbar">
-    <div class="container py-3">
+    {{-- NAVBAR --}}
+    @include('layouts.partials.admin-navbar')
 
-        <div class="d-flex align-items-center justify-content-between">
 
-            <a href="{{ route('admin.dashboard') }}" class="brand">
-                Rental<span>Ku</span>.
+    <div class="container py-4">
+
+        {{-- HEADER --}}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+                <h2 class="page-title mb-1">
+                    Management Rental
+                </h2>
+
+                <p class="text-muted mb-0">
+                    Kelola pengajuan sewa mobil pelanggan.
+                </p>
+            </div>
+
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
+
+                <i class="bi bi-arrow-left me-1"></i>
+                Dashboard
+
             </a>
 
-            <div class="d-flex align-items-center gap-3">
+        </div>
 
-                <span>
-                    <i class="bi bi-person-circle"></i>
-                    {{ Auth::user()->name }}
-                </span>
 
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
+        {{-- ALERT SUCCESS --}}
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show">
 
-                    <button class="btn btn-outline-danger btn-sm">
-                        <i class="bi bi-box-arrow-right"></i>
-                        Keluar
-                    </button>
-                </form>
+                <i class="bi bi-check-circle-fill me-2"></i>
+
+                {{ session('success') }}
+
+                <button type="button" class="btn-close" data-bs-dismiss="alert">
+                </button>
 
             </div>
-
-        </div>
-
-    </div>
-</nav>
+        @endif
 
 
-<div class="container py-4">
+        {{-- ALERT ERROR --}}
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show">
 
-    {{-- HEADER --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
+                <i class="bi bi-exclamation-circle-fill me-2"></i>
 
-        <div>
-            <h2 class="page-title mb-1">
-                Management Rental
-            </h2>
+                {{ session('error') }}
 
-            <p class="text-muted mb-0">
-                Kelola pengajuan sewa mobil pelanggan.
-            </p>
-        </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert">
+                </button>
 
-        <a href="{{ route('admin.dashboard') }}"
-           class="btn btn-outline-secondary">
-
-            <i class="bi bi-arrow-left me-1"></i>
-            Dashboard
-
-        </a>
-
-    </div>
+            </div>
+        @endif
 
 
-    {{-- ALERT SUCCESS --}}
-    @if(session('success'))
+        {{-- TABLE --}}
+        <div class="card-custom">
 
-        <div class="alert alert-success alert-dismissible fade show">
+            <div class="card-body p-0">
 
-            <i class="bi bi-check-circle-fill me-2"></i>
+                <div class="table-responsive">
 
-            {{ session('success') }}
+                    <table class="table table-hover mb-0" id="rentals-table">
 
-            <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert">
-            </button>
-
-        </div>
-
-    @endif
-
-
-    {{-- ALERT ERROR --}}
-    @if(session('error'))
-
-        <div class="alert alert-danger alert-dismissible fade show">
-
-            <i class="bi bi-exclamation-circle-fill me-2"></i>
-
-            {{ session('error') }}
-
-            <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert">
-            </button>
-
-        </div>
-
-    @endif
-
-
-    {{-- TABLE --}}
-    <div class="card-custom">
-
-        <div class="card-body p-0">
-
-            <div class="table-responsive">
-
-                <table class="table table-hover mb-0">
-
-                    <thead>
-
-                        <tr>
-
-                            <th class="px-4 py-3">
-                                #
-                            </th>
-
-                            <th>
-                                Pelanggan
-                            </th>
-
-                            <th>
-                                Mobil
-                            </th>
-
-                            <th>
-                                Tanggal Sewa
-                            </th>
-
-                            <th>
-                                Hari
-                            </th>
-
-                            <th>
-                                Total
-                            </th>
-
-                            <th>
-                                Status
-                            </th>
-
-                            <th>
-                                Aksi
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody>
-
-                        @forelse($rentals as $rental)
+                        <thead>
 
                             <tr>
 
-                                <td class="px-4">
-                                    {{ $loop->iteration }}
-                                </td>
-
-
-                                {{-- PELANGGAN --}}
-                                <td>
-
-                                    <div class="fw-bold">
-                                        {{ $rental->user->name ?? '-' }}
-                                    </div>
-
-                                    <small class="text-muted">
-                                        {{ $rental->user->email ?? '-' }}
-                                    </small>
-
-                                </td>
-
-
-                                {{-- MOBIL --}}
-                                <td>
-
-                                    <div class="fw-bold">
-                                        {{ $rental->mobil->name ?? '-' }}
-                                    </div>
-
-                                    <small class="text-muted">
-                                        {{ $rental->mobil->plate_number ?? '-' }}
-                                    </small>
-
-                                </td>
-
-
-                                {{-- TANGGAL --}}
-                                <td>
-
-                                    {{ $rental->tanggal_mulai->format('d/m/Y') }}
-
-                                    <br>
-
-                                    <small class="text-muted">
-                                        s/d
-                                        {{ $rental->tanggal_selesai->format('d/m/Y') }}
-                                    </small>
-
-                                </td>
-
-
-                                {{-- JUMLAH HARI --}}
-                                <td>
-
-                                    {{ $rental->jumlah_hari }}
-
-                                    hari
-
-                                </td>
-
-
-                                {{-- TOTAL --}}
-                                <td>
-
-                                    <strong>
-                                        Rp {{ number_format($rental->total_harga, 0, ',', '.') }}
-                                    </strong>
-
-                                </td>
-
-
-                                {{-- STATUS --}}
-                                <td>
-
-                                    @if($rental->status === 'Menunggu')
-
-                                        <span class="status status-menunggu">
-                                            Menunggu
-                                        </span>
-
-                                    @elseif($rental->status === 'Disetujui')
-
-                                        <span class="status status-disetujui">
-                                            Disetujui
-                                        </span>
-
-                                    @elseif($rental->status === 'Ditolak')
-
-                                        <span class="status status-ditolak">
-                                            Ditolak
-                                        </span>
-
-                                    @elseif($rental->status === 'Selesai')
-
-                                        <span class="status status-selesai">
-                                            Selesai
-                                        </span>
-
-                                    @else
-
-                                        <span class="status bg-secondary text-white">
-                                            {{ $rental->status }}
-                                        </span>
-
-                                    @endif
-
-                                </td>
-
-
-                                {{-- AKSI --}}
-                                <td>
-
-                                    @if($rental->status === 'Menunggu')
-
-                                        <div class="d-flex gap-2">
-
-                                            {{-- SETUJUI --}}
-                                            <form
-                                                action="{{ route('rentals.updateStatus', $rental->id) }}"
-                                                method="POST"
-                                            >
-
-                                                @csrf
-                                                @method('PUT')
-
-                                                <input
-                                                    type="hidden"
-                                                    name="status"
-                                                    value="Disetujui"
-                                                >
-
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-success btn-sm btn-action"
-                                                    onclick="return confirm('Setujui pengajuan rental ini?')"
-                                                >
-
-                                                    <i class="bi bi-check-lg"></i>
-                                                    Setujui
-
-                                                </button>
-
-                                            </form>
-
-
-                                            {{-- TOLAK --}}
-                                            <form
-                                                action="{{ route('rentals.updateStatus', $rental->id) }}"
-                                                method="POST"
-                                            >
-
-                                                @csrf
-                                                @method('PUT')
-
-                                                <input
-                                                    type="hidden"
-                                                    name="status"
-                                                    value="Ditolak"
-                                                >
-
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-outline-danger btn-sm btn-action"
-                                                    onclick="return confirm('Tolak pengajuan rental ini?')"
-                                                >
-
-                                                    <i class="bi bi-x-lg"></i>
-                                                    Tolak
-
-                                                </button>
-
-                                            </form>
-
-                                        </div>
-
-
-                                    @elseif($rental->status === 'Disetujui')
-
-                                        {{-- SELESAIKAN --}}
-                                        <form
-                                            action="{{ route('rentals.updateStatus', $rental->id) }}"
-                                            method="POST"
-                                        >
-
-                                            @csrf
-                                            @method('PUT')
-
-                                            <input
-                                                type="hidden"
-                                                name="status"
-                                                value="Selesai"
-                                            >
-
-                                            <button
-                                                type="submit"
-                                                class="btn btn-primary btn-sm btn-action"
-                                                onclick="return confirm('Selesaikan rental ini?')"
-                                            >
-
-                                                <i class="bi bi-check2-circle"></i>
-                                                Selesaikan
-
-                                            </button>
-
-                                        </form>
-
-
-                                    @elseif($rental->status === 'Ditolak')
-
-                                        <span class="text-muted">
-                                            Tidak ada aksi
-                                        </span>
-
-
-                                    @elseif($rental->status === 'Selesai')
-
-                                        <span class="text-muted">
-                                            Selesai
-                                        </span>
-
-                                    @endif
-
-                                </td>
+                                <th class="px-4 py-3">
+                                    #
+                                </th>
+
+                                <th>
+                                    Pelanggan
+                                </th>
+
+                                <th>
+                                    Mobil
+                                </th>
+
+                                <th>
+                                    Tanggal Sewa
+                                </th>
+
+                                <th>
+                                    Hari
+                                </th>
+
+                                <th>
+                                    Total
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th class="text-end pe-4">
+                                    Aksi
+                                </th>
 
                             </tr>
 
-                        @empty
+                        </thead>
 
-                            <tr>
+                        <tbody>
+                            {{-- Diisi oleh DataTables (server-side) --}}
+                        </tbody>
 
-                                <td colspan="8">
+                    </table>
 
-                                    <div class="empty">
-
-                                        <i class="bi bi-car-front fs-1"></i>
-
-                                        <h5 class="mt-3">
-                                            Belum ada rental
-                                        </h5>
-
-                                        <p class="mb-0">
-                                            Belum ada pengajuan sewa mobil dari pelanggan.
-                                        </p>
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                        @endforelse
-
-                    </tbody>
-
-                </table>
+                </div>
 
             </div>
 
@@ -521,12 +228,397 @@
 
     </div>
 
-</div>
+
+    {{-- MODAL DETAIL RENTAL --}}
+    <div class="modal fade" id="detailRentalModal" tabindex="-1" aria-labelledby="detailRentalModalLabel"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header bg-success text-white">
+
+                    <h5 class="modal-title" id="detailRentalModalLabel">
+                        <i class="bi bi-car-front me-2"></i>
+                        Detail Rental
+                    </h5>
+
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Tutup"></button>
+
+                </div>
+
+                <div class="modal-body p-4">
+
+                    {{-- LOADING --}}
+                    <div id="rentalDetailLoading" class="text-center py-5">
+                        <div class="spinner-border text-success" role="status"></div>
+                        <p class="text-muted mt-3 mb-0">
+                            Memuat detail rental...
+                        </p>
+                    </div>
+
+                    {{-- ERROR --}}
+                    <div id="rentalDetailError" class="alert alert-danger d-none" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <span id="rentalDetailErrorMessage">
+                            Gagal memuat detail rental.
+                        </span>
+                    </div>
+
+                    {{-- KONTEN --}}
+                    <div id="rentalDetailContent" class="d-none">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <div class="border rounded-3 p-3 h-100">
+                                    <small class="text-muted fw-bold text-uppercase">Pelanggan</small>
+                                    <h6 class="fw-bold mb-1" id="rd-pelanggan">-</h6>
+                                    <small class="text-muted" id="rd-email">-</small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="border rounded-3 p-3 h-100">
+                                    <small class="text-muted fw-bold text-uppercase">Mobil</small>
+                                    <h6 class="fw-bold mb-1" id="rd-mobil">-</h6>
+                                    <small class="text-muted" id="rd-plat">-</small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="border rounded-3 p-3">
+                                    <small class="text-muted fw-bold text-uppercase">Periode Sewa</small>
+                                    <div class="fw-semibold" id="rd-tanggal">-</div>
+                                    <small class="text-muted" id="rd-jumlah-hari">-</small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="border rounded-3 p-3">
+                                    <small class="text-muted fw-bold text-uppercase">Cabang</small>
+                                    <div class="fw-semibold">
+                                        <i class="bi bi-box-arrow-in-right me-1"></i>
+                                        <span id="rd-cabang-ambil">-</span>
+                                    </div>
+                                    <div class="fw-semibold">
+                                        <i class="bi bi-box-arrow-right me-1"></i>
+                                        <span id="rd-cabang-kembali">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="border rounded-3 p-3">
+                                    <small class="text-muted fw-bold text-uppercase">Rincian Biaya</small>
+                                    <div class="d-flex justify-content-between">
+                                        <small class="text-muted">Harga per hari</small>
+                                        <small id="rd-harga-perhari">-</small>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <small class="text-muted">Subtotal</small>
+                                        <small id="rd-subtotal">-</small>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <small class="text-muted">Deposit</small>
+                                        <small id="rd-deposit">-</small>
+                                    </div>
+                                    <hr class="my-2">
+                                    <div class="d-flex justify-content-between fw-bold">
+                                        <span>Total</span>
+                                        <span id="rd-total">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="border rounded-3 p-3">
+                                    <small class="text-muted fw-bold text-uppercase">Status</small>
+                                    <div id="rd-status">-</div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="border rounded-3 p-3">
+                                    <small class="text-muted fw-bold text-uppercase">Catatan</small>
+                                    <p class="mb-0" id="rd-catatan">-</p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
 
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        const CSRF_TOKEN = '{{ csrf_token() }}';
+
+        function updateRentalStatus(id, status) {
+            const text = status === 'Disetujui' ? 'Setujui pengajuan rental ini?' :
+                (status === 'Ditolak' ? 'Tolak pengajuan rental ini?' : 'Selesaikan rental ini?');
+
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya',
+                cancelButtonText: 'Batal',
+            }).then(function(result) {
+                if (!result.isConfirmed) return;
+
+                $.ajax({
+                    url: "{{ route('rentals.updateStatus', '__ID__') }}".replace('__ID__', id),
+                    method: 'PUT',
+                    headers: {
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Accept': 'application/json',
+                    },
+                    data: {
+                        status: status
+                    },
+                    success: function(res) {
+                        $('#rentals-table').DataTable().ajax.reload();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: res.message || 'Terjadi kesalahan',
+                        });
+                    },
+                    error: function(xhr) {
+                        const res = xhr.responseJSON || {};
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: res.message || 'Terjadi kesalahan',
+                        });
+                    },
+                });
+            });
+        }
+
+            function formatRupiah(value) {
+                return 'Rp ' + Number(value).toLocaleString('id-ID');
+            }
+
+            function statusBadge(status) {
+                const map = {
+                    'Menunggu': 'status-menunggu',
+                    'Disetujui': 'status-disetujui',
+                    'Ditolak': 'status-ditolak',
+                    'Selesai': 'status-selesai',
+                };
+
+                const cls = map[status] || 'bg-secondary text-white';
+
+                return '<span class="status ' + cls + '">' + status + '</span>';
+            }
+
+            function rentalActions(data) {
+                let html = '<div class="d-flex gap-2 justify-content-end">';
+
+                html += '<button class="btn btn-sm btn-outline-primary btn-action" ' +
+                    'onclick="openRentalDetail(' + data.id + ')">' +
+                    '<i class="bi bi-eye"></i> Detail</button>';
+
+                if (data.status === 'Menunggu') {
+                    html += '<button type="button" class="btn btn-success btn-sm btn-action" ' +
+                        'onclick="updateRentalStatus(' + data.id + ', \'Disetujui\')">' +
+                        '<i class="bi bi-check-lg"></i> Setujui</button>';
+                    html += '<button type="button" class="btn btn-outline-danger btn-sm btn-action" ' +
+                        'onclick="updateRentalStatus(' + data.id + ', \'Ditolak\')">' +
+                        '<i class="bi bi-x-lg"></i> Tolak</button>';
+                } else if (data.status === 'Disetujui') {
+                    html += '<button type="button" class="btn btn-primary btn-sm btn-action" ' +
+                        'onclick="updateRentalStatus(' + data.id + ', \'Selesai\')">' +
+                        '<i class="bi bi-check-lg"></i> Selesaikan</button>';
+                }
+
+                html += '</div>';
+                return html;
+            }
+
+            $(document).ready(function() {
+
+                $('#rentals-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: "{{ route('rentals.data') }}",
+                        type: 'GET',
+                    },
+                    columns: [{
+                            data: null,
+                            orderable: false,
+                            searchable: false,
+                            className: 'px-4',
+                            render: function(data, type, row, meta) {
+                                return meta.row + meta.settings._iDisplayStart + 1;
+                            },
+                        },
+                        {
+                            data: null,
+                            orderable: true,
+                            searchable: false,
+                            render: function(data) {
+                                return '<div class="fw-bold">' + data.user_name + '</div>' +
+                                    '<small class="text-muted">' + data.user_email + '</small>';
+                            },
+                        },
+                        {
+                            data: null,
+                            orderable: true,
+                            searchable: false,
+                            render: function(data) {
+                                return '<div class="fw-bold">' + data.mobil_name + '</div>' +
+                                    '<small class="text-muted">' + data.mobil_plate + '</small>';
+                            },
+                        },
+                        {
+                            data: null,
+                            orderable: true,
+                            searchable: false,
+                            render: function(data) {
+                                return data.tanggal_mulai + '<br>' +
+                                    '<small class="text-muted">s/d ' + data.tanggal_selesai +
+                                    '</small>';
+                            },
+                        },
+                        {
+                            data: 'jumlah_hari',
+                            orderable: true,
+                            searchable: false,
+                            render: function(data) {
+                                return data + ' hari';
+                            },
+                        },
+                        {
+                            data: 'total_harga',
+                            orderable: true,
+                            searchable: false,
+                            render: function(data) {
+                                return '<strong>' + formatRupiah(data) + '</strong>';
+                            },
+                        },
+                        {
+                            data: 'status',
+                            orderable: true,
+                            searchable: false,
+                            render: function(data) {
+                                return statusBadge(data);
+                            },
+                        },
+                        {
+                            data: null,
+                            orderable: false,
+                            searchable: false,
+                            className: 'text-end pe-4',
+                            render: function(data) {
+                                return rentalActions(data);
+                            },
+                        },
+                    ],
+                    order: [
+                        [3, 'desc']
+                    ],
+                    language: {
+                        processing: 'Memproses...',
+                        search: 'Cari:',
+                        lengthMenu: 'Tampilkan _MENU_ data',
+                        info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                        infoEmpty: 'Tidak ada data',
+                        infoFiltered: '(difilter dari _MAX_ total data)',
+                        infoPostFix: '',
+                        loadingRecords: 'Memuat...',
+                        zeroRecords: 'Tidak ditemukan data yang cocok',
+                        emptyTable: 'Belum ada rental',
+                        paginate: {
+                            previous: 'Sebelumnya',
+                            next: 'Berikutnya'
+                        },
+                        aria: {
+                            sortAscending: ': aktifkan untuk urut naik',
+                            sortDescending: ': aktifkan untuk urut turun',
+                        },
+                    },
+                });
+
+            });
+
+            function openRentalDetail(id) {
+
+                const modalEl = document.getElementById('detailRentalModal');
+                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+                const loading = document.getElementById('rentalDetailLoading');
+                const error = document.getElementById('rentalDetailError');
+                const content = document.getElementById('rentalDetailContent');
+
+                loading.classList.remove('d-none');
+                error.classList.add('d-none');
+                content.classList.add('d-none');
+
+                modal.show();
+
+                $.ajax({
+                    url: "{{ route('rentals.detail', '__ID__') }}".replace('__ID__', id),
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                    success: function(data) {
+
+                        document.getElementById('rd-pelanggan').textContent = data.pelanggan;
+                        document.getElementById('rd-email').textContent = data.email;
+                        document.getElementById('rd-mobil').textContent = data.mobil;
+                        document.getElementById('rd-plat').textContent = data.plat;
+                        document.getElementById('rd-tanggal').textContent = data.tanggal_mulai + ' s/d ' + data
+                            .tanggal_selesai;
+                        document.getElementById('rd-jumlah-hari').textContent = data.jumlah_hari + ' hari';
+                        document.getElementById('rd-cabang-ambil').textContent = data.cabang_ambil;
+                        document.getElementById('rd-cabang-kembali').textContent = data.cabang_kembali;
+                        document.getElementById('rd-harga-perhari').textContent = formatRupiah(data
+                            .harga_perhari);
+                        document.getElementById('rd-subtotal').textContent = formatRupiah(data.subtotal);
+                        document.getElementById('rd-deposit').textContent = formatRupiah(data.deposit);
+                        document.getElementById('rd-total').textContent = formatRupiah(data.total_harga);
+                        document.getElementById('rd-status').innerHTML = statusBadge(data.status);
+                        document.getElementById('rd-catatan').textContent = data.catatan || '-';
+
+                        loading.classList.add('d-none');
+                        content.classList.remove('d-none');
+                    },
+                    error: function(xhr) {
+                        loading.classList.add('d-none');
+                        document.getElementById('rentalDetailErrorMessage').textContent = 
+                        'Gagal memuat detail rental: ' + xhr.status + ' ' + xhr.statusText;
+                        error.classList.remove('d-none');
+                    }
+                });
+
+            }
+    </script>
 
 </body>
+
 </html>

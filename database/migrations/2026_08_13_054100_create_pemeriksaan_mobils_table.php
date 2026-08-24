@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pemeriksaan_mobils', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade');
+            $table->foreignId('rental_id')->constrained('rentals')->onDelete('cascade');
             $table->foreignId('mobil_id')->constrained('mobils')->onDelete('cascade');
             $table->enum('jenis', ['sebelum_sewa', 'setelah_sewa']);
             $table->enum('kondisi', ['baik', 'rusak'])->default('baik');

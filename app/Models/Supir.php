@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Supir extends Model
 {
     protected $table = 'supirs';
+
     protected $fillable = [
         'name',
         'phone',
@@ -15,8 +16,8 @@ class Supir extends Model
         'status',
     ];
 
-    public function booking()
+    public function rental()
     {
-        return $this->belongsToMany(Booking::class, 'booking_supir', 'supir_id', 'booking_id');
+        return $this->belongsToMany(Rental::class, 'rental_supir', 'supir_id', 'rental_id');
     }
 }

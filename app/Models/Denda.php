@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Denda extends Model
 {
     protected $table = 'dendas';
+
     protected $fillable = [
-        'booking_id',
+        'rental_id',
         'jenis',
         'nominal',
         'foto_bukti',
@@ -16,8 +17,8 @@ class Denda extends Model
         'status',
     ];
 
-    public function booking()
+    public function rental()
     {
-        return $this->belongsTo(Booking::class, 'booking_id');
+        return $this->belongsTo(Rental::class, 'rental_id');
     }
 }

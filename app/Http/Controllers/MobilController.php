@@ -8,7 +8,6 @@ use App\Models\Fasilitas;
 use App\Models\Mobil;
 use App\Models\TipeMobil;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class MobilController extends Controller
 {
@@ -17,9 +16,9 @@ class MobilController extends Controller
      */
     public function index()
     {
-  $mobils = Mobil::with(['brand', 'tipeMobil', 'cabang', 'fasilitas'])
-    ->latest()
-    ->get();
+        $mobils = Mobil::with(['brand', 'tipeMobil', 'cabang', 'fasilitas'])
+            ->latest()
+            ->get();
 
         $brands = Brand::all();
         $tipeMobils = TipeMobil::all();
@@ -45,21 +44,118 @@ class MobilController extends Controller
         ));
     }
 
+    /**
+     * Server-side DataTables: daftar mobil (search, sort, pagination)
+     */
+    public function data(Request $request)
+    {
+        $query = Mobil::query()
+            ->leftJoin('brands', 'mobils.brand_id', '=', 'brands.id')
+            ->leftJoin('tipe_mobils', 'mobils.tipe_mobil_id', '=', 'tipe_mobils.id')
+            ->leftJoin('cabangs', 'mobils.cabang_id', '=', 'cabangs.id')
+            ->select(
+                'mobils.*',
+                'brands.name as brand_name',
+                'tipe_mobils.name as tipe_name',
+                'cabangs.name as cabang_name'
+            )
+            ->withCount('fasilitas')
+            ->with('fasilitas');
 
-public function create()
-{
-    $brands = Brand::all();
-    $tipeMobils = TipeMobil::all();
-    $cabangs = Cabang::all();
-    $fasilitas = Fasilitas::all();
+        $recordsTotal = $query->count();
 
-    return view('staff.mobils.create', compact(
-        'brands',
-        'tipeMobils',
-        'cabangs',
-        'fasilitas'
-    ));
-}
+        $search = $request->input('search.value');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('mobils.name', 'like', "%{$search}%")
+                    ->orWhere('mobils.plate_number', 'like', "%{$search}%")
+                    ->orWhere('mobils.tahun', 'like', "%{$search}%")
+                    ->orWhere('mobils.transmisi', 'like', "%{$search}%")
+                    ->orWhere('mobils.warna', 'like', "%{$search}%")
+                    ->orWhere('mobils.status', 'like', "%{$search}%")
+                    ->orWhere('brands.name', 'like', "%{$search}%")
+                    ->orWhere('tipe_mobils.name', 'like', "%{$search}%")
+                    ->orWhere('cabangs.name', 'like', "%{$search}%");
+            });
+        }
+
+        $recordsFiltered = $query->count();
+
+        $columns = [
+            0 => null,
+            1 => 'mobils.name',
+            2 => 'brands.name',
+            3 => 'tipe_mobils.name',
+            4 => 'cabangs.name',
+            5 => 'mobils.plate_number',
+            6 => 'mobils.tahun',
+            7 => 'mobils.harga_perhari',
+            8 => 'mobils.status',
+            9 => null,
+        ];
+
+        $orderColumn = $request->input('order.0.column', 1);
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
+            $query->orderBy($columns[$orderColumn], $orderDir);
+        } else {
+            $query->orderBy('mobils.name', 'asc');
+        }
+
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $mobils = $query->offset($start)->limit($length)->get();
+
+        $data = $mobils->map(function ($mobil) {
+            return [
+                'id' => $mobil->id,
+                'name' => $mobil->name,
+                'warna' => $mobil->warna,
+                'brand_name' => $mobil->brand_name ?? '-',
+                'tipe_name' => $mobil->tipe_name ?? '-',
+                'cabang_name' => $mobil->cabang_name ?? '-',
+                'plate_number' => $mobil->plate_number,
+                'tahun' => $mobil->tahun,
+                'harga_perhari' => $mobil->harga_perhari,
+                'status' => $mobil->status,
+                'image' => $mobil->image,
+                'fasilitas_count' => $mobil->fasilitas_count,
+                'brand_id' => $mobil->brand_id,
+                'tipe_mobil_id' => $mobil->tipe_mobil_id,
+                'cabang_id' => $mobil->cabang_id,
+                'transmisi' => $mobil->transmisi,
+                'kapasitas' => $mobil->kapasitas,
+                'deposit' => $mobil->deposit,
+                'description' => $mobil->description,
+                'fasilitas_ids' => $mobil->fasilitas->pluck('id')->toArray(),
+            ];
+        });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
+    }
+
+    public function create()
+    {
+        $brands = Brand::all();
+        $tipeMobils = TipeMobil::all();
+        $cabangs = Cabang::all();
+        $fasilitas = Fasilitas::all();
+
+        return view('staff.mobils.create', compact(
+            'brands',
+            'tipeMobils',
+            'cabangs',
+            'fasilitas'
+        ));
+    }
 
     public function store(Request $request)
     {
@@ -68,9 +164,9 @@ public function create()
             'tipe_mobil_id' => 'required|exists:tipe_mobils,id',
             'cabang_id' => 'required|exists:cabangs,id',
             'name' => 'required|string|max:45',
-            'plate_number' => 'required|string|max:10|unique:mobils,plate_number',
-            'tahun' => 'required|integer|min:1990|max:' . date('Y'),
-        'transmisi' => 'required|in:manual,matic,Manual,Matic',
+            'plate_number' => 'required|string|max:7|unique:mobils,plate_number',
+            'tahun' => 'required|integer|min:1990|max:'.date('Y'),
+            'transmisi' => 'required|in:manual,matic,Manual,Matic',
             'kapasitas' => 'required|integer|min:1',
             'warna' => 'required|string|max:20',
             'harga_perhari' => 'required|numeric|min:0',
@@ -104,20 +200,20 @@ public function create()
         ]);
 
         $validated['transmisi'] = ucfirst(strtolower($validated['transmisi']));
-        
+
         // Upload gambar
         if ($request->hasFile('image')) {
 
             $image = $request->file('image');
 
-            $imageName = time() . '_' . $image->getClientOriginalName();
+            $imageName = time().'_'.$image->getClientOriginalName();
 
             $image->move(
                 public_path('images/mobils'),
                 $imageName
             );
 
-            $validated['image'] = 'images/mobils/' . $imageName;
+            $validated['image'] = 'images/mobils/'.$imageName;
         }
 
         // Simpan mobil
@@ -141,110 +237,124 @@ public function create()
             ->with('success', 'Mobil berhasil ditambahkan.');
     }
 
-
     /**
      * Detail mobil
      */
-   public function show($id)
-{
-    $mobil = Mobil::with([
-        'brand',
-        'tipeMobil',
-        'cabang',
-        'fasilitas'
-    ])->findOrFail($id);
+    public function show(Request $request, $id)
+    {
+        $mobil = Mobil::with([
+            'brand',
+            'tipeMobil',
+            'cabang',
+            'fasilitas',
+        ])->findOrFail($id);
 
-    return view('customer.mobil-detail', compact('mobil'));
-}
+        $cabangs = Cabang::orderBy('name')->get();
+
+        // Permintaan AJAX (modal detail mobil di dashboard customer):
+        // kembalikan partial view agar tidak reload seluruh halaman.
+        if ($request->ajax() || $request->wantsJson()) {
+            return view('customer.partials.mobil-detail-modal', compact('mobil', 'cabangs'));
+        }
+
+        return view('customer.mobil-detail', compact('mobil', 'cabangs'));
+    }
+
     /**
      * Form edit
      */
-   public function edit(Mobil $mobil)
-{
-    $brands = Brand::all();
-    $tipeMobils = TipeMobil::all();
-    $cabangs = Cabang::all();
-    $fasilitas = Fasilitas::all();
+    public function edit(Mobil $mobil)
+    {
+        $brands = Brand::all();
+        $tipeMobils = TipeMobil::all();
+        $cabangs = Cabang::all();
+        $fasilitas = Fasilitas::all();
 
-    $mobil->load([
-        'brand',
-        'tipeMobil',
-        'cabang',
-        'fasilitas'
-    ]);
+        $mobil->load([
+            'brand',
+            'tipeMobil',
+            'cabang',
+            'fasilitas',
+        ]);
 
-    return view('staff.mobils.edit', compact(
-        'mobil',
-        'brands',
-        'tipeMobils',
-        'cabangs',
-        'fasilitas'
-    ));
-}
+        return view('staff.mobils.edit', compact(
+            'mobil',
+            'brands',
+            'tipeMobils',
+            'cabangs',
+            'fasilitas'
+        ));
+    }
 
     /**
      * Update mobil
      */
-   public function update(Request $request, Mobil $mobil)
-{
-    $validated = $request->validate([
-        'brand_id' => 'required|exists:brands,id',
-        'tipe_mobil_id' => 'required|exists:tipe_mobils,id',
-        'cabang_id' => 'required|exists:cabangs,id',
-        'name' => 'required|string|max:45',
-        'plate_number' => 'required|string|max:10|unique:mobils,plate_number,' . $mobil->id,
-        'tahun' => 'required|integer|min:1990|max:' . date('Y'),
-        'transmisi' => 'required|in:Manual,Matic',
-       'kapasitas' => 'required|integer|min:1',
-        'warna' => 'required|string|max:20',
-        'harga_perhari' => 'required|numeric|min:0',
-        'deposit' => 'required|numeric|min:0',
-        'image' => 'nullable|mimes:jpeg,png,jpg,svg|max:2048',
-        'status' => 'required|in:Tersedia,Disewa,Maintenance',
-        'description' => 'nullable|string',
-        'fasilitas' => 'nullable|array',
-        'fasilitas.*' => 'exists:fasilitas,id',
-    ]);
+    public function update(Request $request, Mobil $mobil)
+    {
+        $validated = $request->validate([
+            'brand_id' => 'required|exists:brands,id',
+            'tipe_mobil_id' => 'required|exists:tipe_mobils,id',
+            'cabang_id' => 'required|exists:cabangs,id',
+            'name' => 'required|string|max:45',
+            'plate_number' => 'required|string|max:10|unique:mobils,plate_number,'.$mobil->id,
+            'tahun' => 'required|integer|min:1990|max:'.date('Y'),
+            'transmisi' => 'required|in:Manual,Matic',
+            'kapasitas' => 'required|integer|min:1',
+            'warna' => 'required|string|max:20',
+            'harga_perhari' => 'required|numeric|min:0',
+            'deposit' => 'required|numeric|min:0',
+            'image' => 'nullable|mimes:jpeg,png,jpg,svg|max:2048',
+            'status' => 'required|in:Tersedia,Disewa,Maintenance',
+            'description' => 'nullable|string',
+            'fasilitas' => 'nullable|array',
+            'fasilitas.*' => 'exists:fasilitas,id',
+        ]);
 
-    // Upload foto baru
-    if ($request->hasFile('image')) {
+        // Upload foto baru
+        if ($request->hasFile('image')) {
 
-        $image = $request->file('image');
+            $image = $request->file('image');
 
-        $imageName = time() . '_' . $image->getClientOriginalName();
+            $imageName = time().'_'.$image->getClientOriginalName();
 
-        $image->move(
-            public_path('images/mobils'),
-            $imageName
+            $image->move(
+                public_path('images/mobils'),
+                $imageName
+            );
+
+            $validated['image'] = 'images/mobils/'.$imageName;
+        }
+
+        // Update data mobil
+        $mobil->update($validated);
+
+        // Update fasilitas
+        $mobil->fasilitas()->sync(
+            $request->input('fasilitas', [])
         );
 
-        $validated['image'] = 'images/mobils/' . $imageName;
+        // Respons JSON untuk request AJAX (modal edit)
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Mobil berhasil diperbarui.',
+            ]);
+        }
+
+        // Selalu kembali ke data mobil STAFF
+        return redirect()
+            ->route('staff.mobils.index')
+            ->with('success', 'Mobil berhasil diperbarui.');
     }
-
-    // Update data mobil
-    $mobil->update($validated);
-
-    // Update fasilitas
-    $mobil->fasilitas()->sync(
-        $request->input('fasilitas', [])
-    );
-
-    // Selalu kembali ke data mobil STAFF
-    return redirect()
-        ->route('staff.mobils.index')
-        ->with('success', 'Mobil berhasil diperbarui.');
-}
-
 
     /**
      * Hapus mobil
      */
-   public function destroy(Mobil $mobil)
-{
-    $mobil->delete();
+    public function destroy(Mobil $mobil)
+    {
+        $mobil->delete();
 
-    return redirect()
-        ->route('staff.mobils.index')
-        ->with('success', 'Mobil berhasil dihapus.');
-}
+        return redirect()
+            ->route('staff.mobils.index')
+            ->with('success', 'Mobil berhasil dihapus.');
+    }
 }

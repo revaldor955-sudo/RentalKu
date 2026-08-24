@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('kompensasis', function (Blueprint $table) {
             $table->id();
             $table->foreignId('mobil_id')->constrained('mobils')->onDelete('cascade');
-            $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade');
+            $table->foreignId('rental_id')->constrained('rentals')->onDelete('cascade');
             $table->foreignId('customer_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('staff_id')->nullable()->constrained('users')->onDelete('set null');
             $table->enum('jenis', ['pengembalian_dana', 'diskon', 'gratis_sewa']);

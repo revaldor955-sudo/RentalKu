@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Mobil;
 use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
@@ -13,39 +14,30 @@ class HomeController extends Controller
             ->orderBy('urutan')
             ->get();
 
-   $mobils = DB::table('mobils')
-    ->join('brands', 'mobils.brand_id', '=', 'brands.id')
-    ->join('tipe_mobils', 'mobils.tipe_mobil_id', '=', 'tipe_mobils.id')
-    ->join('cabangs', 'mobils.cabang_id', '=', 'cabangs.id')
-    ->where('mobils.status', 'tersedia')
-    ->select(
-        'mobils.*',
-        'brands.name as nama_brand',
-        'tipe_mobils.name as nama_tipe',
-        'cabangs.name as nama_cabang'
-    )
-    ->latest('mobils.id')
-    ->limit(6)
-    ->get();
+        $mobils = Mobil::with(['brand', 'cabang', 'fotoMobils'])
+            ->where('status', 'Tersedia')
+            ->latest('id')
+            ->limit(6)
+            ->get();
 
-       $brands = DB::table('brands')
-    ->orderBy('name')
-    ->get();
+        $brands = DB::table('brands')
+            ->orderBy('name')
+            ->get();
 
-       $ratings = DB::table('ratings')
-    ->join('users', 'ratings.customer_id', '=', 'users.id')
-    ->select(
-        'ratings.*',
-        'users.name',
-        'users.photo as foto_user'
-    )
-    ->latest('ratings.id')
-    ->limit(6)
-    ->get();
+        $ratings = DB::table('ratings')
+            ->join('users', 'ratings.customer_id', '=', 'users.id')
+            ->select(
+                'ratings.*',
+                'users.name',
+                'users.photo as foto_user'
+            )
+            ->latest('ratings.id')
+            ->limit(6)
+            ->get();
 
-      $faqs = DB::table('faqs')
-    ->orderBy('urutan')
-    ->get();
+        $faqs = DB::table('faqs')
+            ->orderBy('urutan')
+            ->get();
 
         return view('home', compact(
             'banners',

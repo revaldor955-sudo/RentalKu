@@ -21,7 +21,7 @@
         body {
             background: #f5f7f6;
             color: #1f2937;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         .navbar {
@@ -175,6 +175,10 @@
             display: none;
         }
     </style>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -372,6 +376,7 @@
 
                         <select
                             name="metode_pembayaran_id"
+                            id="metodeSelect"
                             class="form-select @error('metode_pembayaran_id') is-invalid @enderror"
                             required
                         >
@@ -388,8 +393,6 @@
                                 >
 
                                     {{ $metode->name }}
-                                    -
-                                    {{ $metode->nomor_akun }}
 
                                 </option>
 
@@ -411,7 +414,7 @@
                     {{-- DETAIL METODE --}}
                     @if($metodePembayarans->count())
 
-                        <div class="mb-4">
+                        <div class="mb-4" id="metodeDetail">
 
                             <label class="form-label">
                                 Rekening / Akun Pembayaran
@@ -419,7 +422,10 @@
 
                             @foreach($metodePembayarans as $metode)
 
-                                <div class="payment-method">
+                                <div
+                                    class="payment-method metode-detail d-none"
+                                    id="metode-{{ $metode->id }}"
+                                >
 
                                     <strong>
                                         <i class="bi bi-wallet2 text-success me-2"></i>
@@ -436,6 +442,16 @@
                                 </div>
 
                             @endforeach
+
+                            <div class="payment-method" id="metode-placeholder">
+
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Pilih metode pembayaran untuk melihat
+                                    nomor rekening / akun.
+                                </small>
+
+                            </div>
 
                         </div>
 
@@ -559,6 +575,56 @@
 
 
 <script>
+
+document.getElementById('metodeSelect').addEventListener('change', function() {
+
+    const select = document.getElementById('metodeSelect');
+    const detailBox = document.getElementById('metodeDetail');
+    const placeholder = document.getElementById('metode-placeholder');
+
+    if (!detailBox) {
+        return;
+    }
+
+    const selectedId = select.value;
+
+    detailBox.querySelectorAll('.metode-detail').forEach(function(el) {
+        el.classList.add('d-none');
+    });
+
+    if (selectedId) {
+
+        const target = document.getElementById('metode-' + selectedId);
+
+        if (target) {
+            target.classList.remove('d-none');
+        }
+
+        if (placeholder) {
+            placeholder.classList.add('d-none');
+        }
+
+    } else if (placeholder) {
+
+        placeholder.classList.remove('d-none');
+
+    }
+
+});
+
+showMetodeDetail();
+
+function showMetodeDetail() {
+
+    const select = document.getElementById('metodeSelect');
+
+    if (!select) {
+        return;
+    }
+
+    select.dispatchEvent(new Event('change'));
+
+}
 
 document.getElementById('bukti').addEventListener('change', function(event) {
 

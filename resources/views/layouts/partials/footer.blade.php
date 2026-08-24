@@ -62,7 +62,7 @@
                     <a href="#">Rental Mobil</a>
                     <a href="#">Dengan Supir</a>
                     <a href="#">Tanpa Supir</a>
-                    <a href="#">Booking</a>
+                    <a href="#">Rental</a>
 
                 </div>
 

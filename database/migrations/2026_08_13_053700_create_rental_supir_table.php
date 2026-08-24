@@ -6,14 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('booking_supir', function (Blueprint $table) {
+        Schema::create('rental_supir', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade');
+            $table->foreignId('rental_id')->constrained('rentals')->onDelete('cascade');
             $table->foreignId('supir_id')->constrained('supirs')->onDelete('cascade');
             $table->decimal('tarif_perhari', 12, 2);
             $table->decimal('sub_total', 12, 2);
@@ -21,11 +18,8 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('booking_supir');
+        Schema::dropIfExists('rental_supir');
     }
 };

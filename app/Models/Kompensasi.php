@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Kompensasi extends Model
 {
     protected $table = 'kompensasis';
+
     protected $fillable = [
         'mobil_id',
-        'booking_id',
+        'rental_id',
         'customer_id',
         'staff_id',
         'jenis',
@@ -25,9 +26,9 @@ class Kompensasi extends Model
         return $this->belongsTo(Mobil::class, 'mobil_id');
     }
 
-    public function booking()
+    public function rental()
     {
-        return $this->belongsTo(Booking::class, 'booking_id');
+        return $this->belongsTo(Rental::class, 'rental_id');
     }
 
     public function customer()

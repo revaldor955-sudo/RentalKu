@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Mobil;
 use Illuminate\Database\Eloquent\Model;
 
 class Cabang extends Model
 {
     protected $table = 'cabangs';
+
     protected $fillable = [
         'name',
         'address',
@@ -19,13 +19,13 @@ class Cabang extends Model
         return $this->hasMany(Mobil::class, 'cabang_id');
     }
 
-    public function bookingAmbil()
+    public function rentalAmbil()
     {
-        return $this->hasMany(Booking::class, 'cabang_ambil_id');
+        return $this->hasMany(Rental::class, 'cabang_ambil_id');
     }
 
-    public function bookingKembali()
+    public function rentalKembali()
     {
-        return $this->hasMany(Booking::class, 'cabang_kembali_id');
+        return $this->hasMany(Rental::class, 'cabang_kembali_id');
     }
 }

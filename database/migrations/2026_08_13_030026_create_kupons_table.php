@@ -19,8 +19,8 @@ return new class extends Migration
             $table->integer('kuota')->nullable();
             $table->integer('terpakai')->default(0);
             $table->decimal('minimal_pembelian', 12, 2)->nullable();
-            $table->date('active_at')->nullable();
-            $table->date('expired_at')->nullable();
+            $table->dateTime('active_at')->nullable();
+            $table->dateTime('expired_at')->nullable();
             $table->timestamps();
         });
     }

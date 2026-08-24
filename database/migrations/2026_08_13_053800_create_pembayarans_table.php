@@ -28,12 +28,12 @@ return new class extends Migration
 
             $table->decimal('jumlah', 15, 2);
 
-            $table->string('bukti_pembayaran')->nullable();
+            $table->string('bukti')->nullable();
 
             $table->enum('status', [
                 'Menunggu',
-                'Diverifikasi',
-                'Ditolak'
+                'Disetujui',
+                'Ditolak',
             ])->default('Menunggu');
 
             $table->text('catatan')->nullable();

@@ -12,10 +12,14 @@
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
         body {
             background: #f5f7f6;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             color: #1f2937;
         }
 
@@ -144,42 +148,7 @@
 <body>
 
 {{-- NAVBAR --}}
-<nav class="navbar">
-
-    <div class="container py-3">
-
-        <div class="d-flex justify-content-between align-items-center w-100">
-
-            <a href="{{ route('admin.dashboard') }}"
-                class="text-decoration-none brand">
-                Rental<span>ku</span>.
-            </a>
-
-            <div class="d-flex gap-2">
-
-                <a href="{{ route('admin.dashboard') }}"
-                    class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-speedometer2 me-1"></i>
-                    Dashboard
-                </a>
-
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-
-                    <button type="submit"
-                        class="btn btn-outline-danger btn-sm">
-                        <i class="bi bi-box-arrow-right me-1"></i>
-                        Keluar
-                    </button>
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</nav>
+@include('layouts.partials.admin-navbar')
 
 
 <div class="container py-5">
@@ -199,15 +168,24 @@
 
         </div>
 
-        <button type="button"
-            class="btn btn-green"
-            data-bs-toggle="modal"
-            data-bs-target="#tambahBannerModal">
+        <div class="d-flex gap-2">
 
-            <i class="bi bi-plus-circle me-1"></i>
-            Tambah Banner
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>
+                Dashboard
+            </a>
 
-        </button>
+            <button type="button"
+                class="btn btn-green"
+                data-bs-toggle="modal"
+                data-bs-target="#tambahBannerModal">
+
+                <i class="bi bi-plus-circle me-1"></i>
+                Tambah Banner
+
+            </button>
+
+        </div>
 
     </div>
 
@@ -385,7 +363,7 @@
                                         <form
                                             action="{{ route('banners.destroy', $banner->id) }}"
                                             method="POST"
-                                            onsubmit="return confirm('Yakin ingin menghapus banner ini?')">
+                                            onsubmit="return confirmSubmit(event, 'Yakin ingin menghapus banner ini?')">
 
                                             @csrf
                                             @method('DELETE')
@@ -803,6 +781,35 @@
 
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+</script>
+
+<script>
+
+    function confirmSubmit(event, message) {
+        event.preventDefault();
+
+        const form = event.target;
+
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: message,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+
+        return false;
+    }
+
 </script>
 
 </body>

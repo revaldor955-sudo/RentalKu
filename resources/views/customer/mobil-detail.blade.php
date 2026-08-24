@@ -23,7 +23,7 @@
 
         body {
             background: #f6f8f7;
-            font-family: Arial, sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             color: #1f2937;
         }
 
@@ -63,6 +63,9 @@
             width: 100%;
             height: 470px;
             object-fit: cover;
+            object-position: center;
+            border-radius: 18px;
+            display: block;
         }
 
         .detail-content {
@@ -75,6 +78,18 @@
             gap: 6px;
             background: #e8f7ef;
             color: #198754;
+            padding: 8px 14px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .badge-unavailable {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fde8e8;
+            color: #dc3545;
             padding: 8px 14px;
             border-radius: 50px;
             font-size: 13px;
@@ -210,6 +225,10 @@
         }
 
     </style>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -226,19 +245,34 @@
 
             <div class="d-flex align-items-center gap-3">
 
-                <span class="d-none d-md-block">
-                    <i class="bi bi-person-circle"></i>
-                    {{ Auth::user()->name }}
-                </span>
+                @auth
 
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
+                    <span class="d-none d-md-block">
+                        <i class="bi bi-person-circle"></i>
+                        {{ Auth::user()->name }}
+                    </span>
 
-                    <button class="btn btn-outline-danger btn-sm">
-                        <i class="bi bi-box-arrow-right"></i>
-                        Keluar
-                    </button>
-                </form>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+
+                        <button class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-box-arrow-right"></i>
+                            Keluar
+                        </button>
+                    </form>
+
+                @else
+
+                    <a href="{{ route('login') }}" class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>
+                        Masuk
+                    </a>
+
+                    <a href="{{ route('register') }}" class="btn btn-success btn-sm">
+                        Daftar
+                    </a>
+
+                @endauth
 
             </div>
 
@@ -270,7 +304,7 @@
         <div class="row g-0">
 
             {{-- FOTO --}}
-            <div class="col-lg-6">
+            <div class="col-lg-6 p-3 p-md-4">
 
                @if($mobil->image)
     <img
@@ -294,13 +328,27 @@
 
                 <div class="detail-content">
 
-                    <span class="badge-available">
+                    @if($mobil->status === 'Tersedia')
 
-                        <i class="bi bi-check-circle-fill"></i>
+    <span class="badge-available">
 
-                        Tersedia untuk disewa
+        <i class="bi bi-check-circle-fill"></i>
 
-                    </span>
+        Tersedia untuk disewa
+
+    </span>
+
+@else
+
+    <span class="badge-unavailable">
+
+        <i class="bi bi-x-circle-fill"></i>
+
+        Tidak Tersedia untuk disewa
+
+    </span>
+
+@endif
 
 
                     <h1 class="car-title">
@@ -469,8 +517,6 @@
 
     </div>
 
-</div>
-
 <div class="col-6">
 
     <div class="spec-card">
@@ -491,21 +537,60 @@
 
 </div>
 
+<div class="col-6">
+
+    <div class="spec-card">
+
+        <div class="spec-icon">
+            <i class="bi bi-geo-alt"></i>
+        </div>
+
+        <div class="spec-title">
+            Cabang
+        </div>
+
+        <div class="spec-value">
+            {{ $mobil->cabang->name ?? '-' }}
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
 
                     {{-- BUTTON --}}
                    <div class="mt-4">
 
     @if($mobil->status === 'Tersedia')
 
-        <a
-            href="{{ route('rentals.create', $mobil->id) }}"
-            class="btn btn-rental d-flex align-items-center justify-content-center text-decoration-none">
+        @auth
 
-            <i class="bi bi-calendar-check me-2"></i>
+            <button
+                type="button"
+                class="btn btn-rental d-flex align-items-center justify-content-center"
+                onclick="openSewaPopup()">
 
-            Sewa Sekarang
+                <i class="bi bi-calendar-check me-2"></i>
 
-        </a>
+                Sewa Sekarang
+
+            </button>
+
+        @else
+
+            <a
+                href="{{ route('login') }}"
+                class="btn btn-rental d-flex align-items-center justify-content-center text-decoration-none">
+
+                <i class="bi bi-box-arrow-in-right me-2"></i>
+
+                Masuk untuk Sewa
+
+            </a>
+
+        @endauth
 
     @else
 
@@ -599,6 +684,237 @@
 
 </div>
 
+{{-- FORM SEWA (server-rendered, di-inject ke SweetAlert) --}}
+<div id="sewaFormTemplate" class="d-none">
+
+    <form
+        action="{{ route('rentals.store', $mobil->id) }}"
+        method="POST"
+        id="sewaForm">
+
+        @csrf
+
+        <div class="row g-3 text-start">
+
+            <div class="col-md-6">
+
+                <label class="form-label fw-semibold">
+                    Cabang Ambil
+                </label>
+
+                <select
+                    name="cabang_ambil_id"
+                    class="form-select"
+                    required>
+
+                    <option value="" disabled selected>
+                        Pilih cabang ambil
+                    </option>
+
+                    @foreach($cabangs as $cabang)
+
+                        <option
+                            value="{{ $cabang->id }}"
+                            @selected(old('cabang_ambil_id', $mobil->cabang_id) == $cabang->id)>
+                            {{ $cabang->name }}
+                        </option>
+
+                    @endforeach
+
+                </select>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label fw-semibold">
+                    Cabang Kembali
+                </label>
+
+                <select
+                    name="cabang_kembali_id"
+                    class="form-select"
+                    required>
+
+                    <option value="" disabled selected>
+                        Pilih cabang kembali
+                    </option>
+
+                    @foreach($cabangs as $cabang)
+
+                        <option
+                            value="{{ $cabang->id }}"
+                            @selected(old('cabang_kembali_id', $mobil->cabang_id) == $cabang->id)>
+                            {{ $cabang->name }}
+                        </option>
+
+                    @endforeach
+
+                </select>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label fw-semibold">
+                    Tanggal Mulai
+                </label>
+
+                <input
+                    type="date"
+                    name="tanggal_mulai"
+                    class="form-control"
+                    min="{{ date('Y-m-d') }}"
+                    value="{{ old('tanggal_mulai') }}"
+                    required>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label fw-semibold">
+                    Tanggal Selesai
+                </label>
+
+                <input
+                    type="date"
+                    name="tanggal_selesai"
+                    class="form-control"
+                    min="{{ date('Y-m-d') }}"
+                    value="{{ old('tanggal_selesai') }}"
+                    required>
+
+            </div>
+
+            <div class="col-12">
+
+                <label class="form-label fw-semibold">
+                    Catatan
+                </label>
+
+                <textarea
+                    name="catatan"
+                    class="form-control"
+                    rows="3"
+                    placeholder="Catatan tambahan jika diperlukan...">{{ old('catatan') }}</textarea>
+
+            </div>
+
+            <div class="col-12">
+
+                <div class="alert alert-success py-2 mb-0">
+
+                    <small>
+                        <i class="bi bi-info-circle me-1"></i>
+                        Harga: Rp {{ number_format($mobil->harga_perhari, 0, ',', '.') }}/hari.
+                        Deposit Rp {{ number_format($mobil->deposit, 0, ',', '.') }}
+                        ditambahkan ke total.
+                    </small>
+
+                </div>
+
+            </div>
+
+            <div class="col-12">
+
+                <button type="submit" class="btn btn-success w-100 py-2">
+                    <i class="bi bi-calendar-check me-1"></i>
+                    Ajukan Sewa
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+    function openSewaPopup() {
+
+        const template = document.getElementById('sewaFormTemplate');
+
+        Swal.fire({
+            title: 'Sewa {{ $mobil->name }}',
+            html: template.innerHTML,
+            width: 600,
+            showConfirmButton: false,
+            didOpen: () => {
+
+                const form = document.querySelector('#swal2-html-container form');
+
+                form.addEventListener('submit', async function (event) {
+
+                    event.preventDefault();
+
+                    const submitBtn = form.querySelector('button[type="submit"]');
+
+                    // Tombol submit bawaan SweetAlert tidak dipakai; form submit
+                    // dilempar ke server lewat fetch (tetap server-side).
+                    const formData = new FormData(form);
+
+                    Swal.showLoading();
+
+                    try {
+
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: formData
+                        });
+
+                        const data = await response.json();
+
+                        Swal.hideLoading();
+
+                        if (!response.ok) {
+
+                            const firstError = data.errors
+                                ? Object.values(data.errors).flat()[0]
+                                : (data.message ?? 'Terjadi kesalahan.');
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: firstError,
+                            });
+
+                            return;
+                        }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: data.message ?? 'Pengajuan sewa mobil berhasil dibuat.',
+                            confirmButtonText: 'OK',
+                        }).then(() => {
+                            window.location.href = '{{ route('customer.dashboard') }}';
+                        });
+
+                    } catch (error) {
+
+                        Swal.hideLoading();
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Koneksi bermasalah. Silakan coba lagi.',
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+</script>
 
 </body>
 </html>
