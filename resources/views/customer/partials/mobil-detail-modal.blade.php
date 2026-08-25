@@ -5,8 +5,9 @@
     .mobil-modal .mm-photo {
         width: 100%;
         height: 260px;
-        object-fit: cover;
+        object-fit: contain;
         object-position: center;
+        background: #f8faf9;
         display: block;
     }
 
