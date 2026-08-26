@@ -2,25 +2,86 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cabang;
 use App\Models\Mobil;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        // --- Filter pencarian dari search box (GET /) ---
+        // Sanitasi manual: input invalid diabaikan diam-diam, bukan error validasi,
+        // agar pengunjung landing tidak pernah melihat halaman error.
+
+        $cabangId = $request->query('cabang');
+        $cabangAktif = null;
+        if ($cabangId !== null && $cabangId !== '') {
+            $cabangAktif = Cabang::find($cabangId);
+        }
+
+        $mulai = $this->tanggalValid($request->query('tanggal_mulai'), minDate: Carbon::today());
+        $selesai = $this->tanggalValid($request->query('tanggal_selesai'));
+        // Pasangan tanggal hanya dipakai jika keduanya sah dan urut.
+        if ($mulai === null || $selesai === null || $selesai->lt($mulai)) {
+            $mulai = null;
+            $selesai = null;
+        }
+
+        // Grid bertahap: default 6 mobil, bisa ditambah lewat "Tampilkan Lebih Banyak".
+        // Filter pencarian selalu menampilkan hasil lengkap (tidak bertahap).
+        $jumlah = (int) $request->query('jumlah', 6);
+        $jumlah = max(1, min(48, $jumlah));
+        $punyaFilter = $cabangAktif !== null || $mulai !== null;
+
+        // Tombol hanya perlu tampil jika stok melebihi yang sudah tampil di grid.
+        $totalTersedia = Mobil::where('status', 'Tersedia')->count();
+
+        $mobils = Mobil::with(['brand', 'cabang', 'fotoMobils'])
+            ->where('status', 'Tersedia')
+            ->when($cabangAktif !== null, function ($query) use ($cabangAktif) {
+                $query->where('cabang_id', $cabangAktif->id);
+            })
+            ->when($mulai !== null, function ($query) use ($mulai, $selesai) {
+                // Mobil dianggap bentrok jika ada rental aktif (Menunggu/Disetujui)
+                // yang rentangnya overlap dengan rentang pencarian.
+                $query->whereDoesntHave('rentals', function ($q) use ($mulai, $selesai) {
+                    $q->whereIn('status', ['Menunggu', 'Disetujui'])
+                        ->where('tanggal_mulai', '<=', $selesai)
+                        ->where('tanggal_selesai', '>=', $mulai);
+                });
+            })
+            ->orderByDesc('id')
+            ->when(! $punyaFilter, fn ($query) => $query->limit($jumlah))
+            ->get();
+
+        // Pencarian AJAX (search box landing tanpa reload): kembalikan hanya
+        // partial hasil mobil — pola yang sama dengan detail modal customer.
+        // Query section lain (banner/brand/rating/faq) tidak diperlukan.
+        if ($request->ajax() || $request->wantsJson()) {
+            return view('home.partials.hasil-pencarian', compact(
+                'mobils',
+                'punyaFilter',
+                'cabangAktif',
+                'mulai',
+                'selesai',
+                'jumlah',
+                'totalTersedia'
+            ));
+        }
+
         $banners = DB::table('banners')
             ->where('status', 'aktif')
             ->orderBy('urutan')
             ->get();
 
-        $mobils = Mobil::with(['brand', 'cabang', 'fotoMobils'])
-            ->where('status', 'Tersedia')
-            ->latest('id')
-            ->limit(6)
+        $brands = DB::table('brands')
+            ->orderBy('name')
             ->get();
 
-        $brands = DB::table('brands')
+        $cabangs = DB::table('cabangs')
             ->orderBy('name')
             ->get();
 
@@ -44,7 +105,37 @@ class HomeController extends Controller
             'mobils',
             'brands',
             'ratings',
-            'faqs'
+            'faqs',
+            'cabangs',
+            'cabangAktif',
+            'mulai',
+            'selesai',
+            'punyaFilter',
+            'jumlah',
+            'totalTersedia'
         ));
+    }
+
+    /**
+     * Parse string tanggal Y-m-d dari query string.
+     * Return Carbon jika format valid dan >= minDate, selain itu null.
+     */
+    private function tanggalValid(?string $nilai, ?Carbon $minDate = null): ?Carbon
+    {
+        if ($nilai === null || ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $nilai)) {
+            return null;
+        }
+
+        try {
+            $tanggal = Carbon::createFromFormat('Y-m-d', $nilai)->startOfDay();
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if ($minDate !== null && $tanggal->lt($minDate)) {
+            return null;
+        }
+
+        return $tanggal;
     }
 }

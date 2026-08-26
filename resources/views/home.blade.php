@@ -53,7 +53,7 @@
 
             <div class="search-card">
 
-                <form action="#" method="GET">
+                <form action="{{ route('home') }}" method="GET">
 
                     <div class="row g-3 align-items-end">
 
@@ -63,14 +63,19 @@
                                 Lokasi Pengambilan
                             </div>
 
-                            <select class="form-select search-input">
-                                <option selected>
+                            <select name="cabang" class="form-select search-input" aria-label="Pilih cabang">
+
+                                <option value="">
                                     Pilih cabang
                                 </option>
 
-                                <option>
-                                    Pontianak
-                                </option>
+                                @foreach ($cabangs as $item)
+
+                                    <option value="{{ $item->id }}" @selected($cabangAktif?->id == $item->id)>
+                                        {{ $item->name }}
+                                    </option>
+
+                                @endforeach
 
                             </select>
 
@@ -82,7 +87,8 @@
                                 Tanggal Mulai
                             </div>
 
-                            <input type="date" class="form-control search-input">
+                            <input type="date" name="tanggal_mulai" value="{{ $mulai?->toDateString() }}"
+                                min="{{ now()->toDateString() }}" class="form-control search-input">
 
                         </div>
 
@@ -92,7 +98,8 @@
                                 Tanggal Selesai
                             </div>
 
-                            <input type="date" class="form-control search-input">
+                            <input type="date" name="tanggal_selesai" value="{{ $selesai?->toDateString() }}"
+                                min="{{ now()->toDateString() }}" class="form-control search-input">
 
                         </div>
 
@@ -120,140 +127,13 @@
 
         <div class="container">
 
-            <div class="d-flex justify-content-between align-items-end mb-5">
-
-                <div>
-
-                    <div class="text-success fw-bold mb-2">
-                        PILIH KENDARAAN
-                    </div>
-
-                    <h2 class="section-title">
-                        Mobil pilihan untuk perjalananmu
-                    </h2>
-
-                    <p class="section-subtitle">
-                        Pilih kendaraan yang sesuai dengan kebutuhan
-                        dan budget perjalananmu.
-                    </p>
-
-                </div>
-
-                <a href="#" class="btn btn-outline-dark d-none d-md-block">
-                    Lihat Semua
-                    <i class="bi bi-arrow-right ms-2"></i>
-                </a>
-
-            </div>
-
-
-            <div class="row g-4">
-
-                @forelse($mobils as $mobil)
-                    <div class="col-md-6 col-lg-4">
-
-                        <div class="car-card">
-
-                            @if ($mobil->fotoMobils->isNotEmpty())
-                                <img src="{{ $mobil->fotoMobils->first()->url }}" class="car-image"
-                                    alt="{{ $mobil->name }}">
-                            @elseif($mobil->image)
-                                <img src="{{ asset($mobil->image) }}" class="car-image" alt="{{ $mobil->name }}">
-                            @else
-                                <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=900&q=80"
-                                    class="car-image" alt="{{ $mobil->name }}">
-                            @endif
-
-
-                            <div class="car-content">
-
-                                <div class="car-brand">
-                                    {{ $mobil->brand->name ?? '-' }}
-                                </div>
-
-                                <div class="car-title">
-                                    {{ $mobil->name }}
-                                </div>
-
-
-                                <div class="car-info mb-4">
-
-                                    <span>
-                                        <i class="bi bi-people me-1"></i>
-                                        {{ $mobil->kapasitas }}
-                                    </span>
-
-                                    <span>
-                                        <i class="bi bi-gear me-1"></i>
-                                        {{ ucfirst($mobil->transmisi) }}
-                                    </span>
-
-                                    <span>
-                                        <i class="bi bi-geo-alt me-1"></i>
-                                        {{ $mobil->cabang->name ?? '-' }}
-                                    </span>
-
-                                </div>
-
-
-                                <div class="d-flex justify-content-between align-items-center">
-
-                                    <div>
-
-                                        <div class="car-price">
-
-                                            Rp {{ number_format($mobil->harga_perhari, 0, ',', '.') }}
-
-                                            <small>
-                                                /hari
-                                            </small>
-
-                                        </div>
-
-                                    </div>
-
-                                    <a href="{{ route('mobils.show', $mobil->id) }}" class="btn btn-rent">
-                                        Detail
-                                    </a>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                @empty
-
-                    <div class="col-12">
-
-                        <div class="text-center py-5">
-
-                            <div class="mb-3">
-                                <i class="bi bi-car-front fs-1 text-secondary"></i>
-                            </div>
-
-                            <h5>
-                                Belum ada mobil tersedia
-                            </h5>
-
-                            <p class="text-secondary">
-                                Data mobil akan muncul di sini setelah
-                                ditambahkan melalui dashboard admin.
-                            </p>
-
-                        </div>
-
-                    </div>
-                @endforelse
-
+            <div id="hasil-pencarian">
+                @include('home.partials.hasil-pencarian')
             </div>
 
         </div>
 
     </section>
-
 
     <section class="section section-light">
 
@@ -813,5 +693,130 @@
         </div>
 
     </section>
+
+
+    <script>
+        // Search box landing: validasi pasangan tanggal + pencarian AJAX
+        // (partial hasil diganti tanpa reload, URL tetap disinkronkan).
+        (function () {
+            var form = document.querySelector('.search-card form');
+            if (!form) return;
+
+            var mulai = form.elements.tanggal_mulai;
+            var selesai = form.elements.tanggal_selesai;
+            var cabangEl = form.elements.cabang;
+            var tombol = form.querySelector('button[type="submit"]');
+            var kontainer = document.getElementById('hasil-pencarian');
+
+            // ---------- Validasi ----------
+
+            // Batasi tanggal selesai minimal mengikuti tanggal mulai
+            function sinkronMin() {
+                selesai.min = mulai.value || '';
+            }
+            mulai.addEventListener('change', sinkronMin);
+            sinkronMin();
+
+            // Return pesan error, atau '' jika valid.
+            function pesanError() {
+                var adaMulai = mulai.value !== '';
+                var adaSelesai = selesai.value !== '';
+
+                selesai.setCustomValidity('');
+
+                if (adaMulai !== adaSelesai) {
+                    return 'Lengkapi kedua tanggal (mulai dan selesai) atau kosongkan keduanya.';
+                }
+                if (adaSelesai && selesai.value < mulai.value) {
+                    return 'Tanggal selesai tidak boleh sebelum tanggal mulai.';
+                }
+                return '';
+            }
+
+            function valid() {
+                var pesan = pesanError();
+                if (pesan !== '') {
+                    selesai.setCustomValidity(pesan);
+                    selesai.reportValidity();
+                    return false;
+                }
+                return true;
+            }
+
+            // ---------- Pencarian AJAX ----------
+
+            // Bangun query string dari field terisi saja agar URL bersih.
+            function bangunQuery() {
+                var params = new URLSearchParams();
+                if (cabangEl.value !== '') params.set('cabang', cabangEl.value);
+                if (mulai.value !== '') params.set('tanggal_mulai', mulai.value);
+                if (selesai.value !== '') params.set('tanggal_selesai', selesai.value);
+                return params.toString();
+            }
+
+            var sedangCari = false;
+
+            function cari(url, dorongRiwayat, gulirKeGrid) {
+                if (sedangCari) return;
+                sedangCari = true;
+                tombol.disabled = true;
+                tombol.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Mencari...';
+
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function (res) {
+                        if (!res.ok) throw new Error('HTTP ' + res.status);
+                        return res.text();
+                    })
+                    .then(function (html) {
+                        kontainer.innerHTML = html;
+                        if (dorongRiwayat) history.pushState(null, '', url);
+                        // Konten menyusut (reset / lebih sedikit): pastikan
+                        // pengguna tidak terdampar di area kosong bawah.
+                        if (gulirKeGrid) {
+                            document.getElementById('mobil').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    })
+                    .catch(function () {
+                        // AJAX gagal (jaringan/server): jatuh ke submit normal.
+                        window.location.href = url;
+                    })
+                    .then(function () {
+                        sedangCari = false;
+                        tombol.disabled = false;
+                        tombol.innerHTML = '<i class="bi bi-search me-2"></i>Cari Mobil';
+                    });
+            }
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                if (!valid()) return;
+
+                var query = bangunQuery();
+
+                // Tidak ada filter sama sekali: kembali ke tampilan default polos.
+                if (query === '') {
+                    cari(form.action, true, false);
+                    return;
+                }
+
+                cari(form.action + '?' + query, true, false);
+            });
+
+            // Link reset / lihat-sedikit / load-more / reset-cta di area hasil
+            // ikut AJAX, supaya tidak memicu reload setelah pencarian.
+            document.addEventListener('click', function (e) {
+                var link = e.target.closest('#hasil-pencarian [data-search-link]');
+                if (!link) return;
+                e.preventDefault();
+                cari(link.href, true, link.hasAttribute('data-search-top'));
+            });
+
+            // Tombol back/forward browser: muat ulang hasil sesuai URL.
+            window.addEventListener('popstate', function () {
+                cari(window.location.href, false, false);
+            });
+        })();
+    </script>
 
 @endsection
