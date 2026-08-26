@@ -43,6 +43,36 @@ class CabangSeeder extends Seeder
                 'address' => 'Jl. Raya Kuta No. 210, Kuta, Kab. Badung, Bali 80361',
                 'phone' => '+62 812-2001-1006',
             ],
+            [
+                'name' => 'Cabang Pontianak Kota',
+                'address' => 'Jl. Gajah Mada No. 57, Taman Sari, Kota Pontianak, Kalimantan Barat 78112',
+                'phone' => '+62 812-2001-1007',
+            ],
+            [
+                'name' => 'Cabang Pontianak Supadio',
+                'address' => 'Jl. Arteri Supadio, Sei Pinyuh, Kec. Sungai Kakap, Kab. Kubu Raya, Kalimantan Barat 78391',
+                'phone' => '+62 812-2001-1008',
+            ],
+            [
+                'name' => 'Cabang Singkawang',
+                'address' => 'Jl. Diponegoro No. 31, Tengah, Kota Singkawang, Kalimantan Barat 79116',
+                'phone' => '+62 812-2001-1009',
+            ],
+            [
+                'name' => 'Cabang Banjarmasin',
+                'address' => 'Jl. Pangeran Antasari No. 86, Banjarmasin Tengah, Kota Banjarmasin, Kalimantan Selatan 70236',
+                'phone' => '+62 812-2001-1010',
+            ],
+            [
+                'name' => 'Cabang Balikpapan',
+                'address' => 'Jl. Jenderal Sudirman No. 51, Damai Bahagia, Kec. Balikpapan Selatan, Balikpapan, Kalimantan Timur 76114',
+                'phone' => '+62 812-2001-1011',
+            ],
+            [
+                'name' => 'Cabang Samarinda',
+                'address' => 'Jl. Gajah Mada No. 9, Pelabuhan, Kec. Samarinda Kota, Samarinda, Kalimantan Timur 75242',
+                'phone' => '+62 812-2001-1012',
+            ],
         ];
 
         foreach ($cabangs as $cabang) {
