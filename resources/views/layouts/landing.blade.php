@@ -39,6 +39,13 @@
             box-sizing: border-box;
         }
 
+        /* Cegah scroll horizontal: margin negatif .row.g-5 (-24px)
+           melebihi padding .container (12px) di layar kecil */
+        html,
+        body {
+            overflow-x: clip;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             color: var(--dark);
