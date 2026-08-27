@@ -17,12 +17,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
     <style>
         :root {
             --primary: #16a34a;
@@ -39,11 +33,9 @@
             box-sizing: border-box;
         }
 
-        /* Cegah scroll horizontal: margin negatif .row.g-5 (-24px)
-           melebihi padding .container (12px) di layar kecil */
         html,
         body {
-            overflow-x: clip;
+            overflow-x: clip; /* margin negatif .row.g-5 melebihi padding .container */
         }
 
         body {
@@ -108,21 +100,92 @@
         }
 
         .hero {
-            min-height: 680px;
+            /* Tinggi tetap (bukan ikut ukuran natural gambar) agar rantai
+               height:100% container->carousel->slide resolve dan gambar
+               ter-crop rapi oleh cover; overflow:hidden membuang sisa crop. */
+            height: 680px;
+            overflow: hidden;
             background:
                 linear-gradient(90deg,
                     rgba(10, 20, 15, .92) 0%,
                     rgba(10, 20, 15, .75) 42%,
                     rgba(10, 20, 15, .15) 100%),
-                url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=2000&q=85') center/cover;
+                url('{{ asset('images/banners/hero-jalan-palem.jpg') }}') center/cover;
+            display: flex;
+            align-items: stretch;
+            padding: 0;
+            position: relative;
+        }
+
+        .hero .container,
+        #heroCarousel,
+        #heroCarousel .carousel-inner {
+            height: 100%;
+        }
+
+        /* Carousel adalah flex item dalam .container (flex-row) tanpa konten
+           in-flow -> menyusut ke 0px; paksa selebar container agar
+           left: calc(50% - 50vw) pada slide menghasilkan posisi full-bleed. */
+        #heroCarousel {
+            width: 100%;
+        }
+
+        /* Tamp tanpa carousel (banner kosong): konten tetap vertikal center */
+        .hero > .container {
             display: flex;
             align-items: center;
-            position: relative;
+        }
+
+        #heroCarousel .carousel-inner {
+            overflow: visible;
         }
 
         .hero-content {
             color: white;
             max-width: 700px;
+        }
+
+        #heroCarousel .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Slide banner: gambarnya jadi latar penuh, dioverlay gradasi agar teks terbaca */
+        #heroCarousel .hero-slide {
+            background-size: cover;
+            background-position: center;
+        }
+
+        #heroCarousel .hero-slide::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg,
+                rgba(10, 20, 15, .92) 0%,
+                rgba(10, 20, 15, .75) 42%,
+                rgba(10, 20, 15, .15) 100%);
+        }
+
+        /* Item memenuhi seluruh hero agar latar slide full-bleed.
+           Non-aktif tetap display: none dari Bootstrap. */
+        #heroCarousel .carousel-item {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: calc(50% - 50vw);
+            width: 100vw;
+        }
+
+        /* Flex juga berlaku saat transisi (.carousel-item-next/.-prev)
+           agar konten slide masuk/keluar tidak melompat dari atas ke tengah. */
+        #heroCarousel .carousel-item.active,
+        #heroCarousel .carousel-item-next,
+        #heroCarousel .carousel-item-prev {
+            display: flex;
+            align-items: center;
+            padding-block: 95px;
+            /* Ikut garis kiri/kanan .container walau item selebar viewport */
+            padding-inline: max(12px, calc(50vw - 648px));
         }
 
         .hero-badge {
@@ -255,7 +318,7 @@
         .car-image {
             height: 220px;
             width: 100%;
-            object-fit: cover;
+            object-fit: contain;
             background: #f1f5f9;
         }
 
@@ -404,8 +467,66 @@
             position: relative;
             z-index: 2;
             color: white;
-            padding: 60px;
+            padding: 60px 60px 60px 96px;
             max-width: 700px;
+        }
+
+        /* z-index di atas .hero-content agar panah kiri bisa diklik */
+        #heroCarousel .carousel-control-prev,
+        #heroCarousel .carousel-control-next {
+            top: 50%;
+            bottom: auto;
+            width: 42px;
+            height: 42px;
+            background: transparent;
+            opacity: .85;
+            z-index: 3;
+        }
+
+        #heroCarousel .carousel-control-prev {
+            left: -26px;
+        }
+
+        #heroCarousel .carousel-control-next {
+            right: -26px;
+        }
+
+        @media (max-width: 1400px) {
+
+            #heroCarousel .carousel-control-prev {
+                left: 10px;
+            }
+
+            #heroCarousel .carousel-control-next {
+                right: 10px;
+            }
+
+        }
+
+        #heroCarousel .carousel-control-prev:hover,
+        #heroCarousel .carousel-control-next:hover {
+            opacity: 1;
+        }
+
+        /* Indikator slide: dot putih; slide aktif memanjang jadi pill */
+        #heroCarousel .carousel-indicators {
+            z-index: 3;
+            margin-bottom: 26px;
+        }
+
+        #heroCarousel .carousel-indicators [data-bs-target] {
+            width: 9px;
+            height: 9px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, .45);
+            opacity: 1;
+            transition: width .25s ease-out, background-color .25s ease-out;
+        }
+
+        #heroCarousel .carousel-indicators .active {
+            width: 28px;
+            background: white;
         }
 
         .rating-card {
@@ -503,7 +624,7 @@
         @media(max-width: 768px) {
 
             .hero {
-                min-height: 600px;
+                height: 600px;
             }
 
             .hero h1 {
@@ -524,7 +645,7 @@
 
             .promo-content,
             .cta {
-                padding: 35px 25px;
+                padding: 35px 25px 35px 64px;
             }
 
         }
