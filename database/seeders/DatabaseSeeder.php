@@ -22,5 +22,6 @@ class DatabaseSeeder extends Seeder
         $this->call(MobilSeeder::class);
         $this->call(MetodePembayaranSeeder::class);
         $this->call(KerusakanMobilSeeder::class);
+        $this->call(BannerSeeder::class);
     }
 }
