@@ -1,9 +1,5 @@
-{{-- Partial hasil mobil landing: header kondisional + chip filter + grid kartu + empty state.
-     Dipakai oleh:
-     - resources/views/home.blade.php via @include (render penuh halaman)
-     - HomeController::index() saat request AJAX (pencarian tanpa reload) --}}
+{{-- Dipakai oleh home.blade.php via @include dan HomeController::index() saat AJAX --}}
 @php
-    // Nama bulan singkat Indonesia untuk label filter (locale app masih en)
     $bulanIndo = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 @endphp
 
@@ -185,7 +181,6 @@
 
 </div>
 
-{{-- Grid tanpa filter bertahap: tombol tambah / susutkan sesuai keadaan. --}}
 @if (! $punyaFilter && ($mobils->count() < $totalTersedia || $jumlah > 6))
 
     <div class="text-center mt-5 d-flex flex-wrap gap-2 justify-content-center">
