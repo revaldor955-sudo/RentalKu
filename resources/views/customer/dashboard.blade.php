@@ -299,7 +299,8 @@
         .car-img {
             width: 100%;
             height: 210px;
-            object-fit: cover;
+            object-fit: contain;
+            background: #f1f5f9;
             display: block;
             transition: transform .4s ease;
         }
