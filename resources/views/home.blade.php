@@ -8,39 +8,164 @@
 
         <div class="container">
 
-            <div class="hero-content">
+            @if ($banners->count())
 
-                <div class="hero-badge">
-                    <i class="bi bi-patch-check-fill"></i>
-                    Rental mobil mudah & terpercaya
+                <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+
+                    <div class="carousel-inner">
+
+                        <div class="carousel-item active">
+
+                            <div class="hero-content">
+
+                                <div class="hero-badge">
+                                    <i class="bi bi-patch-check-fill"></i>
+                                    Rental mobil mudah & terpercaya
+                                </div>
+
+                                <h1>
+                                    Perjalanan lebih mudah
+                                    dengan <span>Rentalku.</span>
+                                </h1>
+
+                                <p>
+                                    Temukan mobil yang sesuai kebutuhanmu.
+                                    Pilih kendaraan, tentukan tanggal rental,
+                                    dan lakukan rental dengan mudah secara online.
+                                </p>
+
+                                <div class="hero-buttons">
+
+                                    <a href="#mobil" class="btn btn-hero btn-hero-primary">
+                                        <i class="bi bi-car-front me-2"></i>
+                                        Lihat Mobil
+                                    </a>
+
+                                    <a href="#cara-rental" class="btn btn-hero btn-hero-outline">
+                                        Cara Rental
+                                        <i class="bi bi-arrow-right ms-2"></i>
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        @foreach ($banners as $banner)
+
+                            <div class="carousel-item hero-slide"
+                                style="background-image: url('{{ asset($banner->gambar) }}');">
+
+                                <div class="hero-content">
+
+                                    <div class="hero-badge">
+                                        <i class="bi bi-megaphone-fill"></i>
+                                        Promo Spesial
+                                    </div>
+
+                                    <h1>
+                                        {{ $banner->judul }}
+                                    </h1>
+
+                                    <p>
+                                        {{ $banner->description }}
+                                    </p>
+
+                                    <div class="hero-buttons">
+
+                                        @if ($banner->link)
+
+                                            <a href="{{ $banner->link }}"
+                                                class="btn btn-hero btn-hero-primary"
+                                                @if (str_starts_with($banner->link, 'http')) target="_blank" rel="noopener" @endif>
+
+                                                Selengkapnya
+                                                <i class="bi bi-arrow-right ms-2"></i>
+
+                                            </a>
+
+                                        @endif
+
+                                        <a href="#mobil" class="btn btn-hero btn-hero-outline">
+                                            <i class="bi bi-car-front me-2"></i>
+                                            Lihat Mobil
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        @endforeach
+
+                    </div>
+
+                    <div class="carousel-indicators">
+
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0"
+                            class="active" aria-current="true" aria-label="Slide 1"></button>
+
+                        @foreach ($banners as $i => $banner)
+
+                            <button type="button" data-bs-target="#heroCarousel"
+                                data-bs-slide-to="{{ $i + 1 }}"
+                                aria-label="Banner: {{ $banner->judul }}"></button>
+
+                        @endforeach
+
+                    </div>
+
+                    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel"
+                        data-bs-slide="prev" aria-label="Slide sebelumnya">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+
+                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel"
+                        data-bs-slide="next" aria-label="Slide berikutnya">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+
                 </div>
 
-                <h1>
-                    Perjalanan lebih mudah
-                    dengan <span>Rentalku.</span>
-                </h1>
+            @else
 
-                <p>
-                    Temukan mobil yang sesuai kebutuhanmu.
-                    Pilih kendaraan, tentukan tanggal rental,
-                    dan lakukan rental dengan mudah secara online.
-                </p>
+                <div class="hero-content">
 
-                <div class="hero-buttons">
+                    <div class="hero-badge">
+                        <i class="bi bi-patch-check-fill"></i>
+                        Rental mobil mudah & terpercaya
+                    </div>
 
-                    <a href="#mobil" class="btn btn-hero btn-hero-primary">
-                        <i class="bi bi-car-front me-2"></i>
-                        Lihat Mobil
-                    </a>
+                    <h1>
+                        Perjalanan lebih mudah
+                        dengan <span>Rentalku.</span>
+                    </h1>
 
-                    <a href="#cara-rental" class="btn btn-hero btn-hero-outline">
-                        Cara Rental
-                        <i class="bi bi-arrow-right ms-2"></i>
-                    </a>
+                    <p>
+                        Temukan mobil yang sesuai kebutuhanmu.
+                        Pilih kendaraan, tentukan tanggal rental,
+                        dan lakukan rental dengan mudah secara online.
+                    </p>
+
+                    <div class="hero-buttons">
+
+                        <a href="#mobil" class="btn btn-hero btn-hero-primary">
+                            <i class="bi bi-car-front me-2"></i>
+                            Lihat Mobil
+                        </a>
+
+                        <a href="#cara-rental" class="btn btn-hero btn-hero-outline">
+                            Cara Rental
+                            <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+
+                    </div>
 
                 </div>
 
-            </div>
+            @endif
 
         </div>
 
@@ -445,67 +570,6 @@
     </section>
 
 
-    @if ($banners->count())
-
-        <section class="section">
-
-            <div class="container">
-
-                <div id="promoCarousel" class="carousel slide" data-bs-ride="carousel">
-
-                    <div class="carousel-inner">
-
-                        @foreach ($banners as $key => $banner)
-                            <div class="carousel-item {{ $key === 0 ? 'active' : '' }}">
-
-                                <div class="promo">
-
-                                    <img src="{{ asset('storage/' . $banner->gambar) }}" alt="{{ $banner->judul }}">
-
-                                    <div class="promo-content">
-
-                                        <div class="mb-2 text-success fw-bold">
-                                            RENTALKU
-                                        </div>
-
-                                        <h2 class="display-6 fw-bold">
-                                            {{ $banner->judul }}
-                                        </h2>
-
-                                        <p class="mt-3">
-                                            {{ $banner->description }}
-                                        </p>
-                                        
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-                        @endforeach
-
-                    </div>
-
-
-                    @if ($banners->count() > 1)
-                        <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel"
-                            data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon"></span>
-                        </button>
-
-                        <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel"
-                            data-bs-slide="next">
-                            <span class="carousel-control-next-icon"></span>
-                        </button>
-                    @endif
-
-                </div>
-
-            </div>
-
-        </section>
-
-    @endif
 
 
     @if ($ratings->count())
@@ -696,8 +760,6 @@
 
 
     <script>
-        // Search box landing: validasi pasangan tanggal + pencarian AJAX
-        // (partial hasil diganti tanpa reload, URL tetap disinkronkan).
         (function () {
             var form = document.querySelector('.search-card form');
             if (!form) return;
@@ -708,16 +770,12 @@
             var tombol = form.querySelector('button[type="submit"]');
             var kontainer = document.getElementById('hasil-pencarian');
 
-            // ---------- Validasi ----------
-
-            // Batasi tanggal selesai minimal mengikuti tanggal mulai
             function sinkronMin() {
                 selesai.min = mulai.value || '';
             }
             mulai.addEventListener('change', sinkronMin);
             sinkronMin();
 
-            // Return pesan error, atau '' jika valid.
             function pesanError() {
                 var adaMulai = mulai.value !== '';
                 var adaSelesai = selesai.value !== '';
@@ -743,9 +801,6 @@
                 return true;
             }
 
-            // ---------- Pencarian AJAX ----------
-
-            // Bangun query string dari field terisi saja agar URL bersih.
             function bangunQuery() {
                 var params = new URLSearchParams();
                 if (cabangEl.value !== '') params.set('cabang', cabangEl.value);
@@ -770,14 +825,11 @@
                     .then(function (html) {
                         kontainer.innerHTML = html;
                         if (dorongRiwayat) history.pushState(null, '', url);
-                        // Konten menyusut (reset / lebih sedikit): pastikan
-                        // pengguna tidak terdampar di area kosong bawah.
                         if (gulirKeGrid) {
                             document.getElementById('mobil').scrollIntoView({ behavior: 'smooth', block: 'start' });
                         }
                     })
                     .catch(function () {
-                        // AJAX gagal (jaringan/server): jatuh ke submit normal.
                         window.location.href = url;
                     })
                     .then(function () {
@@ -794,7 +846,6 @@
 
                 var query = bangunQuery();
 
-                // Tidak ada filter sama sekali: kembali ke tampilan default polos.
                 if (query === '') {
                     cari(form.action, true, false);
                     return;
@@ -803,8 +854,6 @@
                 cari(form.action + '?' + query, true, false);
             });
 
-            // Link reset / lihat-sedikit / load-more / reset-cta di area hasil
-            // ikut AJAX, supaya tidak memicu reload setelah pencarian.
             document.addEventListener('click', function (e) {
                 var link = e.target.closest('#hasil-pencarian [data-search-link]');
                 if (!link) return;
@@ -812,7 +861,6 @@
                 cari(link.href, true, link.hasAttribute('data-search-top'));
             });
 
-            // Tombol back/forward browser: muat ulang hasil sesuai URL.
             window.addEventListener('popstate', function () {
                 cari(window.location.href, false, false);
             });
