@@ -33,6 +33,7 @@ class BannerController extends Controller
             'judul' => 'required|string|max:100',
             'gambar' => 'nullable|mimes:jpeg,png,jpg,svg|max:2048',
             'description' => 'nullable|string',
+            'link' => 'nullable|string|max:255',
             'status' => 'required|in:aktif,nonaktif',
             'urutan' => 'nullable|integer|min:0',
         ], [
@@ -80,6 +81,7 @@ class BannerController extends Controller
             'judul' => 'required|string|max:100',
             'gambar' => 'nullable|mimes:jpeg,png,jpg,svg|max:2048',
             'description' => 'nullable|string',
+            'link' => 'nullable|string|max:255',
             'status' => 'required|in:aktif,nonaktif',
             'urutan' => 'nullable|integer|min:0',
         ], [

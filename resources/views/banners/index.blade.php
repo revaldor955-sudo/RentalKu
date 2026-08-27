@@ -496,6 +496,23 @@
                                                     </div>
 
 
+                                                    {{-- LINK CTA --}}
+                                                    <div class="col-md-6">
+
+                                                        <label class="form-label">
+                                                            Link CTA <span class="text-secondary">(opsional)</span>
+                                                        </label>
+
+                                                        <input
+                                                            type="text"
+                                                            name="link"
+                                                            value="{{ old('link', $banner->link) }}"
+                                                            class="form-control"
+                                                            placeholder="https://wa.me/6281234567890">
+
+                                                    </div>
+
+
                                                     {{-- STATUS --}}
                                                     <div class="col-md-6">
 
@@ -708,6 +725,23 @@
                                 class="form-control"
                                 rows="3"
                                 placeholder="Deskripsi banner...">{{ old('description') }}</textarea>
+
+                        </div>
+
+
+                        {{-- LINK CTA --}}
+                        <div class="col-12">
+
+                            <label class="form-label">
+                                Link CTA <span class="text-secondary">(opsional — tombol "Selengkapnya" pada banner)</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                name="link"
+                                value="{{ old('link') }}"
+                                class="form-control"
+                                placeholder="https://wa.me/6281234567890">
 
                         </div>
 
