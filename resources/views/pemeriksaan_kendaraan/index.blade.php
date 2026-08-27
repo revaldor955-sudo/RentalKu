@@ -420,7 +420,7 @@
         function openTambahModal() {
             resetForm();
             $('#pemeriksaanModalLabel').text('Tambah Pemeriksaan');
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('pemeriksaanModal')).show();
+            bootstrap.Modal.getOrCreateInstance($('#pemeriksaanModal')[0]).show();
         }
 
         function openEditModal(id) {
@@ -450,7 +450,7 @@
                     .val(keterangan);
             });
 
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('pemeriksaanModal')).show();
+            bootstrap.Modal.getOrCreateInstance($('#pemeriksaanModal')[0]).show();
         }
 
         function hapusPemeriksaan(id) {
@@ -520,7 +520,7 @@
                 processData: false,
                 contentType: false,
                 success: function(res) {
-                    bootstrap.Modal.getInstance(document.getElementById('pemeriksaanModal')).hide();
+                    bootstrap.Modal.getInstance($('#pemeriksaanModal')[0]).hide();
                     $('#pemeriksaan-table').DataTable().ajax.reload();
                     Swal.fire({
                         icon: 'success',

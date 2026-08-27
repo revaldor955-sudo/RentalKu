@@ -904,28 +904,17 @@
 
 <script>
 
-document.getElementById('image').addEventListener('change', function(event) {
+$('#image').on('change', function(event) {
+    var file = event.target.files[0];
+    var $preview = $('#imagePreview');
 
-    const file = event.target.files[0];
+    if (!file) return;
 
-    const preview = document.getElementById('imagePreview');
-
-    if (!file) {
-        return;
-    }
-
-    const reader = new FileReader();
-
+    var reader = new FileReader();
     reader.onload = function(e) {
-
-        preview.innerHTML = `
-            <img src="${e.target.result}" alt="Preview Foto">
-        `;
-
+        $preview.html('<img src="' + e.target.result + '" alt="Preview Foto">');
     };
-
     reader.readAsDataURL(file);
-
 });
 
 </script>

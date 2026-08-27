@@ -760,32 +760,33 @@
 
 
     <script>
-        (function () {
-            var form = document.querySelector('.search-card form');
-            if (!form) return;
+        $(function () {
+            var $form = $('.search-card form');
+            if (!$form.length) return;
 
-            var mulai = form.elements.tanggal_mulai;
-            var selesai = form.elements.tanggal_selesai;
-            var cabangEl = form.elements.cabang;
-            var tombol = form.querySelector('button[type="submit"]');
-            var kontainer = document.getElementById('hasil-pencarian');
+            var form = $form[0];
+            var $mulai = $(form.elements.tanggal_mulai);
+            var $selesai = $(form.elements.tanggal_selesai);
+            var $cabangEl = $(form.elements.cabang);
+            var $tombol = $form.find('button[type="submit"]');
+            var $kontainer = $('#hasil-pencarian');
 
             function sinkronMin() {
-                selesai.min = mulai.value || '';
+                $selesai.attr('min', $mulai.val() || '');
             }
-            mulai.addEventListener('change', sinkronMin);
+            $mulai.on('change', sinkronMin);
             sinkronMin();
 
             function pesanError() {
-                var adaMulai = mulai.value !== '';
-                var adaSelesai = selesai.value !== '';
+                var adaMulai = $mulai.val() !== '';
+                var adaSelesai = $selesai.val() !== '';
 
-                selesai.setCustomValidity('');
+                $selesai[0].setCustomValidity('');
 
                 if (adaMulai !== adaSelesai) {
                     return 'Lengkapi kedua tanggal (mulai dan selesai) atau kosongkan keduanya.';
                 }
-                if (adaSelesai && selesai.value < mulai.value) {
+                if (adaSelesai && $selesai.val() < $mulai.val()) {
                     return 'Tanggal selesai tidak boleh sebelum tanggal mulai.';
                 }
                 return '';
@@ -794,8 +795,8 @@
             function valid() {
                 var pesan = pesanError();
                 if (pesan !== '') {
-                    selesai.setCustomValidity(pesan);
-                    selesai.reportValidity();
+                    $selesai[0].setCustomValidity(pesan);
+                    $selesai[0].reportValidity();
                     return false;
                 }
                 return true;
@@ -803,9 +804,9 @@
 
             function bangunQuery() {
                 var params = new URLSearchParams();
-                if (cabangEl.value !== '') params.set('cabang', cabangEl.value);
-                if (mulai.value !== '') params.set('tanggal_mulai', mulai.value);
-                if (selesai.value !== '') params.set('tanggal_selesai', selesai.value);
+                if ($cabangEl.val() !== '') params.set('cabang', $cabangEl.val());
+                if ($mulai.val() !== '') params.set('tanggal_mulai', $mulai.val());
+                if ($selesai.val() !== '') params.set('tanggal_selesai', $selesai.val());
                 return params.toString();
             }
 
@@ -814,32 +815,31 @@
             function cari(url, dorongRiwayat, gulirKeGrid) {
                 if (sedangCari) return;
                 sedangCari = true;
-                tombol.disabled = true;
-                tombol.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Mencari...';
+                $tombol.prop('disabled', true);
+                $tombol.html('<span class="spinner-border spinner-border-sm me-2"></span>Mencari...');
 
-                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                    .then(function (res) {
-                        if (!res.ok) throw new Error('HTTP ' + res.status);
-                        return res.text();
-                    })
-                    .then(function (html) {
-                        kontainer.innerHTML = html;
-                        if (dorongRiwayat) history.pushState(null, '', url);
-                        if (gulirKeGrid) {
-                            document.getElementById('mobil').scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
-                    })
-                    .catch(function () {
-                        window.location.href = url;
-                    })
-                    .then(function () {
-                        sedangCari = false;
-                        tombol.disabled = false;
-                        tombol.innerHTML = '<i class="bi bi-search me-2"></i>Cari Mobil';
-                    });
+                $.ajax({
+                    url: url,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .done(function (html) {
+                    $kontainer.html(html);
+                    if (dorongRiwayat) history.pushState(null, '', url);
+                    if (gulirKeGrid) {
+                        $('#mobil')[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                })
+                .fail(function () {
+                    window.location.href = url;
+                })
+                .always(function () {
+                    sedangCari = false;
+                    $tombol.prop('disabled', false);
+                    $tombol.html('<i class="bi bi-search me-2"></i>Cari Mobil');
+                });
             }
 
-            form.addEventListener('submit', function (e) {
+            $form.on('submit', function (e) {
                 e.preventDefault();
 
                 if (!valid()) return;
@@ -854,17 +854,16 @@
                 cari(form.action + '?' + query, true, false);
             });
 
-            document.addEventListener('click', function (e) {
-                var link = e.target.closest('#hasil-pencarian [data-search-link]');
-                if (!link) return;
+            $(document).on('click', '#hasil-pencarian [data-search-link]', function (e) {
                 e.preventDefault();
-                cari(link.href, true, link.hasAttribute('data-search-top'));
+                var $link = $(this);
+                cari($link.attr('href'), true, $link.attr('data-search-top') !== undefined);
             });
 
-            window.addEventListener('popstate', function () {
+            $(window).on('popstate', function () {
                 cari(window.location.href, false, false);
             });
-        })();
+        });
     </script>
 
 @endsection

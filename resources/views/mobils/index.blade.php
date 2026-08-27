@@ -1747,7 +1747,7 @@
         $('#editImage').val('');
 
         // Tampilkan modal
-        new bootstrap.Modal(document.getElementById('editMobilModal')).show();
+        bootstrap.Modal.getOrCreateInstance($('#editMobilModal')[0]).show();
     }
 
     $('#formEditMobil').on('submit', function(e) {

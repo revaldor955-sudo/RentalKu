@@ -567,52 +567,45 @@
 
             function openRentalDetail(id) {
 
-                const modalEl = document.getElementById('detailRentalModal');
-                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                var $modal = bootstrap.Modal.getOrCreateInstance($('#detailRentalModal')[0]);
 
-                const loading = document.getElementById('rentalDetailLoading');
-                const error = document.getElementById('rentalDetailError');
-                const content = document.getElementById('rentalDetailContent');
+                var $loading = $('#rentalDetailLoading');
+                var $error = $('#rentalDetailError');
+                var $content = $('#rentalDetailContent');
 
-                loading.classList.remove('d-none');
-                error.classList.add('d-none');
-                content.classList.add('d-none');
+                $loading.removeClass('d-none');
+                $error.addClass('d-none');
+                $content.addClass('d-none');
 
-                modal.show();
+                $modal.show();
 
                 $.ajax({
                     url: "{{ route('rentals.detail', '__ID__') }}".replace('__ID__', id),
                     method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                    },
+                    headers: { 'Accept': 'application/json' },
                     success: function(data) {
+                        $('#rd-pelanggan').text(data.pelanggan);
+                        $('#rd-email').text(data.email);
+                        $('#rd-mobil').text(data.mobil);
+                        $('#rd-plat').text(data.plat);
+                        $('#rd-tanggal').text(data.tanggal_mulai + ' s/d ' + data.tanggal_selesai);
+                        $('#rd-jumlah-hari').text(data.jumlah_hari + ' hari');
+                        $('#rd-cabang-ambil').text(data.cabang_ambil);
+                        $('#rd-cabang-kembali').text(data.cabang_kembali);
+                        $('#rd-harga-perhari').text(formatRupiah(data.harga_perhari));
+                        $('#rd-subtotal').text(formatRupiah(data.subtotal));
+                        $('#rd-deposit').text(formatRupiah(data.deposit));
+                        $('#rd-total').text(formatRupiah(data.total_harga));
+                        $('#rd-status').html(statusBadge(data.status));
+                        $('#rd-catatan').text(data.catatan || '-');
 
-                        document.getElementById('rd-pelanggan').textContent = data.pelanggan;
-                        document.getElementById('rd-email').textContent = data.email;
-                        document.getElementById('rd-mobil').textContent = data.mobil;
-                        document.getElementById('rd-plat').textContent = data.plat;
-                        document.getElementById('rd-tanggal').textContent = data.tanggal_mulai + ' s/d ' + data
-                            .tanggal_selesai;
-                        document.getElementById('rd-jumlah-hari').textContent = data.jumlah_hari + ' hari';
-                        document.getElementById('rd-cabang-ambil').textContent = data.cabang_ambil;
-                        document.getElementById('rd-cabang-kembali').textContent = data.cabang_kembali;
-                        document.getElementById('rd-harga-perhari').textContent = formatRupiah(data
-                            .harga_perhari);
-                        document.getElementById('rd-subtotal').textContent = formatRupiah(data.subtotal);
-                        document.getElementById('rd-deposit').textContent = formatRupiah(data.deposit);
-                        document.getElementById('rd-total').textContent = formatRupiah(data.total_harga);
-                        document.getElementById('rd-status').innerHTML = statusBadge(data.status);
-                        document.getElementById('rd-catatan').textContent = data.catatan || '-';
-
-                        loading.classList.add('d-none');
-                        content.classList.remove('d-none');
+                        $loading.addClass('d-none');
+                        $content.removeClass('d-none');
                     },
                     error: function(xhr) {
-                        loading.classList.add('d-none');
-                        document.getElementById('rentalDetailErrorMessage').textContent = 
-                        'Gagal memuat detail rental: ' + xhr.status + ' ' + xhr.statusText;
-                        error.classList.remove('d-none');
+                        $loading.addClass('d-none');
+                        $('#rentalDetailErrorMessage').text('Gagal memuat detail rental: ' + xhr.status + ' ' + xhr.statusText);
+                        $error.removeClass('d-none');
                     }
                 });
 

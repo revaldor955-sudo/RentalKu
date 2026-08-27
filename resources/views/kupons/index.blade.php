@@ -655,15 +655,15 @@
 
 <script>
 
-    const CSRF_TOKEN = '{{ csrf_token() }}';
+    var CSRF_TOKEN = '{{ csrf_token() }}';
 
-    const flashSuccess = document.getElementById('flashSuccess');
+    var $flashSuccess = $('#flashSuccess');
 
-    if (flashSuccess) {
+    if ($flashSuccess.length) {
         Swal.fire({
             icon: 'success',
             title: 'Berhasil',
-            text: flashSuccess.textContent,
+            text: $flashSuccess.text(),
             timer: 1800,
             showConfirmButton: false,
         });
@@ -879,7 +879,7 @@
         $('#formEditKupon').attr('action',
             "{{ route('kupons.update', '__ID__') }}".replace('__ID__', id));
 
-        new bootstrap.Modal(document.getElementById('editKuponModal')).show();
+        bootstrap.Modal.getOrCreateInstance($('#editKuponModal')[0]).show();
     }
 
     $(document).on('submit', '#formTambahKupon', function(e) {
@@ -901,7 +901,7 @@
                 'X-Requested-With': 'XMLHttpRequest',
             },
             success: function(result) {
-                bootstrap.Modal.getInstance(document.getElementById('tambahModal')).hide();
+                bootstrap.Modal.getInstance($('#tambahModal')[0]).hide();
                 form.reset();
                 $('#kupons-table').DataTable().ajax.reload();
 
@@ -947,7 +947,7 @@
                 'X-Requested-With': 'XMLHttpRequest',
             },
             success: function(result) {
-                bootstrap.Modal.getInstance(document.getElementById('editKuponModal')).hide();
+                bootstrap.Modal.getInstance($('#editKuponModal')[0]).hide();
                 $('#kupons-table').DataTable().ajax.reload();
 
                 Swal.fire({

@@ -549,57 +549,47 @@
 
                         function openPembayaranDetail(id) {
 
-                            const modalEl = document.getElementById('detailPembayaranModal');
-                            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                            var $modal = bootstrap.Modal.getOrCreateInstance($('#detailPembayaranModal')[0]);
 
-                            const loading = document.getElementById('pembayaranDetailLoading');
-                            const error = document.getElementById('pembayaranDetailError');
-                            const content = document.getElementById('pembayaranDetailContent');
+                            var $loading = $('#pembayaranDetailLoading');
+                            var $error = $('#pembayaranDetailError');
+                            var $content = $('#pembayaranDetailContent');
 
-                            loading.classList.remove('d-none');
-                            error.classList.add('d-none');
-                            content.classList.add('d-none');
+                            $loading.removeClass('d-none');
+                            $error.addClass('d-none');
+                            $content.addClass('d-none');
 
-                            modal.show();
+                            $modal.show();
 
                             $.ajax({
                                 url: "{{ route('pembayarans.detail', '__ID__') }}".replace('__ID__', id),
                                 method: 'GET',
                                 success: function(data) {
+                                    $('#pd-pelanggan').text(data.pelanggan);
+                                    $('#pd-email').text(data.email);
+                                    $('#pd-mobil').text(data.mobil);
+                                    $('#pd-plat').text(data.plat);
+                                    $('#pd-metode').text(data.metode);
+                                    $('#pd-tanggal').text(data.tanggal_bayar);
+                                    $('#pd-jumlah').text(formatRupiah(data.jumlah));
+                                    $('#pd-status').html(statusBadge(data.status));
 
-                                    document.getElementById('pd-pelanggan').textContent = data.pelanggan;
-                                    document.getElementById('pd-email').textContent = data.email;
-                                    document.getElementById('pd-mobil').textContent = data.mobil;
-                                    document.getElementById('pd-plat').textContent = data.plat;
-                                    document.getElementById('pd-metode').textContent = data.metode;
-                                    document.getElementById('pd-tanggal').textContent = data.tanggal_bayar;
-                                    document.getElementById('pd-jumlah').textContent = formatRupiah(data.jumlah);
-                                    document.getElementById('pd-status').innerHTML = statusBadge(data.status);
-
-                                    const buktiContainer = document.getElementById('pd-bukti');
-                                    buktiContainer.innerHTML = '';
+                                    var $buktiContainer = $('#pd-bukti');
+                                    $buktiContainer.empty();
 
                                     if (data.bukti_url) {
-                                        const img = document.createElement('img');
-                                        img.src = data.bukti_url;
-                                        img.className = 'proof-image';
-                                        img.alt = 'Bukti pembayaran';
-                                        buktiContainer.appendChild(img);
+                                        $buktiContainer.append('<img src="' + data.bukti_url + '" class="proof-image" alt="Bukti pembayaran">');
                                     } else {
-                                        buktiContainer.innerHTML =
-                                            '<span class="text-muted">Tidak ada</span>';
+                                        $buktiContainer.html('<span class="text-muted">Tidak ada</span>');
                                     }
 
-                                    loading.classList.add('d-none');
-                                    content.classList.remove('d-none');
-
+                                    $loading.addClass('d-none');
+                                    $content.removeClass('d-none');
                                 },
                                 error: function(xhr) {
-                                    loading.classList.add('d-none');
-                                    error.classList.remove('d-none');
-                                    document.getElementById('pembayaranDetailErrorMessage').textContent =
-                                        'Gagal memuat detail pembayaran: ' + xhr.status + ' ' + xhr
-                                        .statusText;
+                                    $loading.addClass('d-none');
+                                    $error.removeClass('d-none');
+                                    $('#pembayaranDetailErrorMessage').text('Gagal memuat detail pembayaran: ' + xhr.status + ' ' + xhr.statusText);
                                 }
                             });
 

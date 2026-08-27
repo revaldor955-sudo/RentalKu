@@ -848,79 +848,67 @@
 <script>
 
     function openSewaPopup() {
-
-        const template = document.getElementById('sewaFormTemplate');
+        var $template = $('#sewaFormTemplate');
 
         Swal.fire({
             title: 'Sewa {{ $mobil->name }}',
-            html: template.innerHTML,
+            html: $template.html(),
             width: 600,
             showConfirmButton: false,
-            didOpen: () => {
+            didOpen: function() {
+                var $form = $('#swal2-html-container form');
 
-                const form = document.querySelector('#swal2-html-container form');
-
-                form.addEventListener('submit', async function (event) {
-
+                $form.on('submit', function(event) {
                     event.preventDefault();
 
-                    const submitBtn = form.querySelector('button[type="submit"]');
-
-                    // Tombol submit bawaan SweetAlert tidak dipakai; form submit
-                    // dilempar ke server lewat fetch (tetap server-side).
-                    const formData = new FormData(form);
+                    var formData = new FormData($form[0]);
 
                     Swal.showLoading();
 
-                    try {
-
-                        const response = await fetch(form.action, {
-                            method: 'POST',
-                            headers: {
-                                'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            body: formData
-                        });
-
-                        const data = await response.json();
-
+                    $.ajax({
+                        url: $form.attr('action'),
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        data: formData,
+                        processData: false,
+                        contentType: false
+                    })
+                    .done(function(data, textStatus, xhr) {
                         Swal.hideLoading();
 
-                        if (!response.ok) {
-
-                            const firstError = data.errors
+                        if (xhr.status !== 200) {
+                            var firstError = data.errors
                                 ? Object.values(data.errors).flat()[0]
-                                : (data.message ?? 'Terjadi kesalahan.');
+                                : (data.message || 'Terjadi kesalahan.');
 
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Gagal',
                                 text: firstError,
                             });
-
                             return;
                         }
 
                         Swal.fire({
                             icon: 'success',
                             title: 'Berhasil!',
-                            text: data.message ?? 'Pengajuan sewa mobil berhasil dibuat.',
+                            text: data.message || 'Pengajuan sewa mobil berhasil dibuat.',
                             confirmButtonText: 'OK',
-                        }).then(() => {
+                        }).then(function() {
                             window.location.href = '{{ route('customer.dashboard') }}';
                         });
-
-                    } catch (error) {
-
+                    })
+                    .fail(function() {
                         Swal.hideLoading();
-
                         Swal.fire({
                             icon: 'error',
                             title: 'Gagal',
                             text: 'Koneksi bermasalah. Silakan coba lagi.',
                         });
-                    }
+                    });
                 });
             }
         });

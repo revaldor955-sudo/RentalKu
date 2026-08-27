@@ -448,15 +448,15 @@
 
 <script>
 
-    const CSRF_TOKEN = '{{ csrf_token() }}';
+    var CSRF_TOKEN = '{{ csrf_token() }}';
 
-    const flashSuccess = document.getElementById('flashSuccess');
+    var $flashSuccess = $('#flashSuccess');
 
-    if (flashSuccess) {
+    if ($flashSuccess.length) {
         Swal.fire({
             icon: 'success',
             title: 'Berhasil',
-            text: flashSuccess.textContent,
+            text: $flashSuccess.text(),
             timer: 1800,
             showConfirmButton: false,
         });
@@ -597,7 +597,7 @@
         $('#formEditFasilitas').attr('action',
             "{{ route('fasilitas.update', '__ID__') }}".replace('__ID__', id));
 
-        new bootstrap.Modal(document.getElementById('editFasilitasModal')).show();
+        bootstrap.Modal.getOrCreateInstance($('#editFasilitasModal')[0]).show();
     }
 
     $(document).on('submit', '#formTambahFasilitas', function(e) {

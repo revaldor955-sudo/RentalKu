@@ -843,153 +843,140 @@
 
         function openUserDetail(id) {
 
-            const modalEl = document.getElementById('detailUserModal');
-            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            var $modal = bootstrap.Modal.getOrCreateInstance($('#detailUserModal')[0]);
 
-            const loading = document.getElementById('userDetailLoading');
-            const error = document.getElementById('userDetailError');
-            const content = document.getElementById('userDetailContent');
+            var $loading = $('#userDetailLoading');
+            var $error = $('#userDetailError');
+            var $content = $('#userDetailContent');
 
-            loading.classList.remove('d-none');
-            error.classList.add('d-none');
-            content.classList.add('d-none');
+            $loading.removeClass('d-none');
+            $error.addClass('d-none');
+            $content.addClass('d-none');
 
-            modal.show();
+            $modal.show();
 
             $.ajax({
-                        url: '{{ route('users.detail', '__ID__') }}'.replace('__ID__', id),
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json'
-                        },
-                        success: function(data) {
-                            document.getElementById('ud-photo').innerHTML =
-                                data.photo_url ?
-                                '<img src="' + data.photo_url +
-                                '" class="user-photo" style="width:90px;height:90px;" alt="Foto pengguna">' :
-                                '<div class="photo-placeholder" style="width:90px;height:90px;"><i class="bi bi-person-fill"></i></div>';
-                                document.getElementById('ud-name').textContent = data.name;
-                                document.getElementById('ud-email').textContent = data.email;
-                                document.getElementById('ud-role').innerHTML = roleBadge(data.roles_id, data.role_name);
-                                document.getElementById('ud-phone').textContent = data.phone;
-                                document.getElementById('ud-id').textContent = data.id;
-                                document.getElementById('ud-address').textContent = data.address;
+                url: '{{ route('users.detail', '__ID__') }}'.replace('__ID__', id),
+                method: 'GET',
+                headers: { 'Accept': 'application/json' },
+                success: function(data) {
+                    $('#ud-photo').html(
+                        data.photo_url ?
+                        '<img src="' + data.photo_url + '" class="user-photo" style="width:90px;height:90px;" alt="Foto pengguna">' :
+                        '<div class="photo-placeholder" style="width:90px;height:90px;"><i class="bi bi-person-fill"></i></div>'
+                    );
+                    $('#ud-name').text(data.name);
+                    $('#ud-email').text(data.email);
+                    $('#ud-role').html(roleBadge(data.roles_id, data.role_name));
+                    $('#ud-phone').text(data.phone);
+                    $('#ud-id').text(data.id);
+                    $('#ud-address').text(data.address);
 
-                                loading.classList.add('d-none');
-                                content.classList.remove('d-none');
-                            },
-                            error: function(xhr) {
-                                loading.classList.add('d-none');
-                                document.getElementById('userDetailErrorMessage').textContent =
-                                    'Gagal memuat detail pengguna: ' + (xhr.status + ' ' + xhr.statusText);
-                                error.classList.remove('d-none');
-                            },
-                        });
+                    $loading.addClass('d-none');
+                    $content.removeClass('d-none');
+                },
+                error: function(xhr) {
+                    $loading.addClass('d-none');
+                    $('#userDetailErrorMessage').text('Gagal memuat detail pengguna: ' + xhr.status + ' ' + xhr.statusText);
+                    $error.removeClass('d-none');
+                },
+            });
 
-                    }
+        }
 
-                        function openEditUser(id) {
+        function openEditUser(id) {
 
-                            const modalEl = document.getElementById('editUserModal');
-                            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            var $modal = bootstrap.Modal.getOrCreateInstance($('#editUserModal')[0]);
 
-                            const loading = document.getElementById('editUserLoading');
-                            const error = document.getElementById('editUserError');
-                            const fields = document.getElementById('editUserFields');
-                            const submitBtn = document.getElementById('editUserSubmit');
-                            document.getElementById('editUserErrorForm').classList.add('d-none');
+            var $loading = $('#editUserLoading');
+            var $error = $('#editUserError');
+            var $fields = $('#editUserFields');
+            var $submitBtn = $('#editUserSubmit');
+            $('#editUserErrorForm').addClass('d-none');
 
-                            loading.classList.remove('d-none');
-                            error.classList.add('d-none');
-                            fields.classList.add('d-none');
-                            submitBtn.disabled = true;
+            $loading.removeClass('d-none');
+            $error.addClass('d-none');
+            $fields.addClass('d-none');
+            $submitBtn.prop('disabled', true);
 
-                            modal.show();
+            $modal.show();
 
-                            $.ajax({
-                                url: '{{ route('users.detail', '__ID__') }}'.replace('__ID__', id),
-                                method: 'GET',
-                                headers: {
-                                    'Accept': 'application/json',
-                                },
-                                success: function(data) {
-                                    document.getElementById('edit-name').value = data.name;
-                                    document.getElementById('edit-email').value = data.email;
-                                    document.getElementById('edit-roles-id').value = data.roles_id;
-                                    document.getElementById('edit-phone').value = data.phone === '-' ? '' : data.phone;
-                                    document.getElementById('edit-address').value = data.address === '-' ? '' : data
-                                        .address;
+            $.ajax({
+                url: '{{ route('users.detail', '__ID__') }}'.replace('__ID__', id),
+                method: 'GET',
+                headers: { 'Accept': 'application/json' },
+                success: function(data) {
+                    $('#edit-name').val(data.name);
+                    $('#edit-email').val(data.email);
+                    $('#edit-roles-id').val(data.roles_id);
+                    $('#edit-phone').val(data.phone === '-' ? '' : data.phone);
+                    $('#edit-address').val(data.address === '-' ? '' : data.address);
+                    $('#editUserForm').attr('action', '{{ route('users.update', '__ID__') }}'.replace('__ID__', id));
 
-                                    document.getElementById('editUserForm').action =
-                                        '{{ route('users.update', '__ID__') }}'.replace('__ID__', id);
+                    $loading.addClass('d-none');
+                    $fields.removeClass('d-none');
+                    $submitBtn.prop('disabled', false);
+                },
+                error: function(xhr) {
+                    $loading.addClass('d-none');
+                    $('#editUserErrorMessage').text('Gagal memuat data pengguna: ' + xhr.status + ' ' + xhr.statusText);
+                    $error.removeClass('d-none');
+                    $submitBtn.prop('disabled', false);
+                },
+            });
 
-                                    loading.classList.add('d-none');
-                                    fields.classList.remove('d-none');
-                                    submitBtn.disabled = false;
-                                },
-                                error: function(xhr) {
-                                    loading.classList.add('d-none');
-                                    document.getElementById('editUserErrorMessage').textContent =
-                                        'Gagal memuat data pengguna: ' + xhr.status + ' ' + xhr.statusText;
-                                    error.classList.remove('d-none');
-                                    submitBtn.disabled = false;
-                                },
-                            });
+        }
 
-                        }
+        function submitUserForm(event, formId) {
+            event.preventDefault();
 
-                        function submitUserForm(event, formId) {
-                            event.preventDefault();
+            var $form = $('#' + formId);
+            var $btn = $form.find('button[onclick^="submitUserForm"]');
+            var $errorBox = $form.find('.ajax-error');
 
-                            const form = document.getElementById(formId);
-                            const btn = form.querySelector('button[onclick^="submitUserForm"]');
-                            const errorBox = form.querySelector('.ajax-error');
+            $btn.prop('disabled', true);
+            $errorBox.addClass('d-none');
 
-                            btn.disabled = true;
-                            errorBox.classList.add('d-none');
+            var formData = new FormData($form[0]);
+            if (formId === 'editUserForm') {
+                formData.append('_method', 'PUT');
+            }
+            $.ajax({
+                url: $form.attr('action'),
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(result) {
+                    var modalId = formId === 'editUserForm' ? 'editUserModal' : 'tambahUserModal';
+                    bootstrap.Modal.getInstance($('#' + modalId)[0]).hide();
+                    $form[0].reset();
+                    $('#users-table').DataTable().ajax.reload();
 
-                            const formData = new FormData(form);
-                            if (formId === 'editUserForm') {
-                                formData.append('_method', 'PUT');
-                            }
-                            $.ajax({
-                                url: form.action,
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': CSRF_TOKEN,
-                                    'Accept': 'application/json',
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                },
-                                data: formData,
-                                processData: false,
-                                contentType: false,
-                                success: function(result) {
-                                    const modalId = formId === 'editUserForm' ? 'editUserModal' :
-                                        'tambahUserModal';
-                                    bootstrap.Modal.getInstance(document.getElementById(modalId)).hide();
-                                    form.reset();
-                                    $('#users-table').DataTable().ajax.reload();
-
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Berhasil',
-                                        text: result.message,
-                                        timer: 1500,
-                                        showConfirmButton: false,
-                                    });
-                                },
-                                error: function(xhr) {
-                                    const result = xhr.responseJSON || {};
-                                    const msgs = Object.values(result.errors || {}).flat();
-                                    errorBox.textContent = msgs.length ? msgs.join(', ') : (result.message ||
-                                        'Terjadi kesalahan.');
-                                    errorBox.classList.remove('d-none');
-                                },
-                                complete: function() {
-                                    btn.disabled = false;
-                                }
-                            });
-                        }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: result.message,
+                        timer: 1500,
+                        showConfirmButton: false,
+                    });
+                },
+                error: function(xhr) {
+                    var result = xhr.responseJSON || {};
+                    var msgs = Object.values(result.errors || {}).flat();
+                    $errorBox.text(msgs.length ? msgs.join(', ') : (result.message || 'Terjadi kesalahan.'));
+                    $errorBox.removeClass('d-none');
+                },
+                complete: function() {
+                    $btn.prop('disabled', false);
+                }
+            });
+        }
 
                         function deleteUser(id, name) {
                             Swal.fire({
