@@ -108,7 +108,7 @@ class MobilSeeder extends Seeder
                 'warna' => 'Putih',
                 'harga_perhari' => 350000,
                 'deposit' => 500000,
-                'image' => '',
+                'image' => 'images/mobils/AVANZA.jpg',
                 'description' => 'MPV keluarga paling populer, irit dan mudah dikendarai di jalanan kota Pontianak.',
             ],
             [
@@ -123,7 +123,7 @@ class MobilSeeder extends Seeder
                 'warna' => 'Abu-abu',
                 'harga_perhari' => 400000,
                 'deposit' => 500000,
-                'image' => '',
+                'image' => 'images/mobils/ERTIGA.jpg',
                 'description' => 'MPV ringkas dengan mesin hybrid hemat bahan bakar, nyaman untuk harian maupun mudik.',
             ],
             [
@@ -138,7 +138,7 @@ class MobilSeeder extends Seeder
                 'warna' => 'Hitam',
                 'harga_perhari' => 450000,
                 'deposit' => 600000,
-                'image' => '',
+                'image' => 'images/mobils/RUSH.jpg',
                 'description' => 'SUV kompak tangguh, cocok untuk perjalanan bandara kota maupun luar kota.',
             ],
             [
@@ -153,7 +153,7 @@ class MobilSeeder extends Seeder
                 'warna' => 'Merah',
                 'harga_perhari' => 300000,
                 'deposit' => 400000,
-                'image' => '',
+                'image' => 'images/mobils/BRIO.jpg',
                 'description' => 'City car lincah dan irit untuk perjalanan singkat di sekitar Pontianak.',
             ],
             [
@@ -168,7 +168,7 @@ class MobilSeeder extends Seeder
                 'warna' => 'Putih',
                 'harga_perhari' => 400000,
                 'deposit' => 500000,
-                'image' => '',
+                'image' => 'images/mobils/TERIOS.jpg',
                 'description' => 'SUV andal untuk menjangkau wisata Singkawang dan pesisir Kalimantan Barat.',
             ],
             [
@@ -183,7 +183,7 @@ class MobilSeeder extends Seeder
                 'warna' => 'Silver',
                 'harga_perhari' => 400000,
                 'deposit' => 500000,
-                'image' => '',
+                'image' => 'images/mobils/VIOS.jpg',
                 'description' => 'Sedan nyaman dengan konsumsi bahan bakar efisien untuk mobilitas kota Banjarmasin.',
             ],
             [
@@ -198,7 +198,7 @@ class MobilSeeder extends Seeder
                 'warna' => 'Hitam',
                 'harga_perhari' => 650000,
                 'deposit' => 800000,
-                'image' => '',
+                'image' => 'images/mobils/TRITON.jpg',
                 'description' => 'Double cabin bertenaga besar, pas untuk proyek maupun perjalanan luar Balikpapan.',
             ],
             [
@@ -213,7 +213,7 @@ class MobilSeeder extends Seeder
                 'warna' => 'Putih',
                 'harga_perhari' => 450000,
                 'deposit' => 550000,
-                'image' => '',
+                'image' => 'images/mobils/EVALIA.jpg',
                 'description' => 'Van lega untuk rombongan kecil, fleksibel untuk antar-jemput di area Samarinda.',
             ],
         ];
