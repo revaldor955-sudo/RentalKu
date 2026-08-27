@@ -137,6 +137,11 @@
 
         <div class="mb-4 no-print">
 
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary mb-3">
+                <i class="bi bi-arrow-left me-1"></i>
+                Dashboard
+            </a>
+
             <h2 class="fw-bold mb-1">
                 Laporan
             </h2>
