@@ -2,44 +2,22 @@
 <html lang="id">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Management Brand - RentalKu</title>
 
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
-
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-    >
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/css/dataTables.bootstrap5.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-
         body {
             background: #f5f7f6;
             color: #1f2937;
             font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        .navbar {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .brand {
-            font-size: 27px;
-            font-weight: 800;
-            color: #1f2937;
-        }
-
-        .brand span {
-            color: #198754;
         }
 
         .page-card {
@@ -75,6 +53,7 @@
             text-transform: uppercase;
             border-bottom: 1px solid #e9ecef;
             white-space: nowrap;
+            padding: 12px 16px;
         }
 
         .table tbody td {
@@ -134,651 +113,373 @@
             border-color: #198754;
             box-shadow: 0 0 0 .2rem rgba(25,135,84,.12);
         }
-
-        .empty {
-            padding: 60px 20px;
-            text-align: center;
-        }
-
-        .empty-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 20px;
-            background: #e9f7ef;
-            color: #198754;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: auto;
-            font-size: 30px;
-        }
-
     </style>
-
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-{{-- NAVBAR --}}
-
 @include('layouts.partials.admin-navbar')
-
 
 <div class="container py-5">
 
-    {{-- HEADER --}}
-
     <div class="d-flex justify-content-between align-items-center mb-4">
-
         <div>
-
-            <h1 class="page-title mb-1">
-                Kategori Merek
-            </h1>
-
-            <p class="text-muted mb-0">
-                Kelola merek kendaraan yang tersedia di RentalKu.
-            </p>
-
+            <h1 class="page-title mb-1">Kategori Merek</h1>
+            <p class="text-muted mb-0">Kelola merek kendaraan yang tersedia di RentalKu.</p>
         </div>
-
         <div class="d-flex gap-2">
-
             <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left me-1"></i>
                 Dashboard
             </a>
-
-            <button
-                type="button"
-                class="btn btn-green"
-                data-bs-toggle="modal"
-                data-bs-target="#tambahBrandModal"
-            >
+            <button type="button" class="btn btn-green" data-bs-toggle="modal" data-bs-target="#tambahBrandModal">
                 <i class="bi bi-plus-lg me-1"></i>
                 Tambah Merek
             </button>
-
         </div>
-
     </div>
 
-
-    {{-- SUCCESS --}}
-
-    @if(session('success'))
-
-        <div class="alert alert-success alert-dismissible fade show">
-
-            <i class="bi bi-check-circle-fill me-2"></i>
-
-            {{ session('success') }}
-
-            <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert"
-            ></button>
-
-        </div>
-
-    @endif
-
-
-    {{-- ERROR --}}
-
-    @if(session('error'))
-
-        <div class="alert alert-danger alert-dismissible fade show">
-
-            <i class="bi bi-exclamation-circle-fill me-2"></i>
-
-            {{ session('error') }}
-
-            <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert"
-            ></button>
-
-        </div>
-
-    @endif
-
-
-    {{-- VALIDATION ERROR --}}
-
-    @if($errors->any())
-
-        <div class="alert alert-danger">
-
-            <strong>
-                Terdapat kesalahan:
-            </strong>
-
-            <ul class="mb-0 mt-2">
-
-                @foreach($errors->all() as $error)
-
-                    <li>{{ $error }}</li>
-
-                @endforeach
-
-            </ul>
-
-        </div>
-
-    @endif
-
-
-    {{-- TABLE --}}
-
     <div class="page-card">
-
-        @if($brands->count())
-
-            <div class="table-responsive">
-
-                <table class="table align-middle mb-0">
-
-                    <thead>
-
-                        <tr>
-
-                            <th class="px-4 py-3">
-                                #
-                            </th>
-
-                            <th>
-                                Logo
-                            </th>
-
-                            <th>
-                                Merek
-                            </th>
-
-                            <th>
-                                Deskripsi
-                            </th>
-
-                            <th>
-                                Jumlah Mobil
-                            </th>
-
-                            <th>
-                                Aksi
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody>
-
-                        @foreach($brands as $brand)
-
-                            <tr>
-
-                                <td class="px-4">
-                                    {{ $loop->iteration }}
-                                </td>
-
-
-                                {{-- LOGO --}}
-
-                                <td>
-
-                                    @if($brand->logo)
-
-                                        <img
-                                            src="{{ asset($brand->logo) }}"
-                                            class="brand-logo"
-                                            alt="{{ $brand->name }}"
-                                        >
-
-                                    @else
-
-                                        <div class="no-logo">
-
-                                            <i class="bi bi-car-front-fill"></i>
-
-                                        </div>
-
-                                    @endif
-
-                                </td>
-
-
-                                {{-- NAME --}}
-
-                                <td>
-
-                                    <div class="brand-name">
-                                        {{ $brand->name }}
-                                    </div>
-
-                                </td>
-
-
-                                {{-- DESCRIPTION --}}
-
-                                <td>
-
-                                    <div class="description">
-
-                                        {{ $brand->description ?: 'Tidak ada deskripsi.' }}
-
-                                    </div>
-
-                                </td>
-
-
-                                {{-- JUMLAH MOBIL --}}
-
-                                <td>
-
-                                    <span class="badge bg-success-subtle text-success px-3 py-2">
-
-                                        {{ $brand->mobils->count() }}
-
-                                        Mobil
-
-                                    </span>
-
-                                </td>
-
-
-                                {{-- ACTION --}}
-
-                                <td>
-
-                                    <div class="d-flex gap-2">
-
-                                        {{-- EDIT --}}
-
-                                        <button
-                                            type="button"
-                                            class="btn btn-warning btn-sm"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editBrand{{ $brand->id }}"
-                                        >
-                                            <i class="bi bi-pencil-square"></i>
-                                        </button>
-
-
-                                        {{-- DELETE --}}
-
-                                        @if($brand->mobils->count() == 0)
-
-                                            <form
-                                                action="{{ route('brands.destroy', $brand->id) }}"
-                                                method="POST"
-                                            >
-
-                                                @csrf
-
-                                                @method('DELETE')
-
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-danger btn-sm"
-                                                    onclick="confirmAction(event, 'Yakin ingin menghapus merek {{ $brand->name }}?')"
-                                                >
-
-                                                    <i class="bi bi-trash"></i>
-
-                                                </button>
-
-                                            </form>
-
-                                        @else
-
-                                            <button
-                                                type="button"
-                                                class="btn btn-secondary btn-sm"
-                                                disabled
-                                                title="Brand masih digunakan mobil"
-                                            >
-
-                                                <i class="bi bi-lock"></i>
-
-                                            </button>
-
-                                        @endif
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-
-                            {{-- MODAL EDIT --}}
-
-                            <div
-                                class="modal fade"
-                                id="editBrand{{ $brand->id }}"
-                                tabindex="-1"
-                            >
-
-                                <div class="modal-dialog modal-dialog-centered">
-
-                                    <div class="modal-content">
-
-                                        <div class="modal-header">
-
-                                            <h5 class="modal-title fw-bold">
-                                                Edit Merek
-                                            </h5>
-
-                                            <button
-                                                type="button"
-                                                class="btn-close btn-close-white"
-                                                data-bs-dismiss="modal"
-                                            ></button>
-
-                                        </div>
-
-
-                                        <form
-                                            action="{{ route('brands.update', $brand->id) }}"
-                                            method="POST"
-                                            enctype="multipart/form-data"
-                                        >
-
-                                            @csrf
-
-                                            @method('PUT')
-
-
-                                            <div class="modal-body p-4">
-
-                                                <div class="mb-3">
-
-                                                    <label class="form-label fw-bold">
-                                                        Nama Merek
-                                                    </label>
-
-                                                    <input
-                                                        type="text"
-                                                        name="name"
-                                                        class="form-control"
-                                                        value="{{ $brand->name }}"
-                                                        required
-                                                    >
-
-                                                </div>
-
-
-                                                <div class="mb-3">
-
-                                                    <label class="form-label fw-bold">
-                                                        Logo
-                                                    </label>
-
-                                                    <input
-                                                        type="file"
-                                                        name="logo"
-                                                        class="form-control"
-                                                        accept=".jpg,.jpeg,.png,.svg"
-                                                    >
-
-                                                    <small class="text-muted">
-                                                        Kosongkan jika tidak ingin mengganti logo.
-                                                    </small>
-
-                                                </div>
-
-
-                                                <div class="mb-3">
-
-                                                    <label class="form-label fw-bold">
-                                                        Deskripsi
-                                                    </label>
-
-                                                    <textarea
-                                                        name="description"
-                                                        class="form-control"
-                                                        rows="4"
-                                                    >{{ $brand->description }}</textarea>
-
-                                                </div>
-
-                                            </div>
-
-
-                                            <div class="modal-footer">
-
-                                                <button
-                                                    type="button"
-                                                    class="btn btn-outline-secondary"
-                                                    data-bs-dismiss="modal"
-                                                >
-                                                    Batal
-                                                </button>
-
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-green"
-                                                >
-                                                    <i class="bi bi-save me-1"></i>
-                                                    Simpan Perubahan
-                                                </button>
-
-                                            </div>
-
-                                        </form>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        @endforeach
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        @else
-
-            <div class="empty">
-
-                <div class="empty-icon">
-
-                    <i class="bi bi-tags"></i>
-
-                </div>
-
-                <h5 class="fw-bold mt-4">
-                    Belum Ada Merek
-                </h5>
-
-                <p class="text-muted mb-4">
-                    Tambahkan merek kendaraan pertama untuk RentalKu.
-                </p>
-
-                <button
-                    type="button"
-                    class="btn btn-green"
-                    data-bs-toggle="modal"
-                    data-bs-target="#tambahBrandModal"
-                >
-                    <i class="bi bi-plus-lg me-1"></i>
-                    Tambah Merek
-                </button>
-
-            </div>
-
-        @endif
-
+        <div class="table-responsive">
+            <table class="table align-middle mb-0" id="brands-table">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-3">No</th>
+                        <th>Logo</th>
+                        <th>Nama Merek</th>
+                        <th>Deskripsi</th>
+                        <th class="text-center">Jumlah Mobil</th>
+                        <th class="text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{-- Diisi oleh DataTables (server-side) --}}
+                </tbody>
+            </table>
+        </div>
     </div>
 
 </div>
 
 
 {{-- MODAL TAMBAH --}}
-
-<div
-    class="modal fade"
-    id="tambahBrandModal"
-    tabindex="-1"
->
-
+<div class="modal fade" id="tambahBrandModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-
         <div class="modal-content">
-
             <div class="modal-header">
-
-                <h5 class="modal-title fw-bold">
-                    Tambah Merek
-                </h5>
-
-                <button
-                    type="button"
-                    class="btn-close btn-close-white"
-                    data-bs-dismiss="modal"
-                ></button>
-
+                <h5 class="modal-title fw-bold">Tambah Merek</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-
-
-            <form
-                action="{{ route('brands.store') }}"
-                method="POST"
-                enctype="multipart/form-data"
-            >
-
+            <form id="formTambahBrand" action="{{ route('brands.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-
-
                 <div class="modal-body p-4">
-
                     <div class="mb-3">
-
-                        <label class="form-label fw-bold">
-                            Nama Merek
-                        </label>
-
-                        <input
-                            type="text"
-                            name="name"
-                            class="form-control"
-                            placeholder="Contoh: Toyota"
-                            value="{{ old('name') }}"
-                            required
-                        >
-
+                        <label class="form-label fw-bold">Nama Merek</label>
+                        <input type="text" name="name" class="form-control" placeholder="Contoh: Toyota" required>
                     </div>
-
-
                     <div class="mb-3">
-
-                        <label class="form-label fw-bold">
-                            Logo
-                        </label>
-
-                        <input
-                            type="file"
-                            name="logo"
-                            class="form-control"
-                            accept=".jpg,.jpeg,.png,.svg"
-                        >
-
-                        <small class="text-muted">
-                            JPG, JPEG, PNG, atau SVG. Maksimal 2 MB.
-                        </small>
-
+                        <label class="form-label fw-bold">Logo</label>
+                        <input type="file" name="logo" class="form-control" accept=".jpg,.jpeg,.png,.svg">
+                        <small class="text-muted">JPG, JPEG, PNG, atau SVG. Maksimal 2 MB.</small>
                     </div>
-
-
                     <div class="mb-3">
-
-                        <label class="form-label fw-bold">
-                            Deskripsi
-                        </label>
-
-                        <textarea
-                            name="description"
-                            class="form-control"
-                            rows="4"
-                            placeholder="Deskripsi singkat mengenai merek..."
-                        >{{ old('description') }}</textarea>
-
+                        <label class="form-label fw-bold">Deskripsi</label>
+                        <textarea name="description" class="form-control" rows="4" placeholder="Deskripsi singkat mengenai merek..."></textarea>
                     </div>
-
                 </div>
-
-
                 <div class="modal-footer">
-
-                    <button
-                        type="button"
-                        class="btn btn-outline-secondary"
-                        data-bs-dismiss="modal"
-                    >
-                        Batal
-                    </button>
-
-                    <button
-                        type="submit"
-                        class="btn btn-green"
-                    >
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-green">
                         <i class="bi bi-plus-lg me-1"></i>
                         Tambah Merek
                     </button>
-
                 </div>
-
             </form>
-
         </div>
-
     </div>
-
 </div>
 
 
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-</script>
+{{-- MODAL EDIT --}}
+<div class="modal fade" id="editBrandModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Edit Merek</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formEditBrand" action="" method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nama Merek</label>
+                        <input type="text" name="name" id="editNamaBrand" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Logo</label>
+                        <input type="file" name="logo" class="form-control" accept=".jpg,.jpeg,.png,.svg">
+                        <small class="text-muted">Kosongkan jika tidak ingin mengganti logo.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Deskripsi</label>
+                        <textarea name="description" id="editDeskripsiBrand" class="form-control" rows="4"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-green">
+                        <i class="bi bi-save me-1"></i>
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-<script
-    src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
-</script>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    var CSRF_TOKEN = '{{ csrf_token() }}';
 
-    function confirmAction(event, message) {
-        event.preventDefault();
-
-        const form = event.target.closest('form');
-
+    function flashSuccess(message) {
         Swal.fire({
-            title: 'Konfirmasi',
+            icon: 'success',
+            title: 'Berhasil',
             text: message,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                form.submit();
+            timer: 1800,
+            showConfirmButton: false,
+        });
+    }
+
+    $(document).ready(function() {
+
+        $('#brands-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{{ route("brands.data") }}',
+                type: 'GET',
+            },
+            columns: [
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    className: 'px-4',
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    },
+                },
+                {
+                    data: 'logo',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, row) {
+                        if (data) {
+                            return '<img src="' + asset(data) + '" class="brand-logo" alt="' + row.name + '">';
+                        }
+                        return '<div class="no-logo"><i class="bi bi-car-front-fill"></i></div>';
+                    },
+                },
+                {
+                    data: 'name',
+                    orderable: true,
+                    render: function(data) {
+                        return '<div class="brand-name">' + data + '</div>';
+                    },
+                },
+                {
+                    data: 'description',
+                    orderable: false,
+                    render: function(data) {
+                        return data
+                            ? '<div class="description">' + data + '</div>'
+                            : '<span class="text-muted">Tidak ada deskripsi.</span>';
+                    },
+                },
+                {
+                    data: 'mobils_count',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center',
+                    render: function(data) {
+                        return '<span class="badge bg-success-subtle text-success px-3 py-2">' + data + ' Mobil</span>';
+                    },
+                },
+                {
+                    data: 'id',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center',
+                    render: function(data, type, row) {
+                        var html = '<div class="d-flex justify-content-center gap-2">';
+                        html += '<button type="button" class="btn btn-warning btn-sm" title="Edit" onclick="editBrand(' + data + ')"><i class="bi bi-pencil-square"></i></button>';
+                        if (row.mobils_count == 0) {
+                            html += '<button type="button" class="btn btn-danger btn-sm" title="Hapus" onclick="deleteBrand(' + data + ', \'' + row.name.replace(/'/g, "\\'") + '\')"><i class="bi bi-trash"></i></button>';
+                        } else {
+                            html += '<button type="button" class="btn btn-secondary btn-sm" disabled title="Brand masih digunakan mobil"><i class="bi bi-lock"></i></button>';
+                        }
+                        html += '</div>';
+                        return html;
+                    },
+                },
+            ],
+            order: [[2, 'asc']],
+            language: {
+                processing: 'Memproses...',
+                search: 'Cari:',
+                lengthMenu: 'Tampilkan _MENU_ data',
+                info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                infoEmpty: 'Tidak ada data',
+                infoFiltered: '(difilter dari _MAX_ total data)',
+                loadingRecords: 'Memuat...',
+                zeroRecords: 'Tidak ditemukan data yang cocok',
+                emptyTable: 'Belum ada merek',
+                paginate: {
+                    previous: '',
+                    next: '',
+                },
+            },
+        });
+
+    });
+
+    function editBrand(id) {
+        $.ajax({
+            url: '{{ url("brands") }}/' + id,
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            },
+            success: function(data) {
+                $('#editNamaBrand').val(data.name);
+                $('#editDeskripsiBrand').val(data.description);
+                $('#formEditBrand').attr('action', '{{ url("brands") }}/' + id);
+                bootstrap.Modal.getOrCreateInstance($('#editBrandModal')[0]).show();
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Data brand tidak ditemukan.',
+                });
             }
         });
     }
 
+    function deleteBrand(id, name) {
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: 'Yakin ingin menghapus merek "' + name + '"?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus',
+            cancelButtonText: 'Batal',
+        }).then(function(result) {
+            if (!result.isConfirmed) return;
+
+            $.ajax({
+                url: '{{ url("brands") }}/' + id,
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                success: function(res) {
+                    $('#brands-table').DataTable().ajax.reload();
+                    flashSuccess(res.message || 'Brand berhasil dihapus.');
+                },
+                error: function(xhr) {
+                    var r = xhr.responseJSON || {};
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: r.message || 'Terjadi kesalahan saat menghapus brand.',
+                    });
+                }
+            });
+        });
+    }
+
+    $(document).on('submit', '#formTambahBrand', function(e) {
+        e.preventDefault();
+
+        var formData = new FormData(this);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            success: function(result) {
+                $('#tambahBrandModal').modal('hide');
+                $('#formTambahBrand')[0].reset();
+                $('#brands-table').DataTable().ajax.reload();
+                flashSuccess(result.message || 'Brand berhasil ditambahkan.');
+            },
+            error: function(xhr) {
+                var r = xhr.responseJSON || {};
+                var msg = r.errors ? Object.values(r.errors)[0][0] :
+                    (r.message || 'Terjadi kesalahan saat menambahkan brand.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: msg,
+                });
+            }
+        });
+    });
+
+    $(document).on('submit', '#formEditBrand', function(e) {
+        e.preventDefault();
+
+        var formData = new FormData(this);
+        var url = $(this).attr('action');
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            success: function(result) {
+                $('#editBrandModal').modal('hide');
+                $('#brands-table').DataTable().ajax.reload();
+                flashSuccess(result.message || 'Brand berhasil diperbarui.');
+            },
+            error: function(xhr) {
+                var r = xhr.responseJSON || {};
+                var msg = r.errors ? Object.values(r.errors)[0][0] :
+                    (r.message || 'Terjadi kesalahan saat memperbarui brand.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: msg,
+                });
+            }
+        });
+    });
+
 </script>
 
 </body>
-
 </html>

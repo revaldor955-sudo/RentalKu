@@ -12,9 +12,79 @@ class BrandController extends Controller
      */
     public function index()
     {
-        $brands = Brand::latest()->get();
+        return view('brands.index');
+    }
 
-        return view('brands.index', compact('brands'));
+    /**
+     * Server-side DataTables: daftar brand (search, sort, pagination)
+     */
+    public function data(Request $request)
+    {
+        $query = Brand::query()->withCount('mobils');
+
+        $recordsTotal = $query->count();
+
+        $search = $request->input('search.value');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('brands.name', 'like', "%{$search}%")
+                    ->orWhere('brands.description', 'like', "%{$search}%");
+            });
+        }
+
+        $recordsFiltered = $query->count();
+
+        $columns = [
+            0 => null,
+            1 => 'brands.name',
+            2 => 'brands.description',
+        ];
+
+        $orderColumn = $request->input('order.0.column', 1);
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
+            $query->orderBy($columns[$orderColumn], $orderDir);
+        } else {
+            $query->orderBy('brands.name', 'asc');
+        }
+
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $brands = $query->offset($start)->limit($length)->get();
+
+        $data = $brands->map(function ($brand) {
+            return [
+                'id' => $brand->id,
+                'name' => $brand->name,
+                'logo' => $brand->logo,
+                'description' => $brand->description,
+                'mobils_count' => $brand->mobils_count,
+            ];
+        });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * Detail brand untuk edit modal (AJAX)
+     */
+    public function show(Brand $brand)
+    {
+        return response()->json([
+            'id' => $brand->id,
+            'name' => $brand->name,
+            'logo' => $brand->logo,
+            'description' => $brand->description,
+            'mobils_count' => $brand->mobils()->count(),
+        ]);
     }
 
     /**
@@ -51,6 +121,12 @@ class BrandController extends Controller
         }
 
         Brand::create($validated);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Brand berhasil ditambahkan.',
+            ]);
+        }
 
         return redirect()
             ->route('brands.index')
@@ -100,6 +176,12 @@ class BrandController extends Controller
 
         $brand->update($validated);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Brand berhasil diperbarui.',
+            ]);
+        }
+
         return redirect()
             ->route('brands.index')
             ->with('success', 'Brand berhasil diperbarui.');
@@ -108,10 +190,16 @@ class BrandController extends Controller
     /**
      * Menghapus brand
      */
-    public function destroy(Brand $brand)
+    public function destroy(Request $request, Brand $brand)
     {
         // Cegah penghapusan jika masih digunakan mobil
         if ($brand->mobils()->exists()) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Brand tidak dapat dihapus karena masih digunakan oleh mobil.',
+                ], 422);
+            }
+
             return redirect()
                 ->route('brands.index')
                 ->with('error', 'Brand tidak dapat dihapus karena masih digunakan oleh mobil.');
@@ -125,6 +213,12 @@ class BrandController extends Controller
         }
 
         $brand->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Brand berhasil dihapus.',
+            ]);
+        }
 
         return redirect()
             ->route('brands.index')

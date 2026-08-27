@@ -217,7 +217,7 @@
 
                 <thead>
                     <tr>
-                        <th class="px-4 py-3">#</th>
+                        <th class="px-4 py-3">No</th>
                         <th>Kode</th>
                         <th>Jenis</th>
                         <th>Nilai</th>
@@ -799,8 +799,8 @@
                 zeroRecords: 'Tidak ditemukan data yang cocok',
                 emptyTable: 'Belum ada promo',
                 paginate: {
-                    previous: 'Sebelumnya',
-                    next: 'Berikutnya'
+                    previous: '',
+                    next: ''
                 },
                 aria: {
                     sortAscending: ': aktifkan untuk urut naik',

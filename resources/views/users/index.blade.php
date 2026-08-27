@@ -250,7 +250,7 @@
                         <tr>
 
                             <th class="px-4 py-3">
-                                #
+                                No
                             </th>
 
                             <th>
@@ -829,8 +829,8 @@
                     zeroRecords: 'Tidak ditemukan data yang cocok',
                     emptyTable: 'Belum ada pengguna',
                     paginate: {
-                        previous: 'Sebelumnya',
-                        next: 'Berikutnya'
+                    previous: '',
+                    next: ''
                     },
                     aria: {
                         sortAscending: ': aktifkan untuk urut naik',

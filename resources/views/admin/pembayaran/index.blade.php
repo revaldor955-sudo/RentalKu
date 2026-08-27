@@ -121,6 +121,11 @@
 
         <div class="mb-4">
 
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary mb-3">
+                <i class="bi bi-arrow-left me-1"></i>
+                Dashboard
+            </a>
+
             <h2 class="fw-bold mb-1">
                 Management Pembayaran
             </h2>
@@ -177,7 +182,7 @@
                         <tr>
 
                             <th class="px-4 py-3">
-                                #
+                                No
                             </th>
 
                             <th>
@@ -535,8 +540,8 @@
                                     zeroRecords: 'Tidak ditemukan data yang cocok',
                                     emptyTable: 'Belum ada pembayaran',
                                     paginate: {
-                                        previous: 'Sebelumnya',
-                                        next: 'Berikutnya'
+                    previous: '',
+                    next: ''
                                     },
                                     aria: {
                                         sortAscending: ': aktifkan untuk urut naik',

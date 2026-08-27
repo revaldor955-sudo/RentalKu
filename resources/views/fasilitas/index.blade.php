@@ -524,8 +524,8 @@
                 zeroRecords: 'Tidak ditemukan data yang cocok',
                 emptyTable: 'Belum ada fasilitas',
                 paginate: {
-                    previous: 'Sebelumnya',
-                    next: 'Berikutnya'
+                    previous: '',
+                    next: ''
                 },
                 aria: {
                     sortAscending: ': aktifkan untuk urut naik',

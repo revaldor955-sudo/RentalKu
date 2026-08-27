@@ -1635,10 +1635,6 @@
                 loadingRecords: 'Memuat...',
                 zeroRecords: 'Tidak ditemukan data yang cocok',
                 emptyTable: 'Belum ada mobil',
-                paginate: {
-                    previous: 'Sebelumnya',
-                    next: 'Berikutnya'
-                },
                 aria: {
                     sortAscending: ': aktifkan untuk urut naik',
                     sortDescending: ': aktifkan untuk urut turun',

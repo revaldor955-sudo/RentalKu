@@ -31,8 +31,10 @@ use Illuminate\Support\Facades\Route;
 Route::resource('roles', RoleController::class)
     ->except(['create', 'edit', 'show']);
 
+Route::get('brands/data', [BrandController::class, 'data'])->name('brands.data');
+
 Route::resource('brands', BrandController::class)
-    ->except(['create', 'edit', 'show']);
+    ->except(['create', 'edit']);
 
 Route::resource('tipe_mobils', TipeMobilController::class)
     ->except(['create', 'edit', 'show']);

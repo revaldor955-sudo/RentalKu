@@ -39,6 +39,9 @@
             font-size: 13px;
             color: #6b7280;
             white-space: nowrap;
+            text-transform: uppercase;
+            background: #f8faf9;
+            border-bottom: 1px solid #e9ecef;
         }
 
         .table td {
@@ -134,7 +137,7 @@
                             <tr>
 
                                 <th class="px-4 py-3">
-                                    #
+                                    No
                                 </th>
 
                                 <th>
@@ -645,8 +648,8 @@
                     zeroRecords: 'Tidak ditemukan data yang cocok',
                     emptyTable: 'Belum ada pemeriksaan',
                     paginate: {
-                        previous: 'Sebelumnya',
-                        next: 'Berikutnya'
+                    previous: '',
+                    next: ''
                     },
                     aria: {
                         sortAscending: ': aktifkan untuk urut naik',

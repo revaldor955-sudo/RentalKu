@@ -244,17 +244,17 @@
 
                         <tr>
 
-                            <th class="px-4 py-3">#</th>
+                            <th class="px-4 py-3">No</th>
 
-                            <th>Banner</th>
+                            <th class="px-4 py-3">Banner</th>
 
-                            <th>Judul</th>
+                            <th class="px-4 py-3">Judul</th>
 
-                            <th>Urutan</th>
+                            <th class="px-4 py-3">Urutan</th>
 
-                            <th>Status</th>
+                            <th class="px-4 py-3">Status</th>
 
-                            <th class="text-center">Aksi</th>
+                            <th class="px-4 py-3 text-center">Aksi</th>
 
                         </tr>
 
