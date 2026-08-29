@@ -443,19 +443,19 @@
             function rentalActions(data) {
                 let html = '<div class="d-flex gap-2 justify-content-end">';
 
-                html += '<button class="btn btn-sm btn-outline-primary btn-action" ' +
+                html += '<button class="btn btn-sm btn-outline-primary" ' +
                     'onclick="openRentalDetail(' + data.id + ')">' +
                     '<i class="bi bi-eye"></i> Detail</button>';
 
                 if (data.status === 'Menunggu') {
-                    html += '<button type="button" class="btn btn-success btn-sm btn-action" ' +
+                    html += '<button type="button" class="btn btn-sm btn-outline-success" ' +
                         'onclick="updateRentalStatus(' + data.id + ', \'Disetujui\')">' +
                         '<i class="bi bi-check-lg"></i> Setujui</button>';
-                    html += '<button type="button" class="btn btn-outline-danger btn-sm btn-action" ' +
+                    html += '<button type="button" class="btn btn-sm btn-outline-danger" ' +
                         'onclick="updateRentalStatus(' + data.id + ', \'Ditolak\')">' +
                         '<i class="bi bi-x-lg"></i> Tolak</button>';
                 } else if (data.status === 'Disetujui') {
-                    html += '<button type="button" class="btn btn-primary btn-sm btn-action" ' +
+                    html += '<button type="button" class="btn btn-sm btn-outline-info" ' +
                         'onclick="updateRentalStatus(' + data.id + ', \'Selesai\')">' +
                         '<i class="bi bi-check-lg"></i> Selesaikan</button>';
                 }

@@ -630,10 +630,10 @@
                         width: '140px',
                         render: function(data) {
                             return '<div class="d-flex justify-content-end gap-2">' +
-                                '<button type="button" class="btn btn-warning btn-sm btn-action" ' +
+                                '<button type="button" class="btn btn-outline-primary btn-sm" ' +
                                 'onclick="openEditModal(' + data.id + ')">' +
                                 '<i class="bi bi-pencil-square"></i></button>' +
-                                '<button type="button" class="btn btn-danger btn-sm btn-action" ' +
+                                '<button type="button" class="btn btn-outline-danger btn-sm" ' +
                                 'onclick="hapusPemeriksaan(' + data.id + ')">' +
                                 '<i class="bi bi-trash"></i></button>' +
                                 '</div>';
