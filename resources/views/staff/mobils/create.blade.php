@@ -1096,25 +1096,7 @@
 
 
 
-<footer class="bg-white border-top py-4">
-
-    <div class="container text-center">
-
-        <div class="fw-bold">
-
-            Rental<span class="text-success">ku</span>.
-
-        </div>
-
-        <small class="text-muted">
-
-            Staff Dashboard • Tambah Data Mobil
-
-        </small>
-
-    </div>
-
-</footer>
+@include('layouts.partials.admin-footer', ['pageTitle' => 'Staff Dashboard • Tambah Data Mobil'])
 
 
 
