@@ -92,6 +92,8 @@ Route::resource('dokumen_mobils', DokumenMobilController::class)
 Route::resource('banners', BannerController::class)
     ->except(['create', 'edit', 'show']);
 
+Route::get('banners/data', [BannerController::class, 'data'])->name('banners.data');
+
 Route::resource('faqs', FaqController::class)
     ->except(['create', 'edit', 'show']);
 

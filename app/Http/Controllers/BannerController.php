@@ -8,12 +8,72 @@ use Illuminate\Http\Request;
 class BannerController extends Controller
 {
     /**
+     * Server-side DataTables: daftar banner (search, sort, pagination)
+     */
+    public function data(Request $request)
+    {
+        $query = Banner::query();
+
+        $recordsTotal = $query->count();
+
+        $search = $request->input('search.value');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('judul', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        $recordsFiltered = $query->count();
+
+        $columns = [
+            0 => null,
+            1 => 'judul',
+            2 => 'urutan',
+            3 => 'status',
+        ];
+
+        $orderColumn = $request->input('order.0.column', 0);
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
+            $query->orderBy($columns[$orderColumn], $orderDir);
+        } else {
+            $query->orderBy('urutan', 'asc');
+        }
+
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $banners = $query->offset($start)->limit($length)->get();
+
+        $data = $banners->map(function ($banner) {
+            return [
+                'id' => $banner->id,
+                'judul' => $banner->judul,
+                'gambar' => $banner->gambar,
+                'description' => $banner->description,
+                'link' => $banner->link,
+                'status' => $banner->status,
+                'urutan' => $banner->urutan,
+            ];
+        });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $banners = Banner::all();
-        return view('banners.index', compact('banners'));
+        return view('banners.index');
     }
 
     /**
