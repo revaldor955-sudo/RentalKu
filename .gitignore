@@ -28,4 +28,8 @@ Thumbs.db
 
 /.omo
 /.playwright-mcp
+/.opencode
+/.graphify_python
+/graphify-out
 AGENTS.md
+*.png
