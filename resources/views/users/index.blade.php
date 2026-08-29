@@ -96,17 +96,22 @@
             font-size: 20px;
         }
 
-        .table thead th {
-            background: #f8faf9;
-            color: #6c757d;
-            font-size: 12px;
-            text-transform: uppercase;
-            white-space: nowrap;
-            border-bottom: 1px solid #e9ecef;
-        }
+    .table thead th {
+        background: #f8faf9;
+        color: #6c757d;
+        font-size: 12px;
+        text-transform: uppercase;
+        white-space: nowrap;
+        border-bottom: 1px solid #e9ecef;
+    }
 
         .table tbody td {
             vertical-align: middle;
+        }
+
+        /* Sembunyikan ikon sort di semua kolom */
+        #users-table thead .dt-column-order {
+            display: none !important;
         }
 
         .role-badge {
@@ -249,7 +254,7 @@
 
                         <tr>
 
-                            <th class="px-4 py-3">
+                            <th class="px-3 py-3">
                                 No
                             </th>
 
@@ -755,7 +760,8 @@
                         data: null,
                         orderable: false,
                         searchable: false,
-                        className: 'px-4',
+                        className: 'px-3',
+                        width: '70px',
                         render: function(data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
                         },
@@ -809,6 +815,7 @@
                         orderable: false,
                         searchable: false,
                         className: 'text-center',
+                        width: '140px',
                         render: function(data) {
                             return userActions(data);
                         },
@@ -828,10 +835,6 @@
                     loadingRecords: 'Memuat...',
                     zeroRecords: 'Tidak ditemukan data yang cocok',
                     emptyTable: 'Belum ada pengguna',
-                    paginate: {
-                    previous: '',
-                    next: ''
-                    },
                     aria: {
                         sortAscending: ': aktifkan untuk urut naik',
                         sortDescending: ': aktifkan untuk urut turun',

@@ -55,11 +55,17 @@
             font-size: 13px;
             color: #6b7280;
             white-space: nowrap;
+            text-transform: uppercase;
         }
 
         .table td {
             vertical-align: middle;
             white-space: nowrap;
+        }
+
+        /* Sembunyikan ikon sort di semua kolom */
+        #rentals-table thead .dt-column-order {
+            display: none !important;
         }
 
         .status {
@@ -178,7 +184,7 @@
 
                             <tr>
 
-                                <th class="px-4 py-3">
+                                <th class="px-3 py-3">
                                     No
                                 </th>
 
@@ -471,7 +477,8 @@
                             data: null,
                             orderable: false,
                             searchable: false,
-                            className: 'px-4',
+                            className: 'px-3',
+                            width: '70px',
                             render: function(data, type, row, meta) {
                                 return meta.row + meta.settings._iDisplayStart + 1;
                             },
@@ -533,6 +540,7 @@
                             orderable: false,
                             searchable: false,
                             className: 'text-end pe-4',
+                            width: '140px',
                             render: function(data) {
                                 return rentalActions(data);
                             },
@@ -552,10 +560,6 @@
                         loadingRecords: 'Memuat...',
                         zeroRecords: 'Tidak ditemukan data yang cocok',
                         emptyTable: 'Belum ada rental',
-                        paginate: {
-                    previous: '',
-                    next: ''
-                        },
                         aria: {
                             sortAscending: ': aktifkan untuk urut naik',
                             sortDescending: ': aktifkan untuk urut turun',

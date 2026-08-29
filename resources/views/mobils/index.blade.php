@@ -211,6 +211,11 @@
             vertical-align: middle;
         }
 
+        /* Sembunyikan ikon sort di semua kolom */
+        #mobils-table thead .dt-column-order {
+            display: none !important;
+        }
+
         .car-image {
             width: 58px;
             height: 45px;
@@ -520,7 +525,7 @@
 
                         <tr>
 
-                            <th class="px-4 py-3">
+                            <th class="px-3 py-3">
                                 No
                             </th>
 
@@ -1538,7 +1543,8 @@
                     data: null,
                     orderable: false,
                     searchable: false,
-                    className: 'px-4',
+                    className: 'px-3',
+                    width: '70px',
                     render: function(data, type, row, meta) {
                         return meta.row + meta.settings._iDisplayStart + 1;
                     },
@@ -1616,6 +1622,7 @@
                     data: null,
                     orderable: false,
                     searchable: false,
+                    width: '140px',
                     render: function(data) {
                         return mobilActions(data);
                     },

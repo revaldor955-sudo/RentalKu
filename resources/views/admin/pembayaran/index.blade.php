@@ -61,6 +61,11 @@
             white-space: nowrap;
         }
 
+        /* Sembunyikan ikon sort di semua kolom */
+        #pembayaran-table thead .dt-column-order {
+            display: none !important;
+        }
+
         .badge-status {
             padding: 7px 12px;
             border-radius: 20px;
@@ -181,7 +186,7 @@
 
                         <tr>
 
-                            <th class="px-4 py-3">
+                            <th class="px-3 py-3">
                                 No
                             </th>
 
@@ -445,7 +450,8 @@
                                         data: null,
                                         orderable: false,
                                         searchable: false,
-                                        className: 'px-4',
+                                        className: 'px-3',
+                                        width: '70px',
                                         render: function(data, type, row, meta) {
                                             return meta.row + meta.settings._iDisplayStart + 1;
                                         },
@@ -520,6 +526,7 @@
                                         orderable: false,
                                         searchable: false,
                                         className: 'text-end pe-4',
+                                        width: '140px',
                                         render: function(data) {
                                             return pembayaranActions(data);
                                         },
@@ -539,10 +546,6 @@
                                     loadingRecords: 'Memuat...',
                                     zeroRecords: 'Tidak ditemukan data yang cocok',
                                     emptyTable: 'Belum ada pembayaran',
-                                    paginate: {
-                    previous: '',
-                    next: ''
-                                    },
                                     aria: {
                                         sortAscending: ': aktifkan untuk urut naik',
                                         sortDescending: ': aktifkan untuk urut turun',

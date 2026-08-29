@@ -49,6 +49,11 @@
             white-space: nowrap;
         }
 
+        /* Sembunyikan ikon sort di semua kolom */
+        #pengembalian-table thead .dt-column-order {
+            display: none !important;
+        }
+
         .status {
             display: inline-block;
             padding: 6px 12px;
@@ -111,7 +116,7 @@
 
                             <tr>
 
-                                <th class="px-4 py-3">
+                                <th class="px-3 py-3">
                                     No
                                 </th>
 
@@ -232,7 +237,8 @@
                         data: null,
                         orderable: false,
                         searchable: false,
-                        className: 'px-4',
+                        className: 'px-3',
+                        width: '70px',
                         render: function(data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
                         },
@@ -286,6 +292,7 @@
                         orderable: false,
                         searchable: false,
                         className: 'text-end pe-4',
+                        width: '140px',
                         render: function(data) {
                             return '<button type="button" class="btn btn-primary btn-sm btn-action" ' +
                                 'onclick="prosesPengembalian(' + data.id + ', \'' +
@@ -308,10 +315,6 @@
                     loadingRecords: 'Memuat...',
                     zeroRecords: 'Tidak ditemukan data yang cocok',
                     emptyTable: 'Tidak ada rental yang sedang berjalan',
-                    paginate: {
-                    previous: '',
-                    next: ''
-                    },
                     aria: {
                         sortAscending: ': aktifkan untuk urut naik',
                         sortDescending: ': aktifkan untuk urut turun',

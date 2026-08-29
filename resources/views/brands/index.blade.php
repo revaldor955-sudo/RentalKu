@@ -60,6 +60,11 @@
             vertical-align: middle;
         }
 
+        /* Sembunyikan ikon sort di semua kolom */
+        #brands-table thead .dt-column-order {
+            display: none !important;
+        }
+
         .brand-logo {
             width: 55px;
             height: 55px;
@@ -144,7 +149,7 @@
             <table class="table align-middle mb-0" id="brands-table">
                 <thead>
                     <tr>
-                        <th class="px-4 py-3">No</th>
+                        <th class="px-3 py-3">No</th>
                         <th>Logo</th>
                         <th>Nama Merek</th>
                         <th>Deskripsi</th>
@@ -272,7 +277,8 @@
                     data: null,
                     orderable: false,
                     searchable: false,
-                    className: 'px-4',
+                    className: 'px-3',
+                    width: '70px',
                     render: function(data, type, row, meta) {
                         return meta.row + meta.settings._iDisplayStart + 1;
                     },
@@ -318,6 +324,7 @@
                     orderable: false,
                     searchable: false,
                     className: 'text-center',
+                    width: '140px',
                     render: function(data, type, row) {
                         var html = '<div class="d-flex justify-content-center gap-2">';
                         html += '<button type="button" class="btn btn-warning btn-sm" title="Edit" onclick="editBrand(' + data + ')"><i class="bi bi-pencil-square"></i></button>';
@@ -342,10 +349,6 @@
                 loadingRecords: 'Memuat...',
                 zeroRecords: 'Tidak ditemukan data yang cocok',
                 emptyTable: 'Belum ada merek',
-                paginate: {
-                    previous: '',
-                    next: '',
-                },
             },
         });
 
