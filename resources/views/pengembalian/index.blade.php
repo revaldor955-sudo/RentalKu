@@ -294,7 +294,7 @@
                         className: 'text-end pe-4',
                         width: '140px',
                         render: function(data) {
-                            return '<button type="button" class="btn btn-outline-primary btn-sm" ' +
+                            return '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
                                 'onclick="prosesPengembalian(' + data.id + ', \'' +
                                 data.mobil_name.replace(/'/g, "\\'") + '\')">' +
                                 '<i class="bi bi-arrow-return-left"></i> Proses Pengembalian</button>';

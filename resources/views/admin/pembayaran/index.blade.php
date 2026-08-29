@@ -419,15 +419,15 @@
                         function pembayaranActions(data) {
                             let html = '<div class="d-flex gap-2 justify-content-end">';
 
-                            html += '<button class="btn btn-outline-primary btn-sm" ' +
+                            html += '<button class="btn p-1 text-primary" style="border:none;background:none;" ' +
                                 'onclick="openPembayaranDetail(' + data.id + ')" title="Detail">' +
                                 '<i class="bi bi-eye"></i></button>';
 
                             if (data.status === 'Menunggu') {
-                                html += '<button class="btn btn-outline-success btn-sm" ' +
+                                html += '<button class="btn p-1 text-success" style="border:none;background:none;" ' +
                                     'onclick="updatePembayaranStatus(' + data.id + ', \'Disetujui\')" title="Setujui">' +
                                     '<i class="bi bi-check-circle"></i></button>';
-                                html += '<button class="btn btn-outline-danger btn-sm" ' +
+                                html += '<button class="btn p-1 text-danger" style="border:none;background:none;" ' +
                                     'onclick="updatePembayaranStatus(' + data.id + ', \'Ditolak\')" title="Tolak">' +
                                     '<i class="bi bi-x-circle"></i></button>';
                             }

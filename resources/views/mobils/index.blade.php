@@ -1509,11 +1509,11 @@
         let html = '<div class="d-flex gap-2">';
 
         html += '<button type="button" data-id="' + data.id +
-            '" class="btn btn-sm btn-outline-primary" title="Edit" ' +
+            '" class="btn p-1 text-primary" style="border:none;background:none;" title="Edit" ' +
             'onclick="editMobil(this.dataset.id)">' +
             '<i class="bi bi-pencil-square"></i></button>';
 
-        html += '<button type="button" class="btn btn-sm btn-outline-danger" title="Hapus" ' +
+        html += '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" title="Hapus" ' +
             'onclick="deleteMobil(' + data.id + ', \'' + data.name.replace(/'/g, "\\'") + '\')">' +
             '<i class="bi bi-trash"></i></button>';
 
