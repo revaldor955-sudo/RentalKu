@@ -387,10 +387,10 @@
                         render: function(data, type, row) {
                             var html = '<div class="d-flex justify-content-center gap-2">';
                             html +=
-                                '<button type="button" class="btn btn-warning btn-sm" title="Edit" onclick="editBanner(' +
+                                '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" title="Edit" onclick="editBanner(' +
                                 data + ')"><i class="bi bi-pencil-square"></i></button>';
                             html +=
-                                '<button type="button" class="btn btn-danger btn-sm" title="Hapus" onclick="deleteBanner(' +
+                                '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" title="Hapus" onclick="deleteBanner(' +
                                 data + ', \'' + row.judul.replace(/'/g, "\\'") +
                                 '\')"><i class="bi bi-trash"></i></button>';
                             html += '</div>';

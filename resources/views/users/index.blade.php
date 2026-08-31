@@ -726,17 +726,17 @@
         function userActions(data) {
             let html = '<div class="d-flex justify-content-center gap-2">';
 
-            html += '<button type="button" class="btn btn-outline-primary btn-sm" title="Detail" ' +
+            html += '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" title="Detail" ' +
                 'onclick="openUserDetail(' + data.id + ')">' +
                 '<i class="bi bi-eye"></i></button>';
 
-            html += '<button type="button" class="btn btn-warning btn-sm" title="Edit" ' +
+            html += '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" title="Edit" ' +
                 'onclick="openEditUser(' + data.id + ')">' +
                 '<i class="bi bi-pencil-square"></i></button>';
 
             if (data.id != CURRENT_USER_ID) {
 
-                html += '<button type="button" class="btn btn-danger btn-sm" title="Hapus" ' +
+                html += '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" title="Hapus" ' +
                     'onclick="deleteUser(' + data.id + ', \'' + data.name.replace(/'/g, "\\'") + '\')">' +
                     '<i class="bi bi-trash"></i></button>';
 

@@ -327,11 +327,11 @@
                     width: '140px',
                     render: function(data, type, row) {
                         var html = '<div class="d-flex justify-content-center gap-2">';
-                        html += '<button type="button" class="btn btn-warning btn-sm" title="Edit" onclick="editBrand(' + data + ')"><i class="bi bi-pencil-square"></i></button>';
+                        html += '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" title="Edit" onclick="editBrand(' + data + ')"><i class="bi bi-pencil-square"></i></button>';
                         if (row.mobils_count == 0) {
-                            html += '<button type="button" class="btn btn-danger btn-sm" title="Hapus" onclick="deleteBrand(' + data + ', \'' + row.name.replace(/'/g, "\\'") + '\')"><i class="bi bi-trash"></i></button>';
+                            html += '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" title="Hapus" onclick="deleteBrand(' + data + ', \'' + row.name.replace(/'/g, "\\'") + '\')"><i class="bi bi-trash"></i></button>';
                         } else {
-                            html += '<button type="button" class="btn btn-secondary btn-sm" disabled title="Brand masih digunakan mobil"><i class="bi bi-lock"></i></button>';
+                            html += '<button type="button" class="btn p-1 text-secondary" style="border:none;background:none;" disabled title="Brand masih digunakan mobil"><i class="bi bi-lock"></i></button>';
                         }
                         html += '</div>';
                         return html;

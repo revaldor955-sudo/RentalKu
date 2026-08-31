@@ -771,10 +771,10 @@
                     width: '140px',
                     render: function(data, type, row) {
                         return '<div class="d-flex justify-content-center gap-2">' +
-                            '<button type="button" class="btn btn-warning btn-sm" ' +
+                            '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
                             'title="Edit" onclick="editKupon(' + data + ')">' +
                             '<i class="bi bi-pencil-square"></i></button>' +
-                            '<button type="button" class="btn btn-danger btn-sm" ' +
+                            '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" ' +
                             'title="Hapus" onclick="deleteKupon(' + data +
                             ', \'' + row.code.replace(/'/g, "\\'") + '\')">' +
                             '<i class="bi bi-trash"></i></button>' +
