@@ -349,12 +349,26 @@ class MobilController extends Controller
     /**
      * Hapus mobil
      */
-    public function destroy(Mobil $mobil)
+    public function destroy(Request $request, Mobil $mobil)
     {
         $mobil->delete();
 
+        // Respons JSON untuk request AJAX (tombol hapus di halaman admin)
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'message' => 'Mobil berhasil dihapus.',
+            ]);
+        }
+
+        // Redirect sesuai asal halaman (admin vs staff)
+        if ($request->routeIs('staff.mobils.destroy')) {
+            return redirect()
+                ->route('staff.mobils.index')
+                ->with('success', 'Mobil berhasil dihapus.');
+        }
+
         return redirect()
-            ->route('staff.mobils.index')
+            ->route('mobils.index')
             ->with('success', 'Mobil berhasil dihapus.');
     }
 }
