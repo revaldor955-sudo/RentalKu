@@ -89,6 +89,11 @@
             vertical-align: middle;
         }
 
+        /* Sembunyikan ikon sort di semua kolom */
+        #kupons-table thead .dt-column-order {
+            display: none !important;
+        }
+
         .code {
             background: #e9f7ef;
             color: #198754;
@@ -117,15 +122,6 @@
             border-radius: 20px;
             font-size: 12px;
             font-weight: 700;
-        }
-
-        .btn-action {
-            width: 36px;
-            height: 36px;
-            border-radius: 9px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .modal-content {
@@ -217,7 +213,7 @@
 
                 <thead>
                     <tr>
-                        <th class="px-4 py-3">#</th>
+                        <th class="px-3 py-3">No</th>
                         <th>Kode</th>
                         <th>Jenis</th>
                         <th>Nilai</th>
@@ -655,15 +651,15 @@
 
 <script>
 
-    const CSRF_TOKEN = '{{ csrf_token() }}';
+    var CSRF_TOKEN = '{{ csrf_token() }}';
 
-    const flashSuccess = document.getElementById('flashSuccess');
+    var $flashSuccess = $('#flashSuccess');
 
-    if (flashSuccess) {
+    if ($flashSuccess.length) {
         Swal.fire({
             icon: 'success',
             title: 'Berhasil',
-            text: flashSuccess.textContent,
+            text: $flashSuccess.text(),
             timer: 1800,
             showConfirmButton: false,
         });
@@ -692,7 +688,8 @@
                     data: null,
                     orderable: false,
                     searchable: false,
-                    className: 'px-4',
+                    className: 'px-3',
+                    width: '70px',
                     render: function(data, type, row, meta) {
                         return meta.row + meta.settings._iDisplayStart + 1;
                     },
@@ -771,12 +768,13 @@
                     orderable: false,
                     searchable: false,
                     className: 'text-center',
+                    width: '140px',
                     render: function(data, type, row) {
                         return '<div class="d-flex justify-content-center gap-2">' +
-                            '<button type="button" class="btn btn-warning btn-sm btn-action" ' +
+                            '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
                             'title="Edit" onclick="editKupon(' + data + ')">' +
                             '<i class="bi bi-pencil-square"></i></button>' +
-                            '<button type="button" class="btn btn-danger btn-sm btn-action" ' +
+                            '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" ' +
                             'title="Hapus" onclick="deleteKupon(' + data +
                             ', \'' + row.code.replace(/'/g, "\\'") + '\')">' +
                             '<i class="bi bi-trash"></i></button>' +
@@ -798,10 +796,6 @@
                 loadingRecords: 'Memuat...',
                 zeroRecords: 'Tidak ditemukan data yang cocok',
                 emptyTable: 'Belum ada promo',
-                paginate: {
-                    previous: 'Sebelumnya',
-                    next: 'Berikutnya'
-                },
                 aria: {
                     sortAscending: ': aktifkan untuk urut naik',
                     sortDescending: ': aktifkan untuk urut turun',
@@ -879,7 +873,7 @@
         $('#formEditKupon').attr('action',
             "{{ route('kupons.update', '__ID__') }}".replace('__ID__', id));
 
-        new bootstrap.Modal(document.getElementById('editKuponModal')).show();
+        bootstrap.Modal.getOrCreateInstance($('#editKuponModal')[0]).show();
     }
 
     $(document).on('submit', '#formTambahKupon', function(e) {
@@ -901,7 +895,7 @@
                 'X-Requested-With': 'XMLHttpRequest',
             },
             success: function(result) {
-                bootstrap.Modal.getInstance(document.getElementById('tambahModal')).hide();
+                bootstrap.Modal.getInstance($('#tambahModal')[0]).hide();
                 form.reset();
                 $('#kupons-table').DataTable().ajax.reload();
 
@@ -947,7 +941,7 @@
                 'X-Requested-With': 'XMLHttpRequest',
             },
             success: function(result) {
-                bootstrap.Modal.getInstance(document.getElementById('editKuponModal')).hide();
+                bootstrap.Modal.getInstance($('#editKuponModal')[0]).hide();
                 $('#kupons-table').DataTable().ajax.reload();
 
                 Swal.fire({

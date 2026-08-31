@@ -59,7 +59,7 @@
                     <div class="user-icon">
                         <i class="bi bi-person"></i>
                     </div>
-                    <span>{{ Auth::user()->name }}</span>
+                    <span>{{ Auth::user()?->name ?? 'Admin' }}</span>
                 </a>
 
             </div>

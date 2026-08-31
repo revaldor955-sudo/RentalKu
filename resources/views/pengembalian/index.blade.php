@@ -39,11 +39,19 @@
             font-size: 13px;
             color: #6b7280;
             white-space: nowrap;
+            text-transform: uppercase;
+            background: #f8faf9;
+            border-bottom: 1px solid #e9ecef;
         }
 
         .table td {
             vertical-align: middle;
             white-space: nowrap;
+        }
+
+        /* Sembunyikan ikon sort di semua kolom */
+        #pengembalian-table thead .dt-column-order {
+            display: none !important;
         }
 
         .status {
@@ -108,8 +116,8 @@
 
                             <tr>
 
-                                <th class="px-4 py-3">
-                                    #
+                                <th class="px-3 py-3">
+                                    No
                                 </th>
 
                                 <th>
@@ -229,7 +237,8 @@
                         data: null,
                         orderable: false,
                         searchable: false,
-                        className: 'px-4',
+                        className: 'px-3',
+                        width: '70px',
                         render: function(data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
                         },
@@ -283,8 +292,9 @@
                         orderable: false,
                         searchable: false,
                         className: 'text-end pe-4',
+                        width: '140px',
                         render: function(data) {
-                            return '<button type="button" class="btn btn-primary btn-sm btn-action" ' +
+                            return '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
                                 'onclick="prosesPengembalian(' + data.id + ', \'' +
                                 data.mobil_name.replace(/'/g, "\\'") + '\')">' +
                                 '<i class="bi bi-arrow-return-left"></i> Proses Pengembalian</button>';
@@ -305,10 +315,6 @@
                     loadingRecords: 'Memuat...',
                     zeroRecords: 'Tidak ditemukan data yang cocok',
                     emptyTable: 'Tidak ada rental yang sedang berjalan',
-                    paginate: {
-                        previous: 'Sebelumnya',
-                        next: 'Berikutnya'
-                    },
                     aria: {
                         sortAscending: ': aktifkan untuk urut naik',
                         sortDescending: ': aktifkan untuk urut turun',

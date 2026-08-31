@@ -42,14 +42,19 @@
             color: #198754;
         }
 
-        .back-btn {
-            color: #198754;
-            text-decoration: none;
-            font-weight: 600;
+        /* Samakan gaya tombol auth navbar dengan landing (layouts/partials/navbar) */
+        .btn-rent {
+            background: #198754;
+            color: white;
+            border-radius: 10px;
+            padding: 11px 21px;
+            font-weight: 700;
+            border: none;
         }
 
-        .back-btn:hover {
-            color: #146c43;
+        .btn-rent:hover {
+            background: #146c43;
+            color: white;
         }
 
         .detail-card {
@@ -62,9 +67,10 @@
         .car-photo {
             width: 100%;
             height: 470px;
-            object-fit: cover;
+            object-fit: contain;
             object-position: center;
             border-radius: 18px;
+            background: #f6f8f7;
             display: block;
         }
 
@@ -237,13 +243,11 @@
 <nav class="navbar">
     <div class="container py-3">
 
-        <div class="d-flex align-items-center justify-content-between">
+        <a href="{{ url('/') }}" class="text-decoration-none brand">
+            Rental<span>ku</span>.
+        </a>
 
-            <a href="{{ url('/') }}" class="text-decoration-none brand">
-                Rental<span>ku</span>.
-            </a>
-
-            <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center gap-3">
 
                 @auth
 
@@ -255,7 +259,7 @@
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
 
-                        <button class="btn btn-outline-danger btn-sm">
+                        <button class="btn btn-outline-danger fw-semibold rounded-3">
                             <i class="bi bi-box-arrow-right"></i>
                             Keluar
                         </button>
@@ -263,12 +267,12 @@
 
                 @else
 
-                    <a href="{{ route('login') }}" class="btn btn-outline-success btn-sm">
+                    <a href="{{ route('login') }}" class="btn btn-light border rounded-3 px-3 fw-semibold">
                         <i class="bi bi-box-arrow-in-right me-1"></i>
                         Masuk
                     </a>
 
-                    <a href="{{ route('register') }}" class="btn btn-success btn-sm">
+                    <a href="{{ route('register') }}" class="btn btn-rent">
                         Daftar
                     </a>
 
@@ -276,24 +280,32 @@
 
             </div>
 
-        </div>
-
     </div>
 </nav>
 
 
 <div class="container py-4">
 
-    {{-- KEMBALI --}}
+    {{-- KEMBALI: customer → dashboard, guest → beranda (dashboard dilindungi auth) --}}
     <div class="mb-4">
 
-        <a href="{{ route('customer.dashboard') }}" class="back-btn">
+        @auth
+            <a href="{{ route('customer.dashboard') }}" class="btn btn-outline-secondary">
 
-            <i class="bi bi-arrow-left me-2"></i>
+                <i class="bi bi-arrow-left me-2"></i>
 
-            Kembali ke Dashboard
+                Kembali ke Dashboard
 
-        </a>
+            </a>
+        @else
+            <a href="{{ url('/') }}" class="btn btn-outline-secondary">
+
+                <i class="bi bi-arrow-left me-2"></i>
+
+                Kembali ke Beranda
+
+            </a>
+        @endauth
 
     </div>
 
@@ -836,79 +848,67 @@
 <script>
 
     function openSewaPopup() {
-
-        const template = document.getElementById('sewaFormTemplate');
+        var $template = $('#sewaFormTemplate');
 
         Swal.fire({
             title: 'Sewa {{ $mobil->name }}',
-            html: template.innerHTML,
+            html: $template.html(),
             width: 600,
             showConfirmButton: false,
-            didOpen: () => {
+            didOpen: function() {
+                var $form = $('#swal2-html-container form');
 
-                const form = document.querySelector('#swal2-html-container form');
-
-                form.addEventListener('submit', async function (event) {
-
+                $form.on('submit', function(event) {
                     event.preventDefault();
 
-                    const submitBtn = form.querySelector('button[type="submit"]');
-
-                    // Tombol submit bawaan SweetAlert tidak dipakai; form submit
-                    // dilempar ke server lewat fetch (tetap server-side).
-                    const formData = new FormData(form);
+                    var formData = new FormData($form[0]);
 
                     Swal.showLoading();
 
-                    try {
-
-                        const response = await fetch(form.action, {
-                            method: 'POST',
-                            headers: {
-                                'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            body: formData
-                        });
-
-                        const data = await response.json();
-
+                    $.ajax({
+                        url: $form.attr('action'),
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        data: formData,
+                        processData: false,
+                        contentType: false
+                    })
+                    .done(function(data, textStatus, xhr) {
                         Swal.hideLoading();
 
-                        if (!response.ok) {
-
-                            const firstError = data.errors
+                        if (xhr.status !== 200) {
+                            var firstError = data.errors
                                 ? Object.values(data.errors).flat()[0]
-                                : (data.message ?? 'Terjadi kesalahan.');
+                                : (data.message || 'Terjadi kesalahan.');
 
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Gagal',
                                 text: firstError,
                             });
-
                             return;
                         }
 
                         Swal.fire({
                             icon: 'success',
                             title: 'Berhasil!',
-                            text: data.message ?? 'Pengajuan sewa mobil berhasil dibuat.',
+                            text: data.message || 'Pengajuan sewa mobil berhasil dibuat.',
                             confirmButtonText: 'OK',
-                        }).then(() => {
+                        }).then(function() {
                             window.location.href = '{{ route('customer.dashboard') }}';
                         });
-
-                    } catch (error) {
-
+                    })
+                    .fail(function() {
                         Swal.hideLoading();
-
                         Swal.fire({
                             icon: 'error',
                             title: 'Gagal',
                             text: 'Koneksi bermasalah. Silakan coba lagi.',
                         });
-                    }
+                    });
                 });
             }
         });

@@ -137,9 +137,16 @@
 
         <div class="mb-4 no-print">
 
-            <h2 class="fw-bold mb-1">
-                Laporan
-            </h2>
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <h2 class="fw-bold mb-0">
+                    Laporan
+                </h2>
+
+                <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Dashboard
+                </a>
+            </div>
 
             <p class="text-muted mb-0">
                 Laporan pendapatan dari pembayaran berstatus Disetujui.

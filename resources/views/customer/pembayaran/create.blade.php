@@ -576,74 +576,43 @@
 
 <script>
 
-document.getElementById('metodeSelect').addEventListener('change', function() {
+$('#metodeSelect').on('change', function() {
+    var $select = $(this);
+    var $detailBox = $('#metodeDetail');
+    var $placeholder = $('#metode-placeholder');
 
-    const select = document.getElementById('metodeSelect');
-    const detailBox = document.getElementById('metodeDetail');
-    const placeholder = document.getElementById('metode-placeholder');
+    if (!$detailBox.length) return;
 
-    if (!detailBox) {
-        return;
-    }
+    var selectedId = $select.val();
 
-    const selectedId = select.value;
-
-    detailBox.querySelectorAll('.metode-detail').forEach(function(el) {
-        el.classList.add('d-none');
-    });
+    $detailBox.find('.metode-detail').addClass('d-none');
 
     if (selectedId) {
-
-        const target = document.getElementById('metode-' + selectedId);
-
-        if (target) {
-            target.classList.remove('d-none');
-        }
-
-        if (placeholder) {
-            placeholder.classList.add('d-none');
-        }
-
-    } else if (placeholder) {
-
-        placeholder.classList.remove('d-none');
-
+        $('#metode-' + selectedId).removeClass('d-none');
+        if ($placeholder.length) $placeholder.addClass('d-none');
+    } else if ($placeholder.length) {
+        $placeholder.removeClass('d-none');
     }
-
 });
 
 showMetodeDetail();
 
 function showMetodeDetail() {
-
-    const select = document.getElementById('metodeSelect');
-
-    if (!select) {
-        return;
-    }
-
-    select.dispatchEvent(new Event('change'));
-
+    var $select = $('#metodeSelect');
+    if (!$select.length) return;
+    $select.trigger('change');
 }
 
-document.getElementById('bukti').addEventListener('change', function(event) {
-
-    const file = event.target.files[0];
-
-    const preview = document.getElementById('preview');
+$('#bukti').on('change', function(event) {
+    var file = event.target.files[0];
+    var $preview = $('#preview');
 
     if (file) {
-
-        preview.src = URL.createObjectURL(file);
-
-        preview.style.display = 'block';
-
+        $preview.attr('src', URL.createObjectURL(file));
+        $preview.show();
     } else {
-
-        preview.style.display = 'none';
-
+        $preview.hide();
     }
-
 });
 
 </script>

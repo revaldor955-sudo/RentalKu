@@ -39,11 +39,19 @@
             font-size: 13px;
             color: #6b7280;
             white-space: nowrap;
+            text-transform: uppercase;
+            background: #f8faf9;
+            border-bottom: 1px solid #e9ecef;
         }
 
         .table td {
             vertical-align: middle;
             white-space: nowrap;
+        }
+
+        /* Sembunyikan ikon sort di semua kolom */
+        #pemeriksaan-table thead .dt-column-order {
+            display: none !important;
         }
 
         .status {
@@ -133,8 +141,8 @@
 
                             <tr>
 
-                                <th class="px-4 py-3">
-                                    #
+                                <th class="px-3 py-3">
+                                    No
                                 </th>
 
                                 <th>
@@ -420,7 +428,7 @@
         function openTambahModal() {
             resetForm();
             $('#pemeriksaanModalLabel').text('Tambah Pemeriksaan');
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('pemeriksaanModal')).show();
+            bootstrap.Modal.getOrCreateInstance($('#pemeriksaanModal')[0]).show();
         }
 
         function openEditModal(id) {
@@ -450,7 +458,7 @@
                     .val(keterangan);
             });
 
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('pemeriksaanModal')).show();
+            bootstrap.Modal.getOrCreateInstance($('#pemeriksaanModal')[0]).show();
         }
 
         function hapusPemeriksaan(id) {
@@ -520,7 +528,7 @@
                 processData: false,
                 contentType: false,
                 success: function(res) {
-                    bootstrap.Modal.getInstance(document.getElementById('pemeriksaanModal')).hide();
+                    bootstrap.Modal.getInstance($('#pemeriksaanModal')[0]).hide();
                     $('#pemeriksaan-table').DataTable().ajax.reload();
                     Swal.fire({
                         icon: 'success',
@@ -555,7 +563,8 @@
                         data: null,
                         orderable: false,
                         searchable: false,
-                        className: 'px-4',
+                        className: 'px-3',
+                        width: '70px',
                         render: function(data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
                         },
@@ -618,12 +627,13 @@
                         orderable: false,
                         searchable: false,
                         className: 'text-end pe-4',
+                        width: '140px',
                         render: function(data) {
                             return '<div class="d-flex justify-content-end gap-2">' +
-                                '<button type="button" class="btn btn-warning btn-sm btn-action" ' +
+                                '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
                                 'onclick="openEditModal(' + data.id + ')">' +
                                 '<i class="bi bi-pencil-square"></i></button>' +
-                                '<button type="button" class="btn btn-danger btn-sm btn-action" ' +
+                                '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" ' +
                                 'onclick="hapusPemeriksaan(' + data.id + ')">' +
                                 '<i class="bi bi-trash"></i></button>' +
                                 '</div>';
@@ -644,10 +654,6 @@
                     loadingRecords: 'Memuat...',
                     zeroRecords: 'Tidak ditemukan data yang cocok',
                     emptyTable: 'Belum ada pemeriksaan',
-                    paginate: {
-                        previous: 'Sebelumnya',
-                        next: 'Berikutnya'
-                    },
                     aria: {
                         sortAscending: ': aktifkan untuk urut naik',
                         sortDescending: ': aktifkan untuk urut turun',

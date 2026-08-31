@@ -375,7 +375,8 @@
 
                                         <a
                                             href="{{ route('staff.mobils.edit', $mobil->id) }}"
-                                            class="btn btn-warning btn-sm"
+                                            class="btn p-1 text-primary"
+                                            style="border:none;background:none;"
                                             title="Edit"
                                         >
                                             <i class="bi bi-pencil-square"></i>
@@ -392,7 +393,8 @@
 
                                             <button
                                                 type="submit"
-                                                class="btn btn-danger btn-sm"
+                                                class="btn p-1 text-danger"
+                                                style="border:none;background:none;"
                                                 title="Hapus"
                                             >
                                                 <i class="bi bi-trash"></i>

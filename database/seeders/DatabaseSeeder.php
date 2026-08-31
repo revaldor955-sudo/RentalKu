@@ -19,7 +19,9 @@ class DatabaseSeeder extends Seeder
         $this->call(BrandSeeder::class);
         $this->call(TipeMobilSeeder::class);
         $this->call(CabangSeeder::class);
+        $this->call(MobilSeeder::class);
         $this->call(MetodePembayaranSeeder::class);
         $this->call(KerusakanMobilSeeder::class);
+        $this->call(BannerSeeder::class);
     }
 }

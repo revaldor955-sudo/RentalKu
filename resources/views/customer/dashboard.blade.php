@@ -299,7 +299,8 @@
         .car-img {
             width: 100%;
             height: 210px;
-            object-fit: cover;
+            object-fit: contain;
+            background: #f1f5f9;
             display: block;
             transition: transform .4s ease;
         }
@@ -1257,149 +1258,103 @@
 <script>
 
     // Buka modal detail mobil via AJAX — tanpa reload halaman.
-    const mobilDetailModalEl = document.getElementById('mobilDetailModal');
+    var $mobilDetailModalBody = $('#mobilDetailModalBody');
 
-    const mobilDetailModalBody = document.getElementById('mobilDetailModalBody');
+    function openMobilDetail(mobilId) {
+        $mobilDetailModalBody.html('<div class="text-center py-5"><div class="spinner-border text-success" role="status"></div></div>');
 
-    async function openMobilDetail(mobilId) {
-
-        mobilDetailModalBody.innerHTML = `
-
-            <div class="text-center py-5">
-
-                <div class="spinner-border text-success" role="status"></div>
-
-            </div>`;
-
-        try {
-
-            const response = await fetch(`/mobils/${mobilId}`, {
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Respon tidak valid.');
+        $.ajax({
+            url: '/mobils/' + mobilId,
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
             }
-
-            const html = await response.text();
-
-            mobilDetailModalBody.innerHTML = html;
-
-            bootstrap.Modal.getOrCreateInstance(mobilDetailModalEl).show();
-
-        } catch (error) {
-
-            mobilDetailModalBody.innerHTML = `
-
-                <div class="alert alert-danger m-3 mb-0">
-
-                    <i class="bi bi-exclamation-triangle me-1"></i>
-
-                    Gagal memuat detail mobil. Silakan coba lagi.
-
-                </div>`;
-
-        }
-
+        })
+        .done(function(html) {
+            $mobilDetailModalBody.html(html);
+            bootstrap.Modal.getOrCreateInstance($('#mobilDetailModal')[0]).show();
+        })
+        .fail(function() {
+            $mobilDetailModalBody.html('<div class="alert alert-danger m-3 mb-0"><i class="bi bi-exclamation-triangle me-1"></i> Gagal memuat detail mobil. Silakan coba lagi.</div>');
+        });
     }
 
     // Klik kartu mobil (atau tombol "Sewa") di dashboard → buka modal
-    document.querySelectorAll('[data-mobil-id]').forEach(function (card) {
-
-        card.addEventListener('click', function () {
-
-            openMobilDetail(card.dataset.mobilId);
-
-        });
-
+    $(document).on('click', '[data-mobil-id]', function() {
+        openMobilDetail($(this).data('mobil-id'));
     });
 
     // Popup form sewa (SweetAlert) — template di-inject dari konten modal
     function openSewaPopup() {
+        var $template = $('#sewaFormTemplate');
+        if (!$template.length) return;
 
-        const template = document.getElementById('sewaFormTemplate');
-
-        if (!template) return;
-
-        const carTitle = document.querySelector('.mobil-modal .mm-title');
+        var $carTitle = $('.mobil-modal .mm-title');
 
         Swal.fire({
-            title: carTitle ? carTitle.textContent.trim() : 'Sewa Mobil',
-            html: template.innerHTML,
+            title: $carTitle.length ? $carTitle.text().trim() : 'Sewa Mobil',
+            html: $template.html(),
             width: 600,
             showConfirmButton: false,
-            didOpen: () => {
+            didOpen: function() {
+                var $form = $('#swal2-html-container form');
+                if (!$form.length) return;
 
-                const form = document.querySelector('#swal2-html-container form');
-
-                if (!form) return;
-
-                form.addEventListener('submit', async function (event) {
-
+                $form.on('submit', function(event) {
                     event.preventDefault();
 
-                    const formData = new FormData(form);
+                    var formData = new FormData($form[0]);
 
                     Swal.showLoading();
 
-                    try {
-
-                        const response = await fetch(form.action, {
-                            method: 'POST',
-                            headers: {
-                                'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            body: formData
-                        });
-
-                        const data = await response.json();
-
+                    $.ajax({
+                        url: $form.attr('action'),
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        data: formData,
+                        processData: false,
+                        contentType: false
+                    })
+                    .done(function(data, textStatus, xhr) {
                         Swal.hideLoading();
 
-                        if (!response.ok) {
-
-                            const firstError = data.errors
+                        if (xhr.status !== 200) {
+                            var firstError = data.errors
                                 ? Object.values(data.errors).flat()[0]
-                                : (data.message ?? 'Terjadi kesalahan.');
+                                : (data.message || 'Terjadi kesalahan.');
 
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Gagal',
                                 text: firstError,
                             });
-
                             return;
                         }
 
                         Swal.fire({
                             icon: 'success',
                             title: 'Berhasil!',
-                            text: data.message ?? 'Pengajuan sewa mobil berhasil dibuat.',
+                            text: data.message || 'Pengajuan sewa mobil berhasil dibuat.',
                             confirmButtonText: 'OK',
-                        }).then(() => {
+                        }).then(function() {
                             window.location.reload();
                         });
-
-                    } catch (error) {
-
+                    })
+                    .fail(function() {
                         Swal.hideLoading();
-
                         Swal.fire({
                             icon: 'error',
                             title: 'Gagal',
                             text: 'Terjadi kesalahan. Silakan coba lagi.',
                         });
-
-                    }
-
+                    });
                 });
-
             }
         });
+    }
 
     }
 

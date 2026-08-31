@@ -211,6 +211,11 @@
             vertical-align: middle;
         }
 
+        /* Sembunyikan ikon sort di semua kolom */
+        #mobils-table thead .dt-column-order {
+            display: none !important;
+        }
+
         .car-image {
             width: 58px;
             height: 45px;
@@ -251,14 +256,6 @@
             color: #b02a37;
         }
 
-        .btn-action {
-            width: 36px;
-            height: 36px;
-            border-radius: 9px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
 
         .alert {
             border-radius: 12px;
@@ -520,7 +517,7 @@
 
                         <tr>
 
-                            <th class="px-4 py-3">
+                            <th class="px-3 py-3">
                                 No
                             </th>
 
@@ -1512,11 +1509,11 @@
         let html = '<div class="d-flex gap-2">';
 
         html += '<button type="button" data-id="' + data.id +
-            '" class="btn btn-outline-primary btn-action" title="Edit" ' +
+            '" class="btn p-1 text-primary" style="border:none;background:none;" title="Edit" ' +
             'onclick="editMobil(this.dataset.id)">' +
-            '<i class="bi bi-pencil"></i></button>';
+            '<i class="bi bi-pencil-square"></i></button>';
 
-        html += '<button type="button" class="btn btn-outline-danger btn-action" title="Hapus" ' +
+        html += '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" title="Hapus" ' +
             'onclick="deleteMobil(' + data.id + ', \'' + data.name.replace(/'/g, "\\'") + '\')">' +
             '<i class="bi bi-trash"></i></button>';
 
@@ -1538,7 +1535,8 @@
                     data: null,
                     orderable: false,
                     searchable: false,
-                    className: 'px-4',
+                    className: 'px-3',
+                    width: '70px',
                     render: function(data, type, row, meta) {
                         return meta.row + meta.settings._iDisplayStart + 1;
                     },
@@ -1616,6 +1614,7 @@
                     data: null,
                     orderable: false,
                     searchable: false,
+                    width: '140px',
                     render: function(data) {
                         return mobilActions(data);
                     },
@@ -1635,10 +1634,6 @@
                 loadingRecords: 'Memuat...',
                 zeroRecords: 'Tidak ditemukan data yang cocok',
                 emptyTable: 'Belum ada mobil',
-                paginate: {
-                    previous: 'Sebelumnya',
-                    next: 'Berikutnya'
-                },
                 aria: {
                     sortAscending: ': aktifkan untuk urut naik',
                     sortDescending: ': aktifkan untuk urut turun',
@@ -1747,7 +1742,7 @@
         $('#editImage').val('');
 
         // Tampilkan modal
-        new bootstrap.Modal(document.getElementById('editMobilModal')).show();
+        bootstrap.Modal.getOrCreateInstance($('#editMobilModal')[0]).show();
     }
 
     $('#formEditMobil').on('submit', function(e) {

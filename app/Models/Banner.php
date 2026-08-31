@@ -12,6 +12,7 @@ class Banner extends Model
         'judul',
         'gambar',
         'description',
+        'link',
         'status',
         'urutan',
     ];

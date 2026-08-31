@@ -61,6 +61,11 @@
             white-space: nowrap;
         }
 
+        /* Sembunyikan ikon sort di semua kolom */
+        #pembayaran-table thead .dt-column-order {
+            display: none !important;
+        }
+
         .badge-status {
             padding: 7px 12px;
             border-radius: 20px;
@@ -121,9 +126,16 @@
 
         <div class="mb-4">
 
-            <h2 class="fw-bold mb-1">
-                Management Pembayaran
-            </h2>
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <h2 class="fw-bold mb-0">
+                    Management Pembayaran
+                </h2>
+
+                <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Dashboard
+                </a>
+            </div>
 
             <p class="text-muted mb-0">
                 Kelola dan verifikasi pembayaran pelanggan RentalKu.
@@ -176,8 +188,8 @@
 
                         <tr>
 
-                            <th class="px-4 py-3">
-                                #
+                            <th class="px-3 py-3">
+                                No
                             </th>
 
                             <th>
@@ -409,17 +421,17 @@
                         function pembayaranActions(data) {
                             let html = '<div class="d-flex gap-2 justify-content-end">';
 
-                            html += '<button class="btn btn-outline-primary btn-sm" ' +
-                                'onclick="openPembayaranDetail(' + data.id + ')">' +
-                                '<i class="bi bi-eye"></i> Detail</button>';
+                            html += '<button class="btn p-1 text-primary" style="border:none;background:none;" ' +
+                                'onclick="openPembayaranDetail(' + data.id + ')" title="Detail">' +
+                                '<i class="bi bi-eye"></i></button>';
 
                             if (data.status === 'Menunggu') {
-                                html += '<button class="btn btn-outline-primary btn-sm" ' +
-                                    'onclick="updatePembayaranStatus(' + data.id + ', \'Disetujui\')">' +
-                                    '<i class="bi bi-check"></i></button>';
-                                html += '<button class="btn btn-outline-primary btn-sm" ' +
-                                    'onclick="updatePembayaranStatus(' + data.id + ', \'Ditolak\')">' +
-                                    '<i class="bi bi-x"></i></button>';
+                                html += '<button class="btn p-1 text-success" style="border:none;background:none;" ' +
+                                    'onclick="updatePembayaranStatus(' + data.id + ', \'Disetujui\')" title="Setujui">' +
+                                    '<i class="bi bi-check-circle"></i></button>';
+                                html += '<button class="btn p-1 text-danger" style="border:none;background:none;" ' +
+                                    'onclick="updatePembayaranStatus(' + data.id + ', \'Ditolak\')" title="Tolak">' +
+                                    '<i class="bi bi-x-circle"></i></button>';
                             }
 
                             html += '</div>';
@@ -440,7 +452,8 @@
                                         data: null,
                                         orderable: false,
                                         searchable: false,
-                                        className: 'px-4',
+                                        className: 'px-3',
+                                        width: '70px',
                                         render: function(data, type, row, meta) {
                                             return meta.row + meta.settings._iDisplayStart + 1;
                                         },
@@ -515,6 +528,7 @@
                                         orderable: false,
                                         searchable: false,
                                         className: 'text-end pe-4',
+                                        width: '140px',
                                         render: function(data) {
                                             return pembayaranActions(data);
                                         },
@@ -534,10 +548,6 @@
                                     loadingRecords: 'Memuat...',
                                     zeroRecords: 'Tidak ditemukan data yang cocok',
                                     emptyTable: 'Belum ada pembayaran',
-                                    paginate: {
-                                        previous: 'Sebelumnya',
-                                        next: 'Berikutnya'
-                                    },
                                     aria: {
                                         sortAscending: ': aktifkan untuk urut naik',
                                         sortDescending: ': aktifkan untuk urut turun',
@@ -549,57 +559,47 @@
 
                         function openPembayaranDetail(id) {
 
-                            const modalEl = document.getElementById('detailPembayaranModal');
-                            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                            var $modal = bootstrap.Modal.getOrCreateInstance($('#detailPembayaranModal')[0]);
 
-                            const loading = document.getElementById('pembayaranDetailLoading');
-                            const error = document.getElementById('pembayaranDetailError');
-                            const content = document.getElementById('pembayaranDetailContent');
+                            var $loading = $('#pembayaranDetailLoading');
+                            var $error = $('#pembayaranDetailError');
+                            var $content = $('#pembayaranDetailContent');
 
-                            loading.classList.remove('d-none');
-                            error.classList.add('d-none');
-                            content.classList.add('d-none');
+                            $loading.removeClass('d-none');
+                            $error.addClass('d-none');
+                            $content.addClass('d-none');
 
-                            modal.show();
+                            $modal.show();
 
                             $.ajax({
                                 url: "{{ route('pembayarans.detail', '__ID__') }}".replace('__ID__', id),
                                 method: 'GET',
                                 success: function(data) {
+                                    $('#pd-pelanggan').text(data.pelanggan);
+                                    $('#pd-email').text(data.email);
+                                    $('#pd-mobil').text(data.mobil);
+                                    $('#pd-plat').text(data.plat);
+                                    $('#pd-metode').text(data.metode);
+                                    $('#pd-tanggal').text(data.tanggal_bayar);
+                                    $('#pd-jumlah').text(formatRupiah(data.jumlah));
+                                    $('#pd-status').html(statusBadge(data.status));
 
-                                    document.getElementById('pd-pelanggan').textContent = data.pelanggan;
-                                    document.getElementById('pd-email').textContent = data.email;
-                                    document.getElementById('pd-mobil').textContent = data.mobil;
-                                    document.getElementById('pd-plat').textContent = data.plat;
-                                    document.getElementById('pd-metode').textContent = data.metode;
-                                    document.getElementById('pd-tanggal').textContent = data.tanggal_bayar;
-                                    document.getElementById('pd-jumlah').textContent = formatRupiah(data.jumlah);
-                                    document.getElementById('pd-status').innerHTML = statusBadge(data.status);
-
-                                    const buktiContainer = document.getElementById('pd-bukti');
-                                    buktiContainer.innerHTML = '';
+                                    var $buktiContainer = $('#pd-bukti');
+                                    $buktiContainer.empty();
 
                                     if (data.bukti_url) {
-                                        const img = document.createElement('img');
-                                        img.src = data.bukti_url;
-                                        img.className = 'proof-image';
-                                        img.alt = 'Bukti pembayaran';
-                                        buktiContainer.appendChild(img);
+                                        $buktiContainer.append('<img src="' + data.bukti_url + '" class="proof-image" alt="Bukti pembayaran">');
                                     } else {
-                                        buktiContainer.innerHTML =
-                                            '<span class="text-muted">Tidak ada</span>';
+                                        $buktiContainer.html('<span class="text-muted">Tidak ada</span>');
                                     }
 
-                                    loading.classList.add('d-none');
-                                    content.classList.remove('d-none');
-
+                                    $loading.addClass('d-none');
+                                    $content.removeClass('d-none');
                                 },
                                 error: function(xhr) {
-                                    loading.classList.add('d-none');
-                                    error.classList.remove('d-none');
-                                    document.getElementById('pembayaranDetailErrorMessage').textContent =
-                                        'Gagal memuat detail pembayaran: ' + xhr.status + ' ' + xhr
-                                        .statusText;
+                                    $loading.addClass('d-none');
+                                    $error.removeClass('d-none');
+                                    $('#pembayaranDetailErrorMessage').text('Gagal memuat detail pembayaran: ' + xhr.status + ' ' + xhr.statusText);
                                 }
                             });
 

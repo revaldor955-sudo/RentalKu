@@ -96,6 +96,11 @@
         vertical-align: middle;
     }
 
+    /* Sembunyikan ikon sort di semua kolom */
+    #fasilitas-table thead .dt-column-order {
+        display: none !important;
+    }
+
     .facility-icon {
         width: 40px;
         height: 40px;
@@ -106,15 +111,6 @@
         align-items: center;
         justify-content: center;
         font-size: 18px;
-    }
-
-    .btn-action {
-        width: 36px;
-        height: 36px;
-        border-radius: 9px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
     }
 
     .modal-footer .btn {
@@ -238,7 +234,7 @@
 
                         <tr>
 
-                            <th class="px-4 py-3">
+                            <th class="px-3 py-3">
                                 No
                             </th>
 
@@ -448,15 +444,15 @@
 
 <script>
 
-    const CSRF_TOKEN = '{{ csrf_token() }}';
+    var CSRF_TOKEN = '{{ csrf_token() }}';
 
-    const flashSuccess = document.getElementById('flashSuccess');
+    var $flashSuccess = $('#flashSuccess');
 
-    if (flashSuccess) {
+    if ($flashSuccess.length) {
         Swal.fire({
             icon: 'success',
             title: 'Berhasil',
-            text: flashSuccess.textContent,
+            text: $flashSuccess.text(),
             timer: 1800,
             showConfirmButton: false,
         });
@@ -475,19 +471,20 @@
                     data: null,
                     orderable: false,
                     searchable: false,
-                    className: 'px-4',
+                    className: 'px-3',
+                    width: '70px',
                     render: function(data, type, row, meta) {
                         return meta.row + meta.settings._iDisplayStart + 1;
                     },
                 },
                 {
-                    data: null,
+                    data: 'name',
                     orderable: true,
                     searchable: false,
-                    render: function(data) {
+                    render: function(data, type, row) {
                         return '<div class="d-flex align-items-center gap-3">' +
                             '<div class="facility-icon"><i class="bi bi-tools"></i></div>' +
-                            '<strong>' + data.name + '</strong>' +
+                            '<strong>' + row.name + '</strong>' +
                             '</div>';
                     },
                 },
@@ -496,12 +493,13 @@
                     orderable: false,
                     searchable: false,
                     className: 'text-center',
+                    width: '140px',
                     render: function(data, type, row) {
                         return '<div class="d-flex justify-content-center gap-2">' +
-                            '<button type="button" class="btn btn-warning btn-sm btn-action" ' +
+                            '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
                             'title="Edit" onclick="editFasilitas(' + data + ')">' +
-                            '<i class="bi bi-pencil"></i></button>' +
-                            '<button type="button" class="btn btn-danger btn-sm btn-action" ' +
+                            '<i class="bi bi-pencil-square"></i></button>' +
+                            '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" ' +
                             'title="Hapus" onclick="deleteFasilitas(' + data +
                             ', \'' + row.name.replace(/'/g, "\\'") + '\')">' +
                             '<i class="bi bi-trash"></i></button>' +
@@ -523,10 +521,6 @@
                 loadingRecords: 'Memuat...',
                 zeroRecords: 'Tidak ditemukan data yang cocok',
                 emptyTable: 'Belum ada fasilitas',
-                paginate: {
-                    previous: 'Sebelumnya',
-                    next: 'Berikutnya'
-                },
                 aria: {
                     sortAscending: ': aktifkan untuk urut naik',
                     sortDescending: ': aktifkan untuk urut turun',
@@ -597,7 +591,7 @@
         $('#formEditFasilitas').attr('action',
             "{{ route('fasilitas.update', '__ID__') }}".replace('__ID__', id));
 
-        new bootstrap.Modal(document.getElementById('editFasilitasModal')).show();
+        bootstrap.Modal.getOrCreateInstance($('#editFasilitasModal')[0]).show();
     }
 
     $(document).on('submit', '#formTambahFasilitas', function(e) {

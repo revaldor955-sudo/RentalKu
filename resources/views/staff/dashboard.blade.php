@@ -871,21 +871,7 @@
 </div>
 
 
-<footer class="bg-white border-top py-4 mt-5">
-
-    <div class="container text-center">
-
-        <div class="fw-bold">
-            Rental<span class="text-success">ku</span>.
-        </div>
-
-        <small class="text-muted">
-            Staff Dashboard • RentalKu
-        </small>
-
-    </div>
-
-</footer>
+@include('layouts.partials.admin-footer', ['pageTitle' => 'Staff Dashboard'])
 
 {{-- Modal profil + Bootstrap JS (dibutuhkan modal) --}}
 @include('layouts.partials.profile-modal')

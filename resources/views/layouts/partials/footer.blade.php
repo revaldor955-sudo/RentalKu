@@ -18,15 +18,7 @@
 
                 <div class="d-flex gap-3 mt-4">
 
-                    <a href="#">
-                        <i class="bi bi-instagram fs-5"></i>
-                    </a>
-
-                    <a href="#">
-                        <i class="bi bi-facebook fs-5"></i>
-                    </a>
-
-                    <a href="#">
+                    <a href="https://wa.me/6281234567890" target="_blank" rel="noopener" aria-label="WhatsApp">
                         <i class="bi bi-whatsapp fs-5"></i>
                     </a>
 
@@ -59,10 +51,9 @@
 
                 <div class="d-flex flex-column gap-2">
 
-                    <a href="#">Rental Mobil</a>
-                    <a href="#">Dengan Supir</a>
-                    <a href="#">Tanpa Supir</a>
-                    <a href="#">Rental</a>
+                    <a href="#mobil">Rental Mobil</a>
+                    <a href="#cara-rental">Dengan Supir</a>
+                    <a href="#cara-rental">Tanpa Supir</a>
 
                 </div>
 

@@ -8,42 +8,30 @@
     <title>Management Banner - RentalKu</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/css/dataTables.bootstrap5.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <style>
         body {
             background: #f5f7f6;
+            color: #1f2937;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            color: #1f2937;
-        }
-
-        .navbar {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .brand {
-            font-size: 25px;
-            font-weight: 800;
-            color: #1f2937;
-        }
-
-        .brand span {
-            color: #198754;
         }
 
         .page-card {
             background: white;
-            border-radius: 20px;
             border: 1px solid #edf0ee;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, .04);
-            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .05);
+        }
+
+        .page-title {
+            font-size: 30px;
+            font-weight: 800;
         }
 
         .btn-green {
@@ -51,13 +39,32 @@
             color: white;
             border: none;
             border-radius: 10px;
-            font-weight: 600;
-            padding: 10px 18px;
+            font-weight: 700;
+            padding: 10px 17px;
         }
 
         .btn-green:hover {
             background: #146c43;
             color: white;
+        }
+
+        .table thead th {
+            background: #f8faf9;
+            color: #6b7280;
+            font-size: 12px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e9ecef;
+            white-space: nowrap;
+            padding: 12px 16px;
+        }
+
+        .table tbody td {
+            vertical-align: middle;
+        }
+
+        /* Sembunyikan ikon sort di semua kolom */
+        #banners-table thead .dt-column-order {
+            display: none !important;
         }
 
         .banner-image {
@@ -80,19 +87,6 @@
             font-size: 30px;
         }
 
-        .table thead th {
-            background: #f8faf9;
-            color: #6c757d;
-            font-size: 12px;
-            text-transform: uppercase;
-            white-space: nowrap;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .table tbody td {
-            vertical-align: middle;
-        }
-
         .status-active {
             background: #dff7e8;
             color: #198754;
@@ -113,7 +107,7 @@
 
         .modal-content {
             border: none;
-            border-radius: 18px;
+            border-radius: 20px;
             overflow: hidden;
         }
 
@@ -122,695 +116,437 @@
             color: white;
         }
 
-        .modal-header .btn-close {
-            filter: brightness(0) invert(1);
-        }
-
         .form-control,
         .form-select {
             border-radius: 10px;
-            padding: 10px 12px;
+            padding: 11px 13px;
         }
 
-        .form-control:focus,
-        .form-select:focus {
+        .form-control:focus {
             border-color: #198754;
             box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .12);
         }
-
-        .form-label {
-            font-weight: 600;
-        }
     </style>
-
 </head>
 
 <body>
 
-{{-- NAVBAR --}}
-@include('layouts.partials.admin-navbar')
+    @include('layouts.partials.admin-navbar')
 
+    <div class="container py-5">
 
-<div class="container py-5">
-
-    {{-- HEADER --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <div>
-
-            <h2 class="fw-bold mb-1">
-                Management Banner
-            </h2>
-
-            <p class="text-muted mb-0">
-                Kelola banner yang ditampilkan pada halaman utama RentalKu.
-            </p>
-
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="page-title mb-1">Management Banner</h1>
+                <p class="text-muted mb-0">Kelola banner yang ditampilkan pada halaman utama RentalKu.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Dashboard
+                </a>
+                <button type="button" class="btn btn-green" data-bs-toggle="modal" data-bs-target="#tambahBannerModal">
+                    <i class="bi bi-plus-lg me-1"></i>
+                    Tambah Banner
+                </button>
+            </div>
         </div>
 
-        <div class="d-flex gap-2">
-
-            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1"></i>
-                Dashboard
-            </a>
-
-            <button type="button"
-                class="btn btn-green"
-                data-bs-toggle="modal"
-                data-bs-target="#tambahBannerModal">
-
-                <i class="bi bi-plus-circle me-1"></i>
-                Tambah Banner
-
-            </button>
-
-        </div>
-
-    </div>
-
-
-    {{-- SUCCESS --}}
-    @if(session('success'))
-
-        <div class="alert alert-success alert-dismissible fade show">
-
-            <i class="bi bi-check-circle me-2"></i>
-
-            {{ session('success') }}
-
-            <button type="button"
-                class="btn-close"
-                data-bs-dismiss="alert">
-            </button>
-
-        </div>
-
-    @endif
-
-
-    {{-- VALIDATION --}}
-    @if($errors->any())
-
-        <div class="alert alert-danger">
-
-            <strong>Terdapat kesalahan:</strong>
-
-            <ul class="mb-0 mt-2">
-
-                @foreach($errors->all() as $error)
-
-                    <li>{{ $error }}</li>
-
-                @endforeach
-
-            </ul>
-
-        </div>
-
-    @endif
-
-
-    {{-- TABLE --}}
-    <div class="page-card">
-
-        @if($banners->count())
-
+        <div class="page-card">
             <div class="table-responsive">
-
-                <table class="table align-middle mb-0">
-
+                <table class="table align-middle mb-0" id="banners-table">
                     <thead>
-
                         <tr>
-
-                            <th class="px-4 py-3">#</th>
-
+                            <th class="px-3 py-3">No</th>
                             <th>Banner</th>
-
                             <th>Judul</th>
-
                             <th>Urutan</th>
-
                             <th>Status</th>
-
                             <th class="text-center">Aksi</th>
-
                         </tr>
-
                     </thead>
-
-
                     <tbody>
-
-                        @foreach($banners as $banner)
-
-                            <tr>
-
-                                {{-- NO --}}
-                                <td class="px-4">
-                                    {{ $loop->iteration }}
-                                </td>
-
-
-                                {{-- GAMBAR --}}
-                                <td>
-
-                                    @if($banner->gambar)
-
-                                        <img
-                                            src="{{ asset($banner->gambar) }}"
-                                            class="banner-image"
-                                            alt="{{ $banner->judul }}"
-                                        >
-
-                                    @else
-
-                                        <div class="image-placeholder">
-                                            <i class="bi bi-image"></i>
-                                        </div>
-
-                                    @endif
-
-                                </td>
-
-
-                                {{-- JUDUL --}}
-                                <td>
-
-                                    <strong>
-                                        {{ $banner->judul }}
-                                    </strong>
-
-                                    @if($banner->description)
-
-                                        <div class="small text-muted">
-
-                                            {{ Str::limit($banner->description, 60) }}
-
-                                        </div>
-
-                                    @endif
-
-                                </td>
-
-
-                                {{-- URUTAN --}}
-                                <td>
-                                    {{ $banner->urutan ?? 0 }}
-                                </td>
-
-
-                                {{-- STATUS --}}
-                                <td>
-
-                                    @if($banner->status === 'aktif')
-
-                                        <span class="status-active">
-                                            Aktif
-                                        </span>
-
-                                    @else
-
-                                        <span class="status-inactive">
-                                            Tidak Aktif
-                                        </span>
-
-                                    @endif
-
-                                </td>
-
-
-                                {{-- AKSI --}}
-                                <td>
-
-                                    <div class="d-flex justify-content-center gap-2">
-
-                                        {{-- EDIT --}}
-                                        <button
-                                            type="button"
-                                            class="btn btn-warning btn-sm"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editBanner{{ $banner->id }}"
-                                            title="Edit">
-
-                                            <i class="bi bi-pencil-square"></i>
-
-                                        </button>
-
-
-                                        {{-- HAPUS --}}
-                                        <form
-                                            action="{{ route('banners.destroy', $banner->id) }}"
-                                            method="POST"
-                                            onsubmit="return confirmSubmit(event, 'Yakin ingin menghapus banner ini?')">
-
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button
-                                                type="submit"
-                                                class="btn btn-danger btn-sm"
-                                                title="Hapus">
-
-                                                <i class="bi bi-trash"></i>
-
-                                            </button>
-
-                                        </form>
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-
-                            {{-- MODAL EDIT --}}
-                            <div
-                                class="modal fade"
-                                id="editBanner{{ $banner->id }}"
-                                tabindex="-1">
-
-                                <div class="modal-dialog modal-lg modal-dialog-centered">
-
-                                    <div class="modal-content">
-
-                                        <div class="modal-header">
-
-                                            <h5 class="modal-title">
-
-                                                <i class="bi bi-pencil-square me-2"></i>
-
-                                                Edit Banner
-
-                                            </h5>
-
-                                            <button
-                                                type="button"
-                                                class="btn-close"
-                                                data-bs-dismiss="modal">
-                                            </button>
-
-                                        </div>
-
-
-                                        <form
-                                            action="{{ route('banners.update', $banner->id) }}"
-                                            method="POST"
-                                            enctype="multipart/form-data">
-
-                                            @csrf
-                                            @method('PUT')
-
-                                            <div class="modal-body">
-
-                                                <div class="row g-3">
-
-                                                    {{-- JUDUL --}}
-                                                    <div class="col-md-8">
-
-                                                        <label class="form-label">
-                                                            Judul Banner
-                                                        </label>
-
-                                                        <input
-                                                            type="text"
-                                                            name="judul"
-                                                            class="form-control"
-                                                            value="{{ $banner->judul }}"
-                                                            required>
-
-                                                    </div>
-
-
-                                                    {{-- URUTAN --}}
-                                                    <div class="col-md-4">
-
-                                                        <label class="form-label">
-                                                            Urutan
-                                                        </label>
-
-                                                        <input
-                                                            type="number"
-                                                            name="urutan"
-                                                            class="form-control"
-                                                            min="0"
-                                                            value="{{ $banner->urutan ?? 0 }}">
-
-                                                    </div>
-
-
-                                                    {{-- GAMBAR --}}
-                                                    <div class="col-12">
-
-                                                        <label class="form-label">
-                                                            Gambar Banner
-                                                        </label>
-
-                                                        <input
-                                                            type="file"
-                                                            name="gambar"
-                                                            class="form-control"
-                                                            accept=".jpg,.jpeg,.png,.svg">
-
-                                                        <div class="form-text">
-                                                            Kosongkan jika gambar tidak ingin diubah.
-                                                        </div>
-
-                                                    </div>
-
-
-                                                    {{-- DESKRIPSI --}}
-                                                    <div class="col-12">
-
-                                                        <label class="form-label">
-                                                            Deskripsi
-                                                        </label>
-
-                                                        <textarea
-                                                            name="description"
-                                                            class="form-control"
-                                                            rows="3">{{ $banner->description }}</textarea>
-
-                                                    </div>
-
-
-                                                    {{-- STATUS --}}
-                                                    <div class="col-md-6">
-
-                                                        <label class="form-label">
-                                                            Status
-                                                        </label>
-
-                                                        <select
-                                                            name="status"
-                                                            class="form-select"
-                                                            required>
-
-                                                            <option value="aktif"
-                                                                {{ $banner->status === 'aktif' ? 'selected' : '' }}>
-                                                                Aktif
-                                                            </option>
-
-                                                            <option value="nonaktif"
-                                                                {{ $banner->status === 'nonaktif' ? 'selected' : '' }}>
-                                                                Tidak Aktif
-                                                            </option>
-
-                                                        </select>
-
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-
-
-                                            <div class="modal-footer">
-
-                                                <button
-                                                    type="button"
-                                                    class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">
-
-                                                    Batal
-
-                                                </button>
-
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-green">
-
-                                                    <i class="bi bi-save me-1"></i>
-
-                                                    Simpan Perubahan
-
-                                                </button>
-
-                                            </div>
-
-                                        </form>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        @endforeach
-
+                        {{-- Diisi oleh DataTables (server-side) --}}
                     </tbody>
-
                 </table>
-
             </div>
-
-        @else
-
-            <div class="text-center py-5">
-
-                <i class="bi bi-images fs-1 text-muted"></i>
-
-                <h5 class="fw-bold mt-3">
-                    Belum ada banner
-                </h5>
-
-                <p class="text-muted">
-                    Silakan tambahkan banner baru.
-                </p>
-
-                <button
-                    type="button"
-                    class="btn btn-green"
-                    data-bs-toggle="modal"
-                    data-bs-target="#tambahBannerModal">
-
-                    <i class="bi bi-plus-circle me-1"></i>
-
-                    Tambah Banner
-
-                </button>
-
-            </div>
-
-        @endif
-
-    </div>
-
-</div>
-
-
-{{-- MODAL TAMBAH --}}
-<div
-    class="modal fade"
-    id="tambahBannerModal"
-    tabindex="-1">
-
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-
-        <div class="modal-content">
-
-            <div class="modal-header">
-
-                <h5 class="modal-title">
-
-                    <i class="bi bi-plus-circle me-2"></i>
-
-                    Tambah Banner
-
-                </h5>
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal">
-                </button>
-
-            </div>
-
-
-            <form
-                action="{{ route('banners.store') }}"
-                method="POST"
-                enctype="multipart/form-data">
-
-                @csrf
-
-                <div class="modal-body">
-
-                    <div class="row g-3">
-
-                        {{-- JUDUL --}}
-                        <div class="col-md-8">
-
-                            <label class="form-label">
-                                Judul Banner
-                            </label>
-
-                            <input
-                                type="text"
-                                name="judul"
-                                class="form-control"
-                                placeholder="Contoh: Promo RentalKu"
-                                value="{{ old('judul') }}"
-                                required>
-
-                        </div>
-
-
-                        {{-- URUTAN --}}
-                        <div class="col-md-4">
-
-                            <label class="form-label">
-                                Urutan
-                            </label>
-
-                            <input
-                                type="number"
-                                name="urutan"
-                                class="form-control"
-                                min="0"
-                                value="{{ old('urutan', 0) }}">
-
-                        </div>
-
-
-                        {{-- GAMBAR --}}
-                        <div class="col-12">
-
-                            <label class="form-label">
-                                Gambar Banner
-                            </label>
-
-                            <input
-                                type="file"
-                                name="gambar"
-                                class="form-control"
-                                accept=".jpg,.jpeg,.png,.svg">
-
-                            <div class="form-text">
-                                JPG, JPEG, PNG, atau SVG. Maksimal 2 MB.
-                            </div>
-
-                        </div>
-
-
-                        {{-- DESKRIPSI --}}
-                        <div class="col-12">
-
-                            <label class="form-label">
-                                Deskripsi
-                            </label>
-
-                            <textarea
-                                name="description"
-                                class="form-control"
-                                rows="3"
-                                placeholder="Deskripsi banner...">{{ old('description') }}</textarea>
-
-                        </div>
-
-
-                        {{-- STATUS --}}
-                        <div class="col-md-6">
-
-                            <label class="form-label">
-                                Status
-                            </label>
-
-                            <select
-                                name="status"
-                                class="form-select"
-                                required>
-
-                                <option value="">
-                                    -- Pilih Status --
-                                </option>
-
-                                <option value="aktif"
-                                    {{ old('status') === 'aktif' ? 'selected' : '' }}>
-                                    Aktif
-                                </option>
-
-                                <option value="nonaktif"
-                                    {{ old('status') === 'nonaktif' ? 'selected' : '' }}>
-                                    Tidak Aktif
-                                </option>
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="modal-footer">
-
-                    <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal">
-
-                        Batal
-
-                    </button>
-
-                    <button
-                        type="submit"
-                        class="btn btn-green">
-
-                        <i class="bi bi-plus-circle me-1"></i>
-
-                        Tambah Banner
-
-                    </button>
-
-                </div>
-
-            </form>
-
         </div>
 
     </div>
 
-</div>
+
+    {{-- MODAL TAMBAH --}}
+    <div class="modal fade" id="tambahBannerModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Tambah Banner</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formTambahBanner" action="{{ route('banners.store') }}" method="POST"
+                    enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold">Judul Banner</label>
+                                <input type="text" name="judul" class="form-control"
+                                    placeholder="Contoh: Promo RentalKu" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Urutan</label>
+                                <input type="number" name="urutan" class="form-control" min="0" value="0">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Gambar Banner</label>
+                                <input type="file" name="gambar" class="form-control" accept=".jpg,.jpeg,.png,.svg">
+                                <small class="text-muted">JPG, JPEG, PNG, atau SVG. Maksimal 2 MB.</small>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Deskripsi</label>
+                                <textarea name="description" class="form-control" rows="3" placeholder="Deskripsi banner..."></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Link CTA <span
+                                        class="text-secondary">(opsional)</span></label>
+                                <input type="text" name="link" class="form-control"
+                                    placeholder="https://wa.me/6281234567890">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Status</label>
+                                <select name="status" class="form-select" required>
+                                    <option value="">-- Pilih Status --</option>
+                                    <option value="aktif">Aktif</option>
+                                    <option value="nonaktif">Tidak Aktif</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-green">
+                            <i class="bi bi-plus-lg me-1"></i>
+                            Tambah Banner
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-</script>
+    {{-- MODAL EDIT --}}
+    <div class="modal fade" id="editBannerModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Edit Banner</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formEditBanner" action="" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold">Judul Banner</label>
+                                <input type="text" name="judul" id="editJudul" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Urutan</label>
+                                <input type="number" name="urutan" id="editUrutan" class="form-control"
+                                    min="0">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Gambar Banner</label>
+                                <input type="file" name="gambar" class="form-control"
+                                    accept=".jpg,.jpeg,.png,.svg">
+                                <small class="text-muted">Kosongkan jika gambar tidak ingin diubah.</small>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Deskripsi</label>
+                                <textarea name="description" id="editDescription" class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Link CTA <span
+                                        class="text-secondary">(opsional)</span></label>
+                                <input type="text" name="link" id="editLink" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Status</label>
+                                <select name="status" id="editStatus" class="form-select" required>
+                                    <option value="aktif">Aktif</option>
+                                    <option value="nonaktif">Tidak Aktif</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-green">
+                            <i class="bi bi-save me-1"></i>
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
-<script
-    src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
-</script>
 
-<script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    function confirmSubmit(event, message) {
-        event.preventDefault();
+    <script>
+        var CSRF_TOKEN = '{{ csrf_token() }}';
+        var ASSET_BASE_URL = '{{ asset('') }}';
 
-        const form = event.target;
+        function flashSuccess(message) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: message,
+                timer: 1800,
+                showConfirmButton: false,
+            });
+        }
 
-        Swal.fire({
-            title: 'Konfirmasi',
-            text: message,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya',
-            cancelButtonText: 'Batal',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                form.submit();
-            }
+        $(document).ready(function() {
+
+            $('#banners-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '{{ route('banners.data') }}',
+                    type: 'GET',
+                },
+                columns: [
+                    {
+                        data: 'id',
+                        orderable: false,
+                        searchable: false,
+                        className: 'px-3',
+                        width: '70px',
+                        render: function(data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        },
+                    },
+                    {
+                        data: 'gambar',
+                        orderable: false,
+                        searchable: false,
+                        render: function(data, row) {
+                            if (data) {
+                                return '<img src="' + ASSET_BASE_URL + data +
+                                    '" class="banner-image" alt="Banner">';
+                            }
+                            return '<div class="image-placeholder"><i class="bi bi-image"></i></div>';
+                        },
+                    },
+                    {
+                        data: 'judul',
+                        orderable: true,
+                        render: function(data, type, row) {
+                            var html = '<strong>' + data + '</strong>';
+                            if (row.description) {
+                                html += '<div class="small text-muted">' + row.description
+                                    .substring(0, 60) + '</div>';
+                            }
+                            return html;
+                        },
+                    },
+                    {
+                        data: 'urutan',
+                        orderable: true,
+                        searchable: false,
+                        render: function(data) {
+                            return data ?? 0;
+                        },
+                    },
+                    {
+                        data: 'status',
+                        orderable: true,
+                        searchable: false,
+                        render: function(data) {
+                            if (data === 'aktif') {
+                                return '<span class="status-active">Aktif</span>';
+                            }
+                            return '<span class="status-inactive">Tidak Aktif</span>';
+                        },
+                    },
+                    {
+                        data: 'id',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center',
+                        width: '140px',
+                        render: function(data, type, row) {
+                            var html = '<div class="d-flex justify-content-center gap-2">';
+                            html +=
+                                '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" title="Edit" onclick="editBanner(' +
+                                data + ')"><i class="bi bi-pencil-square"></i></button>';
+                            html +=
+                                '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" title="Hapus" onclick="deleteBanner(' +
+                                data + ', \'' + row.judul.replace(/'/g, "\\'") +
+                                '\')"><i class="bi bi-trash"></i></button>';
+                            html += '</div>';
+                            return html;
+                        },
+                    },
+                ],
+                order: [
+                    [2, 'asc']
+                ],
+                language: {
+                    processing: 'Memproses...',
+                    search: 'Cari:',
+                    lengthMenu: 'Tampilkan _MENU_ data',
+                    info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                    infoEmpty: 'Tidak ada data',
+                    infoFiltered: '(difilter dari _MAX_ total data)',
+                    loadingRecords: 'Memuat...',
+                    zeroRecords: 'Tidak ditemukan data yang cocok',
+                    emptyTable: 'Belum ada banner',
+                },
+            });
+
         });
 
-        return false;
-    }
+        function editBanner(id) {
+            $.ajax({
+                url: '{{ url('banners') }}/' + id,
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                success: function(data) {
+                    $('#editJudul').val(data.judul);
+                    $('#editUrutan').val(data.urutan);
+                    $('#editDescription').val(data.description);
+                    $('#editLink').val(data.link);
+                    $('#editStatus').val(data.status);
+                    $('#formEditBanner').attr('action', '{{ url('banners') }}/' + id);
+                    bootstrap.Modal.getOrCreateInstance($('#editBannerModal')[0]).show();
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Data banner tidak ditemukan.',
+                    });
+                }
+            });
+        }
 
-</script>
+        function deleteBanner(id, judul) {
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: 'Yakin ingin menghapus banner "' + judul + '"?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, hapus',
+                cancelButtonText: 'Batal',
+            }).then(function(result) {
+                if (!result.isConfirmed) return;
+
+                $.ajax({
+                    url: '{{ url('banners') }}/' + id,
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    success: function(res) {
+                        $('#banners-table').DataTable().ajax.reload();
+                        flashSuccess(res.message || 'Banner berhasil dihapus.');
+                    },
+                    error: function(xhr) {
+                        var r = xhr.responseJSON || {};
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: r.message || 'Terjadi kesalahan saat menghapus banner.',
+                        });
+                    }
+                });
+            });
+        }
+
+        $(document).on('submit', '#formTambahBanner', function(e) {
+            e.preventDefault();
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: $(this).attr('action'),
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                success: function(result) {
+                    $('#tambahBannerModal').modal('hide');
+                    $('#formTambahBanner')[0].reset();
+                    $('#banners-table').DataTable().ajax.reload();
+                    flashSuccess(result.message || 'Banner berhasil ditambahkan.');
+                },
+                error: function(xhr) {
+                    var r = xhr.responseJSON || {};
+                    var msg = r.errors ? Object.values(r.errors)[0][0] :
+                        (r.message || 'Terjadi kesalahan saat menambahkan banner.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: msg,
+                    });
+                }
+            });
+        });
+
+        $(document).on('submit', '#formEditBanner', function(e) {
+            e.preventDefault();
+
+            var formData = new FormData(this);
+            var url = $(this).attr('action');
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                success: function(result) {
+                    $('#editBannerModal').modal('hide');
+                    $('#banners-table').DataTable().ajax.reload();
+                    flashSuccess(result.message || 'Banner berhasil diperbarui.');
+                },
+                error: function(xhr) {
+                    var r = xhr.responseJSON || {};
+                    var msg = r.errors ? Object.values(r.errors)[0][0] :
+                        (r.message || 'Terjadi kesalahan saat memperbarui banner.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: msg,
+                    });
+                }
+            });
+        });
+    </script>
 
 </body>
 

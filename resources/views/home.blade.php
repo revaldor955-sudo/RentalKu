@@ -8,39 +8,164 @@
 
         <div class="container">
 
-            <div class="hero-content">
+            @if ($banners->count())
 
-                <div class="hero-badge">
-                    <i class="bi bi-patch-check-fill"></i>
-                    Rental mobil mudah & terpercaya
+                <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+
+                    <div class="carousel-inner">
+
+                        <div class="carousel-item active">
+
+                            <div class="hero-content">
+
+                                <div class="hero-badge">
+                                    <i class="bi bi-patch-check-fill"></i>
+                                    Rental mobil mudah & terpercaya
+                                </div>
+
+                                <h1>
+                                    Perjalanan lebih mudah
+                                    dengan <span>Rentalku.</span>
+                                </h1>
+
+                                <p>
+                                    Temukan mobil yang sesuai kebutuhanmu.
+                                    Pilih kendaraan, tentukan tanggal rental,
+                                    dan lakukan rental dengan mudah secara online.
+                                </p>
+
+                                <div class="hero-buttons">
+
+                                    <a href="#mobil" class="btn btn-hero btn-hero-primary">
+                                        <i class="bi bi-car-front me-2"></i>
+                                        Lihat Mobil
+                                    </a>
+
+                                    <a href="#cara-rental" class="btn btn-hero btn-hero-outline">
+                                        Cara Rental
+                                        <i class="bi bi-arrow-right ms-2"></i>
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        @foreach ($banners as $banner)
+
+                            <div class="carousel-item hero-slide"
+                                style="background-image: url('{{ asset($banner->gambar) }}');">
+
+                                <div class="hero-content">
+
+                                    <div class="hero-badge">
+                                        <i class="bi bi-megaphone-fill"></i>
+                                        Promo Spesial
+                                    </div>
+
+                                    <h1>
+                                        {{ $banner->judul }}
+                                    </h1>
+
+                                    <p>
+                                        {{ $banner->description }}
+                                    </p>
+
+                                    <div class="hero-buttons">
+
+                                        @if ($banner->link)
+
+                                            <a href="{{ $banner->link }}"
+                                                class="btn btn-hero btn-hero-primary"
+                                                @if (str_starts_with($banner->link, 'http')) target="_blank" rel="noopener" @endif>
+
+                                                Selengkapnya
+                                                <i class="bi bi-arrow-right ms-2"></i>
+
+                                            </a>
+
+                                        @endif
+
+                                        <a href="#mobil" class="btn btn-hero btn-hero-outline">
+                                            <i class="bi bi-car-front me-2"></i>
+                                            Lihat Mobil
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        @endforeach
+
+                    </div>
+
+                    <div class="carousel-indicators">
+
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0"
+                            class="active" aria-current="true" aria-label="Slide 1"></button>
+
+                        @foreach ($banners as $i => $banner)
+
+                            <button type="button" data-bs-target="#heroCarousel"
+                                data-bs-slide-to="{{ $i + 1 }}"
+                                aria-label="Banner: {{ $banner->judul }}"></button>
+
+                        @endforeach
+
+                    </div>
+
+                    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel"
+                        data-bs-slide="prev" aria-label="Slide sebelumnya">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+
+                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel"
+                        data-bs-slide="next" aria-label="Slide berikutnya">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+
                 </div>
 
-                <h1>
-                    Perjalanan lebih mudah
-                    dengan <span>Rentalku.</span>
-                </h1>
+            @else
 
-                <p>
-                    Temukan mobil yang sesuai kebutuhanmu.
-                    Pilih kendaraan, tentukan tanggal rental,
-                    dan lakukan rental dengan mudah secara online.
-                </p>
+                <div class="hero-content">
 
-                <div class="hero-buttons">
+                    <div class="hero-badge">
+                        <i class="bi bi-patch-check-fill"></i>
+                        Rental mobil mudah & terpercaya
+                    </div>
 
-                    <a href="#mobil" class="btn btn-hero btn-hero-primary">
-                        <i class="bi bi-car-front me-2"></i>
-                        Lihat Mobil
-                    </a>
+                    <h1>
+                        Perjalanan lebih mudah
+                        dengan <span>Rentalku.</span>
+                    </h1>
 
-                    <a href="#cara-rental" class="btn btn-hero btn-hero-outline">
-                        Cara Rental
-                        <i class="bi bi-arrow-right ms-2"></i>
-                    </a>
+                    <p>
+                        Temukan mobil yang sesuai kebutuhanmu.
+                        Pilih kendaraan, tentukan tanggal rental,
+                        dan lakukan rental dengan mudah secara online.
+                    </p>
+
+                    <div class="hero-buttons">
+
+                        <a href="#mobil" class="btn btn-hero btn-hero-primary">
+                            <i class="bi bi-car-front me-2"></i>
+                            Lihat Mobil
+                        </a>
+
+                        <a href="#cara-rental" class="btn btn-hero btn-hero-outline">
+                            Cara Rental
+                            <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+
+                    </div>
 
                 </div>
 
-            </div>
+            @endif
 
         </div>
 
@@ -53,7 +178,7 @@
 
             <div class="search-card">
 
-                <form action="#" method="GET">
+                <form action="{{ route('home') }}" method="GET">
 
                     <div class="row g-3 align-items-end">
 
@@ -63,14 +188,19 @@
                                 Lokasi Pengambilan
                             </div>
 
-                            <select class="form-select search-input">
-                                <option selected>
+                            <select name="cabang" class="form-select search-input" aria-label="Pilih cabang">
+
+                                <option value="">
                                     Pilih cabang
                                 </option>
 
-                                <option>
-                                    Pontianak
-                                </option>
+                                @foreach ($cabangs as $item)
+
+                                    <option value="{{ $item->id }}" @selected($cabangAktif?->id == $item->id)>
+                                        {{ $item->name }}
+                                    </option>
+
+                                @endforeach
 
                             </select>
 
@@ -82,7 +212,8 @@
                                 Tanggal Mulai
                             </div>
 
-                            <input type="date" class="form-control search-input">
+                            <input type="date" name="tanggal_mulai" value="{{ $mulai?->toDateString() }}"
+                                min="{{ now()->toDateString() }}" class="form-control search-input">
 
                         </div>
 
@@ -92,7 +223,8 @@
                                 Tanggal Selesai
                             </div>
 
-                            <input type="date" class="form-control search-input">
+                            <input type="date" name="tanggal_selesai" value="{{ $selesai?->toDateString() }}"
+                                min="{{ now()->toDateString() }}" class="form-control search-input">
 
                         </div>
 
@@ -120,140 +252,13 @@
 
         <div class="container">
 
-            <div class="d-flex justify-content-between align-items-end mb-5">
-
-                <div>
-
-                    <div class="text-success fw-bold mb-2">
-                        PILIH KENDARAAN
-                    </div>
-
-                    <h2 class="section-title">
-                        Mobil pilihan untuk perjalananmu
-                    </h2>
-
-                    <p class="section-subtitle">
-                        Pilih kendaraan yang sesuai dengan kebutuhan
-                        dan budget perjalananmu.
-                    </p>
-
-                </div>
-
-                <a href="#" class="btn btn-outline-dark d-none d-md-block">
-                    Lihat Semua
-                    <i class="bi bi-arrow-right ms-2"></i>
-                </a>
-
-            </div>
-
-
-            <div class="row g-4">
-
-                @forelse($mobils as $mobil)
-                    <div class="col-md-6 col-lg-4">
-
-                        <div class="car-card">
-
-                            @if ($mobil->fotoMobils->isNotEmpty())
-                                <img src="{{ $mobil->fotoMobils->first()->url }}" class="car-image"
-                                    alt="{{ $mobil->name }}">
-                            @elseif($mobil->image)
-                                <img src="{{ asset($mobil->image) }}" class="car-image" alt="{{ $mobil->name }}">
-                            @else
-                                <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=900&q=80"
-                                    class="car-image" alt="{{ $mobil->name }}">
-                            @endif
-
-
-                            <div class="car-content">
-
-                                <div class="car-brand">
-                                    {{ $mobil->brand->name ?? '-' }}
-                                </div>
-
-                                <div class="car-title">
-                                    {{ $mobil->name }}
-                                </div>
-
-
-                                <div class="car-info mb-4">
-
-                                    <span>
-                                        <i class="bi bi-people me-1"></i>
-                                        {{ $mobil->kapasitas }}
-                                    </span>
-
-                                    <span>
-                                        <i class="bi bi-gear me-1"></i>
-                                        {{ ucfirst($mobil->transmisi) }}
-                                    </span>
-
-                                    <span>
-                                        <i class="bi bi-geo-alt me-1"></i>
-                                        {{ $mobil->cabang->name ?? '-' }}
-                                    </span>
-
-                                </div>
-
-
-                                <div class="d-flex justify-content-between align-items-center">
-
-                                    <div>
-
-                                        <div class="car-price">
-
-                                            Rp {{ number_format($mobil->harga_perhari, 0, ',', '.') }}
-
-                                            <small>
-                                                /hari
-                                            </small>
-
-                                        </div>
-
-                                    </div>
-
-                                    <a href="{{ route('mobils.show', $mobil->id) }}" class="btn btn-rent">
-                                        Detail
-                                    </a>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                @empty
-
-                    <div class="col-12">
-
-                        <div class="text-center py-5">
-
-                            <div class="mb-3">
-                                <i class="bi bi-car-front fs-1 text-secondary"></i>
-                            </div>
-
-                            <h5>
-                                Belum ada mobil tersedia
-                            </h5>
-
-                            <p class="text-secondary">
-                                Data mobil akan muncul di sini setelah
-                                ditambahkan melalui dashboard admin.
-                            </p>
-
-                        </div>
-
-                    </div>
-                @endforelse
-
+            <div id="hasil-pencarian">
+                @include('home.partials.hasil-pencarian')
             </div>
 
         </div>
 
     </section>
-
 
     <section class="section section-light">
 
@@ -565,67 +570,6 @@
     </section>
 
 
-    @if ($banners->count())
-
-        <section class="section">
-
-            <div class="container">
-
-                <div id="promoCarousel" class="carousel slide" data-bs-ride="carousel">
-
-                    <div class="carousel-inner">
-
-                        @foreach ($banners as $key => $banner)
-                            <div class="carousel-item {{ $key === 0 ? 'active' : '' }}">
-
-                                <div class="promo">
-
-                                    <img src="{{ asset('storage/' . $banner->gambar) }}" alt="{{ $banner->judul }}">
-
-                                    <div class="promo-content">
-
-                                        <div class="mb-2 text-success fw-bold">
-                                            RENTALKU
-                                        </div>
-
-                                        <h2 class="display-6 fw-bold">
-                                            {{ $banner->judul }}
-                                        </h2>
-
-                                        <p class="mt-3">
-                                            {{ $banner->description }}
-                                        </p>
-                                        
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-                        @endforeach
-
-                    </div>
-
-
-                    @if ($banners->count() > 1)
-                        <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel"
-                            data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon"></span>
-                        </button>
-
-                        <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel"
-                            data-bs-slide="next">
-                            <span class="carousel-control-next-icon"></span>
-                        </button>
-                    @endif
-
-                </div>
-
-            </div>
-
-        </section>
-
-    @endif
 
 
     @if ($ratings->count())
@@ -813,5 +757,113 @@
         </div>
 
     </section>
+
+
+    <script>
+        $(function () {
+            var $form = $('.search-card form');
+            if (!$form.length) return;
+
+            var form = $form[0];
+            var $mulai = $(form.elements.tanggal_mulai);
+            var $selesai = $(form.elements.tanggal_selesai);
+            var $cabangEl = $(form.elements.cabang);
+            var $tombol = $form.find('button[type="submit"]');
+            var $kontainer = $('#hasil-pencarian');
+
+            function sinkronMin() {
+                $selesai.attr('min', $mulai.val() || '');
+            }
+            $mulai.on('change', sinkronMin);
+            sinkronMin();
+
+            function pesanError() {
+                var adaMulai = $mulai.val() !== '';
+                var adaSelesai = $selesai.val() !== '';
+
+                $selesai[0].setCustomValidity('');
+
+                if (adaMulai !== adaSelesai) {
+                    return 'Lengkapi kedua tanggal (mulai dan selesai) atau kosongkan keduanya.';
+                }
+                if (adaSelesai && $selesai.val() < $mulai.val()) {
+                    return 'Tanggal selesai tidak boleh sebelum tanggal mulai.';
+                }
+                return '';
+            }
+
+            function valid() {
+                var pesan = pesanError();
+                if (pesan !== '') {
+                    $selesai[0].setCustomValidity(pesan);
+                    $selesai[0].reportValidity();
+                    return false;
+                }
+                return true;
+            }
+
+            function bangunQuery() {
+                var params = new URLSearchParams();
+                if ($cabangEl.val() !== '') params.set('cabang', $cabangEl.val());
+                if ($mulai.val() !== '') params.set('tanggal_mulai', $mulai.val());
+                if ($selesai.val() !== '') params.set('tanggal_selesai', $selesai.val());
+                return params.toString();
+            }
+
+            var sedangCari = false;
+
+            function cari(url, dorongRiwayat, gulirKeGrid) {
+                if (sedangCari) return;
+                sedangCari = true;
+                $tombol.prop('disabled', true);
+                $tombol.html('<span class="spinner-border spinner-border-sm me-2"></span>Mencari...');
+
+                $.ajax({
+                    url: url,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .done(function (html) {
+                    $kontainer.html(html);
+                    if (dorongRiwayat) history.pushState(null, '', url);
+                    if (gulirKeGrid) {
+                        $('#mobil')[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                })
+                .fail(function () {
+                    window.location.href = url;
+                })
+                .always(function () {
+                    sedangCari = false;
+                    $tombol.prop('disabled', false);
+                    $tombol.html('<i class="bi bi-search me-2"></i>Cari Mobil');
+                });
+            }
+
+            $form.on('submit', function (e) {
+                e.preventDefault();
+
+                if (!valid()) return;
+
+                var query = bangunQuery();
+
+                if (query === '') {
+                    cari(form.action, true, false);
+                    return;
+                }
+
+                cari(form.action + '?' + query, true, false);
+            });
+
+            $(document).on('click', '#hasil-pencarian [data-search-link]', function (e) {
+                e.preventDefault();
+                var $link = $(this);
+                cari($link.attr('href'), true, $link.attr('data-search-top') !== undefined);
+            });
+
+            $(window).on('popstate', function () {
+                cari(window.location.href, false, false);
+            });
+        });
+    </script>
 
 @endsection

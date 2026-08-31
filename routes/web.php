@@ -31,8 +31,10 @@ use Illuminate\Support\Facades\Route;
 Route::resource('roles', RoleController::class)
     ->except(['create', 'edit', 'show']);
 
+Route::get('brands/data', [BrandController::class, 'data'])->name('brands.data');
+
 Route::resource('brands', BrandController::class)
-    ->except(['create', 'edit', 'show']);
+    ->except(['create', 'edit']);
 
 Route::resource('tipe_mobils', TipeMobilController::class)
     ->except(['create', 'edit', 'show']);
@@ -59,9 +61,11 @@ Route::resource('kupons', KuponController::class)
     ->except(['create', 'edit', 'show']);
 
 Route::resource('mobils', MobilController::class)
-    ->except(['create', 'edit', 'show', 'update', 'destroy']);
+    ->except(['create', 'edit', 'show', 'update', 'destroy'])
+    ->middleware('admin');
 
 Route::get('/mobils/data', [MobilController::class, 'data'])
+    ->middleware('admin')
     ->name('mobils.data');
 
 Route::get('/mobils/{mobil}', [MobilController::class, 'show'])
@@ -89,6 +93,8 @@ Route::resource('dokumen_mobils', DokumenMobilController::class)
 
 Route::resource('banners', BannerController::class)
     ->except(['create', 'edit', 'show']);
+
+Route::get('banners/data', [BannerController::class, 'data'])->name('banners.data');
 
 Route::resource('faqs', FaqController::class)
     ->except(['create', 'edit', 'show']);

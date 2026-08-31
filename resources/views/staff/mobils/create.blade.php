@@ -1096,60 +1096,26 @@
 
 
 
-<footer class="bg-white border-top py-4">
-
-    <div class="container text-center">
-
-        <div class="fw-bold">
-
-            Rental<span class="text-success">ku</span>.
-
-        </div>
-
-        <small class="text-muted">
-
-            Staff Dashboard • Tambah Data Mobil
-
-        </small>
-
-    </div>
-
-</footer>
+@include('layouts.partials.admin-footer', ['pageTitle' => 'Staff Dashboard • Tambah Data Mobil'])
 
 
 
 <script>
 
-    document.getElementById('image').addEventListener('change', function(event) {
-
-        const file = event.target.files[0];
-
-        const preview = document.getElementById('imagePreview');
+    $('#image').on('change', function(event) {
+        var file = event.target.files[0];
+        var $preview = $('#imagePreview');
 
         if (!file) {
-
-            preview.innerHTML = `
-                <div class="text-center">
-                    <i class="bi bi-image" style="font-size: 40px;"></i>
-                    <div class="mt-2">Preview Foto</div>
-                </div>
-            `;
-
+            $preview.html('<div class="text-center"><i class="bi bi-image" style="font-size: 40px;"></i><div class="mt-2">Preview Foto</div></div>');
             return;
         }
 
-        const reader = new FileReader();
-
+        var reader = new FileReader();
         reader.onload = function(e) {
-
-            preview.innerHTML = `
-                <img src="${e.target.result}" alt="Preview Foto">
-            `;
-
+            $preview.html('<img src="' + e.target.result + '" alt="Preview Foto">');
         };
-
         reader.readAsDataURL(file);
-
     });
 
 </script>
