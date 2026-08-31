@@ -126,14 +126,16 @@
 
         <div class="mb-4">
 
-            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary mb-3">
-                <i class="bi bi-arrow-left me-1"></i>
-                Dashboard
-            </a>
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <h2 class="fw-bold mb-0">
+                    Management Pembayaran
+                </h2>
 
-            <h2 class="fw-bold mb-1">
-                Management Pembayaran
-            </h2>
+                <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Dashboard
+                </a>
+            </div>
 
             <p class="text-muted mb-0">
                 Kelola dan verifikasi pembayaran pelanggan RentalKu.
