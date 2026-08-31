@@ -61,9 +61,11 @@ Route::resource('kupons', KuponController::class)
     ->except(['create', 'edit', 'show']);
 
 Route::resource('mobils', MobilController::class)
-    ->except(['create', 'edit', 'show', 'update', 'destroy']);
+    ->except(['create', 'edit', 'show', 'update', 'destroy'])
+    ->middleware('admin');
 
 Route::get('/mobils/data', [MobilController::class, 'data'])
+    ->middleware('admin')
     ->name('mobils.data');
 
 Route::get('/mobils/{mobil}', [MobilController::class, 'show'])
