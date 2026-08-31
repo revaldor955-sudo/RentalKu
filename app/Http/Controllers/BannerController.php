@@ -121,7 +121,7 @@ class BannerController extends Controller
      */
     public function show(Banner $banner)
     {
-        //
+        return response()->json($banner);
     }
 
     /**
