@@ -24,6 +24,17 @@
         body {
             background: #f5f7f6;
             font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+        }
+
+        .page-content {
+            padding: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
+            }
         }
 
         .navbar {
@@ -203,59 +214,11 @@
 
 <body>
 
-{{-- NAVBAR --}}
+{{-- Sidebar Layout --}}
+@include('layouts.partials.staff-sidebar')
 
-<nav class="navbar">
-
-    <div class="container py-3">
-
-        <div class="d-flex justify-content-between align-items-center w-100">
-
-            <a
-                href="{{ route('staff.dashboard') }}"
-                class="text-decoration-none brand"
-            >
-                Rental<span>ku</span>.
-            </a>
-
-            <div class="d-flex align-items-center gap-3">
-
-                <div class="profile d-flex align-items-center gap-2"
-                     data-bs-toggle="modal"
-                     data-bs-target="#profileModal"
-                     style="cursor: pointer;">
-
-                    <div class="profile-icon">
-
-                        <i class="bi bi-person-badge"></i>
-
-                    </div>
-
-                    <div class="d-none d-md-block">
-
-                        <div class="fw-bold small">
-                            {{ Auth::user()->name }}
-                        </div>
-
-                        <div
-                            class="text-muted"
-                            style="font-size:12px;"
-                        >
-                            Staff
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</nav>
-
+{{-- Page Content (dipindah ke #mainContent oleh staff-sidebar) --}}
+<div class="page-content">
 
 <div class="container">
 
@@ -873,8 +836,9 @@
 
 @include('layouts.partials.admin-footer', ['pageTitle' => 'Staff Dashboard'])
 
-{{-- Modal profil + Bootstrap JS (dibutuhkan modal) --}}
-@include('layouts.partials.profile-modal')
+{{-- Bootstrap JS (dibutuhkan modal) --}}
+
+</div>
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

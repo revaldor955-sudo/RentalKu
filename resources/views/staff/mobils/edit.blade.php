@@ -163,8 +163,18 @@
             font-weight: 600;
         }
 
-        footer {
+        .page-content footer {
             margin-top: 50px;
+        }
+
+        .page-content {
+            padding: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
+            }
         }
     </style>
 
@@ -172,53 +182,11 @@
 
 <body>
 
-{{-- NAVBAR --}}
-<nav class="navbar">
+{{-- Sidebar Layout --}}
+@include('layouts.partials.staff-sidebar')
 
-    <div class="container py-3">
-
-        <div class="d-flex justify-content-between align-items-center">
-
-            <a href="{{ route('staff.dashboard') }}"
-               class="text-decoration-none brand">
-
-                Rental<span>ku</span>.
-
-            </a>
-
-            <div class="d-flex align-items-center gap-3">
-
-                <span class="d-none d-md-block">
-
-                    <i class="bi bi-person-circle me-1"></i>
-
-                    {{ Auth::user()->name }}
-
-                </span>
-
-                <form action="{{ route('logout') }}" method="POST">
-
-                    @csrf
-
-                    <button type="submit"
-                            class="btn btn-outline-danger btn-sm">
-
-                        <i class="bi bi-box-arrow-right"></i>
-
-                        Keluar
-
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</nav>
-
+{{-- Page Content (dipindah ke #mainContent oleh staff-sidebar) --}}
+<div class="page-content">
 
 <div class="container">
 
@@ -794,7 +762,7 @@
 
                                 <span class="form-check-label">
 
-                                    {{ $item->nama_fasilitas }}
+                                    {{ $item->name }}
 
                                 </span>
 
@@ -877,6 +845,8 @@
         </form>
 
     </div>
+
+</div>
 
 </div>
 

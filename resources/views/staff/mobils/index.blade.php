@@ -21,6 +21,17 @@
         body {
             background: #f5f7f6;
             font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+        }
+
+        .page-content {
+            padding: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
+            }
         }
 
         .navbar {
@@ -140,47 +151,11 @@
 
 <body>
 
-<nav class="navbar">
-    <div class="container py-3">
+{{-- Sidebar Layout --}}
+@include('layouts.partials.staff-sidebar')
 
-        <div class="d-flex justify-content-between align-items-center w-100">
-
-            <a
-                href="{{ route('staff.dashboard') }}"
-                class="text-decoration-none brand"
-            >
-                Rental<span>ku</span>.
-            </a>
-
-            <div class="d-flex gap-2">
-
-                <a
-                    href="{{ route('staff.dashboard') }}"
-                    class="btn btn-outline-secondary btn-sm"
-                >
-                    <i class="bi bi-speedometer2 me-1"></i>
-                    Dashboard
-                </a>
-
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-
-                    <button
-                        type="submit"
-                        class="btn btn-outline-danger btn-sm"
-                    >
-                        <i class="bi bi-box-arrow-right me-1"></i>
-                        Keluar
-                    </button>
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-</nav>
-
+{{-- Page Content (dipindah ke #mainContent oleh staff-sidebar) --}}
+<div class="page-content">
 
 <div class="container py-5">
 
@@ -197,11 +172,6 @@
         </div>
 
         <div class="d-flex gap-2">
-
-            <a href="{{ route('staff.dashboard') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1"></i>
-                Dashboard
-            </a>
 
             <button
                 type="button"
@@ -220,16 +190,7 @@
 
     @if(session('success'))
 
-        <div class="alert alert-success alert-dismissible fade show">
-            <i class="bi bi-check-circle me-2"></i>
-            {{ session('success') }}
-
-            <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert"
-            ></button>
-        </div>
+        <span id="flashSuccess" class="d-none">{{ session('success') }}</span>
 
     @endif
 
@@ -435,6 +396,8 @@
         @endif
 
     </div>
+
+</div>
 
 </div>
 
@@ -812,6 +775,21 @@
 
 <script
     src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+</script>
+
+<script>
+    (function() {
+        var ok = document.getElementById('flashSuccess');
+        if (ok) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: ok.textContent,
+                timer: 1800,
+                showConfirmButton: false,
+            });
+        }
+    })();
 </script>
 
 <script>
