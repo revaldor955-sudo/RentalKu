@@ -431,6 +431,14 @@
 </style>
 
 <div class="sidebar-layout" data-sidebar-layout>
+    {{-- Sidebar dipakai halaman admin DAN halaman bersama adminstaff.
+         Link Dashboard & Kelola Mobil mengikuti role agar staff tak 403. --}}
+    @php
+        $sidebarIsStaff = (auth()->user()->role->name ?? '') === 'Staff';
+        $sidebarDashboardRoute = $sidebarIsStaff ? 'staff.dashboard' : 'admin.dashboard';
+        $sidebarMobilRoute = $sidebarIsStaff ? 'staff.mobils.index' : 'mobils.index';
+        $sidebarMobilPattern = $sidebarIsStaff ? 'staff.mobils*' : 'mobils*';
+    @endphp
     <aside
         class="admin-sidebar"
         id="adminSidebar"
@@ -439,7 +447,7 @@
         data-collapsed="false"
     >
         <header class="sidebar-header">
-            <a href="{{ route('admin.dashboard') }}" class="sidebar-brand" aria-label="Dashboard RentalKu">
+            <a href="{{ route($sidebarDashboardRoute) }}" class="sidebar-brand" aria-label="Dashboard RentalKu">
                 <div class="brand-icon" aria-hidden="true">
                     <i class="bi bi-car-front-fill"></i>
                 </div>
@@ -462,9 +470,9 @@
                 <div class="section-label" data-section-label="core">Utama</div>
                 <ul class="nav-list" role="list">
                     <li class="nav-item">
-                        <a href="{{ route('admin.dashboard') }}"
-                           class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
-                           aria-current="{{ request()->routeIs('admin.dashboard') ? 'page' : 'false' }}">
+                        <a href="{{ route($sidebarDashboardRoute) }}"
+                           class="nav-link {{ request()->routeIs('admin.dashboard', 'staff.dashboard') ? 'active' : '' }}"
+                           aria-current="{{ request()->routeIs('admin.dashboard', 'staff.dashboard') ? 'page' : 'false' }}">
                             <i class="bi bi-speedometer2 nav-icon" aria-hidden="true"></i>
                             <span class="nav-text">Dashboard</span>
                         </a>
@@ -476,9 +484,9 @@
                 <div class="section-label" data-section-label="master">Master Data</div>
                 <ul class="nav-list" role="list">
                     <li class="nav-item">
-                        <a href="{{ route('mobils.index') }}"
-                           class="nav-link {{ request()->routeIs('mobils*') ? 'active' : '' }}"
-                           aria-current="{{ request()->routeIs('mobils*') ? 'page' : 'false' }}">
+                        <a href="{{ route($sidebarMobilRoute) }}"
+                           class="nav-link {{ request()->routeIs($sidebarMobilPattern) ? 'active' : '' }}"
+                           aria-current="{{ request()->routeIs($sidebarMobilPattern) ? 'page' : 'false' }}">
                             <i class="bi bi-car-front-fill nav-icon" aria-hidden="true"></i>
                             <span class="nav-text">Kelola Mobil</span>
                             @if(($totalMobils ?? 0) > 0)<span class="nav-badge">{{ $totalMobils }}</span>@endif
