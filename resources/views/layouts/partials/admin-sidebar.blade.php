@@ -1,4 +1,3 @@
-{{-- ADMIN SIDEBAR --}}
 {{-- shadcn/ui style: collapsible, accessible, keyboard navigable --}}
 {{-- Usage: @include('layouts.partials.admin-sidebar') --}}
 
@@ -151,10 +150,6 @@
         margin-bottom: 8px;
     }
 
-    .sidebar-section:first-child {
-        margin-top: 0;
-    }
-
     .section-label {
         font-size: 11px;
         font-weight: 700;
@@ -270,77 +265,6 @@
         opacity: 0;
     }
 
-    .nav-group {
-        border-radius: 10px;
-        overflow: hidden;
-        background: transparent;
-    }
-
-    .group-trigger {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 10px 12px;
-        border-radius: 10px;
-        color: #4b5563;
-        font-size: 14px;
-        font-weight: 500;
-        background: transparent;
-        border: none;
-        width: 100%;
-        text-align: left;
-        cursor: pointer;
-        white-space: nowrap;
-        transition: all 150ms ease;
-    }
-
-    .group-trigger:hover {
-        background: #f5f7f6;
-        color: #198754;
-    }
-
-    .group-trigger:focus-visible {
-        outline: 2px solid #198754;
-        outline-offset: 2px;
-    }
-
-    .group-trigger.active {
-        background: #e9f7ef;
-        color: #198754;
-    }
-
-    .group-trigger .chevron {
-        margin-left: auto;
-        transition: transform var(--sidebar-transition);
-        flex-shrink: 0;
-    }
-
-    .group-trigger[aria-expanded="true"] .chevron {
-        transform: rotate(90deg);
-    }
-
-    .group-content {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height var(--sidebar-transition), padding var(--sidebar-transition);
-        padding: 0 12px;
-    }
-
-    .group-content.open {
-        max-height: 500px;
-        padding: 8px 12px;
-    }
-
-    .group-content .nav-link {
-        padding: 8px 10px;
-        font-size: 13px;
-        border-radius: 8px;
-    }
-
-    .group-content .nav-link::before {
-        left: -12px;
-    }
-
     .sidebar-footer {
         padding: 12px;
         border-top: 1px solid #edf0ee;
@@ -351,11 +275,15 @@
         display: flex;
         align-items: center;
         gap: 10px;
+        width: 100%;
         padding: 8px 12px;
+        border: none;
         border-radius: 10px;
         background: #f5f8f6;
-        text-decoration: none;
         color: #1f2937;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
         transition: all 150ms ease;
         white-space: nowrap;
         overflow: hidden;
@@ -442,7 +370,6 @@
     @media (max-width: 1024px) {
         .admin-sidebar {
             transform: translateX(-100%);
-            box-shadow: 0 0 0 100vmax rgba(0,0,0,0.3);
         }
 
         .admin-sidebar.mobile-open {
@@ -479,10 +406,7 @@
         .admin-sidebar,
         .main-content,
         .nav-link,
-        .group-trigger,
-        .group-content,
         .sidebar-toggle .chevron,
-        .group-trigger .chevron,
         .brand-text,
         .nav-text,
         .nav-badge,
@@ -507,7 +431,6 @@
 </style>
 
 <div class="sidebar-layout" data-sidebar-layout>
-    {{-- Sidebar --}}
     <aside
         class="admin-sidebar"
         id="adminSidebar"
@@ -515,7 +438,6 @@
         aria-label="Navigasi utama"
         data-collapsed="false"
     >
-        {{-- Header --}}
         <header class="sidebar-header">
             <a href="{{ route('admin.dashboard') }}" class="sidebar-brand" aria-label="Dashboard RentalKu">
                 <div class="brand-icon" aria-hidden="true">
@@ -535,9 +457,7 @@
             </button>
         </header>
 
-        {{-- Navigation --}}
         <nav class="sidebar-nav" aria-label="Menu admin">
-            {{-- Core --}}
             <div class="sidebar-section" data-section="core">
                 <div class="section-label" data-section-label="core">Utama</div>
                 <ul class="nav-list" role="list">
@@ -552,7 +472,6 @@
                 </ul>
             </div>
 
-            {{-- Master Data --}}
             <div class="sidebar-section" data-section="master">
                 <div class="section-label" data-section-label="master">Master Data</div>
                 <ul class="nav-list" role="list">
@@ -562,7 +481,7 @@
                            aria-current="{{ request()->routeIs('mobils*') ? 'page' : 'false' }}">
                             <i class="bi bi-car-front-fill nav-icon" aria-hidden="true"></i>
                             <span class="nav-text">Kelola Mobil</span>
-                            <span class="nav-badge">{{ $totalMobils ?? 0 }}</span>
+                            @if(($totalMobils ?? 0) > 0)<span class="nav-badge">{{ $totalMobils }}</span>@endif
                         </a>
                     </li>
                     <li class="nav-item">
@@ -570,7 +489,15 @@
                            class="nav-link {{ request()->routeIs('brands*') ? 'active' : '' }}"
                            aria-current="{{ request()->routeIs('brands*') ? 'page' : 'false' }}">
                             <i class="bi bi-tags nav-icon" aria-hidden="true"></i>
-                            <span class="nav-text">Merek & Tipe</span>
+                            <span class="nav-text">Merek</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('tipe_mobils.index') }}"
+                           class="nav-link {{ request()->routeIs('tipe_mobils*') ? 'active' : '' }}"
+                           aria-current="{{ request()->routeIs('tipe_mobils*') ? 'page' : 'false' }}">
+                            <i class="bi bi-list-check nav-icon" aria-hidden="true"></i>
+                            <span class="nav-text">Tipe Mobil</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -600,7 +527,6 @@
                 </ul>
             </div>
 
-            {{-- Operasional --}}
             <div class="sidebar-section" data-section="operational">
                 <div class="section-label" data-section-label="operational">Operasional</div>
                 <ul class="nav-list" role="list">
@@ -610,7 +536,7 @@
                            aria-current="{{ request()->routeIs('rentals*') ? 'page' : 'false' }}">
                             <i class="bi bi-car-front nav-icon" aria-hidden="true"></i>
                             <span class="nav-text">Rental</span>
-                            <span class="nav-badge">{{ $pendingRentalsCount ?? 0 }}</span>
+                            @if(($pendingRentalsCount ?? 0) > 0)<span class="nav-badge">{{ $pendingRentalsCount }}</span>@endif
                         </a>
                     </li>
                     <li class="nav-item">
@@ -619,7 +545,7 @@
                            aria-current="{{ request()->routeIs('pembayarans*') ? 'page' : 'false' }}">
                             <i class="bi bi-credit-card nav-icon" aria-hidden="true"></i>
                             <span class="nav-text">Pembayaran</span>
-                            <span class="nav-badge">{{ $pendingPaymentsCount ?? 0 }}</span>
+                            @if(($pendingPaymentsCount ?? 0) > 0)<span class="nav-badge">{{ $pendingPaymentsCount }}</span>@endif
                         </a>
                     </li>
                     <li class="nav-item">
@@ -641,7 +567,6 @@
                 </ul>
             </div>
 
-            {{-- Pengguna & Akses --}}
             <div class="sidebar-section" data-section="users">
                 <div class="section-label" data-section-label="users">Pengguna & Akses</div>
                 <ul class="nav-list" role="list">
@@ -664,7 +589,6 @@
                 </ul>
             </div>
 
-            {{-- Promo & Konten --}}
             <div class="sidebar-section" data-section="content">
                 <div class="section-label" data-section-label="content">Promo & Konten</div>
                 <ul class="nav-list" role="list">
@@ -695,7 +619,6 @@
                 </ul>
             </div>
 
-            {{-- Laporan & Lainnya --}}
             <div class="sidebar-section" data-section="reports">
                 <div class="section-label" data-section-label="reports">Laporan & Lainnya</div>
                 <ul class="nav-list" role="list">
@@ -713,7 +636,7 @@
                            aria-current="{{ request()->routeIs('dendas*') ? 'page' : 'false' }}">
                             <i class="bi bi-exclamation-triangle nav-icon" aria-hidden="true"></i>
                             <span class="nav-text">Denda</span>
-                            <span class="nav-badge">{{ $pendingDendasCount ?? 0 }}</span>
+                            @if(($pendingDendasCount ?? 0) > 0)<span class="nav-badge">{{ $pendingDendasCount }}</span>@endif
                         </a>
                     </li>
                     <li class="nav-item">
@@ -722,7 +645,7 @@
                            aria-current="{{ request()->routeIs('kompensasis*') ? 'page' : 'false' }}">
                             <i class="bi bi-cash-stack nav-icon" aria-hidden="true"></i>
                             <span class="nav-text">Kompensasi</span>
-                            <span class="nav-badge">{{ $pendingKompensasisCount ?? 0 }}</span>
+                            @if(($pendingKompensasisCount ?? 0) > 0)<span class="nav-badge">{{ $pendingKompensasisCount }}</span>@endif
                         </a>
                     </li>
                     <li class="nav-item">
@@ -769,15 +692,13 @@
             </div>
         </nav>
 
-        {{-- Footer / User Menu --}}
         <footer class="sidebar-footer">
-            <a href="#"
+            <button
+               type="button"
                class="user-menu"
                data-bs-toggle="modal"
                data-bs-target="#profileModal"
                aria-label="Profil pengguna"
-               role="button"
-               tabindex="0"
             >
                 <div class="user-avatar" aria-hidden="true">
                     <i class="bi bi-person-fill"></i>
@@ -787,21 +708,17 @@
                     <span class="user-role">{{ Auth::user()->role->name ?? 'Admin' }}</span>
                 </div>
                 <i class="bi bi-chevron-right chevron" aria-hidden="true"></i>
-            </a>
+            </button>
         </footer>
     </aside>
 
-    {{-- Mobile Overlay --}}
     <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true" tabindex="-1"></div>
 
-    {{-- Main Content Wrapper --}}
     <div class="main-content" id="mainContent">
         {{-- Topbar: satu-satunya sumber header.topbar + profileModal di halaman admin --}}
         @include('layouts.partials.admin-navbar')
 
-        {{-- Page Content --}}
         <main class="page-content" role="main">
-            {{-- Content injected by page --}}
         </main>
     </div>
 </div>
@@ -815,16 +732,13 @@
 
     const sidebar = document.getElementById('adminSidebar');
     const toggleBtn = document.getElementById('sidebarToggle');
-    const mobileToggleBtn = document.getElementById('mobileSidebarToggle');
     const overlay = document.getElementById('sidebarOverlay');
-    const mainContent = document.getElementById('mainContent');
 
     if (!sidebar || !toggleBtn) return;
 
     let isCollapsed = false;
     let isMobile = window.innerWidth < MOBILE_BREAKPOINT;
 
-    // Initialize from localStorage (desktop only)
     function init() {
         if (!isMobile) {
             const saved = localStorage.getItem(STORAGE_KEY);
@@ -872,7 +786,6 @@
         }
     }
 
-    // Toggle button
     toggleBtn.addEventListener('click', toggleSidebar);
 
     // Mobile toggle (lives in admin-navbar, may parse after this script)
@@ -904,23 +817,14 @@
     }
     document.addEventListener('DOMContentLoaded', relocatePageContent);
 
-    // Overlay click closes mobile sidebar
     if (overlay) overlay.addEventListener('click', closeMobileSidebar);
 
-    // Keyboard navigation
     document.addEventListener('keydown', function(e) {
-        // Ctrl/Cmd + B to toggle sidebar
-        if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
-            e.preventDefault();
-            toggleSidebar();
-        }
-        // Escape closes mobile sidebar
         if (e.key === 'Escape' && isMobile && sidebar.classList.contains('mobile-open')) {
             closeMobileSidebar();
         }
     });
 
-    // Handle resize
     let resizeTimer;
     window.addEventListener('resize', function() {
         clearTimeout(resizeTimer);
@@ -929,13 +833,11 @@
             isMobile = window.innerWidth < MOBILE_BREAKPOINT;
 
             if (wasMobile && !isMobile) {
-                // Mobile -> Desktop
                 sidebar.classList.remove('mobile-open');
                 overlay.classList.remove('visible');
                 document.body.style.overflow = '';
                 applyCollapsedState();
             } else if (!wasMobile && isMobile) {
-                // Desktop -> Mobile
                 sidebar.classList.remove('collapsed');
                 sidebar.setAttribute('data-collapsed', 'false');
                 isCollapsed = false;
@@ -945,30 +847,6 @@
         }, 100);
     });
 
-    // Group triggers (expandable sections)
-    document.querySelectorAll('.group-trigger').forEach(function(trigger) {
-        trigger.addEventListener('click', function() {
-            const expanded = this.getAttribute('aria-expanded') === 'true';
-            this.setAttribute('aria-expanded', !expanded);
-            const content = this.nextElementSibling;
-            if (content && content.classList.contains('group-content')) {
-                if (!expanded) {
-                    content.classList.add('open');
-                } else {
-                    content.classList.remove('open');
-                }
-            }
-        });
-
-        trigger.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                this.click();
-            }
-        });
-    });
-
-    // Auto-collapse on nav link click (mobile)
     document.querySelectorAll('.nav-link').forEach(function(link) {
         link.addEventListener('click', function() {
             if (isMobile) {
@@ -976,20 +854,6 @@
             }
         });
     });
-
-    // Persist collapsed state across page loads (desktop)
-    if (!isMobile) {
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden && !isMobile) {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                if (saved !== null) {
-                    isCollapsed = saved === 'true';
-                    applyCollapsedState();
-                    updateAria();
-                }
-            }
-        });
-    }
 
     // Ingat posisi scroll nav per sesi supaya tidak balik ke atas tiap pindah halaman
     function restoreNavScroll() {
@@ -1010,7 +874,6 @@
         }, { passive: true });
     }
 
-    // Initialize
     init();
     restoreNavScroll();
 })();

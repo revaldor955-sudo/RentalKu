@@ -1,4 +1,3 @@
-```blade
 <!DOCTYPE html>
 <html lang="id">
 
@@ -13,6 +12,8 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -21,21 +22,6 @@
         body {
             background: #f5f7f6;
             font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        .navbar {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .brand {
-            font-size: 25px;
-            font-weight: 800;
-            color: #1f2937;
-        }
-
-        .brand span {
-            color: #198754;
         }
 
         .page-header {
@@ -117,14 +103,6 @@
             font-weight: 500;
         }
 
-        .current-image {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            border-radius: 15px;
-            border: 1px solid #dee2e6;
-        }
-
         .image-preview {
             width: 100%;
             height: 220px;
@@ -163,10 +141,6 @@
             font-weight: 600;
         }
 
-        .page-content footer {
-            margin-top: 50px;
-        }
-
         .page-content {
             padding: 24px;
         }
@@ -182,7 +156,6 @@
 
 <body>
 
-{{-- Sidebar Layout --}}
 @include('layouts.partials.staff-sidebar')
 
 {{-- Page Content (dipindah ke #mainContent oleh staff-sidebar) --}}
@@ -190,7 +163,6 @@
 
 <div class="container">
 
-    {{-- HEADER --}}
     <div class="page-header">
 
         <div class="d-flex justify-content-between align-items-center">
@@ -228,7 +200,6 @@
     </div>
 
 
-    {{-- ERROR --}}
     @if($errors->any())
 
         <div class="alert alert-danger alert-dismissible fade show mt-4">
@@ -261,7 +232,6 @@
     @endif
 
 
-    {{-- FORM --}}
     <div class="form-card">
 
         <form action="{{ route('staff.mobils.update', $mobil->id) }}"
@@ -274,7 +244,6 @@
 
             <div class="p-4 p-md-5">
 
-                {{-- INFORMASI DASAR --}}
                 <div class="section-title">
 
                     <i class="bi bi-car-front me-2"></i>
@@ -286,7 +255,6 @@
 
                 <div class="row g-4">
 
-                    {{-- BRAND --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -322,7 +290,6 @@
                     </div>
 
 
-                    {{-- TIPE --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -358,7 +325,6 @@
                     </div>
 
 
-                    {{-- NAMA --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -380,7 +346,6 @@
                     </div>
 
 
-                    {{-- PLAT --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -402,7 +367,6 @@
                     </div>
 
 
-                    {{-- TAHUN --}}
                     <div class="col-md-4">
 
                         <label class="form-label">
@@ -425,7 +389,6 @@
                     </div>
 
 
-                    {{-- TRANSMISI --}}
                     <div class="col-md-4">
 
                         <label class="form-label">
@@ -460,7 +423,6 @@
                     </div>
 
 
-                    {{-- KAPASITAS --}}
                     <div class="col-md-4">
 
                         <label class="form-label">
@@ -490,7 +452,6 @@
                     </div>
 
 
-                    {{-- WARNA --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -512,7 +473,6 @@
                     </div>
 
 
-                    {{-- CABANG --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -550,7 +510,6 @@
                 </div>
 
 
-                {{-- HARGA --}}
                 <div class="section-title mt-5">
 
                     <i class="bi bi-cash-stack me-2"></i>
@@ -562,7 +521,6 @@
 
                 <div class="row g-4">
 
-                    {{-- HARGA --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -592,7 +550,6 @@
                     </div>
 
 
-                    {{-- DEPOSIT --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -622,7 +579,6 @@
                     </div>
 
 
-                    {{-- STATUS --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -660,7 +616,6 @@
                 </div>
 
 
-                {{-- FOTO --}}
                 <div class="section-title mt-5">
 
                     <i class="bi bi-image me-2"></i>
@@ -729,7 +684,6 @@
                 </div>
 
 
-                {{-- FASILITAS --}}
                 <div class="section-title mt-5">
 
                     <i class="bi bi-check2-square me-2"></i>
@@ -787,7 +741,6 @@
                 </div>
 
 
-                {{-- DESKRIPSI --}}
                 <div class="section-title mt-5">
 
                     <i class="bi bi-card-text me-2"></i>
@@ -817,7 +770,6 @@
                 </div>
 
 
-                {{-- BUTTON --}}
                 <div class="d-flex justify-content-end gap-2 mt-5">
 
                     <a href="{{ route('staff.mobils.index') }}"

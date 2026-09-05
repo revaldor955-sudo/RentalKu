@@ -34,21 +34,6 @@
             }
         }
 
-        .navbar {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .brand {
-            font-size: 25px;
-            font-weight: 800;
-            color: #1f2937;
-        }
-
-        .brand span {
-            color: #198754;
-        }
-
         .page-card {
             background: white;
             border-radius: 20px;
@@ -151,7 +136,6 @@
 
 <body>
 
-{{-- Sidebar Layout --}}
 @include('layouts.partials.staff-sidebar')
 
 {{-- Page Content (dipindah ke #mainContent oleh staff-sidebar) --}}
@@ -308,13 +292,13 @@
 
                                 <td>
 
-                                    @if($mobil->status === 'Tersedia' || $mobil->status === 'tersedia')
+                                    @if($mobil->status === 'Tersedia')
 
                                         <span class="status status-tersedia">
                                             Tersedia
                                         </span>
 
-                                    @elseif($mobil->status === 'Disewa' || $mobil->status === 'disewa')
+                                    @elseif($mobil->status === 'Disewa')
 
                                         <span class="status status-disewa">
                                             Disewa
@@ -401,8 +385,6 @@
 
 </div>
 
-
-{{-- MODAL TAMBAH MOBIL --}}
 
 <div
     class="modal fade"

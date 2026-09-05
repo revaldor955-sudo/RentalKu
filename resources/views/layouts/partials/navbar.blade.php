@@ -61,10 +61,6 @@
 
     @auth
 
-        <span class="fw-semibold">
-            Halo, {{ Auth::user()->name }}
-        </span>
-
         <form action="{{ route('logout') }}" method="POST" class="m-0">
             @csrf
 

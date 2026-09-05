@@ -37,39 +37,6 @@
             }
         }
 
-        .navbar {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .brand {
-            font-size: 25px;
-            font-weight: 800;
-            color: #1f2937;
-        }
-
-        .brand span {
-            color: #198754;
-        }
-
-        .profile {
-            background: #f3f7f5;
-            border-radius: 12px;
-            padding: 8px 14px;
-        }
-
-        .profile-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: #198754;
-            color: white;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
         .hero {
             margin-top: 30px;
             padding: 40px;
@@ -214,7 +181,6 @@
 
 <body>
 
-{{-- Sidebar Layout --}}
 @include('layouts.partials.staff-sidebar')
 
 {{-- Page Content (dipindah ke #mainContent oleh staff-sidebar) --}}
@@ -222,8 +188,6 @@
 
 <div class="container">
 
-
-{{-- HERO --}}
 
 <div class="hero">
 
@@ -251,8 +215,6 @@
 
 </div>
 
-
-{{-- STATISTIK --}}
 
 <div class="row g-4 mt-2">
 
@@ -382,8 +344,6 @@
 </div>
 
 
-{{-- MANAGEMENT STAFF --}}
-
 <section class="mt-5">
 
     <h3 class="section-title mb-4">
@@ -393,8 +353,6 @@
 
     <div class="row g-4">
 
-
-        {{-- MOBIL --}}
 
         <div class="col-md-6 col-lg-3">
 
@@ -421,8 +379,6 @@
 
         </div>
 
-
-        {{-- KATEGORI & MEREK --}}
 
         <div class="col-md-6 col-lg-3">
 
@@ -454,8 +410,6 @@
         </div>
 
 
-        {{-- FASILITAS --}}
-
         <div class="col-md-6 col-lg-3">
 
             <a
@@ -485,8 +439,6 @@
 
         </div>
 
-
-        {{-- PENGGUNA --}}
 
         <div class="col-md-6 col-lg-3">
 
@@ -518,8 +470,6 @@
         </div>
 
 
-        {{-- PROMO --}}
-
         <div class="col-md-6 col-lg-3">
 
             <a
@@ -549,8 +499,6 @@
 
         </div>
 
-
-        {{-- BANNER --}}
 
         <div class="col-md-6 col-lg-3">
 
@@ -582,8 +530,6 @@
         </div>
 
 
-        {{-- RENTAL --}}
-
         <div class="col-md-6 col-lg-3">
 
             <a
@@ -613,8 +559,6 @@
 
         </div>
 
-
-        {{-- PEMBAYARAN --}}
 
         <div class="col-md-6 col-lg-3">
 
@@ -646,8 +590,6 @@
         </div>
 
 
-        {{-- PEMERIKSAAN --}}
-
         <div class="col-md-6 col-lg-3">
 
             <a
@@ -677,8 +619,6 @@
 
         </div>
 
-
-        {{-- LAPORAN --}}
 
         <div class="col-md-6 col-lg-3">
 
@@ -713,8 +653,6 @@
 
 </section>
 
-
-{{-- MOBIL TERBARU --}}
 
 <section class="mt-5">
 

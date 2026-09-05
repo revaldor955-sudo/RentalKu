@@ -20,26 +20,13 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     >
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
     <style>
 
         body {
             background: #f5f7f6;
             font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        .navbar {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .brand {
-            font-size: 25px;
-            font-weight: 800;
-            color: #1f2937;
-        }
-
-        .brand span {
-            color: #198754;
         }
 
         .page-header {
@@ -65,11 +52,6 @@
             border: 1px solid #edf0ee;
             margin-top: 25px;
             margin-bottom: 50px;
-        }
-
-        .form-title {
-            font-weight: 800;
-            color: #212529;
         }
 
         .section-title {
@@ -164,10 +146,6 @@
             font-weight: 600;
         }
 
-        .page-content footer {
-            margin-top: 50px;
-        }
-
         .page-content {
             padding: 24px;
         }
@@ -190,7 +168,6 @@
 <body>
 
 
-{{-- Sidebar Layout --}}
 @include('layouts.partials.staff-sidebar')
 
 {{-- Page Content (dipindah ke #mainContent oleh staff-sidebar) --}}
@@ -198,8 +175,6 @@
 
 <div class="container">
 
-
-    {{-- HEADER --}}
 
     <div class="page-header">
 
@@ -247,8 +222,6 @@
 
 
 
-    {{-- ERROR --}}
-
     @if($errors->any())
 
         <div class="alert alert-danger alert-dismissible fade show mt-4">
@@ -287,8 +260,6 @@
 
 
 
-    {{-- FORM --}}
-
     <div class="form-card">
 
         <form
@@ -303,8 +274,6 @@
             <div class="p-4 p-md-5">
 
 
-                {{-- INFORMASI DASAR --}}
-
                 <div class="section-title">
 
                     <i class="bi bi-car-front me-2"></i>
@@ -316,8 +285,6 @@
 
                 <div class="row g-4">
 
-
-                    {{-- BRAND --}}
 
                     <div class="col-md-6">
 
@@ -368,8 +335,6 @@
 
 
 
-                    {{-- TIPE MOBIL --}}
-
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -415,8 +380,6 @@
 
 
 
-                    {{-- NAMA MOBIL --}}
-
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -449,8 +412,6 @@
 
 
 
-                    {{-- PLAT --}}
-
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -482,8 +443,6 @@
                     </div>
 
 
-
-                    {{-- TAHUN --}}
 
                     <div class="col-md-4">
 
@@ -518,8 +477,6 @@
                     </div>
 
 
-
-                    {{-- TRANSMISI --}}
 
                     <div class="col-md-4">
 
@@ -570,8 +527,6 @@
 
 
 
-                {{-- KAPASITAS --}}
-
 <div class="col-md-4">
 
     <label class="form-label">
@@ -606,8 +561,6 @@
 </div>
 
 
-
-                    {{-- WARNA --}}
 
                     <div class="col-md-6">
 
@@ -650,7 +603,6 @@
 
     <select
         name="cabang_id"
-        id="cabang_id"
         class="form-select @error('cabang_id') is-invalid @enderror"
         required
     >
@@ -679,8 +631,6 @@
 
 
 
-                {{-- HARGA --}}
-
                 <div class="section-title mt-5">
 
                     <i class="bi bi-cash-stack me-2"></i>
@@ -692,8 +642,6 @@
 
                 <div class="row g-4">
 
-
-                    {{-- HARGA PER HARI --}}
 
                     <div class="col-md-6">
 
@@ -736,8 +684,6 @@
 
 
 
-                    {{-- DEPOSIT --}}
-
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -778,8 +724,6 @@
                     </div>
 
 
-
-                    {{-- STATUS --}}
 
                     <div class="col-md-6">
 
@@ -839,8 +783,6 @@
                 </div>
 
 
-
-                {{-- FOTO --}}
 
                 <div class="section-title mt-5">
 
@@ -918,8 +860,6 @@
 
 
 
-                {{-- FASILITAS --}}
-
                 <div class="section-title mt-5">
 
                     <i class="bi bi-check2-square me-2"></i>
@@ -973,8 +913,6 @@
 
 
 
-                {{-- DESKRIPSI --}}
-
                 <div class="section-title mt-5">
 
                     <i class="bi bi-card-text me-2"></i>
@@ -1012,8 +950,6 @@
                 </div>
 
 
-
-                {{-- BUTTON --}}
 
                 <div class="d-flex justify-content-end gap-2 mt-5">
 
