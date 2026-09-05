@@ -171,8 +171,6 @@
 
                 <p class="mm-subtitle">
                     <i class="bi bi-car-front me-1"></i>
-                    {{ $mobil->brand->name ?? '-' }}
-                    ·
                     {{ $mobil->tipeMobil->name ?? '-' }}
                 </p>
 

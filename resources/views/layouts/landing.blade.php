@@ -326,12 +326,6 @@
             padding: 20px;
         }
 
-        .car-brand {
-            color: var(--primary);
-            font-size: 13px;
-            font-weight: 700;
-        }
-
         .car-title {
             font-size: 20px;
             font-weight: 800;

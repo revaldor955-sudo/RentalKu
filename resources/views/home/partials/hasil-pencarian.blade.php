@@ -84,10 +84,6 @@
 
                 <div class="car-content">
 
-                    <div class="car-brand">
-                        {{ $mobil->brand->name ?? '-' }}
-                    </div>
-
                     <div class="car-title">
                         {{ $mobil->name }}
                     </div>
