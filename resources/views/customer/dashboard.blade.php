@@ -16,11 +16,9 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     >
 
-    <style>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-        * {
-            box-sizing: border-box;
-        }
+    <style>
 
         body {
             margin: 0;
@@ -516,6 +514,14 @@
 
 <div class="container">
 
+    @if (session('success'))
+        <span id="flashSuccess" class="d-none">{{ session('success') }}</span>
+    @endif
+
+    @if (session('error'))
+        <span id="flashError" class="d-none">{{ session('error') }}</span>
+    @endif
+
 
 <section class="hero">
 
@@ -747,8 +753,7 @@
                                 </small>
 
                             </div>
-
-                            @if($rental->status === 'Menunggu')
+@if($rental->status === 'Menunggu')
 
                                 <span class="badge bg-warning text-dark">
                                     Menunggu
@@ -762,13 +767,6 @@
 
                                 </span>
 
-                            @elseif($rental->status === 'Berjalan')
-
-                                <span class="badge bg-primary">
-                                    Berjalan
-
-                                </span>
-
                             @elseif($rental->status === 'Selesai')
 
                                 <span class="badge bg-secondary">
@@ -776,10 +774,17 @@
 
                                 </span>
 
-                            @else
+                            @elseif($rental->status === 'Ditolak')
 
                                 <span class="badge bg-danger">
-                                    Dibatalkan
+                                    Ditolak
+
+                                </span>
+
+                            @else
+
+                                <span class="badge bg-dark">
+                                    {{ $rental->status }}
                                 </span>
 
                             @endif
@@ -839,8 +844,6 @@
 
                         </div>
 
-
-                   {{-- TOMBOL PEMBAYARAN --}}
 
 @if($rental->status === 'Disetujui')
 
@@ -962,8 +965,6 @@
 
                 <div class="car-card" data-mobil-id="{{ $mobil->id }}" role="button" title="Lihat detail {{ $mobil->name }}">
 
-                    {{-- FOTO --}}
-
                   <div class="car-photo-wrapper">
 
     @if($mobil->image)
@@ -997,8 +998,6 @@
 
 </div>
 
-
-                    {{-- DETAIL MOBIL --}}
 
                     <div class="car-body">
 
@@ -1256,6 +1255,29 @@
     src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    (function() {
+        var ok = document.getElementById('flashSuccess');
+        if (ok) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: ok.textContent,
+                timer: 1800,
+                showConfirmButton: false,
+            });
+        }
+        var err = document.getElementById('flashError');
+        if (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: err.textContent,
+            });
+        }
+    })();
+</script>
+
+<script>
 
     // Buka modal detail mobil via AJAX — tanpa reload halaman.
     var $mobilDetailModalBody = $('#mobilDetailModalBody');
@@ -1279,7 +1301,6 @@
         });
     }
 
-    // Klik kartu mobil (atau tombol "Sewa") di dashboard → buka modal
     $(document).on('click', '[data-mobil-id]', function() {
         openMobilDetail($(this).data('mobil-id'));
     });
@@ -1354,8 +1375,6 @@
                 });
             }
         });
-    }
-
     }
 
 </script>
