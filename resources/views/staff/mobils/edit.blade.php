@@ -803,7 +803,7 @@
 </div>
 
 
-@include('layouts.partials.admin-footer', ['pageTitle' => 'Staff Dashboard • Edit Data Mobil'])
+@include('layouts.partials.admin-footer', ['pageTitle' => 'Staff Dashboard - Edit Data Mobil'])
 
 
 <script>

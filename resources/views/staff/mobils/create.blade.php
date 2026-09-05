@@ -991,7 +991,7 @@
 
 
 
-@include('layouts.partials.admin-footer', ['pageTitle' => 'Staff Dashboard • Tambah Data Mobil'])
+@include('layouts.partials.admin-footer', ['pageTitle' => 'Staff Dashboard - Tambah Data Mobil'])
 
 
 
