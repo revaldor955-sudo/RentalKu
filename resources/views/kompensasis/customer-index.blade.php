@@ -104,6 +104,7 @@
             text-transform: uppercase;
             white-space: nowrap;
             border-bottom: 1px solid #e9ecef;
+            padding: 12px 16px;
         }
 
         .table tbody td {
@@ -153,7 +154,7 @@
 
     @include('layouts.partials.navbar')
 
-    <div class="container py-5">
+    <div class="container-fluid px-4">
 
         <div class="d-flex justify-content-between align-items-center mb-4">
 

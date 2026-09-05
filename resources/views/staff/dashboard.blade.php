@@ -38,7 +38,7 @@
         }
 
         .hero {
-            margin-top: 30px;
+            margin-top: 0;
             padding: 40px;
             border-radius: 24px;
 
@@ -61,6 +61,11 @@
         .hero p {
             color: #dcefe4;
             max-width: 700px;
+        }
+
+        .hero-icon {
+            font-size: 120px;
+            opacity: .12;
         }
 
         .stat-card {
@@ -186,37 +191,52 @@
 {{-- Page Content (dipindah ke #mainContent oleh staff-sidebar) --}}
 <div class="page-content">
 
-<div class="container">
+<div class="container-fluid px-4">
 
 
-<div class="hero">
+<div class="hero mb-4">
 
-    <span class="badge bg-light text-success px-3 py-2 mb-3">
+    <div class="row align-items-center">
 
-        <i class="bi bi-person-check"></i>
+        <div class="col-lg-8">
 
-        Staff RentalKu
+            <span class="badge bg-light text-success px-3 py-2 mb-3">
 
-    </span>
+                <i class="bi bi-person-check"></i>
 
-    <h1>
+                Staff RentalKu
 
-        Selamat datang,
-        {{ Auth::user()->name }} 👋
+            </span>
 
-    </h1>
+            <h1>
 
-    <p class="mt-3 mb-0">
+                Selamat datang,
+                {{ Auth::user()->name }} 👋
 
-        Kelola operasional RentalKu mulai dari kendaraan,
-        rental pelanggan, pembayaran, hingga pemeriksaan kendaraan.
+            </h1>
 
-    </p>
+            <p class="mt-3 mb-4">
+
+                Kelola operasional RentalKu mulai dari kendaraan,
+                rental pelanggan, pembayaran, hingga pemeriksaan kendaraan.
+
+            </p>
+
+        </div>
+
+
+        <div class="col-lg-4 text-center d-none d-lg-block">
+
+            <i class="bi bi-person-badge hero-icon"></i>
+
+        </div>
+
+    </div>
 
 </div>
 
 
-<div class="row g-4 mt-2">
+<div class="row g-4 mb-4">
 
     <div class="col-md-6 col-xl-3">
 
@@ -405,11 +425,9 @@
 
     </div>
 
-</div>
 
 
-
-<section class="mt-5">
+<section class="mb-5">
 
     <h3 class="section-title mb-4">
         Perlu Tindakan
@@ -603,7 +621,7 @@
 </section>
 
 
-<section class="mt-5">
+<section class="mb-5">
 
     <h3 class="section-title mb-4">
         Mobil Terbaru
@@ -718,7 +736,7 @@
 </section>
 
 
-<section class="mt-5">
+<section class="mb-5">
 
     <h3 class="section-title mb-4">
         Transaksi Terakhir

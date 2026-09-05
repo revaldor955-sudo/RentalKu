@@ -80,6 +80,7 @@
             font-size: 12px;
             text-transform: uppercase;
             white-space: nowrap;
+            padding: 12px 16px;
         }
 
         .table tbody td {
@@ -141,7 +142,7 @@
 {{-- Page Content (dipindah ke #mainContent oleh staff-sidebar) --}}
 <div class="page-content">
 
-<div class="container py-5">
+<div class="container-fluid px-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
 
