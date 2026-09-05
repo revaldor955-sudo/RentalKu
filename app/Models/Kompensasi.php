@@ -21,6 +21,11 @@ class Kompensasi extends Model
         'catatan',
     ];
 
+    protected $casts = [
+        'tanggal' => 'date',
+        'nominal' => 'decimal:2',
+    ];
+
     public function mobil()
     {
         return $this->belongsTo(Mobil::class, 'mobil_id');
