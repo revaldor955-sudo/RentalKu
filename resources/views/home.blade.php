@@ -289,14 +289,10 @@
 
                         <div class="brand-card">
 
-                            @if ($brand->logo)
-                                <img src="{{ asset('storage/' . $brand->logo) }}" class="brand-logo" alt="{{ $brand->name }}">
-                            @else
-                                <div
-                                    class="brand-logo mx-auto d-flex align-items-center justify-content-center bg-light rounded-circle">
-                                    <i class="bi bi-car-front fs-4 text-success"></i>
-                                </div>
-                            @endif
+                            <div
+                                class="brand-logo mx-auto d-flex align-items-center justify-content-center bg-light rounded-circle">
+                                <i class="bi bi-car-front fs-4 text-success"></i>
+                            </div>
 
                             <div class="fw-bold">
                                 {{ $brand->name }}
