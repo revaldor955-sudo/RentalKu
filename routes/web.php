@@ -5,13 +5,16 @@ use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CabangController;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboardController;
+use App\Http\Controllers\DendaController;
 use App\Http\Controllers\DokumenMobilController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\FasilitasController;
 use App\Http\Controllers\FotoMobilController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KerusakanMobilController;
+use App\Http\Controllers\KompensasiController;
 use App\Http\Controllers\KuponController;
+use App\Http\Controllers\ServisMobilController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\MetodePembayaranController;
 use App\Http\Controllers\MobilController;
@@ -28,6 +31,8 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+Route::get('roles/data', [RoleController::class, 'data'])->name('roles.data');
+
 Route::resource('roles', RoleController::class)
     ->except(['create', 'edit', 'show']);
 
@@ -36,8 +41,12 @@ Route::get('brands/data', [BrandController::class, 'data'])->name('brands.data')
 Route::resource('brands', BrandController::class)
     ->except(['create', 'edit']);
 
+Route::get('tipe_mobils/data', [TipeMobilController::class, 'data'])->name('tipe_mobils.data');
+
 Route::resource('tipe_mobils', TipeMobilController::class)
     ->except(['create', 'edit', 'show']);
+
+Route::get('cabangs/data', [CabangController::class, 'data'])->name('cabangs.data');
 
 Route::resource('cabangs', CabangController::class)
     ->except(['create', 'edit', 'show']);
@@ -48,8 +57,12 @@ Route::get('/fasilitas/data', [FasilitasController::class, 'data'])
 Route::resource('fasilitas', FasilitasController::class)
     ->except(['create', 'edit', 'show']);
 
+Route::get('metode_pembayarans/data', [MetodePembayaranController::class, 'data'])->name('metode_pembayarans.data');
+
 Route::resource('metode_pembayarans', MetodePembayaranController::class)
     ->except(['create', 'edit', 'show']);
+
+Route::get('supirs/data', [SupirController::class, 'data'])->name('supirs.data');
 
 Route::resource('supirs', SupirController::class)
     ->except(['create', 'edit', 'show']);
@@ -82,24 +95,50 @@ Route::middleware('admin')->group(function () {
         ->name('mobils.destroy');
 });
 
+Route::get('kerusakan_mobils/data', [KerusakanMobilController::class, 'data'])->name('kerusakan_mobils.data');
+
 Route::resource('kerusakan_mobils', KerusakanMobilController::class)
     ->except(['create', 'edit', 'show']);
+
+Route::get('foto_mobils/data', [FotoMobilController::class, 'data'])->name('foto_mobils.data');
 
 Route::resource('foto_mobils', FotoMobilController::class)
     ->except(['create', 'edit', 'show']);
 
+Route::get('dokumen_mobils/data', [DokumenMobilController::class, 'data'])->name('dokumen_mobils.data');
+
 Route::resource('dokumen_mobils', DokumenMobilController::class)
     ->except(['create', 'edit', 'show']);
+
+Route::get('dendas/data', [DendaController::class, 'data'])->name('dendas.data');
+
+Route::resource('dendas', DendaController::class)
+    ->except(['create', 'edit', 'show'])
+    ->middleware('adminstaff');
+
+Route::get('kompensasis/data', [KompensasiController::class, 'data'])->name('kompensasis.data');
+
+Route::resource('kompensasis', KompensasiController::class)
+    ->except(['create', 'edit', 'show'])
+    ->middleware('adminstaff');
+
+Route::get('servis_mobils/data', [ServisMobilController::class, 'data'])->name('servis_mobils.data');
+
+Route::resource('servis_mobils', ServisMobilController::class)
+    ->middleware('adminstaff');
 
 Route::resource('banners', BannerController::class)
     ->except(['create', 'edit', 'show']);
 
 Route::get('banners/data', [BannerController::class, 'data'])->name('banners.data');
 
+Route::get('faqs/data', [FaqController::class, 'data'])->name('faqs.data');
+
 Route::resource('faqs', FaqController::class)
     ->except(['create', 'edit', 'show']);
 
 Route::get('/', [HomeController::class, 'index'])
+    ->middleware('guest')
     ->name('home');
 
 Route::get('/dashboard', function () {
@@ -155,6 +194,15 @@ Route::middleware('customer')->group(function () {
 
     Route::post('/customer/pembayaran/{rental}', [PembayaranController::class, 'store'])
         ->name('pembayaran.store');
+
+    Route::get('/customer/kompensasi', [KompensasiController::class, 'customerIndex'])
+        ->name('customer.kompensasi.index');
+
+    Route::get('/customer/kompensasi/data', [KompensasiController::class, 'customerData'])
+        ->name('customer.kompensasi.data');
+
+    Route::get('/customer/kompensasi/create', [KompensasiController::class, 'customerCreate'])
+        ->name('customer.kompensasi.create');
 });
 
 Route::middleware('adminstaff')->group(function () {
