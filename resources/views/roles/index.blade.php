@@ -166,21 +166,6 @@
 
         </div>
 
-        <div class="d-flex gap-2">
-
-            <button
-                type="button"
-                class="btn btn-green"
-                data-bs-toggle="modal"
-                data-bs-target="#tambahRoleModal">
-
-                <i class="bi bi-plus-circle me-1"></i>
-                Tambah Role
-
-            </button>
-
-        </div>
-
     </div>
 
 
