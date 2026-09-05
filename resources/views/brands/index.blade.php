@@ -2,6 +2,7 @@
 <html lang="id">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Management Brand - RentalKu</title>
@@ -18,6 +19,7 @@
             background: #f5f7f6;
             color: #1f2937;
             font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
         }
 
         .page-card {
@@ -37,8 +39,8 @@
             color: white;
             border: none;
             border-radius: 10px;
-            font-weight: 700;
-            padding: 10px 17px;
+            font-weight: 600;
+            padding: 10px 18px;
         }
 
         .btn-green:hover {
@@ -60,7 +62,6 @@
             vertical-align: middle;
         }
 
-        /* Sembunyikan ikon sort di semua kolom */
         #brands-table thead .dt-column-order {
             display: none !important;
         }
@@ -108,8 +109,7 @@
             color: white;
         }
 
-        .form-control,
-        .form-select {
+        .form-control {
             border-radius: 10px;
             padding: 11px 13px;
         }
@@ -118,30 +118,62 @@
             border-color: #198754;
             box-shadow: 0 0 0 .2rem rgba(25,135,84,.12);
         }
+
+        .modal-footer .btn {
+            padding: 6px 14px;
+            min-width: 100px;
+        }
+
+        /* Sidebar layout base styles are in admin-sidebar.blade.php */
+
+        .page-content {
+            padding: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
+            }
+        }
     </style>
 </head>
 
 <body>
 
-@include('layouts.partials.admin-navbar')
+@include('layouts.partials.admin-sidebar')
 
-<div class="container py-5">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mainContent = document.getElementById('mainContent');
+        const pageContent = mainContent?.querySelector('.page-content');
+
+        if (mainContent && pageContent) {
+            const navbar = document.querySelector('header.topbar');
+            if (navbar) {
+                mainContent.insertBefore(navbar, pageContent);
+            }
+        }
+    });
+</script>
+
+<div class="page-content">
+
+<div class="container-fluid px-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="page-title mb-1">Kategori Merek</h1>
             <p class="text-muted mb-0">Kelola merek kendaraan yang tersedia di RentalKu.</p>
         </div>
-        <div class="d-flex gap-2">
-            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1"></i>
-                Dashboard
-            </a>
-            <button type="button" class="btn btn-green" data-bs-toggle="modal" data-bs-target="#tambahBrandModal">
-                <i class="bi bi-plus-lg me-1"></i>
-                Tambah Merek
-            </button>
-        </div>
+
+        <button
+            type="button"
+            class="btn btn-green"
+            data-bs-toggle="modal"
+            data-bs-target="#tambahBrandModal">
+            <i class="bi bi-plus-circle me-1"></i>
+            Tambah Merek
+        </button>
     </div>
 
     <div class="page-card">
@@ -158,7 +190,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{-- Diisi oleh DataTables (server-side) --}}
                 </tbody>
             </table>
         </div>
@@ -167,7 +198,20 @@
 </div>
 
 
-{{-- MODAL TAMBAH --}}
+<div class="modal fade" id="fotoBrandModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Logo Merek</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body p-3 text-center">
+                <img id="fotoBrandPreview" src="" class="img-fluid rounded" alt="Logo merek">
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="tambahBrandModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -193,10 +237,10 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i>Batal</button>
                     <button type="submit" class="btn btn-green">
-                        <i class="bi bi-plus-lg me-1"></i>
-                        Tambah Merek
+                        <i class="bi bi-save me-1"></i>
+                        Simpan Merek
                     </button>
                 </div>
             </form>
@@ -205,7 +249,6 @@
 </div>
 
 
-{{-- MODAL EDIT --}}
 <div class="modal fade" id="editBrandModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -232,7 +275,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i>Batal</button>
                     <button type="submit" class="btn btn-green">
                         <i class="bi bi-save me-1"></i>
                         Simpan Perubahan
@@ -252,6 +295,11 @@
 
 <script>
     var CSRF_TOKEN = '{{ csrf_token() }}';
+
+    function openFotoBrand(url, name) {
+        $('#fotoBrandPreview').attr('src', url).attr('alt', name);
+        bootstrap.Modal.getOrCreateInstance($('#fotoBrandModal')[0]).show();
+    }
 
     function flashSuccess(message) {
         Swal.fire({
@@ -289,7 +337,9 @@
                     searchable: false,
                     render: function(data, type, row) {
                         if (data) {
-                            return '<img src="' + asset(data) + '" class="brand-logo" alt="' + row.name + '">';
+                            const full = '{{ asset('__LOGO__') }}'.replace('__LOGO__', data);
+                            return '<a href="#" onclick="openFotoBrand(\'' + full + '\', \'' + row.name.replace(/'/g, "\\'") + '\');return false;">' +
+                                '<img src="' + full + '" class="brand-logo" alt="' + row.name + '"></a>';
                         }
                         return '<div class="no-logo"><i class="bi bi-car-front-fill"></i></div>';
                     },
@@ -429,7 +479,7 @@
                 'X-Requested-With': 'XMLHttpRequest',
             },
             success: function(result) {
-                $('#tambahBrandModal').modal('hide');
+                bootstrap.Modal.getInstance($('#tambahBrandModal')[0]).hide();
                 $('#formTambahBrand')[0].reset();
                 $('#brands-table').DataTable().ajax.reload();
                 flashSuccess(result.message || 'Brand berhasil ditambahkan.');
@@ -465,7 +515,7 @@
                 'X-Requested-With': 'XMLHttpRequest',
             },
             success: function(result) {
-                $('#editBrandModal').modal('hide');
+                bootstrap.Modal.getInstance($('#editBrandModal')[0]).hide();
                 $('#brands-table').DataTable().ajax.reload();
                 flashSuccess(result.message || 'Brand berhasil diperbarui.');
             },

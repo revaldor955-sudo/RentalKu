@@ -21,6 +21,7 @@
         body {
             background: #f6f8f7;
             font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
         }
 
         .page-title {
@@ -54,107 +55,109 @@
             display: none !important;
         }
 
-        .status {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 700;
+        /* Sidebar layout base styles are in admin-sidebar.blade.php */
+
+        .page-content {
+            padding: 24px;
         }
 
-        .status-disetujui {
-            background: #d1e7dd;
-            color: #0f5132;
-        }
-
-        .btn-action {
-            border-radius: 9px;
-            font-size: 12px;
-            font-weight: 600;
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    @include('layouts.partials.admin-navbar')
+{{-- Sidebar Layout --}}
+@include('layouts.partials.admin-sidebar')
 
+<script>
+    // Inject navbar into sidebar layout
+    document.addEventListener('DOMContentLoaded', function() {
+        const mainContent = document.getElementById('mainContent');
+        const pageContent = mainContent?.querySelector('.page-content');
 
-    <div class="container py-4">
+        if (mainContent && pageContent) {
+            const navbar = document.querySelector('header.topbar');
+            if (navbar) {
+                mainContent.insertBefore(navbar, pageContent);
+            }
+        }
+    });
+</script>
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
+{{-- Page Content --}}
+<div class="page-content">
 
-            <div>
-                <h2 class="page-title mb-1">
-                    Pengembalian Mobil
-                </h2>
+<div class="container py-4">
 
-                <p class="text-muted mb-0">
-                    Proses pengembalian kendaraan yang sedang disewa pelanggan.
-                </p>
-            </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
+        <div>
+            <h2 class="page-title mb-1">
+                Pengembalian Mobil
+            </h2>
 
-                <i class="bi bi-arrow-left me-1"></i>
-                Dashboard
-
-            </a>
-
+            <p class="text-muted mb-0">
+                Proses pengembalian kendaraan yang sedang disewa pelanggan.
+            </p>
         </div>
 
+    </div>
 
-        <div class="card-custom">
 
-            <div class="card-body p-0">
+    <div class="card-custom">
 
-                <div class="table-responsive">
+        <div class="card-body p-0">
 
-                    <table class="table table-hover mb-0" id="pengembalian-table">
+            <div class="table-responsive">
 
-                        <thead>
+                <table class="table table-hover mb-0" id="pengembalian-table">
 
-                            <tr>
+                    <thead>
 
-                                <th class="px-3 py-3">
-                                    No
-                                </th>
+                        <tr>
 
-                                <th>
-                                    Pelanggan
-                                </th>
+                            <th class="px-3 py-3">
+                                No
+                            </th>
 
-                                <th>
-                                    Mobil
-                                </th>
+                            <th>
+                                Pelanggan
+                            </th>
 
-                                <th>
-                                    Tanggal Sewa
-                                </th>
+                            <th>
+                                Mobil
+                            </th>
 
-                                <th>
-                                    Hari
-                                </th>
+                            <th>
+                                Tanggal Sewa
+                            </th>
 
-                                <th>
-                                    Total
-                                </th>
+                            <th>
+                                Hari
+                            </th>
 
-                                <th class="text-end pe-4">
-                                    Aksi
-                                </th>
+                            <th>
+                                Total
+                            </th>
 
-                            </tr>
+                            <th class="text-end pe-4">
+                                Aksi
+                            </th>
 
-                        </thead>
+                        </tr>
 
-                        <tbody>
-                            {{-- Diisi oleh DataTables (server-side) --}}
-                        </tbody>
+                    </thead>
 
-                    </table>
+                    <tbody>
+                        {{-- Diisi oleh DataTables (server-side) --}}
+                    </tbody>
 
-                </div>
+                </table>
 
             </div>
 
@@ -162,168 +165,171 @@
 
     </div>
 
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
 
-    <script>
-        const CSRF_TOKEN = '{{ csrf_token() }}';
+<script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/js/dataTables.bootstrap5.min.js"></script>
 
-        function formatRupiah(value) {
-            return 'Rp ' + Number(value).toLocaleString('id-ID');
-        }
+<script>
+    const CSRF_TOKEN = '{{ csrf_token() }}';
 
-        function prosesPengembalian(id, mobil) {
-            Swal.fire({
-                title: 'Proses Pengembalian?',
-                text: 'Mobil ' + mobil + ' akan dikembalikan dan berstatus "Tersedia".',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Kembalikan',
-                cancelButtonText: 'Batal',
-            }).then(function(result) {
-                if (!result.isConfirmed) return;
+    function formatRupiah(value) {
+        return 'Rp ' + Number(value).toLocaleString('id-ID');
+    }
 
-                $.ajax({
-                    url: "{{ route('rentals.updateStatus', '__ID__') }}".replace('__ID__', id),
-                    method: 'PUT',
-                    headers: {
-                        'X-CSRF-TOKEN': CSRF_TOKEN,
-                        'Accept': 'application/json',
-                    },
-                    data: {
-                        status: 'Selesai'
-                    },
-                    success: function(res) {
-                        $('#pengembalian-table').DataTable().ajax.reload();
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil',
-                            text: res.message || 'Pengembalian berhasil diproses.',
-                        });
-                    },
-                    error: function(xhr) {
-                        const res = xhr.responseJSON || {};
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: res.message || 'Terjadi kesalahan',
-                        });
-                    },
-                });
-            });
-        }
+    function prosesPengembalian(id, mobil) {
+        Swal.fire({
+            title: 'Proses Pengembalian?',
+            text: 'Mobil ' + mobil + ' akan dikembalikan dan berstatus "Tersedia".',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Kembalikan',
+            cancelButtonText: 'Batal',
+        }).then(function(result) {
+            if (!result.isConfirmed) return;
 
-        $(document).ready(function() {
-
-            $('#pengembalian-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: "{{ route('rentals.data') }}",
-                    type: 'GET',
-                    data: function(d) {
-                        d.status = 'Disetujui';
-                    },
+            $.ajax({
+                url: "{{ route('rentals.updateStatus', '__ID__') }}".replace('__ID__', id),
+                method: 'PUT',
+                headers: {
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'Accept': 'application/json',
                 },
-                columns: [{
-                        data: null,
-                        orderable: false,
-                        searchable: false,
-                        className: 'px-3',
-                        width: '70px',
-                        render: function(data, type, row, meta) {
-                            return meta.row + meta.settings._iDisplayStart + 1;
-                        },
-                    },
-                    {
-                        data: null,
-                        orderable: true,
-                        searchable: false,
-                        render: function(data) {
-                            return '<div class="fw-bold">' + data.user_name + '</div>' +
-                                '<small class="text-muted">' + data.user_email + '</small>';
-                        },
-                    },
-                    {
-                        data: null,
-                        orderable: true,
-                        searchable: false,
-                        render: function(data) {
-                            return '<div class="fw-bold">' + data.mobil_name + '</div>' +
-                                '<small class="text-muted">' + data.mobil_plate + '</small>';
-                        },
-                    },
-                    {
-                        data: null,
-                        orderable: true,
-                        searchable: false,
-                        render: function(data) {
-                            return data.tanggal_mulai + '<br>' +
-                                '<small class="text-muted">s/d ' + data.tanggal_selesai +
-                                '</small>';
-                        },
-                    },
-                    {
-                        data: 'jumlah_hari',
-                        orderable: true,
-                        searchable: false,
-                        render: function(data) {
-                            return data + ' hari';
-                        },
-                    },
-                    {
-                        data: 'total_harga',
-                        orderable: true,
-                        searchable: false,
-                        render: function(data) {
-                            return '<strong>' + formatRupiah(data) + '</strong>';
-                        },
-                    },
-                    {
-                        data: null,
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-end pe-4',
-                        width: '140px',
-                        render: function(data) {
-                            return '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
-                                'onclick="prosesPengembalian(' + data.id + ', \'' +
-                                data.mobil_name.replace(/'/g, "\\'") + '\')">' +
-                                '<i class="bi bi-arrow-return-left"></i> Proses Pengembalian</button>';
-                        },
-                    },
-                ],
-                order: [
-                    [3, 'desc']
-                ],
-                language: {
-                    processing: 'Memproses...',
-                    search: 'Cari:',
-                    lengthMenu: 'Tampilkan _MENU_ data',
-                    info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
-                    infoEmpty: 'Tidak ada data',
-                    infoFiltered: '(difilter dari _MAX_ total data)',
-                    infoPostFix: '',
-                    loadingRecords: 'Memuat...',
-                    zeroRecords: 'Tidak ditemukan data yang cocok',
-                    emptyTable: 'Tidak ada rental yang sedang berjalan',
-                    aria: {
-                        sortAscending: ': aktifkan untuk urut naik',
-                        sortDescending: ': aktifkan untuk urut turun',
-                    },
+                data: {
+                    status: 'Selesai'
+                },
+                success: function(res) {
+                    $('#pengembalian-table').DataTable().ajax.reload();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: res.message || 'Pengembalian berhasil diproses.',
+                    });
+                },
+                error: function(xhr) {
+                    const res = xhr.responseJSON || {};
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: res.message || 'Terjadi kesalahan',
+                    });
                 },
             });
-
         });
-    </script>
+    }
+
+    $(document).ready(function() {
+
+        $('#pengembalian-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('rentals.data') }}",
+                type: 'GET',
+                data: function(d) {
+                    d.status = 'Disetujui';
+                },
+            },
+            columns: [{
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    className: 'px-3',
+                    width: '70px',
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    },
+                },
+                {
+                    data: null,
+                    orderable: true,
+                    searchable: false,
+                    render: function(data) {
+                        return '<div class="fw-bold">' + data.user_name + '</div>' +
+                            '<small class="text-muted">' + data.user_email + '</small>';
+                    },
+                },
+                {
+                    data: null,
+                    orderable: true,
+                    searchable: false,
+                    render: function(data) {
+                        return '<div class="fw-bold">' + data.mobil_name + '</div>' +
+                            '<small class="text-muted">' + data.mobil_plate + '</small>';
+                    },
+                },
+                {
+                    data: null,
+                    orderable: true,
+                    searchable: false,
+                    render: function(data) {
+                        return data.tanggal_mulai + '<br>' +
+                            '<small class="text-muted">s/d ' + data.tanggal_selesai +
+                            '</small>';
+                    },
+                },
+                {
+                    data: 'jumlah_hari',
+                    orderable: true,
+                    searchable: false,
+                    render: function(data) {
+                        return data + ' hari';
+                    },
+                },
+                {
+                    data: 'total_harga',
+                    orderable: true,
+                    searchable: false,
+                    render: function(data) {
+                        return '<strong>' + formatRupiah(data) + '</strong>';
+                    },
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-end pe-4',
+                    width: '140px',
+                    render: function(data) {
+                        return '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
+                            'onclick="prosesPengembalian(' + data.id + ', \'' +
+                            data.mobil_name.replace(/'/g, "\\'") + '\')">' +
+                            '<i class="bi bi-arrow-return-left"></i> Proses Pengembalian</button>';
+                    },
+                },
+            ],
+            order: [
+                [3, 'desc']
+            ],
+            language: {
+                processing: 'Memproses...',
+                search: 'Cari:',
+                lengthMenu: 'Tampilkan _MENU_ data',
+                info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                infoEmpty: 'Tidak ada data',
+                infoFiltered: '(difilter dari _MAX_ total data)',
+                infoPostFix: '',
+                loadingRecords: 'Memuat...',
+                zeroRecords: 'Tidak ditemukan data yang cocok',
+                emptyTable: 'Tidak ada rental yang sedang berjalan',
+                aria: {
+                    sortAscending: ': aktifkan untuk urut naik',
+                    sortDescending: ': aktifkan untuk urut turun',
+                },
+            },
+        });
+
+    });
+
+</script>
 
 </body>
 

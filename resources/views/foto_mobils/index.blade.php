@@ -1,83 +1,758 @@
+<!DOCTYPE html>
 <html lang="id">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Data Foto Mobil</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Management Foto Mobil - RentalKu</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/css/dataTables.bootstrap5.min.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f5f7f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .page-title {
+            font-weight: 800;
+        }
+
+        .page-card {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #edf0ee;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .05);
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            padding: 11px 13px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .12);
+        }
+
+        .btn-green {
+            background: #198754;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 10px 18px;
+        }
+
+        .btn-green:hover {
+            background: #146c43;
+            color: white;
+        }
+
+        .table thead th {
+            background: #f8faf9;
+            color: #6c757d;
+            font-size: 12px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .table tbody td {
+            vertical-align: middle;
+        }
+
+        #fotoMobils-table thead .dt-column-order {
+            display: none !important;
+        }
+
+        .foto-preview {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .modal-footer .btn {
+            padding: 6px 14px;
+            min-width: 100px;
+        }
+
+        .modal-content {
+            border: none;
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: #198754;
+            color: white;
+        }
+
+        /* Sidebar layout base styles are in admin-sidebar.blade.php */
+
+        .page-content {
+            padding: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-@include('layouts.partials.admin-navbar')
 
-<div class="container py-5">
+@include('layouts.partials.admin-sidebar')
 
-<h1>Data Foto Mobil</h1>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mainContent = document.getElementById('mainContent');
+        const pageContent = mainContent?.querySelector('.page-content');
 
-@if (session('success'))
-    <p style="color: green;">{{ session('success') }}</p>
-@endif
+        if (mainContent && pageContent) {
+            const navbar = document.querySelector('header.topbar');
+            if (navbar) {
+                mainContent.insertBefore(navbar, pageContent);
+            }
+        }
+    });
+</script>
 
-@if ($errors->any())
-    <p style="color: red;">
-        @foreach ($errors->all() as $error)
-            {{ $error }}<br>
-        @endforeach
-    </p>
-@endif
+<div class="page-content">
 
-<form action="{{ route('foto_mobils.store') }}" method="POST" enctype="multipart/form-data">
-    @csrf
+<div class="container py-4">
 
-    <select name="mobil_id">
-        <option value="">Pilih Mobil</option>
-        @foreach ($mobils as $mobil)
-            <option value="{{ $mobil->id }}">{{ $mobil->name }} ({{ $mobil->plate_number }})</option>
-        @endforeach
-    </select>
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <input type="file" name="url">
+        <div>
+            <h2 class="page-title mb-1">
+                Management Foto Mobil
+            </h2>
 
-    <button type="submit">Simpan</button>
-</form>
+            <p class="text-muted mb-0">
+                Kelola foto-foto tambahan mobil di RentalKu.
+            </p>
 
-<table>
-    <thead>
-        <tr>
-            <th>No</th>
-            <th>Mobil</th>
-            <th>Foto</th>
-            <th>Aksi</th>
-        </tr>
-    </thead>
+        </div>
 
-    <tbody>
-        @foreach ($fotoMobils as $fotoMobil)
-            <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $fotoMobil->mobil->name ?? '-' }}</td>
-                <td>
-                    @if ($fotoMobil->url)
-                        <img src="{{ asset($fotoMobil->url) }}" width="80">
-                    @endif
-                </td>
+        <div class="d-flex gap-2">
 
-                <td>
-                    <form action="{{ route('foto_mobils.destroy', $fotoMobil->id) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
+            <button
+                type="button"
+                class="btn btn-green"
+                data-bs-toggle="modal"
+                data-bs-target="#tambahFotoMobilModal">
 
-                        <button type="submit">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        @endforeach
-    </tbody>
-</table>
+                <i class="bi bi-plus-circle me-1"></i>
+                Tambah Foto
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    @if(session('success'))
+        <span id="flashSuccess" class="d-none">{{ session('success') }}</span>
+    @endif
+
+
+    @if($errors->any())
+
+        <div class="alert alert-danger mb-4">
+
+            <strong>
+                Terdapat kesalahan:
+            </strong>
+
+            <ul class="mb-0 mt-2">
+
+                @foreach($errors->all() as $error)
+
+                    <li>{{ $error }}</li>
+
+                @endforeach
+
+            </ul>
+
+        </div>
+
+    @endif
+
+
+    <div class="row g-4">
+
+        <div class="col-lg-12">
+
+            <div class="page-card">
+
+                <div class="p-4 border-bottom">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <h5 class="fw-bold mb-1">
+                                Daftar Foto Mobil
+                            </h5>
+
+                            <small class="text-muted">
+                                Seluruh foto mobil yang terdaftar di RentalKu.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="table align-middle mb-0" id="fotoMobils-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th class="px-3 py-3">
+                                    No
+                                </th>
+
+                                <th>
+                                    Mobil
+                                </th>
+
+                                <th>
+                                    Foto
+                                </th>
+
+                                <th class="text-center">
+                                    Aksi
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="modal fade" id="fotoMobilModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Foto Mobil</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body p-3 text-center">
+                    <img id="fotoMobilPreview" src="" class="img-fluid rounded" alt="Foto mobil">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div
+        class="modal fade"
+        id="tambahFotoMobilModal"
+        tabindex="-1">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-plus-circle text-success me-2"></i>
+                        Tambah Foto Mobil
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <form
+                    action="{{ route('foto_mobils.store') }}"
+                    method="POST"
+                    enctype="multipart/form-data"
+                    id="formTambahFotoMobil">
+
+                    @csrf
+
+                    <div class="modal-body">
+
+                        <label class="form-label fw-semibold">
+                            Mobil
+                        </label>
+
+                        <select name="mobil_id" class="form-select" required>
+                            <option value="">-- Pilih Mobil --</option>
+                            @foreach($mobils as $mobil)
+                                <option value="{{ $mobil->id }}">
+                                    {{ $mobil->name }} ({{ $mobil->plate_number }})
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <label class="form-label fw-semibold mt-3">
+                            Foto Mobil
+                        </label>
+
+                        <input
+                            type="file"
+                            name="url"
+                            class="form-control"
+                            accept=".jpg,.jpeg,.png,.svg"
+                            required>
+
+                        <small class="text-muted">JPG, PNG, JPEG, SVG, Maksimal 2MB</small>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                            <i class="bi bi-x-circle me-1"></i>
+                            Batal
+
+                        </button>
+
+                        <button
+                            type="submit"
+                            form="formTambahFotoMobil"
+                            class="btn btn-green">
+
+                            <i class="bi bi-save me-1"></i>
+                            Simpan Foto
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="modal fade"
+        id="editFotoMobilModal"
+        tabindex="-1">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-pencil-square text-primary me-2"></i>
+                        Edit Foto Mobil
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <form
+                    action=""
+                    method="POST"
+                    enctype="multipart/form-data"
+                    id="formEditFotoMobil">
+
+                    @csrf
+                    @method('PUT')
+
+                    <div class="modal-body">
+
+                        <label class="form-label fw-semibold">
+                            Mobil
+                        </label>
+
+                        <select name="mobil_id" id="editMobilIdFoto" class="form-select" required>
+                            <option value="">-- Pilih Mobil --</option>
+                            @foreach($mobils as $mobil)
+                                <option value="{{ $mobil->id }}">
+                                    {{ $mobil->name }} ({{ $mobil->plate_number }})
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <label class="form-label fw-semibold mt-3">
+                            Foto Mobil
+                        </label>
+
+                        <img
+                            id="editFotoPreview"
+                            src=""
+                            class="foto-preview mb-2"
+                            style="display:none;"
+                            alt="Preview foto mobil">
+
+                        <input
+                            type="file"
+                            name="url"
+                            id="editUrlFoto"
+                            class="form-control"
+                            accept=".jpg,.jpeg,.png,.svg">
+
+                        <small class="text-muted">JPG, PNG, JPEG, SVG, Maksimal 2MB, Kosongkan jika foto tidak diganti</small>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                            <i class="bi bi-x-circle me-1"></i>
+                            Batal
+
+                        </button>
+
+                        <button
+                            type="submit"
+                            form="formEditFotoMobil"
+                            class="btn btn-green">
+
+                            <i class="bi bi-save me-1"></i>
+                            Simpan Perubahan
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/js/dataTables.bootstrap5.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+    var CSRF_TOKEN = '{{ csrf_token() }}';
+
+    var $flashSuccess = $('#flashSuccess');
+
+    if ($flashSuccess.length) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: $flashSuccess.text(),
+            timer: 1800,
+            showConfirmButton: false,
+        });
+    }
+
+    function openFotoMobil(url) {
+        $('#fotoMobilPreview').attr('src', url);
+        bootstrap.Modal.getOrCreateInstance($('#fotoMobilModal')[0]).show();
+    }
+
+    function fotoPreview(url) {
+        if (url) {
+            const full = '{{ asset('__PHOTO__') }}'.replace('__PHOTO__', url);
+            return '<a href="#" onclick="openFotoMobil(\'' + full + '\');return false;">' +
+                '<img src="' + full + '" class="foto-preview" alt="Foto mobil"></a>';
+        }
+        return '<span class="text-muted">-</span>';
+    }
+
+    $(document).ready(function() {
+
+        $('#fotoMobils-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{{ route('foto_mobils.data') }}',
+                type: 'GET',
+            },
+            columns: [{
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    className: 'px-3',
+                    width: '70px',
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    },
+                },
+                {
+                    data: null,
+                    orderable: true,
+                    searchable: true,
+                    render: function(data) {
+                        return '<strong>' + data.mobil_name + '</strong>' +
+                            '<div class="small text-muted">' + data.mobil_plate + '</div>';
+                    },
+                },
+                {
+                    data: 'url',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data) {
+                        return fotoPreview(data);
+                    },
+                },
+                {
+                    data: 'id',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center',
+                    width: '140px',
+                    render: function(data, type, row) {
+                        return '<div class="d-flex justify-content-center gap-2">' +
+                            '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
+                            'title="Edit" onclick="editFotoMobil(' + data + ')">' +
+                            '<i class="bi bi-pencil-square"></i></button>' +
+                            '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" ' +
+                            'title="Hapus" onclick="deleteFotoMobil(' + data +
+                            ', \'' + row.mobil_name.replace(/'/g, "\\'") + '\')">' +
+                            '<i class="bi bi-trash"></i></button>' +
+                            '</div>';
+                    },
+                },
+            ],
+            order: [
+                [1, 'asc']
+            ],
+            language: {
+                processing: 'Memproses...',
+                search: 'Cari:',
+                lengthMenu: 'Tampilkan _MENU_ data',
+                info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                infoEmpty: 'Tidak ada data',
+                infoFiltered: '(difilter dari _MAX_ total data)',
+                infoPostFix: '',
+                loadingRecords: 'Memuat...',
+                zeroRecords: 'Tidak ditemukan data yang cocok',
+                emptyTable: 'Belum ada foto mobil',
+                aria: {
+                    sortAscending: ': aktifkan untuk urut naik',
+                    sortDescending: ': aktifkan untuk urut turun',
+                },
+            },
+        });
+
+    });
+
+    function deleteFotoMobil(id, mobilName) {
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: 'Apakah Anda yakin ingin menghapus foto mobil "' + mobilName + '"?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus',
+            cancelButtonText: 'Batal',
+        }).then(function(result) {
+            if (!result.isConfirmed) return;
+
+            $.ajax({
+                url: "{{ route('foto_mobils.destroy', '__ID__') }}".replace('__ID__', id),
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                success: function(result) {
+                    $('#fotoMobils-table').DataTable().ajax.reload();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: (result && result.message) ? result.message : 'Foto mobil berhasil dihapus.',
+                        timer: 1500,
+                        showConfirmButton: false,
+                    });
+                },
+                error: function(xhr) {
+                    const result = xhr.responseJSON || {};
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: result.message ||
+                            'Terjadi kesalahan saat menghapus foto mobil.',
+                    });
+                }
+            });
+        });
+    }
+
+    function editFotoMobil(id) {
+        const data = $('#fotoMobils-table').DataTable().rows().data().toArray()
+            .find(r => r.id == id);
+
+        if (!data) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: 'Data foto mobil tidak ditemukan.',
+            });
+            return;
+        }
+
+        $('#editMobilIdFoto').val(data.mobil_id);
+        $('#editUrlFoto').val('');
+
+        if (data.url) {
+            $('#editFotoPreview').attr('src', '{{ asset('__PHOTO__') }}'.replace('__PHOTO__', data.url)).show();
+        } else {
+            $('#editFotoPreview').hide();
+        }
+
+        $('#formEditFotoMobil').attr('action',
+            "{{ route('foto_mobils.update', '__ID__') }}".replace('__ID__', id));
+
+        bootstrap.Modal.getOrCreateInstance($('#editFotoMobilModal')[0]).show();
+    }
+
+    $(document).on('submit', '#formTambahFotoMobil', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            success: function(result) {
+                bootstrap.Modal.getInstance($('#tambahFotoMobilModal')[0]).hide();
+                $('#formTambahFotoMobil')[0].reset();
+                $('#fotoMobils-table').DataTable().ajax.reload();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: result.message || 'Foto mobil berhasil ditambahkan.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+            },
+            error: function(xhr) {
+                const r = xhr.responseJSON || {};
+                const msg = r.errors ? Object.values(r.errors)[0][0] :
+                    (r.message || 'Terjadi kesalahan saat menambahkan foto mobil.');
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: msg,
+                });
+            }
+        });
+    });
+
+    $(document).on('submit', '#formEditFotoMobil', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            method: 'PUT',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            success: function(result) {
+                bootstrap.Modal.getInstance($('#editFotoMobilModal')[0]).hide();
+                $('#fotoMobils-table').DataTable().ajax.reload();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: result.message || 'Foto mobil berhasil diperbarui.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+            },
+            error: function(xhr) {
+                const r = xhr.responseJSON || {};
+                const msg = r.errors ? Object.values(r.errors)[0][0] :
+                    (r.message || 'Terjadi kesalahan saat memperbarui foto mobil.');
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: msg,
+                });
+            }
+        });
+    });
+
+</script>
+
 </body>
+
 </html>

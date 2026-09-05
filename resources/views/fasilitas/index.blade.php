@@ -7,127 +7,148 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
-<title>Management Fasilitas - RentalKu</title>
+    <title>Management Fasilitas - RentalKu</title>
 
-<link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
 
-<link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/css/dataTables.bootstrap5.min.css">
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/css/dataTables.bootstrap5.min.css">
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-<style>
-    body {
-        background: #f5f7f6;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        color: #1f2937;
-    }
+    <style>
+        body {
+            background: #f5f7f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #1f2937;
+            margin: 0;
+        }
 
-    .navbar {
-        background: white;
-        border-bottom: 1px solid #e9ecef;
-    }
+        .page-title {
+            font-weight: 800;
+        }
 
-    .brand {
-        font-size: 25px;
-        font-weight: 800;
-        color: #1f2937;
-    }
+        .page-card {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #edf0ee;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .05);
+        }
 
-    .brand span {
-        color: #198754;
-    }
+        .form-control {
+            border-radius: 10px;
+            padding: 11px 13px;
+        }
 
-    .page-title {
-        font-weight: 800;
-    }
+        .form-control:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .12);
+        }
 
-    .page-card {
-        background: white;
-        border-radius: 20px;
-        border: 1px solid #edf0ee;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, .05);
-    }
+        .btn-green {
+            background: #198754;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 10px 18px;
+        }
 
-    .form-control {
-        border-radius: 10px;
-        padding: 11px 13px;
-    }
+        .btn-green:hover {
+            background: #146c43;
+            color: white;
+        }
 
-    .form-control:focus {
-        border-color: #198754;
-        box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .12);
-    }
+        .table thead th {
+            background: #f8faf9;
+            color: #6c757d;
+            font-size: 12px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e9ecef;
+        }
 
-    .btn-green {
-        background: #198754;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        font-weight: 600;
-        padding: 10px 18px;
-    }
+        .table tbody td {
+            vertical-align: middle;
+        }
 
-    .btn-green:hover {
-        background: #146c43;
-        color: white;
-    }
+        #fasilitas-table thead .dt-column-order {
+            display: none !important;
+        }
 
-    .table thead th {
-        background: #f8faf9;
-        color: #6c757d;
-        font-size: 12px;
-        text-transform: uppercase;
-        border-bottom: 1px solid #e9ecef;
-    }
+        .facility-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #e9f7ef;
+            color: #198754;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
 
-    .table tbody td {
-        vertical-align: middle;
-    }
+        .modal-footer .btn {
+            padding: 6px 14px;
+            min-width: 100px;
+        }
 
-    /* Sembunyikan ikon sort di semua kolom */
-    #fasilitas-table thead .dt-column-order {
-        display: none !important;
-    }
+        .modal-content {
+            border: none;
+            border-radius: 18px;
+            overflow: hidden;
+        }
 
-    .facility-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        background: #e9f7ef;
-        color: #198754;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-    }
+        .modal-header {
+            background: #198754;
+            color: white;
+        }
 
-    .modal-footer .btn {
-        padding: 6px 14px;
-        min-width: 100px;
-    }
-</style>
+        /* Sidebar layout base styles are in admin-sidebar.blade.php */
 
+        .page-content {
+            padding: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-@include('layouts.partials.admin-navbar')
+@include('layouts.partials.admin-sidebar')
 
-<div class="container py-5">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mainContent = document.getElementById('mainContent');
+        const pageContent = mainContent?.querySelector('.page-content');
 
-{{-- HEADER --}}
+        if (mainContent && pageContent) {
+            const navbar = document.querySelector('header.topbar');
+            if (navbar) {
+                mainContent.insertBefore(navbar, pageContent);
+            }
+        }
+    });
+</script>
+
+<div class="page-content">
+
+<div class="container py-4">
 
 <div class="d-flex justify-content-between align-items-center mb-4">
 
@@ -145,18 +166,13 @@
 
 <div class="d-flex gap-2">
 
-    <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-1"></i>
-        Dashboard
-    </a>
-
-    <button
+            <button
         type="button"
         class="btn btn-green"
         data-bs-toggle="modal"
         data-bs-target="#tambahFasilitasModal">
 
-        <i class="bi bi-plus-lg me-1"></i>
+        <i class="bi bi-plus-circle me-1"></i>
         Tambah Fasilitas
 
     </button>
@@ -166,18 +182,14 @@
 </div>
 
 
-{{-- SUCCESS --}}
-
 @if(session('success'))
     <span id="flashSuccess" class="d-none">{{ session('success') }}</span>
 @endif
 
 
-{{-- ERROR --}}
-
 @if($errors->any())
 
-    <div class="alert alert-danger">
+    <div class="alert alert-danger mb-4">
 
         <strong>
             Terdapat kesalahan:
@@ -199,8 +211,6 @@
 
 
 <div class="row g-4">
-
-    {{-- DAFTAR FASILITAS --}}
 
     <div class="col-lg-12">
 
@@ -251,7 +261,6 @@
                     </thead>
 
                     <tbody>
-                        {{-- Diisi oleh DataTables (server-side) --}}
                     </tbody>
 
                 </table>
@@ -264,8 +273,6 @@
 
 </div>
 
-
-{{-- MODAL TAMBAH --}}
 
 <div
     class="modal fade"
@@ -345,8 +352,6 @@
 
 </div>
 
-
-{{-- MODAL EDIT --}}
 
 <div
     class="modal fade"
@@ -611,7 +616,7 @@
                 'X-Requested-With': 'XMLHttpRequest',
             },
             success: function(result) {
-                $('#tambahFasilitasModal').modal('hide');
+                bootstrap.Modal.getInstance($('#tambahFasilitasModal')[0]).hide();
                 $('#formTambahFasilitas')[0].reset();
                 $('#fasilitas-table').DataTable().ajax.reload();
 
@@ -654,7 +659,7 @@
                 'X-Requested-With': 'XMLHttpRequest',
             },
             success: function(result) {
-                $('#editFasilitasModal').modal('hide');
+                bootstrap.Modal.getInstance($('#editFasilitasModal')[0]).hide();
                 $('#fasilitas-table').DataTable().ajax.reload();
 
                 Swal.fire({
