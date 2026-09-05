@@ -341,196 +341,83 @@
 
     </div>
 
+
+    <div class="col-md-6 col-xl-3">
+
+        <div class="stat-card">
+
+            <div class="d-flex justify-content-between">
+
+                <div>
+
+                    <div class="text-muted">
+                        Denda Belum Bayar
+                    </div>
+
+                    <div class="stat-number text-danger">
+                        {{ $unpaidDendasCount ?? 0 }}
+                    </div>
+
+                </div>
+
+                <div class="stat-icon">
+
+                    <i class="bi bi-exclamation-triangle"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-md-6 col-xl-3">
+
+        <div class="stat-card">
+
+            <div class="d-flex justify-content-between">
+
+                <div>
+
+                    <div class="text-muted">
+                        Klaim Diajukan
+                    </div>
+
+                    <div class="stat-number text-primary">
+                        {{ $claimedKompensasisCount ?? 0 }}
+                    </div>
+
+                </div>
+
+                <div class="stat-icon">
+
+                    <i class="bi bi-cash-coin"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    </div>
+
 </div>
+
 
 
 <section class="mt-5">
 
     <h3 class="section-title mb-4">
-        Management Staff
+        Perlu Tindakan
     </h3>
-
 
     <div class="row g-4">
 
-
-        <div class="col-md-6 col-lg-3">
-
-       <a href="{{ route('staff.mobils.index') }}"
-   class="text-decoration-none text-dark">
-
-    <div class="menu-card">
-
-        <div class="menu-icon mb-3">
-            <i class="bi bi-car-front"></i>
-        </div>
-
-        <h5 class="fw-bold">
-            Management Mobil
-        </h5>
-
-        <p class="text-muted mb-0">
-            Kelola seluruh data kendaraan.
-        </p>
-
-    </div>
-
-</a>
-
-        </div>
-
-
-        <div class="col-md-6 col-lg-3">
-
-            <a
-                href="{{ route('brands.index') }}"
-                class="text-decoration-none text-dark"
-            >
-
-                <div class="menu-card">
-
-                    <div class="menu-icon mb-3">
-
-                        <i class="bi bi-tags"></i>
-
-                    </div>
-
-                    <h5 class="fw-bold">
-                        Kategori & Merek
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Kelola kategori dan merek mobil.
-                    </p>
-
-                </div>
-
-            </a>
-
-        </div>
-
-
-        <div class="col-md-6 col-lg-3">
-
-            <a
-                href="{{ route('fasilitas.index') }}"
-                class="text-decoration-none text-dark"
-            >
-
-                <div class="menu-card">
-
-                    <div class="menu-icon mb-3">
-
-                        <i class="bi bi-stars"></i>
-
-                    </div>
-
-                    <h5 class="fw-bold">
-                        Management Fasilitas
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Kelola fasilitas kendaraan.
-                    </p>
-
-                </div>
-
-            </a>
-
-        </div>
-
-
-        <div class="col-md-6 col-lg-3">
-
-            <a
-                href="{{ route('users.index') }}"
-                class="text-decoration-none text-dark"
-            >
-
-                <div class="menu-card">
-
-                    <div class="menu-icon mb-3">
-
-                        <i class="bi bi-people"></i>
-
-                    </div>
-
-                    <h5 class="fw-bold">
-                        Management Pengguna
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Kelola akun pengguna RentalKu.
-                    </p>
-
-                </div>
-
-            </a>
-
-        </div>
-
-
-        <div class="col-md-6 col-lg-3">
-
-            <a
-                href="{{ route('kupons.index') }}"
-                class="text-decoration-none text-dark"
-            >
-
-                <div class="menu-card">
-
-                    <div class="menu-icon mb-3">
-
-                        <i class="bi bi-ticket-perforated"></i>
-
-                    </div>
-
-                    <h5 class="fw-bold">
-                        Management Promo
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Kelola promo dan kupon.
-                    </p>
-
-                </div>
-
-            </a>
-
-        </div>
-
-
-        <div class="col-md-6 col-lg-3">
-
-            <a
-                href="{{ route('banners.index') }}"
-                class="text-decoration-none text-dark"
-            >
-
-                <div class="menu-card">
-
-                    <div class="menu-icon mb-3">
-
-                        <i class="bi bi-images"></i>
-
-                    </div>
-
-                    <h5 class="fw-bold">
-                        Management Banner
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Kelola banner website.
-                    </p>
-
-                </div>
-
-            </a>
-
-        </div>
-
-
-        <div class="col-md-6 col-lg-3">
+        <div class="col-md-6 col-lg-4">
 
             <a
                 href="{{ route('rentals.index') }}"
@@ -539,19 +426,48 @@
 
                 <div class="menu-card">
 
-                    <div class="menu-icon mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
 
-                        <i class="bi bi-calendar-check"></i>
+                        <div class="menu-icon mb-0">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+
+                        <span class="badge bg-warning text-dark rounded-pill fs-6">
+                            {{ $pendingRentalsCount ?? 0 }}
+                        </span>
 
                     </div>
 
                     <h5 class="fw-bold">
-                        Management Rental
+                        Rental Menunggu
                     </h5>
 
-                    <p class="text-muted mb-0">
-                        Kelola pengajuan rental pelanggan.
+                    <p class="text-muted mb-3">
+                        Pengajuan rental yang perlu disetujui.
                     </p>
+
+                    @forelse($pendingRentals as $rental)
+
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+
+                            <div>
+                                <div class="fw-semibold">
+                                    {{ $rental->user->name ?? '-' }}
+                                </div>
+                                <small class="text-muted">
+                                    {{ $rental->mobil->name ?? '-' }} - Mulai {{ $rental->tanggal_mulai?->format('d M Y') }}
+                                </small>
+                            </div>
+
+                        </div>
+
+                    @empty
+
+                        <p class="text-muted mb-0">
+                            Semua beres.
+                        </p>
+
+                    @endforelse
 
                 </div>
 
@@ -560,7 +476,7 @@
         </div>
 
 
-        <div class="col-md-6 col-lg-3">
+        <div class="col-md-6 col-lg-4">
 
             <a
                 href="{{ route('pembayarans.index') }}"
@@ -569,19 +485,48 @@
 
                 <div class="menu-card">
 
-                    <div class="menu-icon mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
 
-                        <i class="bi bi-credit-card"></i>
+                        <div class="menu-icon mb-0">
+                            <i class="bi bi-credit-card"></i>
+                        </div>
+
+                        <span class="badge bg-info text-dark rounded-pill fs-6">
+                            {{ $pendingPaymentsCount ?? 0 }}
+                        </span>
 
                     </div>
 
                     <h5 class="fw-bold">
-                        Management Pembayaran
+                        Pembayaran Menunggu
                     </h5>
 
-                    <p class="text-muted mb-0">
-                        Kelola pembayaran pelanggan.
+                    <p class="text-muted mb-3">
+                        Pembayaran yang perlu diverifikasi.
                     </p>
+
+                    @forelse($pendingPayments as $pembayaran)
+
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+
+                            <div>
+                                <div class="fw-semibold">
+                                    {{ $pembayaran->rental->user->name ?? '-' }}
+                                </div>
+                                <small class="text-muted">
+                                    Rp {{ number_format($pembayaran->jumlah ?? 0, 0, ',', '.') }} - {{ $pembayaran->tanggal_bayar?->format('d M Y') }}
+                                </small>
+                            </div>
+
+                        </div>
+
+                    @empty
+
+                        <p class="text-muted mb-0">
+                            Semua beres.
+                        </p>
+
+                    @endforelse
 
                 </div>
 
@@ -590,58 +535,62 @@
         </div>
 
 
-        <div class="col-md-6 col-lg-3">
+        <div class="col-md-6 col-lg-4">
 
             <a
-                href="{{ route('pemeriksaan-kendaraan.index') }}"
+                href="{{ route('pengembalian.index') }}"
                 class="text-decoration-none text-dark"
             >
 
                 <div class="menu-card">
 
-                    <div class="menu-icon mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
 
-                        <i class="bi bi-clipboard-check"></i>
+                        <div class="menu-icon mb-0">
+                            <i class="bi bi-arrow-return-left"></i>
+                        </div>
 
-                    </div>
-
-                    <h5 class="fw-bold">
-                        Pemeriksaan Kendaraan
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Periksa kondisi kendaraan.
-                    </p>
-
-                </div>
-
-            </a>
-
-        </div>
-
-
-        <div class="col-md-6 col-lg-3">
-
-            <a
-                href="{{ route('laporan.index') }}"
-                class="text-decoration-none text-dark"
-            >
-
-                <div class="menu-card">
-
-                    <div class="menu-icon mb-3">
-
-                        <i class="bi bi-file-earmark-bar-graph"></i>
+                        <span class="badge bg-danger rounded-pill fs-6">
+                            {{ $returnDueRentals->count() }}
+                        </span>
 
                     </div>
 
                     <h5 class="fw-bold">
-                        Laporan
+                        Perlu Dikembalikan
                     </h5>
 
-                    <p class="text-muted mb-0">
-                        Lihat laporan RentalKu.
+                    <p class="text-muted mb-3">
+                        Sewa yang harus sudah kembali.
                     </p>
+
+                    @forelse($returnDueRentals as $rental)
+
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+
+                            <div>
+                                <div class="fw-semibold">
+                                    {{ $rental->user->name ?? '-' }}
+                                </div>
+                                <small class="text-muted">
+                                    {{ $rental->mobil->name ?? '-' }} -
+                                    @if($rental->tanggal_selesai?->isToday())
+                                        Hari ini
+                                    @else
+                                        <span class="text-danger">Terlambat {{ $rental->tanggal_selesai?->diffInDays(today()) }} hari</span>
+                                    @endif
+                                </small>
+                            </div>
+
+                        </div>
+
+                    @empty
+
+                        <p class="text-muted mb-0">
+                            Semua beres.
+                        </p>
+
+                    @endforelse
 
                 </div>
 
@@ -763,6 +712,71 @@
             </div>
 
         @endif
+
+    </div>
+
+</section>
+
+
+<section class="mt-5">
+
+    <h3 class="section-title mb-4">
+        Transaksi Terakhir
+    </h3>
+
+    <div class="table-card">
+
+        <div class="table-responsive">
+
+            <table class="table align-middle mb-0">
+
+                <thead>
+                    <tr>
+                        <th>Pelanggan</th>
+                        <th>Mobil</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @forelse($latestRentals as $rental)
+
+                        <tr>
+                            <td>{{ $rental->user->name ?? '-' }}</td>
+                            <td>{{ $rental->mobil->name ?? '-' }}</td>
+                            <td>Rp {{ number_format($rental->total_harga ?? 0, 0, ',', '.') }}</td>
+                            <td>
+                                @if($rental->status === 'Menunggu')
+                                    <span class="badge bg-warning text-dark">Menunggu</span>
+                                @elseif($rental->status === 'Disetujui')
+                                    <span class="badge bg-primary">Disetujui</span>
+                                @elseif($rental->status === 'Ditolak')
+                                    <span class="badge bg-danger">Ditolak</span>
+                                @elseif($rental->status === 'Selesai')
+                                    <span class="badge bg-secondary">Selesai</span>
+                                @else
+                                    <span class="badge bg-dark">{{ $rental->status }}</span>
+                                @endif
+                            </td>
+                        </tr>
+
+                    @empty
+
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                Belum ada transaksi.
+                            </td>
+                        </tr>
+
+                    @endforelse
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 
