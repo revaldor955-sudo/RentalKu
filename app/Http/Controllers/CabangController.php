@@ -7,18 +7,68 @@ use Illuminate\Http\Request;
 
 class CabangController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $cabangs = Cabang::all();
-        return view('cabangs.index', compact('cabangs'));
+        return view('cabangs.index');
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Server-side DataTables: daftar cabang (search, sort, pagination)
      */
+    public function data(Request $request)
+    {
+        $query = Cabang::query();
+
+        $recordsTotal = $query->count();
+
+        $search = $request->input('search.value');
+
+        if ($search) {
+            $query->where('cabangs.name', 'like', "%{$search}%")
+                  ->orWhere('cabangs.address', 'like', "%{$search}%")
+                  ->orWhere('cabangs.phone', 'like', "%{$search}%");
+        }
+
+        $recordsFiltered = $query->count();
+
+        $columns = [
+            0 => null,
+            1 => 'cabangs.name',
+            2 => 'cabangs.address',
+            3 => 'cabangs.phone',
+        ];
+
+        $orderColumn = $request->input('order.0.column', 1);
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
+            $query->orderBy($columns[$orderColumn], $orderDir);
+        } else {
+            $query->orderBy('cabangs.name', 'asc');
+        }
+
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $cabangs = $query->offset($start)->limit($length)->get();
+
+        $data = $cabangs->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'address' => $item->address,
+                'phone' => $item->phone,
+            ];
+        });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
+    }
+
     public function create()
     {
         //
@@ -32,6 +82,7 @@ class CabangController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:20',
         ], [
             'name.required' => 'Nama cabang wajib diisi',
             'address.required' => 'Alamat cabang wajib diisi',
@@ -40,34 +91,32 @@ class CabangController extends Controller
 
         Cabang::create($validated);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Cabang berhasil ditambahkan.',
+            ]);
+        }
+
         return redirect()->route('cabangs.index')
             ->with('success', 'Cabang berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Cabang $cabang)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Cabang $cabang)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Cabang $cabang)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:20',
         ], [
             'name.required' => 'Nama cabang wajib diisi',
             'address.required' => 'Alamat cabang wajib diisi',
@@ -76,16 +125,25 @@ class CabangController extends Controller
 
         $cabang->update($validated);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Cabang berhasil diperbarui.',
+            ]);
+        }
+
         return redirect()->route('cabangs.index')
             ->with('success', 'Cabang berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Cabang $cabang)
+    public function destroy(Request $request, Cabang $cabang)
     {
         $cabang->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Cabang berhasil dihapus.',
+            ]);
+        }
 
         return redirect()->route('cabangs.index')
             ->with('success', 'Cabang berhasil dihapus.');

@@ -7,26 +7,62 @@ use Illuminate\Http\Request;
 
 class MetodePembayaranController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $metodePembayarans = MetodePembayaran::all();
-        return view('metode_pembayarans.index', compact('metodePembayarans'));
+        return view('metode_pembayarans.index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function data(Request $request)
     {
-        //
+        $query = MetodePembayaran::query();
+
+        $recordsTotal = $query->count();
+
+        $search = $request->input('search.value');
+
+        if ($search) {
+            $query->where('metode_pembayarans.name', 'like', "%{$search}%")
+                  ->orWhere('metode_pembayarans.nomor_akun', 'like', "%{$search}%");
+        }
+
+        $recordsFiltered = $query->count();
+
+        $columns = [
+            0 => null,
+            1 => 'metode_pembayarans.name',
+            2 => 'metode_pembayarans.nomor_akun',
+        ];
+
+        $orderColumn = $request->input('order.0.column', 1);
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
+            $query->orderBy($columns[$orderColumn], $orderDir);
+        } else {
+            $query->orderBy('metode_pembayarans.name', 'asc');
+        }
+
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $metodePembayarans = $query->offset($start)->limit($length)->get();
+
+        $data = $metodePembayarans->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'nomor_akun' => $item->nomor_akun,
+            ];
+        });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -39,29 +75,16 @@ class MetodePembayaranController extends Controller
 
         MetodePembayaran::create($validated);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Metode pembayaran berhasil ditambahkan.',
+            ]);
+        }
+
         return redirect()->route('metode_pembayarans.index')
             ->with('success', 'Metode pembayaran berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(MetodePembayaran $metodePembayaran)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(MetodePembayaran $metodePembayaran)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, MetodePembayaran $metodePembayaran)
     {
         $validated = $request->validate([
@@ -74,16 +97,25 @@ class MetodePembayaranController extends Controller
 
         $metodePembayaran->update($validated);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Metode pembayaran berhasil diperbarui.',
+            ]);
+        }
+
         return redirect()->route('metode_pembayarans.index')
             ->with('success', 'Metode pembayaran berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(MetodePembayaran $metodePembayaran)
+    public function destroy(Request $request, MetodePembayaran $metodePembayaran)
     {
         $metodePembayaran->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Metode pembayaran berhasil dihapus.',
+            ]);
+        }
 
         return redirect()->route('metode_pembayarans.index')
             ->with('success', 'Metode pembayaran berhasil dihapus.');

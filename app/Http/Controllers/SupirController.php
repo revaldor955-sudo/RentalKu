@@ -7,26 +7,76 @@ use Illuminate\Http\Request;
 
 class SupirController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $supirs = Supir::all();
-        return view('supirs.index', compact('supirs'));
+        return view('supirs.index');
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Server-side DataTables: daftar supir (search, sort, pagination)
      */
+    public function data(Request $request)
+    {
+        $query = Supir::query();
+
+        $recordsTotal = $query->count();
+
+        $search = $request->input('search.value');
+
+        if ($search) {
+            $query->where('supirs.name', 'like', "%{$search}%")
+                  ->orWhere('supirs.phone', 'like', "%{$search}%");
+        }
+
+        $recordsFiltered = $query->count();
+
+        $columns = [
+            0 => null,
+            1 => 'supirs.name',
+            2 => 'supirs.phone',
+            3 => 'supirs.image',
+            4 => 'supirs.tarif_perhari',
+            5 => 'supirs.status',
+        ];
+
+        $orderColumn = $request->input('order.0.column', 1);
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
+            $query->orderBy($columns[$orderColumn], $orderDir);
+        } else {
+            $query->orderBy('supirs.name', 'asc');
+        }
+
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $supirs = $query->offset($start)->limit($length)->get();
+
+        $data = $supirs->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'phone' => $item->phone,
+                'image' => $item->image,
+                'tarif_perhari' => $item->tarif_perhari,
+                'status' => $item->status,
+            ];
+        });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
+    }
+
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -55,29 +105,26 @@ class SupirController extends Controller
 
         Supir::create($validated);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Supir berhasil ditambahkan.',
+            ]);
+        }
+
         return redirect()->route('supirs.index')
             ->with('success', 'Supir berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Supir $supir)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Supir $supir)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Supir $supir)
     {
         $validated = $request->validate([
@@ -106,16 +153,25 @@ class SupirController extends Controller
 
         $supir->update($validated);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Supir berhasil diperbarui.',
+            ]);
+        }
+
         return redirect()->route('supirs.index')
             ->with('success', 'Supir berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Supir $supir)
+    public function destroy(Request $request, Supir $supir)
     {
         $supir->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Supir berhasil dihapus.',
+            ]);
+        }
 
         return redirect()->route('supirs.index')
             ->with('success', 'Supir berhasil dihapus.');

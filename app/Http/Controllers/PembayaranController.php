@@ -10,17 +10,11 @@ use Illuminate\Support\Facades\Auth;
 
 class PembayaranController extends Controller
 {
-    /**
-     * MANAGEMENT PEMBAYARAN ADMIN
-     */
     public function index()
     {
         return view('admin.pembayaran.index');
     }
 
-    /**
-     * Server-side DataTables: daftar pembayaran (search, sort, pagination)
-     */
     public function data(Request $request)
     {
         $query = Pembayaran::query()
@@ -53,21 +47,29 @@ class PembayaranController extends Controller
         $columns = [
             0 => null,
             1 => 'users.name',
-            2 => 'mobils.name',
-            3 => 'metode_pembayarans.name',
-            4 => 'pembayarans.tanggal_bayar',
-            5 => 'pembayarans.jumlah',
-            6 => null,
+            2 => null,
+            3 => 'mobils.name',
+            4 => 'metode_pembayarans.name',
+            5 => 'pembayarans.tanggal_bayar',
+            6 => 'pembayarans.jumlah',
             7 => 'pembayarans.status',
             8 => null,
         ];
 
-        $orderColumn = $request->input('order.0.column', 4);
-        $orderDir = $request->input('order.0.dir', 'desc');
+        $orders = $request->input('order', [['column' => 5, 'dir' => 'desc']]);
+        $applied = false;
 
-        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
-            $query->orderBy($columns[$orderColumn], $orderDir);
-        } else {
+        foreach ($orders as $o) {
+            $c = $o['column'] ?? null;
+            $d = (($o['dir'] ?? 'asc') === 'desc') ? 'desc' : 'asc';
+
+            if (isset($columns[$c]) && $columns[$c]) {
+                $query->orderBy($columns[$c], $d);
+                $applied = true;
+            }
+        }
+
+        if (! $applied) {
             $query->orderBy('pembayarans.tanggal_bayar', 'desc');
         }
 
@@ -102,6 +104,11 @@ class PembayaranController extends Controller
      */
     public function detail(Pembayaran $pembayaran)
     {
+        // Ownership check: customer hanya bisa lihat pembayaran rental sendiri
+        if (auth()->user()->roles_id === 3 && $pembayaran->rental->user_id !== auth()->id()) {
+            abort(403, 'Anda tidak memiliki akses ke pembayaran ini.');
+        }
+
         $pembayaran->load([
             'rental.user',
             'rental.mobil',
@@ -126,9 +133,6 @@ class PembayaranController extends Controller
         ]);
     }
 
-    /**
-     * FORM PEMBAYARAN CUSTOMER
-     */
     public function create(Rental $rental)
     {
         if ($rental->user_id != Auth::id()) {
@@ -149,9 +153,6 @@ class PembayaranController extends Controller
         ));
     }
 
-    /**
-     * SIMPAN PEMBAYARAN CUSTOMER
-     */
     public function store(Request $request, Rental $rental)
     {
         if ($rental->user_id != Auth::id()) {
@@ -192,11 +193,13 @@ class PembayaranController extends Controller
             ->with('success', 'Bukti pembayaran berhasil dikirim.');
     }
 
-    /**
-     * UPDATE STATUS PEMBAYARAN ADMIN
-     */
     public function updateStatus(Request $request, Pembayaran $pembayaran)
     {
+        // Ownership check: customer tidak boleh update status
+        if (auth()->user()->roles_id === 3) {
+            abort(403, 'Anda tidak memiliki akses untuk mengubah status pembayaran.');
+        }
+
         $validated = $request->validate([
             'status' => 'required|in:Disetujui,Ditolak'
         ]);

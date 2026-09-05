@@ -9,9 +9,6 @@ use Illuminate\Http\Request;
 
 class RentalController extends Controller
 {
-    /**
-     * Simpan pengajuan rental customer
-     */
     public function store(Request $request, Mobil $mobil)
     {
         if ($mobil->status !== 'Tersedia') {
@@ -47,9 +44,7 @@ class RentalController extends Controller
 
         $jumlahHari = $tanggalMulai->diffInDays($tanggalSelesai);
 
-        $hargaRental = $jumlahHari * $mobil->harga_perhari;
-
-        $subtotal = $hargaRental;
+        $subtotal = $jumlahHari * $mobil->harga_perhari;
 
         $deposit = $mobil->deposit;
 
@@ -83,17 +78,11 @@ class RentalController extends Controller
             ->with('success', 'Pengajuan sewa mobil berhasil dibuat.');
     }
 
-    /**
-     * Menampilkan semua rental untuk Admin
-     */
     public function index()
     {
         return view('admin.rentals.index');
     }
 
-    /**
-     * Server-side DataTables: daftar rental (search, sort, pagination)
-     */
     public function data(Request $request)
     {
         $query = Rental::query()
@@ -180,6 +169,11 @@ class RentalController extends Controller
      */
     public function detail(Rental $rental)
     {
+        // Ownership check: customer hanya bisa lihat rental sendiri
+        if (auth()->user()->roles_id === 3 && $rental->user_id !== auth()->id()) {
+            abort(403, 'Anda tidak memiliki akses ke rental ini.');
+        }
+
         $rental->load([
             'user',
             'mobil',
@@ -208,11 +202,13 @@ class RentalController extends Controller
         ]);
     }
 
-    /**
-     * Update status rental oleh Admin
-     */
     public function updateStatus(Request $request, Rental $rental)
     {
+        // Ownership check: customer tidak boleh update status rental
+        if (auth()->user()->roles_id === 3) {
+            abort(403, 'Anda tidak memiliki akses untuk mengubah status rental.');
+        }
+
         $request->validate([
             'status' => 'required|in:Disetujui,Ditolak,Selesai',
         ]);
@@ -242,7 +238,6 @@ class RentalController extends Controller
                 'message' => 'Rental berhasil disetujui. Mobil sekarang berstatus "Disewa".',
             ]);
         }
-
 
         if ($status === 'Selesai') {
             $rental->update(['status' => 'Selesai']);
