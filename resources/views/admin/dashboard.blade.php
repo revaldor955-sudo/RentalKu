@@ -202,7 +202,7 @@
 <body>
 
 {{-- Sidebar Layout --}}
-@include('layouts.partials.admin-sidebar')
+@include('layouts.partials.sidebar')
 
 <script>
     // Inject navbar into sidebar layout
@@ -753,22 +753,13 @@
 
 {{-- Footer --}}
 <footer class="bg-white border-top py-4 mt-auto">
-    <div class="container-fluid px-4">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="fw-bold">
-                    Rental<span class="text-success">ku</span>.
-                </div>
-                <small class="text-muted">
-                    Administrator Dashboard
-                </small>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <small class="text-muted">
-                    &copy; {{ date('Y') }} RentalKu. All rights reserved.
-                </small>
-            </div>
+    <div class="container-fluid px-4 text-center">
+        <div class="fw-bold">
+            Rental<span class="text-success">ku</span>.
         </div>
+        <small class="text-muted">
+            Administrator Dashboard &copy; {{ date('Y') }} RentalKu. All rights reserved.
+        </small>
     </div>
 </footer>
 

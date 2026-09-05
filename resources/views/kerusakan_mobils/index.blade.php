@@ -67,6 +67,7 @@
             text-transform: uppercase;
             white-space: nowrap;
             border-bottom: 1px solid #e9ecef;
+            padding: 12px 16px;
         }
 
         .table tbody td {
@@ -128,7 +129,7 @@
 
 <body>
 
-@include('layouts.partials.admin-sidebar')
+@include('layouts.partials.sidebar')
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -146,7 +147,7 @@
 
 <div class="page-content">
 
-<div class="container py-4">
+<div class="container-fluid px-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
 

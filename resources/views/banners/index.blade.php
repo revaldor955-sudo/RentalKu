@@ -147,7 +147,7 @@
 
 <body>
 
-@include('layouts.partials.admin-sidebar')
+@include('layouts.partials.sidebar')
 
 <script>
     // Inject navbar into sidebar layout
@@ -166,7 +166,7 @@
 
 <div class="page-content">
 
-<div class="container py-4">
+<div class="container-fluid px-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>

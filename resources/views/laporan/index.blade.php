@@ -97,6 +97,16 @@
 
         }
 
+        .table thead th {
+            background: #f8faf9;
+            color: #6c757d;
+            font-size: 12px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            border-bottom: 1px solid #e9ecef;
+            padding: 12px 16px;
+        }
+
         /* Sidebar layout base styles are in admin-sidebar.blade.php */
 
         .page-content {
@@ -115,7 +125,7 @@
 <body>
 
 {{-- Sidebar Layout --}}
-@include('layouts.partials.admin-sidebar')
+@include('layouts.partials.sidebar')
 
 <script>
     // Inject navbar into sidebar layout
@@ -135,7 +145,7 @@
 {{-- Page Content --}}
 <div class="page-content">
 
-<div class="container py-5">
+<div class="container-fluid px-4">
 
     {{-- Kop laporan khusus cetak --}}
     <div class="print-header">

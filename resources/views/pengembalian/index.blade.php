@@ -50,6 +50,16 @@
             white-space: nowrap;
         }
 
+        .table thead th {
+            background: #f8faf9;
+            color: #6c757d;
+            font-size: 12px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            border-bottom: 1px solid #e9ecef;
+            padding: 12px 16px;
+        }
+
         /* Sembunyikan ikon sort di semua kolom */
         #pengembalian-table thead .dt-column-order {
             display: none !important;
@@ -72,7 +82,7 @@
 <body>
 
 {{-- Sidebar Layout --}}
-@include('layouts.partials.admin-sidebar')
+@include('layouts.partials.sidebar')
 
 <script>
     // Inject navbar into sidebar layout
@@ -92,7 +102,7 @@
 {{-- Page Content --}}
 <div class="page-content">
 
-<div class="container py-4">
+<div class="container-fluid px-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
 

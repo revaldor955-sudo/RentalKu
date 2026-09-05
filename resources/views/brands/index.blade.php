@@ -140,7 +140,7 @@
 
 <body>
 
-@include('layouts.partials.admin-sidebar')
+@include('layouts.partials.sidebar')
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

@@ -64,11 +64,12 @@
             font-size: 12px;
             text-transform: uppercase;
             white-space: nowrap;
-            border-bottom: 1px solid #e9ecef.
+            border-bottom: 1px solid #e9ecef;
+            padding: 12px 16px;
         }
 
         .table tbody td {
-            vertical-align: middle.
+            vertical-align: middle;
         }
 
         #cabangs-table thead .dt-column-order {
@@ -76,14 +77,14 @@
         }
 
         .modal-footer .btn {
-            padding: 6px 14px.
-            min-width: 100px.
+            padding: 6px 14px;
+            min-width: 100px;
         }
 
         .modal-content {
-            border: none.
-            border-radius: 18px.
-            overflow: hidden.
+            border: none;
+            border-radius: 18px;
+            overflow: hidden;
         }
 
         .modal-header {
@@ -94,12 +95,12 @@
         /* Sidebar layout base styles are in admin-sidebar.blade.php */
 
         .page-content {
-            padding: 24px.
+            padding: 24px;
         }
 
         @media (max-width: 1024px) {
             .page-content {
-                padding: 16px.
+                padding: 16px;
             }
         }
     </style>
@@ -107,7 +108,7 @@
 
 <body>
 
-@include('layouts.partials.admin-sidebar')
+@include('layouts.partials.sidebar')
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -125,7 +126,7 @@
 
 <div class="page-content">
 
-<div class="container py-4">
+<div class="container-fluid px-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
 
