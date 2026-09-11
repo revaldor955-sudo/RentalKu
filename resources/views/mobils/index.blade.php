@@ -229,11 +229,12 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
 
-{{-- Sidebar Layout --}}
 @include('layouts.partials.sidebar')
 
 <script>
@@ -251,7 +252,6 @@
     });
 </script>
 
-{{-- Page Content --}}
 <div class="page-content">
 
 <div class="container-fluid px-4">
@@ -545,13 +545,7 @@
     <div class="modal fade" id="fotoMobilModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold">Foto Mobil</h5>
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Tutup"></button>
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Foto Mobil'])
                 <div class="modal-body p-3 text-center">
                     <img id="fotoMobilPreview" src="" class="img-fluid rounded" alt="Foto mobil">
                 </div>
@@ -568,19 +562,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title" id="tambahMobilModalLabel">
-                        <i class="bi bi-plus-circle text-success me-2"></i>
-                        Tambah Mobil
-                    </h5>
-
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Tutup"></button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Tambah Mobil', 'icon' => 'bi-plus-circle', 'titleId' => 'tambahMobilModalLabel'])
 
                 <div class="modal-body">
 
@@ -982,19 +964,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title" id="editMobilModalLabel">
-                        <i class="bi bi-pencil-square text-primary me-2"></i>
-                        Edit Mobil
-                    </h5>
-
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Tutup"></button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Edit Mobil', 'icon' => 'bi-pencil-square', 'titleId' => 'editMobilModalLabel'])
 
                 <div class="modal-body">
 

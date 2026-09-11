@@ -60,7 +60,6 @@
             padding: 12px 16px;
         }
 
-        /* Sembunyikan ikon sort di semua kolom */
         #pemeriksaan-table thead .dt-column-order {
             display: none !important;
         }
@@ -106,8 +105,6 @@
             color: white;
         }
 
-        /* Sidebar layout base styles are in admin-sidebar.blade.php */
-
         .page-content {
             padding: 24px;
         }
@@ -118,11 +115,12 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
 
-{{-- Sidebar Layout --}}
 @include('layouts.partials.sidebar')
 
 <script>
@@ -140,7 +138,6 @@
     });
 </script>
 
-{{-- Page Content --}}
 <div class="page-content">
 
 <div class="container-fluid px-4">
@@ -220,7 +217,6 @@
                     </thead>
 
                     <tbody>
-                        {{-- Diisi oleh DataTables (server-side) --}}
                     </tbody>
 
                 </table>
@@ -234,23 +230,13 @@
 </div>
 
 
-{{-- MODAL TAMBAH/EDIT --}}
 <div class="modal fade" id="pemeriksaanModal" tabindex="-1" aria-labelledby="pemeriksaanModalLabel" aria-hidden="true">
 
     <div class="modal-dialog modal-lg modal-dialog-centered">
 
         <div class="modal-content">
 
-            <div class="modal-header bg-success text-white">
-
-                <h5 class="modal-title" id="pemeriksaanModalLabel">
-                    <i class="bi bi-clipboard-check me-2"></i>
-                    Tambah Pemeriksaan
-                </h5>
-
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
-
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Tambah Pemeriksaan', 'icon' => 'bi-clipboard-check', 'titleId' => 'pemeriksaanModalLabel'])
 
             <form id="formPemeriksaan">
 
@@ -462,12 +448,11 @@
         $('#formPemeriksaan')[0].reset();
         $('#pemeriksaanId').val('');
         $('.kerusakan-keterangan').prop('disabled', true);
-        $('#fotoBukti').val('');
     }
 
     function openTambahModal() {
         resetForm();
-        $('#pemeriksaanModalLabel').text('Tambah Pemeriksaan');
+        $('#pemeriksaanModalLabel').html('<i class="bi bi-clipboard-check me-2"></i>Tambah Pemeriksaan');
         bootstrap.Modal.getOrCreateInstance($('#pemeriksaanModal')[0]).show();
     }
 
@@ -476,7 +461,7 @@
         if (!row) return;
 
         resetForm();
-        $('#pemeriksaanModalLabel').text('Edit Pemeriksaan');
+        $('#pemeriksaanModalLabel').html('<i class="bi bi-clipboard-check me-2"></i>Edit Pemeriksaan');
         $('#pemeriksaanId').val(row.id);
         $('#rentalId').val(row.rental_id);
         $('#jenis').val(row.jenis);
@@ -539,7 +524,6 @@
         });
     }
 
-    // Aktifkan input keterangan saat checkbox dicentang
     $(document).on('change', '.kerusakan-check', function() {
         $(this).closest('.form-check').find('.kerusakan-keterangan')
             .prop('disabled', !this.checked);
@@ -698,7 +682,6 @@
                 info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
                 infoEmpty: 'Tidak ada data',
                 infoFiltered: '(difilter dari _MAX_ total data)',
-                infoPostFix: '',
                 loadingRecords: 'Memuat...',
                 zeroRecords: 'Tidak ditemukan data yang cocok',
                 emptyTable: 'Belum ada pemeriksaan',

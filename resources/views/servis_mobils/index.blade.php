@@ -74,7 +74,6 @@
             vertical-align: middle;
         }
 
-        /* Sembunyikan ikon sort di semua kolom */
         #servisMobils-table thead .dt-column-order {
             display: none !important;
         }
@@ -100,11 +99,6 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
-
         /* Sidebar layout base styles are in admin-sidebar.blade.php */
 
         .page-content {
@@ -117,6 +111,8 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
@@ -293,20 +289,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-plus-circle text-success me-2"></i>
-                        Tambah Servis Mobil
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Tambah Servis Mobil', 'icon' => 'bi-plus-circle'])
 
                 <form
                     action="{{ route('servis_mobils.store') }}"
@@ -431,20 +414,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-pencil-square text-primary me-2"></i>
-                        Edit Servis Mobil
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Edit Servis Mobil', 'icon' => 'bi-pencil-square'])
 
                 <form
                     action=""
@@ -643,9 +613,7 @@
                     data: 'jenis',
                     orderable: true,
                     searchable: true,
-                    render: function(data) {
-                        return jenisBadge(data);
-                    },
+                    render: jenisBadge,
                 },
                 {
                     data: 'biaya',

@@ -108,13 +108,6 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
-
-        /* Sidebar layout base styles are in admin-sidebar.blade.php */
-
         .page-content {
             padding: 24px;
         }
@@ -125,6 +118,8 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
@@ -285,20 +280,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-plus-circle text-success me-2"></i>
-                        Tambah Kerusakan Mobil
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Tambah Kerusakan Mobil', 'icon' => 'bi-plus-circle'])
 
                 <form
                     action="{{ route('kerusakan_mobils.store') }}"
@@ -354,7 +336,6 @@
 
                         <button
                             type="submit"
-                            form="formTambahKerusakanMobil"
                             class="btn btn-green">
 
                             <i class="bi bi-save me-1"></i>
@@ -382,20 +363,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-pencil-square text-primary me-2"></i>
-                        Edit Kerusakan Mobil
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Edit Kerusakan Mobil', 'icon' => 'bi-pencil-square'])
 
                 <form
                     action=""
@@ -452,7 +420,6 @@
 
                         <button
                             type="submit"
-                            form="formEditKerusakanMobil"
                             class="btn btn-green">
 
                             <i class="bi bi-save me-1"></i>
@@ -584,7 +551,6 @@
                 info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
                 infoEmpty: 'Tidak ada data',
                 infoFiltered: '(difilter dari _MAX_ total data)',
-                infoPostFix: '',
                 loadingRecords: 'Memuat...',
                 zeroRecords: 'Tidak ditemukan data yang cocok',
                 emptyTable: 'Belum ada jenis kerusakan',

@@ -105,7 +105,7 @@ class DendaController extends Controller
             'nominal' => 'required|numeric|min:0',
             'foto_bukti' => 'nullable|mimes:jpeg,png,jpg|max:2048',
             'syarat_dan_ketentuan' => 'nullable|string',
-            'status' => 'required|in:belum bayar,lunas',
+            'status' => 'required|in:belum bayar,lunas,menunggu verifikasi',
         ], [
             'rental_id.required' => 'Rental wajib dipilih',
             'jenis.required' => 'Jenis denda wajib dipilih',
@@ -143,7 +143,7 @@ class DendaController extends Controller
             'nominal' => 'required|numeric|min:0',
             'foto_bukti' => 'nullable|mimes:jpeg,png,jpg|max:2048',
             'syarat_dan_ketentuan' => 'nullable|string',
-            'status' => 'required|in:belum bayar,lunas',
+            'status' => 'required|in:belum bayar,lunas,menunggu verifikasi',
         ], [
             'rental_id.required' => 'Rental wajib dipilih',
             'jenis.required' => 'Jenis denda wajib dipilih',
@@ -185,5 +185,70 @@ class DendaController extends Controller
 
         return redirect()->route('dendas.index')
             ->with('success', 'Denda berhasil dihapus.');
+    }
+
+    public function customerBayar(Request $request, Denda $denda)
+    {
+        $denda->load('rental');
+
+        if ($denda->rental->user_id != auth()->id()) {
+            abort(403, 'Anda tidak memiliki akses ke denda ini.');
+        }
+
+        $validated = $request->validate([
+            'bukti_bayar' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'tanggal_bayar' => 'required|date',
+        ], [
+            'bukti_bayar.required' => 'Bukti pembayaran denda wajib diupload.',
+            'bukti_bayar.image' => 'File bukti harus berupa gambar.',
+            'bukti_bayar.mimes' => 'Bukti harus berformat JPG, JPEG, atau PNG.',
+            'bukti_bayar.max' => 'Ukuran bukti maksimal 2 MB.',
+            'tanggal_bayar.required' => 'Tanggal pembayaran wajib diisi.',
+            'tanggal_bayar.date' => 'Tanggal pembayaran tidak valid.',
+        ]);
+
+        $path = $request->file('bukti_bayar')->store('bukti_denda', 'public');
+
+        $denda->update([
+            'bukti_bayar' => $path,
+            'tanggal_bayar' => $validated['tanggal_bayar'],
+            'status' => 'menunggu verifikasi',
+        ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Bukti pembayaran denda berhasil dikirim.',
+            ]);
+        }
+
+        return redirect()->route('customer.dashboard')
+            ->with('success', 'Bukti pembayaran denda berhasil dikirim.');
+    }
+
+    public function updateStatus(Request $request, Denda $denda)
+    {
+        if (auth()->user()->roles_id === 3) {
+            abort(403, 'Anda tidak memiliki akses untuk mengubah status denda.');
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|in:belum bayar,lunas,menunggu verifikasi',
+        ], [
+            'status.required' => 'Status wajib dipilih.',
+            'status.in' => 'Status tidak valid.',
+        ]);
+
+        $denda->update([
+            'status' => $validated['status'],
+        ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Status denda berhasil diperbarui menjadi ' . $validated['status'] . '.',
+            ]);
+        }
+
+        return redirect()->back()
+            ->with('success', 'Status denda berhasil diperbarui menjadi ' . $validated['status'] . '.');
     }
 }

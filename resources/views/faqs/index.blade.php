@@ -89,13 +89,6 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
-
-        /* Sidebar layout base styles are in admin-sidebar.blade.php */
-
         .page-content {
             padding: 24px;
         }
@@ -106,6 +99,8 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
@@ -113,7 +108,6 @@
 @include('layouts.partials.sidebar')
 
 <script>
-    // Inject navbar into sidebar layout
     document.addEventListener('DOMContentLoaded', function() {
         const mainContent = document.getElementById('mainContent');
         const pageContent = mainContent?.querySelector('.page-content');
@@ -144,20 +138,16 @@
 
         </div>
 
-        <div class="d-flex gap-2">
+        <button
+            type="button"
+            class="btn btn-green"
+            data-bs-toggle="modal"
+            data-bs-target="#tambahFaqModal">
 
-            <button
-                type="button"
-                class="btn btn-green"
-                data-bs-toggle="modal"
-                data-bs-target="#tambahFaqModal">
+            <i class="bi bi-plus-circle me-1"></i>
+            Tambah FAQ
 
-                <i class="bi bi-plus-circle me-1"></i>
-                Tambah FAQ
-
-            </button>
-
-        </div>
+        </button>
 
     </div>
 
@@ -272,20 +262,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-plus-circle text-success me-2"></i>
-                        Tambah FAQ
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Tambah FAQ', 'icon' => 'bi-plus-circle'])
 
                 <form
                     action="{{ route('faqs.store') }}"
@@ -373,20 +350,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-pencil-square text-primary me-2"></i>
-                        Edit FAQ
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Edit FAQ', 'icon' => 'bi-pencil-square'])
 
                 <form
                     action=""

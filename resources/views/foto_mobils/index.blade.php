@@ -97,13 +97,6 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
-
-        /* Sidebar layout base styles are in admin-sidebar.blade.php */
-
         .page-content {
             padding: 24px;
         }
@@ -114,6 +107,8 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
@@ -268,10 +263,7 @@
     <div class="modal fade" id="fotoMobilModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold">Foto Mobil</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Foto Mobil'])
                 <div class="modal-body p-3 text-center">
                     <img id="fotoMobilPreview" src="" class="img-fluid rounded" alt="Foto mobil">
                 </div>
@@ -288,20 +280,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-plus-circle text-success me-2"></i>
-                        Tambah Foto Mobil
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Tambah Foto Mobil', 'icon' => 'bi-plus-circle'])
 
                 <form
                     action="{{ route('foto_mobils.store') }}"
@@ -355,7 +334,6 @@
 
                         <button
                             type="submit"
-                            form="formTambahFotoMobil"
                             class="btn btn-green">
 
                             <i class="bi bi-save me-1"></i>
@@ -383,20 +361,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-pencil-square text-primary me-2"></i>
-                        Edit Foto Mobil
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Edit Foto Mobil', 'icon' => 'bi-pencil-square'])
 
                 <form
                     action=""
@@ -458,7 +423,6 @@
 
                         <button
                             type="submit"
-                            form="formEditFotoMobil"
                             class="btn btn-green">
 
                             <i class="bi bi-save me-1"></i>
@@ -583,7 +547,6 @@
                 info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
                 infoEmpty: 'Tidak ada data',
                 infoFiltered: '(difilter dari _MAX_ total data)',
-                infoPostFix: '',
                 loadingRecords: 'Memuat...',
                 zeroRecords: 'Tidak ditemukan data yang cocok',
                 emptyTable: 'Belum ada foto mobil',

@@ -123,15 +123,6 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
-
-        .modal-header .btn-close {
-            filter: brightness(0) invert(1);
-        }
-
         .page-content {
             padding: 24px;
         }
@@ -146,6 +137,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
@@ -261,20 +254,7 @@
 
         <div class="modal-content">
 
-            <div class="modal-header">
-
-                <h5 class="modal-title">
-                    <i class="bi bi-ticket-perforated me-2"></i>
-                    Tambah Promo
-                </h5>
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                ></button>
-
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Tambah Promo', 'icon' => 'bi-ticket-perforated'])
 
             <form
                 action="{{ route('kupons.store') }}"
@@ -462,20 +442,7 @@
 
         <div class="modal-content">
 
-            <div class="modal-header">
-
-                <h5 class="modal-title">
-                    <i class="bi bi-pencil-square me-2"></i>
-                    Edit Promo
-                </h5>
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                ></button>
-
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Edit Promo', 'icon' => 'bi-pencil-square'])
 
             <form
                 action=""

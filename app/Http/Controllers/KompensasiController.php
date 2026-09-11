@@ -8,17 +8,11 @@ use Illuminate\Http\Request;
 
 class KompensasiController extends Controller
 {
-    /**
-     * Display a listing of the resource (Admin/Staff view).
-     */
     public function index()
     {
         return view('kompensasis.index');
     }
 
-    /**
-     * Server-side DataTables: daftar kompensasi (search, sort, pagination)
-     */
     public function data(Request $request)
     {
         $query = Kompensasi::query()
@@ -104,9 +98,6 @@ class KompensasiController extends Controller
         ]);
     }
 
-    /**
-     * Customer submits a claim (diajukan).
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -135,6 +126,23 @@ class KompensasiController extends Controller
         if (! $rental) {
             abort(403, 'Rental ini bukan milik Anda.');
         }
+
+        // Satu rental hanya boleh punya satu klaim aktif (klaim ditolak boleh diajukan ulang).
+        $klaimAktif = Kompensasi::where('rental_id', $validated['rental_id'])
+            ->whereIn('status', ['diajukan', 'disetujui'])
+            ->exists();
+        if ($klaimAktif) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Rental ini sudah memiliki klaim aktif.',
+                    'errors' => ['rental_id' => ['Rental ini sudah memiliki klaim aktif.']],
+                ], 422);
+            }
+
+            return back()
+                ->withErrors(['rental_id' => 'Rental ini sudah memiliki klaim aktif.'])
+                ->withInput();
+        }
         $validated['mobil_id'] = $rental->mobil_id;
 
         Kompensasi::create($validated);
@@ -149,9 +157,6 @@ class KompensasiController extends Controller
             ->with('success', 'Klaim kompensasi berhasil diajukan.');
     }
 
-    /**
-     * Update the specified resource in storage (Admin/Staff approval).
-     */
     public function update(Request $request, Kompensasi $kompensasi)
     {
         $validated = $request->validate([
@@ -162,6 +167,9 @@ class KompensasiController extends Controller
         ]);
 
         $validated['staff_id'] = auth()->id();
+
+        // Keputusan baru = belum dibaca customer.
+        $validated['dibaca_at'] = null;
 
         $kompensasi->update($validated);
 
@@ -175,9 +183,6 @@ class KompensasiController extends Controller
             ->with('success', 'Kompensasi berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Request $request, Kompensasi $kompensasi)
     {
         $kompensasi->delete();
@@ -192,17 +197,27 @@ class KompensasiController extends Controller
             ->with('success', 'Kompensasi berhasil dihapus.');
     }
 
-    /**
-     * Customer's kompensasi list.
-     */
     public function customerIndex()
     {
-        return view('kompensasis.customer-index');
+        // Tandai update status klaim sebagai sudah dibaca saat halaman dibuka.
+        Kompensasi::where('customer_id', auth()->id())
+            ->whereNull('dibaca_at')
+            ->update(['dibaca_at' => now()]);
+
+        $rentals = Rental::with('mobil')
+            ->where('user_id', auth()->id())
+            ->where('status', 'Selesai')
+            ->whereNotExists(function ($query) {
+                $query->selectRaw('1')
+                    ->from('kompensasis')
+                    ->whereColumn('kompensasis.rental_id', 'rentals.id')
+                    ->whereIn('kompensasis.status', ['diajukan', 'disetujui']);
+            })
+            ->get();
+
+        return view('kompensasis.customer-index', compact('rentals'));
     }
 
-    /**
-     * Server-side DataTables for customer's kompensasi.
-     */
     public function customerData(Request $request)
     {
         $query = Kompensasi::query()
@@ -274,15 +289,11 @@ class KompensasiController extends Controller
     }
 
     /**
-     * Customer create claim page.
+     * Customer create claim page — retired: single flow via index popup.
+     * Kept as redirect for old links/bookmarks.
      */
     public function customerCreate()
     {
-        $rentals = Rental::with('mobil')
-            ->where('user_id', auth()->id())
-            ->where('status', 'Selesai')
-            ->get();
-
-        return view('kompensasis.customer-create', compact('rentals'));
+        return redirect()->route('customer.kompensasi.index', ['baru' => 1]);
     }
 }

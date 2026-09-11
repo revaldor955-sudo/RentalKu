@@ -112,13 +112,6 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
-
-        /* Sidebar layout base styles are in admin-sidebar.blade.php */
-
         .page-content {
             padding: 24px;
         }
@@ -129,6 +122,8 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
@@ -136,7 +131,6 @@
 @include('layouts.partials.sidebar')
 
 <script>
-    // Inject navbar into sidebar layout
     document.addEventListener('DOMContentLoaded', function() {
         const mainContent = document.getElementById('mainContent');
         const pageContent = mainContent?.querySelector('.page-content');
@@ -256,20 +250,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-plus-circle text-success me-2"></i>
-                        Tambah Role
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Tambah Role', 'icon' => 'bi-plus-circle'])
 
                 <form
                     action="{{ route('roles.store') }}"
@@ -344,20 +325,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-pencil-square text-primary me-2"></i>
-                        Edit Role
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Edit Role', 'icon' => 'bi-pencil-square'])
 
                 <form
                     action=""

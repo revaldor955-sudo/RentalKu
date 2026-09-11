@@ -87,13 +87,6 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
-
-        /* Sidebar layout base styles are in admin-sidebar.blade.php */
-
         .page-content {
             padding: 24px;
         }
@@ -104,6 +97,8 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
@@ -268,20 +263,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-plus-circle text-success me-2"></i>
-                        Tambah Cabang
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Tambah Cabang', 'icon' => 'bi-plus-circle'])
 
                 <form
                     action="{{ route('cabangs.store') }}"
@@ -340,7 +322,6 @@
 
                         <button
                             type="submit"
-                            form="formTambahCabang"
                             class="btn btn-green">
 
                             <i class="bi bi-save me-1"></i>
@@ -368,20 +349,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-pencil-square text-primary me-2"></i>
-                        Edit Cabang
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Edit Cabang', 'icon' => 'bi-pencil-square'])
 
                 <form
                     action=""
@@ -444,7 +412,6 @@
 
                         <button
                             type="submit"
-                            form="formEditCabang"
                             class="btn btn-green">
 
                             <i class="bi bi-save me-1"></i>
@@ -521,9 +488,6 @@
                     data: 'address',
                     orderable: true,
                     searchable: true,
-                    render: function(data) {
-                        return data;
-                    },
                 },
                 {
                     data: 'phone',
@@ -564,7 +528,6 @@
                 info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
                 infoEmpty: 'Tidak ada data',
                 infoFiltered: '(difilter dari _MAX_ total data)',
-                infoPostFix: '',
                 loadingRecords: 'Memuat...',
                 zeroRecords: 'Tidak ditemukan data yang cocok',
                 emptyTable: 'Belum ada cabang',

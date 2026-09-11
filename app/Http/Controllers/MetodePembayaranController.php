@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cabang;
 use App\Models\MetodePembayaran;
 use Illuminate\Http\Request;
 
@@ -9,20 +10,38 @@ class MetodePembayaranController extends Controller
 {
     public function index()
     {
-        return view('metode_pembayarans.index');
+        $cabangs = Cabang::orderBy('name')->get();
+
+        return view('metode_pembayarans.index', compact('cabangs'));
     }
 
     public function data(Request $request)
     {
-        $query = MetodePembayaran::query();
+        $query = MetodePembayaran::query()
+            ->leftJoin('cabangs', 'metode_pembayarans.cabang_id', '=', 'cabangs.id')
+            ->select('metode_pembayarans.*')
+            ->with('cabang');
 
         $recordsTotal = $query->count();
+
+        // Filter pemilik rekening: id cabang, 'pusat', atau semua bila kosong.
+        $cabangFilter = $request->input('cabang_id');
+
+        if ($cabangFilter === 'pusat') {
+            $query->whereNull('metode_pembayarans.cabang_id');
+        } elseif ($cabangFilter !== null && $cabangFilter !== '') {
+            $query->where('metode_pembayarans.cabang_id', $cabangFilter);
+        }
 
         $search = $request->input('search.value');
 
         if ($search) {
-            $query->where('metode_pembayarans.name', 'like', "%{$search}%")
-                  ->orWhere('metode_pembayarans.nomor_akun', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('metode_pembayarans.name', 'like', "%{$search}%")
+                  ->orWhere('metode_pembayarans.nomor_akun', 'like', "%{$search}%")
+                  ->orWhere('metode_pembayarans.atas_nama', 'like', "%{$search}%")
+                  ->orWhere('cabangs.name', 'like', "%{$search}%");
+            });
         }
 
         $recordsFiltered = $query->count();
@@ -31,6 +50,8 @@ class MetodePembayaranController extends Controller
             0 => null,
             1 => 'metode_pembayarans.name',
             2 => 'metode_pembayarans.nomor_akun',
+            3 => 'cabangs.name',
+            4 => 'metode_pembayarans.atas_nama',
         ];
 
         $orderColumn = $request->input('order.0.column', 1);
@@ -52,6 +73,9 @@ class MetodePembayaranController extends Controller
                 'id' => $item->id,
                 'name' => $item->name,
                 'nomor_akun' => $item->nomor_akun,
+                'cabang_id' => $item->cabang_id,
+                'cabang_name' => $item->cabang->name ?? 'Pusat',
+                'atas_nama' => $item->atas_nama ?? '-',
             ];
         });
 
@@ -68,9 +92,12 @@ class MetodePembayaranController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'nomor_akun' => 'required|string|max:255',
+            'cabang_id' => 'nullable|exists:cabangs,id',
+            'atas_nama' => 'nullable|string|max:255',
         ], [
             'name.required' => 'Nama metode pembayaran wajib diisi',
             'nomor_akun.required' => 'Nomor akun wajib diisi',
+            'cabang_id.exists' => 'Cabang tidak valid.',
         ]);
 
         MetodePembayaran::create($validated);
@@ -90,9 +117,12 @@ class MetodePembayaranController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'nomor_akun' => 'required|string|max:255',
+            'cabang_id' => 'nullable|exists:cabangs,id',
+            'atas_nama' => 'nullable|string|max:255',
         ], [
             'name.required' => 'Nama metode pembayaran wajib diisi',
             'nomor_akun.required' => 'Nomor akun wajib diisi',
+            'cabang_id.exists' => 'Cabang tidak valid.',
         ]);
 
         $metodePembayaran->update($validated);

@@ -20,7 +20,6 @@
             background: #f5f7f6;
             font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
             color: #1f2937;
-            margin: 0;
         }
 
         .page-card {
@@ -70,7 +69,6 @@
             vertical-align: middle;
         }
 
-        /* Sembunyikan ikon sort di semua kolom */
         #dendas-table thead .dt-column-order {
             display: none !important;
         }
@@ -116,11 +114,6 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
-
         /* Sidebar layout base styles are in admin-sidebar.blade.php */
 
         .page-content {
@@ -133,6 +126,8 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
@@ -285,20 +280,7 @@
 
         <div class="modal-content">
 
-            <div class="modal-header">
-
-                <h5 class="modal-title fw-bold">
-                    <i class="bi bi-plus-circle text-success me-2"></i>
-                    Tambah Denda
-                </h5>
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal">
-                </button>
-
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Tambah Denda', 'icon' => 'bi-plus-circle'])
 
             <form
                 action="{{ route('dendas.store') }}"
@@ -424,20 +406,7 @@
 
         <div class="modal-content">
 
-            <div class="modal-header">
-
-                <h5 class="modal-title fw-bold">
-                    <i class="bi bi-pencil-square text-primary me-2"></i>
-                    Edit Denda
-                </h5>
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal">
-                </button>
-
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Edit Denda', 'icon' => 'bi-pencil-square'])
 
             <form
                 action=""
@@ -566,10 +535,7 @@
 <div class="modal fade" id="fotoDendaModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Bukti Foto Denda</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Bukti Foto Denda'])
             <div class="modal-body p-3 text-center">
                 <img id="fotoDendaPreview" src="" class="img-fluid rounded" alt="Bukti denda">
             </div>

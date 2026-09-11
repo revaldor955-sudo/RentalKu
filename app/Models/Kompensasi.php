@@ -19,6 +19,7 @@ class Kompensasi extends Model
         'tanggal',
         'status',
         'catatan',
+        'dibaca_at',
     ];
 
     protected $casts = [

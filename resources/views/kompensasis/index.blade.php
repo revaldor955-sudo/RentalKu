@@ -74,7 +74,7 @@
             vertical-align: middle;
         }
 
-        /* Sembunyikan ikon sort di semua kolom */
+        /* Sort DataTables disembunyikan: server-side diurut via kolom Status (order) */
         #kompensasis-table thead .dt-column-order {
             display: none !important;
         }
@@ -106,11 +106,6 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
-
         /* Sidebar layout base styles are in admin-sidebar.blade.php */
 
         .page-content {
@@ -123,6 +118,8 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
@@ -132,34 +129,20 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const mainContent = document.getElementById('mainContent');
-        const pageContent = mainContent?.querySelector('.page-content');
-
-        if (mainContent && pageContent) {
-            const navbar = document.querySelector('header.topbar');
-            if (navbar) {
-                mainContent.insertBefore(navbar, pageContent);
-            }
-        }
+        if (!mainContent) return;
+        const pageContent = mainContent.querySelector('.page-content');
+        const navbar = document.querySelector('header.topbar');
+        if (pageContent && navbar) mainContent.insertBefore(navbar, pageContent);
     });
 </script>
 
 <div class="page-content">
-
 <div class="container-fluid px-4">
-
     <div class="d-flex justify-content-between align-items-center mb-4">
-
         <div>
-            <h2 class="page-title mb-1">
-                Management Kompensasi
-            </h2>
-
-            <p class="text-muted mb-0">
-                Kelola klaim kompensasi pelanggan (pengembalian dana, diskon, gratis sewa).
-            </p>
-
+            <h2 class="page-title mb-1">Management Kompensasi</h2>
+            <p class="text-muted mb-0">Kelola klaim kompensasi pelanggan (pengembalian dana, diskon, gratis sewa).</p>
         </div>
-
     </div>
 
 
@@ -169,122 +152,48 @@
 
 
     @if($errors->any())
-
         <div class="alert alert-danger mb-4">
-
-            <strong>
-                Terdapat kesalahan:
-            </strong>
-
+            <strong>Terdapat kesalahan:</strong>
             <ul class="mb-0 mt-2">
-
                 @foreach($errors->all() as $error)
-
                     <li>{{ $error }}</li>
-
                 @endforeach
-
             </ul>
-
         </div>
-
     @endif
 
 
     <div class="row g-4">
-
         <div class="col-lg-12">
-
             <div class="page-card">
-
                 <div class="table-responsive">
-
                     <table class="table align-middle mb-0" id="kompensasis-table">
-
                         <thead>
-
                             <tr>
-
-                                <th class="px-3 py-3">
-                                    No
-                                </th>
-
-                                <th>
-                                    Tanggal
-                                </th>
-
-                                <th>
-                                    Jenis
-                                </th>
-
-                                <th>
-                                    Pelanggan
-                                </th>
-
-                                <th>
-                                    Mobil
-                                </th>
-
-                                <th>
-                                    Nominal
-                                </th>
-
-                                <th>
-                                    Status
-                                </th>
-
-                                <th>
-                                    Staff
-                                </th>
-
-                                <th class="text-center">
-                                    Aksi
-                                </th>
-
+                                <th class="px-3 py-3">No</th>
+                                <th>Tanggal</th>
+                                <th>Jenis</th>
+                                <th>Pelanggan</th>
+                                <th>Mobil</th>
+                                <th>Nominal</th>
+                                <th>Status</th>
+                                <th>Staff</th>
+                                <th class="text-center">Aksi</th>
                             </tr>
-
                         </thead>
-
-                        <tbody>
-                        </tbody>
-
+                        <tbody></tbody>
                     </table>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
 
-    <div
-        class="modal fade"
-        id="detailKompensasiModal"
-        tabindex="-1">
-
+    <div class="modal fade" id="detailKompensasiModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-
             <div class="modal-content">
-
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-eye me-2"></i>
-                        Detail Kompensasi
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
-
+                @include('layouts.partials.modal-head', ['title' => 'Detail Kompensasi', 'icon' => 'bi-eye'])
                 <div class="modal-body">
-
                         <div class="row g-3">
 
                             <div class="col-md-6">
@@ -332,37 +241,20 @@
                     </div>
 
                     <div class="modal-footer">
-
-                        <button
-                            type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
-
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                             <i class="bi bi-x-circle me-1"></i>
                             Tutup
-
                         </button>
-
                     </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 <div class="modal fade" id="editKompensasiModal" tabindex="-1" aria-labelledby="editKompensasiModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="editKompensasiModalLabel">
-                    <i class="bi bi-pencil-square me-2"></i>
-                    Edit Status Kompensasi
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Edit Status Kompensasi', 'icon' => 'bi-pencil-square', 'titleId' => 'editKompensasiModalLabel'])
             <form action="" method="POST" id="formUpdateKompensasi">
                 @csrf
                 @method('PUT')
@@ -423,19 +315,12 @@
 
     function jenisBadge(jenis) {
         const map = {
-            'pengembalian_dana': 'jenis-pengembalian-dana',
-            'diskon': 'jenis-diskon',
-            'gratis_sewa': 'jenis-gratis-sewa',
+            'pengembalian_dana': ['jenis-pengembalian-dana', 'Pengembalian Dana'],
+            'diskon': ['jenis-diskon', 'Diskon'],
+            'gratis_sewa': ['jenis-gratis-sewa', 'Gratis Sewa'],
         };
-
-        const cls = map[jenis] || 'bg-secondary text-white';
-        const labels = {
-            'pengembalian_dana': 'Pengembalian Dana',
-            'diskon': 'Diskon',
-            'gratis_sewa': 'Gratis Sewa',
-        };
-
-        return '<span class="jenis-badge ' + cls + '">' + (labels[jenis] || jenis) + '</span>';
+        const item = map[jenis] || ['bg-secondary text-white', jenis];
+        return '<span class="jenis-badge ' + item[0] + '">' + item[1] + '</span>';
     }
 
     function statusBadge(status) {
@@ -463,7 +348,6 @@
             serverSide: true,
             ajax: {
                 url: '{{ route('kompensasis.data') }}',
-                type: 'GET',
             },
             columns: [{
                     data: null,
@@ -581,8 +465,7 @@
         }
 
         $('#detailTanggal').val(data.tanggal);
-        $('#detailJenis').val(data.jenis === 'pengembalian_dana' ? 'Pengembalian Dana' :
-            (data.jenis === 'diskon' ? 'Diskon' : 'Gratis Sewa'));
+        $('#detailJenis').val(({ 'pengembalian_dana': 'Pengembalian Dana', 'diskon': 'Diskon', 'gratis_sewa': 'Gratis Sewa' })[data.jenis] || data.jenis);
         $('#detailPelanggan').val(data.customer_name + ' (' + data.customer_email + ')');
         $('#detailMobil').val(data.mobil_name + ' (' + data.mobil_plate + ')');
         $('#detailNominal').val(formatRupiah(data.nominal));

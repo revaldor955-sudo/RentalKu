@@ -58,10 +58,6 @@
             padding: 12px 16px;
         }
 
-        .table tbody td {
-            vertical-align: middle;
-        }
-
         #brands-table thead .dt-column-order {
             display: none !important;
         }
@@ -104,11 +100,6 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
-
         .form-control {
             border-radius: 10px;
             padding: 11px 13px;
@@ -124,8 +115,6 @@
             min-width: 100px;
         }
 
-        /* Sidebar layout base styles are in admin-sidebar.blade.php */
-
         .page-content {
             padding: 24px;
         }
@@ -136,6 +125,8 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
@@ -201,10 +192,7 @@
 <div class="modal fade" id="fotoBrandModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Logo Merek</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Logo Merek'])
             <div class="modal-body p-3 text-center">
                 <img id="fotoBrandPreview" src="" class="img-fluid rounded" alt="Logo merek">
             </div>
@@ -215,10 +203,7 @@
 <div class="modal fade" id="tambahBrandModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Tambah Merek</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Tambah Merek'])
             <form id="formTambahBrand" action="{{ route('brands.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body p-4">
@@ -252,10 +237,7 @@
 <div class="modal fade" id="editBrandModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Edit Merek</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Edit Merek'])
             <form id="formEditBrand" action="" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
@@ -346,7 +328,6 @@
                 },
                 {
                     data: 'name',
-                    orderable: true,
                     render: function(data) {
                         return '<div class="brand-name">' + data + '</div>';
                     },

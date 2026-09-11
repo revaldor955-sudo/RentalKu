@@ -90,11 +90,6 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
-
         .page-content {
             padding: 24px;
         }
@@ -105,15 +100,15 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
 
-{{-- Sidebar Layout --}}
 @include('layouts.partials.sidebar')
 
 <script>
-    // Inject navbar into sidebar layout
     document.addEventListener('DOMContentLoaded', function() {
         const mainContent = document.getElementById('mainContent');
         const pageContent = mainContent?.querySelector('.page-content');
@@ -127,7 +122,6 @@
     });
 </script>
 
-{{-- Page Content --}}
 <div class="page-content">
 
 <div class="container-fluid px-4">
@@ -199,7 +193,7 @@
 
                 <div class="p-4 border-bottom">
 
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center">
 
                         <div>
 
@@ -210,6 +204,37 @@
                             <small class="text-muted">
                                 Seluruh metode pembayaran yang terdaftar di RentalKu.
                             </small>
+
+                        </div>
+
+                        <div class="d-flex gap-2 align-items-center">
+
+                            <label class="text-muted small mb-0" for="filterCabang">
+                                Cabang
+                            </label>
+
+                            <select
+                                id="filterCabang"
+                                class="form-select"
+                                style="width: auto;">
+
+                                <option value="">
+                                    Semua cabang
+                                </option>
+
+                                <option value="pusat">
+                                    Pusat
+                                </option>
+
+                                @foreach($cabangs as $cabang)
+
+                                    <option value="{{ $cabang->id }}">
+                                        {{ $cabang->name }}
+                                    </option>
+
+                                @endforeach
+
+                            </select>
 
                         </div>
 
@@ -235,6 +260,14 @@
 
                                 <th>
                                     Nomor Akun
+                                </th>
+
+                                <th>
+                                    Cabang
+                                </th>
+
+                                <th>
+                                    Atas Nama
                                 </th>
 
                                 <th class="text-center">
@@ -269,20 +302,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-plus-circle text-success me-2"></i>
-                        Tambah Metode Pembayaran
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Tambah Metode Pembayaran', 'icon' => 'bi-plus-circle'])
 
                 <form
                     action="{{ route('metode_pembayarans.store') }}"
@@ -314,6 +334,39 @@
                             class="form-control"
                             placeholder="Contoh: 1234567890"
                             required>
+
+                        <label class="form-label fw-semibold mt-3">
+                            Cabang Pemilik Rekening
+                        </label>
+
+                        <select
+                            name="cabang_id"
+                            id="tambahCabangMetodePembayaran"
+                            class="form-select">
+
+                            <option value="">
+                                Pusat (berlaku semua cabang)
+                            </option>
+
+                            @foreach($cabangs as $cabang)
+
+                                <option value="{{ $cabang->id }}">
+                                    {{ $cabang->name }}
+                                </option>
+
+                            @endforeach
+
+                        </select>
+
+                        <label class="form-label fw-semibold mt-3">
+                            Atas Nama
+                        </label>
+
+                        <input
+                            type="text"
+                            name="atas_nama"
+                            class="form-control"
+                            placeholder="Contoh: PT RentalKu Cabang Bandung">
 
                     </div>
 
@@ -358,20 +411,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-pencil-square text-primary me-2"></i>
-                        Edit Metode Pembayaran
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Edit Metode Pembayaran', 'icon' => 'bi-pencil-square'])
 
                 <form
                     action=""
@@ -406,6 +446,40 @@
                             class="form-control"
                             placeholder="Contoh: 1234567890"
                             required>
+
+                        <label class="form-label fw-semibold mt-3">
+                            Cabang Pemilik Rekening
+                        </label>
+
+                        <select
+                            name="cabang_id"
+                            id="editCabangMetodePembayaran"
+                            class="form-select">
+
+                            <option value="">
+                                Pusat (berlaku semua cabang)
+                            </option>
+
+                            @foreach($cabangs as $cabang)
+
+                                <option value="{{ $cabang->id }}">
+                                    {{ $cabang->name }}
+                                </option>
+
+                            @endforeach
+
+                        </select>
+
+                        <label class="form-label fw-semibold mt-3">
+                            Atas Nama
+                        </label>
+
+                        <input
+                            type="text"
+                            name="atas_nama"
+                            id="editAtasNamaMetodePembayaran"
+                            class="form-control"
+                            placeholder="Contoh: PT RentalKu Cabang Bandung">
 
                     </div>
 
@@ -468,6 +542,16 @@
         });
     }
 
+    $(document).on('change', '#filterCabang', function() {
+        $('#metodePembayarans-table').DataTable().ajax.reload();
+    });
+
+    // Preset cabang di modal tambah mengikuti filter aktif.
+    $(document).on('show.bs.modal', '#tambahMetodePembayaranModal', function() {
+        var cabang = $('#filterCabang').val();
+        $('#tambahCabangMetodePembayaran').val(cabang === 'pusat' ? '' : cabang);
+    });
+
     $(document).ready(function() {
 
         $('#metodePembayarans-table').DataTable({
@@ -476,6 +560,9 @@
             ajax: {
                 url: '{{ route('metode_pembayarans.data') }}',
                 type: 'GET',
+                data: function(d) {
+                    d.cabang_id = $('#filterCabang').val();
+                },
             },
             columns: [{
                     data: null,
@@ -497,6 +584,16 @@
                 },
                 {
                     data: 'nomor_akun',
+                    orderable: true,
+                    searchable: true,
+                },
+                {
+                    data: 'cabang_name',
+                    orderable: true,
+                    searchable: true,
+                },
+                {
+                    data: 'atas_nama',
                     orderable: true,
                     searchable: true,
                 },
@@ -599,6 +696,8 @@
 
         $('#editNamaMetodePembayaran').val(data.name);
         $('#editNomorAkunMetodePembayaran').val(data.nomor_akun);
+        $('#editCabangMetodePembayaran').val(data.cabang_id || '');
+        $('#editAtasNamaMetodePembayaran').val(data.atas_nama === '-' ? '' : data.atas_nama);
 
         $('#formEditMetodePembayaran').attr('action',
             "{{ route('metode_pembayarans.update', '__ID__') }}".replace('__ID__', id));

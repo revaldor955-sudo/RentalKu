@@ -248,9 +248,15 @@
             margin: 0;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         .section {
             padding-top: 70px;
             padding-bottom: 30px;
+            /* Judul tidak ketutup navbar sticky saat lompat anchor. */
+            scroll-margin-top: 80px;
         }
 
         .section-label {
@@ -313,6 +319,18 @@
             left: 14px;
             background: #198754;
             color: white;
+            padding: 6px 11px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .car-populer {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: #ffc107;
+            color: #1f2937;
             padding: 6px 11px;
             border-radius: 50px;
             font-size: 12px;
@@ -426,6 +444,10 @@
 
         @media (max-width: 991px) {
 
+            body {
+                padding-bottom: 70px;
+            }
+
             .hero {
                 padding: 35px;
             }
@@ -470,11 +492,85 @@
             cursor: pointer;
         }
 
+        /* Motion 60fps: entrance, skeleton, success check. */
+        @keyframes rise-in {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: none; }
+        }
+
+        .anim-rise {
+            animation: rise-in .5s cubic-bezier(.22,1,.36,1) backwards;
+        }
+
+        @keyframes skel-shimmer {
+            0% { background-position: -400px 0; }
+            100% { background-position: 400px 0; }
+        }
+
+        .skel-card {
+            background: #fff;
+            border: 1px solid #edf0ee;
+            border-radius: 22px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .skel-line {
+            border-radius: 8px;
+            background: linear-gradient(90deg, #eef1f0 25%, #f8faf9 50%, #eef1f0 75%);
+            background-size: 800px 100%;
+            animation: skel-shimmer 1.2s ease-in-out infinite;
+        }
+
+        .swal-check svg circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            animation: check-stroke .6s cubic-bezier(.65,0,.45,1) forwards;
+        }
+
+        .swal-check svg path {
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: check-stroke .3s .5s cubic-bezier(.65,0,.45,1) forwards;
+        }
+
+        @keyframes check-stroke {
+            to { stroke-dashoffset: 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .anim-rise,
+            .skel-line,
+            .swal-check svg circle,
+            .swal-check svg path {
+                animation: none;
+            }
+        }
+
+        .rental-masonry-item {
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 992px) {
+
+            .rental-masonry {
+                columns: 2;
+                column-gap: 1.5rem;
+            }
+
+            .rental-masonry-item {
+                break-inside: avoid;
+            }
+
+        }
+
     </style>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
@@ -488,7 +584,34 @@
             Rental<span>ku</span>.
         </a>
 
-        <div class="d-flex align-items-center gap-3">
+        <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#customerNav" aria-controls="customerNav" aria-expanded="false" aria-label="Menu navigasi">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="customerNav">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-2">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="#mobil">Cari Mobil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="#rental-saya">Rental Saya</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="{{ route('customer.kompensasi.index') }}">Kompensasi</a>
+                </li>
+                <li class="nav-item d-lg-none">
+                    <form action="{{ route('logout') }}" method="POST" class="m-0">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                            <i class="bi bi-box-arrow-right me-1"></i>
+                            Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 ms-2">
 
             <div class="user-box d-none d-md-flex"
                  data-bs-toggle="modal"
@@ -607,11 +730,12 @@
 
                         <strong>Siap menemani perjalananmu</strong>
 
-                    </div>
+        </div>
 
-                </div>
+    </div>
 
-            </div>
+</div>
+
 
         </div>
 
@@ -638,8 +762,8 @@
                         Mobil Tersedia
                     </div>
 
-                    <p class="stat-number">
-                        {{ $mobils->count() }}
+                    <p class="stat-number" data-count="{{ $mobilTersediaCount ?? $mobils->count() }}">
+                        {{ $mobilTersediaCount ?? $mobils->count() }}
                     </p>
 
                 </div>
@@ -667,8 +791,8 @@
                         Rental Saya
                     </div>
 
-                    <p class="stat-number">
-                        0
+                    <p class="stat-number" data-count="{{ $rentalCount ?? $rentals->count() }}">
+                        {{ $rentalCount ?? $rentals->count() }}
                     </p>
 
                 </div>
@@ -696,8 +820,8 @@
                         Total Transaksi
                     </div>
 
-                    <p class="stat-number">
-                        Rp 0
+                    <p class="stat-number" data-count="{{ $totalTransaksi ?? 0 }}" data-rp="1">
+                        Rp {{ number_format($totalTransaksi ?? 0, 0, ',', '.') }}
                     </p>
 
                 </div>
@@ -711,8 +835,43 @@
 </div>
 
 
-<section id="mobil" class="section">
-    <section class="section pt-4">
+@if(($klaimUpdates ?? collect())->count())
+
+    <div class="alert alert-info mt-4 mb-0" role="alert">
+
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-bell-fill"></i>
+            <strong>Kabar Klaim Kompensasi</strong>
+        </div>
+
+        @foreach($klaimUpdates as $klaim)
+
+            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center py-1">
+
+                <span>
+                    Klaim {{ $klaim->jenis === 'pengembalian_dana' ? 'Pengembalian Dana' : ($klaim->jenis === 'diskon' ? 'Diskon' : 'Gratis Sewa') }}
+                    untuk {{ $klaim->mobil->name ?? 'mobil' }}
+                    telah
+                    <span class="badge {{ $klaim->status === 'ditolak' ? 'bg-danger' : 'bg-success' }}">
+                        {{ $klaim->status === 'disetujui' ? 'Disetujui' : ($klaim->status === 'ditolak' ? 'Ditolak' : 'Selesai') }}
+                    </span>
+                </span>
+
+                <a href="{{ route('customer.kompensasi.index') }}" class="btn btn-sm btn-info">
+                    Lihat
+                </a>
+
+            </div>
+
+        @endforeach
+
+    </div>
+
+@endif
+
+
+<section class="section">
+    <section id="rental-saya" class="section pt-4">
 
     <div class="mb-4">
 
@@ -732,13 +891,13 @@
 
     @if($rentals->count())
 
-        <div class="row g-4">
+        <div class="rental-masonry">
 
-            @foreach($rentals as $rental)
+            @foreach(($rentalsTampil ?? $rentals) as $rental)
 
-                <div class="col-lg-6">
+                <div class="rental-masonry-item">
 
-                    <div class="stat-card">
+                    <div class="stat-card d-flex flex-column h-100">
 
                         <div class="d-flex justify-content-between align-items-start mb-3">
 
@@ -845,42 +1004,56 @@
                         </div>
 
 
+                        <div class="mt-auto">
+
 @if($rental->status === 'Disetujui')
 
     @if(!$rental->pembayaran)
 
-        <a
-            href="{{ route('pembayaran.create', $rental->id) }}"
-            class="btn btn-success w-100"
+        <button
+            type="button"
+            class="btn btn-success w-100 btn-bayar"
+            data-action="{{ route('pembayaran.store', $rental->id) }}"
+            data-title="Bayar Sekarang"
+            data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
+            data-rental="{{ $rental->id }}"
+            data-cabang="{{ $rental->cabang_ambil_id }}"
+            data-total="{{ $rental->total_harga }}"
         >
             <i class="bi bi-credit-card me-1"></i>
             Bayar Sekarang
-        </a>
+        </button>
 
     @elseif($rental->pembayaran->status === 'Menunggu')
 
         <div class="alert alert-info mb-0">
             <i class="bi bi-clock-history me-1"></i>
             Bukti pembayaran sudah dikirim dan sedang
-            menunggu verifikasi admin.
+            menunggu verifikasi tim kami.
         </div>
 
    @elseif($rental->pembayaran->status === 'Disetujui')
 
     <div class="alert alert-success mb-0">
         <i class="bi bi-check-circle-fill me-1"></i>
-        Pembayaran sudah diverifikasi admin.
+        Pembayaran sudah diverifikasi tim kami.
     </div>
 
     @elseif($rental->pembayaran->status === 'Ditolak')
 
-        <a
-            href="{{ route('pembayaran.create', $rental->id) }}"
-            class="btn btn-danger w-100"
+        <button
+            type="button"
+            class="btn btn-danger w-100 btn-bayar"
+            data-action="{{ route('pembayaran.store', $rental->id) }}"
+            data-title="Upload Ulang Pembayaran"
+            data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
+            data-rental="{{ $rental->id }}"
+            data-cabang="{{ $rental->cabang_ambil_id }}"
+            data-total="{{ $rental->total_harga }}"
         >
             <i class="bi bi-arrow-repeat me-1"></i>
             Upload Ulang Pembayaran
-        </a>
+        </button>
 
     @endif
 
@@ -888,7 +1061,7 @@
 
     <div class="alert alert-warning mb-0">
         <i class="bi bi-hourglass-split me-1"></i>
-        Menunggu persetujuan admin sebelum melakukan pembayaran.
+        Menunggu persetujuan tim kami sebelum melakukan pembayaran.
     </div>
 
 @elseif($rental->status === 'Ditolak')
@@ -903,9 +1076,84 @@
     <div class="alert alert-secondary mb-0">
         <i class="bi bi-check2-circle me-1"></i>
         Rental telah selesai.
+                <a href="{{ route('customer.kompensasi.index', ['baru' => 1, 'rental' => $rental->id]) }}" class="btn btn-outline-success btn-sm ms-2">
+            <i class="bi bi-megaphone me-1"></i>
+            Ajukan Kompensasi
+        </a>
     </div>
 
 @endif
+
+                        @if($rental->dendas && $rental->dendas->count())
+                                <div class="mt-3">
+                                    <h6 class="fw-bold mb-2">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                        Denda Rental Ini
+                                    </h6>
+                                    @foreach($rental->dendas as $d)
+                                        <div class="border rounded p-3 mb-2">
+                                            <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                                                <strong>{{ $d->jenis ?? 'Denda' }}</strong>
+                                                @if($d->status === 'lunas')
+                                                    <span class="badge bg-success">Lunas</span>
+                                                @elseif($d->status === 'menunggu verifikasi')
+                                                    <span class="badge bg-info text-dark">Menunggu Verifikasi</span>
+                                                @else
+                                                    <span class="badge bg-warning text-dark">Belum Bayar</span>
+                                                @endif
+                                            </div>
+                                            <div class="text-success fw-bold mb-1">
+                                                Rp {{ number_format($d->nominal ?? 0, 0, ',', '.') }}
+                                            </div>
+                                            @isset($d->syarat_dan_ketentuan)
+                                                @if($d->syarat_dan_ketentuan)
+                                                    <small class="text-muted d-block mb-1">{{ $d->syarat_dan_ketentuan }}</small>
+                                                @endif
+                                            @endisset
+                                            @isset($d->foto_bukti)
+                                                @if($d->foto_bukti)
+                                                    <small class="text-muted d-block">Bukti staff:</small>
+                                                    <img src="{{ asset($d->foto_bukti) }}" alt="Bukti denda (klik untuk memperbesar)" title="Klik untuk memperbesar" data-src="{{ asset($d->foto_bukti) }}" onclick="openBuktiModal(this)" class="img-fluid rounded mb-1" style="max-height: 120px; cursor: zoom-in;">
+                                                @endif
+                                            @endisset
+                                            @isset($d->bukti_bayar)
+                                                @if($d->bukti_bayar)
+                                                    <small class="text-muted d-block">Bukti bayar kamu:</small>
+                                                    <img src="{{ asset($d->bukti_bayar) }}" alt="Bukti bayar denda (klik untuk memperbesar)" title="Klik untuk memperbesar" data-src="{{ asset($d->bukti_bayar) }}" onclick="openBuktiModal(this)" class="img-fluid rounded mb-1" style="max-height: 120px; cursor: zoom-in;">
+                                                @endif
+                                            @endisset
+                                            @isset($d->tanggal_bayar)
+                                                @if($d->tanggal_bayar)
+                                                    <small class="text-muted d-block mb-1">Tanggal bayar: {{ \Carbon\Carbon::parse($d->tanggal_bayar)->format('d/m/Y') }}</small>
+                                                @endif
+                                            @endisset
+                                            @if(($d->status ?? 'belum bayar') === 'belum bayar')
+                                                <form method="POST" action="{{ route('customer.dendas.bayar', $d->id) }}" enctype="multipart/form-data" class="mt-2">
+                                                    @csrf
+                                                    <div class="row g-2">
+                                                        <div class="col-12">
+                                                            <label class="form-label small mb-1">Bukti Bayar</label>
+                                                            <input type="file" name="bukti_bayar" class="form-control form-control-sm" accept="image/*" required>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <label class="form-label small mb-1">Tanggal Bayar</label>
+                                                            <input type="date" name="tanggal_bayar" class="form-control form-control-sm" required>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <button type="submit" class="btn btn-warning btn-sm w-100">
+                                                                <i class="bi bi-cash-coin me-1"></i>
+                                                                Bayar Denda
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+
+                        </div>
 
                     </div>
 
@@ -914,6 +1162,33 @@
             @endforeach
 
         </div>
+
+        @if(($totalRentals ?? $rentals->count()) > ($jumlahRental ?? 4) || ($jumlahRental ?? 4) > 4)
+
+            <div class="text-center mt-4 d-flex flex-wrap gap-2 justify-content-center">
+
+                @if(($rentalsTampil ?? $rentals)->count() < ($totalRentals ?? $rentals->count()))
+
+                    <a href="{{ route('customer.dashboard', array_merge(request()->only(['q', 'cabang', 'transmisi']), ['jumlah_rental' => ($jumlahRental ?? 4) + 4])) }}" class="btn btn-outline-success px-4 py-2">
+                        Tampilkan Lebih Banyak
+                        <small class="text-muted ms-1">({{ ($totalRentals ?? $rentals->count()) - ($rentalsTampil ?? $rentals)->count() }} lainnya)</small>
+                        <i class="bi bi-chevron-down ms-1"></i>
+                    </a>
+
+                @endif
+
+                @if(($jumlahRental ?? 4) > 4)
+
+                    <a href="{{ route('customer.dashboard', request()->only(['q', 'cabang', 'transmisi'])) }}" class="btn btn-outline-secondary px-4 py-2">
+                        Tampilkan Lebih Sedikit
+                        <i class="bi bi-chevron-up ms-1"></i>
+                    </a>
+
+                @endif
+
+            </div>
+
+        @endif
 
     @else
 
@@ -939,7 +1214,7 @@
 
 </section>
 
-    <div class="mb-4">
+    <div class="mb-4" id="mobil" style="scroll-margin-top: 80px;">
 
         <div class="section-label">
             Pilihan Rental
@@ -956,14 +1231,49 @@
 
     </div>
 
+    <form method="GET" action="{{ route('customer.dashboard') }}" class="card p-3 mb-4">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label small mb-1" for="filterQ">Cari Mobil</label>
+                <input type="text" id="filterQ" name="q" class="form-control" placeholder="Nama mobil" value="{{ ($filters ?? [])['q'] ?? request('q', '') }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small mb-1" for="filterCabang">Cabang</label>
+                <select id="filterCabang" name="cabang" class="form-select">
+                    <option value="">Semua Cabang</option>
+                    @foreach(($cabangs ?? []) as $cabang)
+                        <option value="{{ $cabang->id }}" {{ (string)(($filters ?? [])['cabang'] ?? request('cabang', '')) === (string)$cabang->id ? 'selected' : '' }}>
+                            {{ $cabang->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small mb-1" for="filterTransmisi">Transmisi</label>
+                <select id="filterTransmisi" name="transmisi" class="form-select">
+                    <option value="">Semua</option>
+                    <option value="Manual" {{ (($filters ?? [])['transmisi'] ?? request('transmisi', '')) === 'Manual' ? 'selected' : '' }}>Manual</option>
+                    <option value="Otomatis" {{ (($filters ?? [])['transmisi'] ?? request('transmisi', '')) === 'Otomatis' ? 'selected' : '' }}>Otomatis</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-success flex-grow-1">
+                    <i class="bi bi-search me-1"></i>
+                    Cari
+                </button>
+                <a href="{{ route('customer.dashboard') }}" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </div>
+    </form>
 
-    <div class="row g-4">
+
+    <div class="row g-4" id="mobilGrid">
 
         @forelse($mobils as $index => $mobil)
 
             <div class="col-md-6 col-lg-4">
 
-                <div class="car-card" data-mobil-id="{{ $mobil->id }}" role="button" title="Lihat detail {{ $mobil->name }}">
+                    <div class="car-card anim-rise" data-mobil-id="{{ $mobil->id }}" role="button" title="Lihat detail {{ $mobil->name }}" style="animation-delay: {{ min($index * 70, 560) }}ms;">
 
                   <div class="car-photo-wrapper">
 
@@ -996,6 +1306,10 @@
 
     </div>
 
+    @if(in_array($mobil->id, ($populerIds ?? [])))
+        <div class="car-populer"><i class="bi bi-fire me-1"></i>Populer</div>
+    @endif
+
 </div>
 
 
@@ -1017,6 +1331,17 @@
             {{ $mobil->kapasitas }} orang
         </span>
 
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mb-2">
+        <small class="text-muted">
+            <i class="bi bi-wallet2 me-1"></i>
+            Deposit: Rp {{ number_format($mobil->deposit ?? 0, 0, ',', '.') }}
+        </small>
+        <small class="text-muted">
+            <i class="bi bi-geo-alt me-1"></i>
+            {{ $mobil->cabang->name ?? '-' }}
+        </small>
     </div>
 
     <div class="d-flex justify-content-between align-items-end">
@@ -1186,11 +1511,6 @@
             <div class="col-md-6 text-md-end">
 
                 <div class="footer-text">
-                    <i class="bi bi-images me-1"></i>
-                    Foto kendaraan menggunakan Pexels API
-                </div>
-
-                <div class="footer-text mt-2">
                     &copy; {{ date('Y') }} RentalKu.
                     Semua hak dilindungi.
                 </div>
@@ -1210,6 +1530,20 @@
 </footer>
 
 
+<div class="d-lg-none fixed-bottom bg-white border-top p-2">
+    <div class="d-flex gap-2">
+        <a href="#mobil" class="btn btn-success flex-grow-1">
+            <i class="bi bi-car-front-fill me-1"></i>
+            Cari Mobil
+        </a>
+        <a href="#rental-saya" class="btn btn-outline-success flex-grow-1">
+            <i class="bi bi-calendar-check-fill me-1"></i>
+            Rental Saya
+        </a>
+    </div>
+</div>
+
+
 {{-- MODAL DETAIL MOBIL (diisi via AJAX, tanpa reload halaman) --}}
 <div
     class="modal fade"
@@ -1222,21 +1556,282 @@
 
         <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
 
-            <div class="modal-header border-0 pb-0">
+            @include('layouts.partials.modal-head', ['title' => 'Detail Mobil', 'titleId' => 'mobilDetailModalLabel'])
 
-                <h5 class="modal-title fw-bold" id="mobilDetailModalLabel">
-                    Detail Mobil
-                </h5>
+            <div class="modal-body p-0" id="mobilDetailModalBody"></div>
 
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Tutup"></button>
+        </div>
+
+    </div>
+
+</div>
+
+
+{{-- MODAL LIHAT BUKTI FOTO (denda) --}}
+<div
+    class="modal fade"
+    id="buktiModal"
+    tabindex="-1"
+    aria-labelledby="buktiModalTitle"
+    aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+
+            @include('layouts.partials.modal-head', ['title' => 'Bukti Foto', 'icon' => 'bi-image', 'titleId' => 'buktiModalTitle'])
+
+            <div class="modal-body text-center p-3">
+
+                <img id="buktiModalImg" src="" alt="Bukti foto" class="img-fluid rounded">
 
             </div>
 
-            <div class="modal-body p-0" id="mobilDetailModalBody"></div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    function openBuktiModal(el) {
+        document.getElementById('buktiModalImg').src = el.dataset.src;
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('buktiModal')).show();
+    }
+</script>
+
+
+{{-- MODAL PEMBAYARAN (diisi via data-attribute tombol, submit AJAX tanpa pindah halaman) --}}
+<style>
+    #pembayaranModal .pm-summary {
+        background: #f5f8f6;
+        border-radius: 14px;
+        padding: 14px 16px;
+    }
+    #pembayaranModal .pm-total-box {
+        background: #e9f7ef;
+        border-radius: 14px;
+        padding: 14px 16px;
+    }
+    #pembayaranModal .pm-total {
+        color: #198754;
+        font-weight: 800;
+        font-size: 24px;
+    }
+    #pembayaranModal .pm-metode {
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 12px 14px;
+    }
+    #pembayaranModal .pm-preview {
+        max-width: 100%;
+        max-height: 220px;
+        object-fit: cover;
+        border-radius: 12px;
+        margin-top: 12px;
+        display: none;
+    }
+</style>
+
+<div
+    class="modal fade"
+    id="pembayaranModal"
+    tabindex="-1"
+    aria-labelledby="pembayaranModalTitle"
+    aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+
+        <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+
+            @include('layouts.partials.modal-head', ['title' => 'Bayar Sekarang', 'titleId' => 'pembayaranModalTitle', 'subtitle' => 'Selesaikan pembayaran rental kendaraanmu.'])
+
+            <div class="modal-body p-4">
+
+                <div class="pm-summary mb-3">
+
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+
+                        <strong id="pmMobil">Mobil</strong>
+
+                        <small class="text-muted" id="pmRental">#0</small>
+
+                    </div>
+
+                    <div class="pm-total-box d-flex justify-content-between align-items-center mt-2">
+
+                        <small class="text-muted">Total dibayar</small>
+
+                        <span class="pm-total" id="pmTotal">Rp 0</span>
+
+                    </div>
+
+                </div>
+
+                <form
+                    id="pembayaranForm"
+                    method="POST"
+                    enctype="multipart/form-data">
+
+                    @csrf
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold" for="pmMetode">
+                            Metode Pembayaran
+                        </label>
+
+                        <select
+                            name="metode_pembayaran_id"
+                            id="pmMetode"
+                            class="form-select"
+                            required>
+
+                            <option value="">
+                                -- Pilih Metode Pembayaran --
+                            </option>
+
+                            @foreach($metodePembayarans as $metode)
+
+                                <option value="{{ $metode->id }}" data-cabang="{{ $metode->cabang_id ?? '' }}">
+                                    {{ $metode->name }}
+                                </option>
+
+                            @endforeach
+
+                        </select>
+
+                    </div>
+
+                    @if($metodePembayarans->count())
+
+                        <div class="mb-3" id="pmMetodeDetail">
+
+                            <label class="form-label fw-semibold">
+                                Rekening / Akun Pembayaran
+                            </label>
+
+                            @foreach($metodePembayarans as $metode)
+
+                                <div
+                                    class="pm-metode pm-metode-detail d-none"
+                                    id="pm-metode-{{ $metode->id }}">
+
+                                    <strong>
+                                        <i class="bi bi-wallet2 text-success me-2"></i>
+                                        {{ $metode->name }}
+                                    </strong>
+
+                                    <div>
+                                        <small class="text-muted">
+                                            Nomor akun:
+                                            <strong>{{ $metode->nomor_akun }}</strong>
+                                        </small>
+                                    </div>
+
+                                    @if($metode->atas_nama)
+
+                                        <div>
+                                            <small class="text-muted">
+                                                Atas nama:
+                                                <strong>{{ $metode->atas_nama }}</strong>
+                                            </small>
+                                        </div>
+
+                                    @endif
+
+                                </div>
+
+                            @endforeach
+
+                            <div class="pm-metode" id="pm-metode-placeholder">
+
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Pilih metode pembayaran untuk melihat
+                                    nomor rekening / akun.
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    @endif
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold" for="pmTanggal">
+                            Tanggal Pembayaran
+                        </label>
+
+                        <input
+                            type="date"
+                            name="tanggal_bayar"
+                            id="pmTanggal"
+                            class="form-control"
+                            value="{{ date('Y-m-d') }}"
+                            required>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold" for="pmBukti">
+                            Bukti Pembayaran
+                        </label>
+
+                        <input
+                            type="file"
+                            name="bukti"
+                            id="pmBukti"
+                            class="form-control"
+                            accept=".jpg,.jpeg,.png"
+                            required>
+
+                        <div class="form-text">
+                            Format JPG, JPEG, atau PNG. Maksimal 2 MB.
+                        </div>
+
+                        <img
+                            id="pmPreview"
+                            class="pm-preview"
+                            alt="Preview bukti pembayaran">
+
+                    </div>
+
+                    <div class="alert alert-warning mb-0">
+
+                        <i class="bi bi-info-circle me-2"></i>
+
+                        Pastikan bukti terlihat jelas dan sesuai dengan jumlah
+                        pembayaran sebesar
+                        <strong id="pmTotalNote">Rp 0</strong>.
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div class="modal-footer border-0 pt-0 px-4 pb-4">
+
+                <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    data-bs-dismiss="modal">
+                    Batal
+                </button>
+
+                <button
+                    type="submit"
+                    form="pembayaranForm"
+                    id="pmSubmit"
+                    class="btn btn-success">
+                    <i class="bi bi-send me-1"></i>
+                    Kirim Pembayaran
+                </button>
+
+            </div>
 
         </div>
 
@@ -1305,10 +1900,26 @@
         openMobilDetail($(this).data('mobil-id'));
     });
 
-    // Popup form sewa (SweetAlert) — template di-inject dari konten modal
+    // Popup form sewa (SweetAlert) — template di-inject dari konten modal.
+    // Modal Bootstrap disembunyikan dulu: focus-trap-nya merebut fokus
+    // sehingga input di dalam SweetAlert (mis. Catatan) tidak bisa diketik.
     function openSewaPopup() {
         var $template = $('#sewaFormTemplate');
         if (!$template.length) return;
+
+        if ($('.mobil-modal .mm-badge-available').length === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: 'Mobil sedang tidak tersedia.',
+            });
+            return;
+        }
+
+        var $modal = $('#mobilDetailModal');
+        if ($modal.length) {
+            bootstrap.Modal.getOrCreateInstance($modal[0]).hide();
+        }
 
         var $carTitle = $('.mobil-modal .mm-title');
 
@@ -1356,9 +1967,8 @@
                         }
 
                         Swal.fire({
-                            icon: 'success',
                             title: 'Berhasil!',
-                            text: data.message || 'Pengajuan sewa mobil berhasil dibuat.',
+                            html: '<div class="swal-check"><svg width="72" height="72" viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" fill="none" stroke="#198754" stroke-width="2.5"/><path fill="none" stroke="#198754" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" d="M14 27l8 8 16-16"/></svg><p>' + escHtml(data.message || 'Pengajuan sewa mobil berhasil dibuat.') + '</p></div>',
                             confirmButtonText: 'OK',
                         }).then(function() {
                             window.location.reload();
@@ -1376,6 +1986,290 @@
             }
         });
     }
+
+    // Modal pembayaran — dibuka dari tombol Bayar / Upload Ulang di kartu rental.
+    function openPembayaranModal(btn) {
+        var $btn = $(btn);
+
+        var form = $('#pembayaranForm')[0];
+        form.reset();
+        $('#pembayaranForm').attr('action', $btn.data('action'));
+
+        // Hanya tampilkan rekening milik cabang rental ini.
+        // Kalau cabang belum punya rekening, tampilkan milik pusat.
+        var cabang = String($btn.data('cabang') || '');
+        var hasOwn = false;
+
+        $('#pmMetode option[value!=""]').each(function() {
+            var c = String($(this).data('cabang') || '');
+            if (c !== '' && c === cabang) {
+                hasOwn = true;
+            }
+        });
+
+        $('#pmMetode option[value!=""]').each(function() {
+            var c = String($(this).data('cabang') || '');
+            $(this).toggle(hasOwn ? (c === cabang) : (c === ''));
+        });
+
+        $('#pembayaranModalTitle').text($btn.data('title') || 'Bayar Sekarang');
+        $('#pmMobil').text($btn.data('mobil') || 'Mobil');
+        $('#pmRental').text('#' + $btn.data('rental'));
+
+        var total = 'Rp ' + Number($btn.data('total') || 0).toLocaleString('id-ID');
+        $('#pmTotal').text(total);
+        $('#pmTotalNote').text(total);
+
+        var now = new Date();
+        var today = now.getFullYear() + '-'
+            + String(now.getMonth() + 1).padStart(2, '0') + '-'
+            + String(now.getDate()).padStart(2, '0');
+        $('#pmTanggal').val(today);
+
+        $('#pmPreview').hide().attr('src', '');
+        toggleMetodeDetail();
+
+        bootstrap.Modal.getOrCreateInstance($('#pembayaranModal')[0]).show();
+    }
+
+    $(document).on('click', '.btn-bayar', function() {
+        openPembayaranModal(this);
+    });
+
+    function toggleMetodeDetail() {
+        var selectedId = $('#pmMetode').val();
+
+        $('#pmMetodeDetail .pm-metode-detail').addClass('d-none');
+
+        if (selectedId) {
+            $('#pm-metode-' + selectedId).removeClass('d-none');
+            $('#pm-metode-placeholder').addClass('d-none');
+        } else {
+            $('#pm-metode-placeholder').removeClass('d-none');
+        }
+    }
+
+    $(document).on('change', '#pmMetode', toggleMetodeDetail);
+
+    $(document).on('change', '#pmBukti', function(event) {
+        var file = event.target.files[0];
+        var $preview = $('#pmPreview');
+
+        if (file) {
+            $preview.attr('src', URL.createObjectURL(file));
+            $preview.show();
+        } else {
+            $preview.hide();
+        }
+    });
+
+    $(document).on('submit', '#pembayaranForm', function(event) {
+        event.preventDefault();
+
+        var $form = $(this);
+        var buktiFile = $('#pmBukti')[0].files[0];
+        if (buktiFile && buktiFile.size > 2 * 1024 * 1024) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: 'Ukuran bukti maksimal 2 MB.',
+            });
+            return;
+        }
+
+        var $submit = $('#pmSubmit');
+        var formData = new FormData($form[0]);
+
+        $submit.prop('disabled', true);
+        Swal.showLoading();
+
+        $.ajax({
+            url: $form.attr('action'),
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            data: formData,
+            processData: false,
+            contentType: false
+        })
+        .done(function(data) {
+            Swal.hideLoading();
+            $submit.prop('disabled', false);
+            bootstrap.Modal.getOrCreateInstance($('#pembayaranModal')[0]).hide();
+
+            Swal.fire({
+                title: 'Berhasil!',
+                html: '<div class="swal-check"><svg width="72" height="72" viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" fill="none" stroke="#198754" stroke-width="2.5"/><path fill="none" stroke="#198754" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" d="M14 27l8 8 16-16"/></svg><p>' + escHtml(data.message || 'Bukti pembayaran berhasil dikirim.') + '</p></div>',
+                confirmButtonText: 'OK',
+            }).then(function() {
+                window.location.reload();
+            });
+        })
+        .fail(function(xhr) {
+            Swal.hideLoading();
+            $submit.prop('disabled', false);
+
+            var r = xhr.responseJSON || {};
+            var firstError = r.errors
+                ? Object.values(r.errors).flat()[0]
+                : (r.message || 'Terjadi kesalahan. Silakan coba lagi.');
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: firstError,
+            });
+        });
+    });
+
+    // Live search katalog: ketik langsung muncul tanpa reload.
+    var mobilSearchUrl = '{{ route('customer.mobils.search') }}';
+    var mobilFallbackImg = 'https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg';
+    var mobilSearchTimer = null;
+
+    function escHtml(text) {
+        return String(text === null || text === undefined ? '' : text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function formatRp(value) {
+        return 'Rp ' + Number(value || 0).toLocaleString('id-ID');
+    }
+
+    var populerIds = @json($populerIds ?? []);
+
+    function renderMobilGrid(mobils) {
+        var $grid = $('#mobilGrid');
+
+        if (!mobils.length) {
+            $grid.html(
+                '<div class="col-12">' +
+                    '<div class="empty-card">' +
+                        '<div class="empty-icon"><i class="bi bi-car-front"></i></div>' +
+                        '<h5 class="fw-bold mt-4">Mobil Tidak Ditemukan</h5>' +
+                        '<p class="text-muted mb-0">Coba kata kunci atau filter lain.</p>' +
+                    '</div>' +
+                '</div>'
+            );
+            return;
+        }
+
+        var html = '';
+
+        mobils.forEach(function(m, i) {
+            var isPopuler = populerIds.indexOf(m.id) !== -1;
+            var delay = Math.min(i * 70, 560);
+            html +=
+                '<div class="col-md-6 col-lg-4">' +
+                    '<div class="car-card anim-rise" data-mobil-id="' + m.id + '" role="button" title="Lihat detail ' + escHtml(m.name) + '" style="animation-delay: ' + delay + 'ms;">' +
+                        '<div class="car-photo-wrapper">' +
+                            '<img src="' + (m.image_url || mobilFallbackImg) + '" class="car-img" alt="' + escHtml(m.name) + '">' +
+                            '<div class="car-status"><i class="bi bi-check-circle-fill me-1"></i>Tersedia</div>' +
+                            (isPopuler ? '<div class="car-populer"><i class="bi bi-fire me-1"></i>Populer</div>' : '') +
+                        '</div>' +
+                        '<div class="car-body">' +
+                            '<h5 class="car-title">' + escHtml(m.name) + '</h5>' +
+                            '<div class="car-info">' +
+                                '<span><i class="bi bi-car-front-fill"></i>' + escHtml(m.transmisi) + '</span>' +
+                                '<span><i class="bi bi-people-fill"></i>' + escHtml(m.kapasitas) + ' orang</span>' +
+                            '</div>' +
+                            '<div class="d-flex flex-wrap gap-2 mb-2">' +
+                                '<small class="text-muted"><i class="bi bi-wallet2 me-1"></i>Deposit: ' + formatRp(m.deposit) + '</small>' +
+                                '<small class="text-muted"><i class="bi bi-geo-alt me-1"></i>' + escHtml(m.cabang) + '</small>' +
+                            '</div>' +
+                            '<div class="d-flex justify-content-between align-items-end">' +
+                                '<div>' +
+                                    '<div class="price-label">Mulai dari</div>' +
+                                    '<div class="price">' + formatRp(m.harga_perhari) + '<span>/hari</span></div>' +
+                                '</div>' +
+                                '<button type="button" class="btn btn-rental">Sewa</button>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+        });
+
+        $grid.html(html);
+    }
+
+    function mobilSkeleton() {
+        var html = '';
+
+        for (var i = 0; i < 3; i++) {
+            html +=
+                '<div class="col-md-6 col-lg-4">' +
+                    '<div class="skel-card">' +
+                        '<div class="skel-line" style="height: 210px; border-radius: 0;"></div>' +
+                        '<div class="p-3">' +
+                            '<div class="skel-line mb-2" style="height: 20px; width: 60%;"></div>' +
+                            '<div class="skel-line mb-3" style="height: 14px; width: 80%;"></div>' +
+                            '<div class="skel-line" style="height: 28px; width: 45%;"></div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+        }
+
+        return html;
+    }
+
+    function fetchMobils() {
+        $('#mobilGrid').html(mobilSkeleton());
+
+        $.ajax({
+            url: mobilSearchUrl,
+            method: 'GET',
+            data: {
+                q: $('#filterQ').val(),
+                cabang: $('#filterCabang').val(),
+                transmisi: $('#filterTransmisi').val(),
+            },
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }).done(function(data) {
+            renderMobilGrid(data);
+        });
+    }
+
+    $('#filterQ').on('input', function() {
+        clearTimeout(mobilSearchTimer);
+        mobilSearchTimer = setTimeout(fetchMobils, 350);
+    });
+
+    $('#filterCabang, #filterTransmisi').on('change', fetchMobils);
+
+    // Count-up statistik (GoodUI + 60fps): angka berjalan saat halaman dibuka.
+    (function() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        document.querySelectorAll('.stat-number[data-count]').forEach(function(el) {
+            var target = parseFloat(el.dataset.count) || 0;
+            var rp = el.dataset.rp === '1';
+            var dur = 900;
+            var t0 = null;
+
+            function fmt(v) {
+                var n = Math.round(v).toLocaleString('id-ID');
+                return rp ? 'Rp ' + n : n;
+            }
+
+            function tick(t) {
+                if (!t0) t0 = t;
+                var p = Math.min((t - t0) / dur, 1);
+                var eased = 1 - Math.pow(1 - p, 4);
+                el.textContent = fmt(target * eased);
+                if (p < 1) requestAnimationFrame(tick);
+            }
+
+            requestAnimationFrame(tick);
+        });
+    })();
 
 </script>
 

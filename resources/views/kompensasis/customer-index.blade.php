@@ -111,7 +111,6 @@
             vertical-align: middle;
         }
 
-        /* Sembunyikan ikon sort di semua kolom */
         #kompensasis-table thead .dt-column-order {
             display: none !important;
         }
@@ -143,20 +142,74 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
 
-    @include('layouts.partials.navbar')
+<nav class="navbar navbar-expand-lg sticky-top">
 
-    <div class="container-fluid px-4">
+    <div class="container py-3">
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{{ route('customer.dashboard') }}" class="text-decoration-none brand">
+            Rental<span>ku</span>.
+        </a>
+
+        <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#customerNav" aria-controls="customerNav" aria-expanded="false" aria-label="Menu navigasi">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="customerNav">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-2">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="{{ route('customer.dashboard') }}#mobil">Cari Mobil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="{{ route('customer.dashboard') }}#rental-saya">Rental Saya</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold" href="{{ route('customer.kompensasi.index') }}">Kompensasi</a>
+                </li>
+                <li class="nav-item d-lg-none">
+                    <form action="{{ route('logout') }}" method="POST" class="m-0">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                            <i class="bi bi-box-arrow-right me-1"></i>
+                            Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 ms-2">
+
+            <div class="user-box d-none d-md-flex"
+                 data-bs-toggle="modal"
+                 data-bs-target="#profileModal"
+                 style="cursor: pointer;">
+
+                <div class="user-icon">
+                    <i class="bi bi-person"></i>
+                </div>
+
+                <span>
+                    {{ Auth::user()->name }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</nav>
+
+    <div class="container py-5">
+
+        <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center mb-4">
 
             <div>
                 <h2 class="page-title mb-1">
@@ -217,16 +270,16 @@
 
                     <div class="p-4 border-bottom">
 
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center">
 
                             <div>
 
                                 <h5 class="fw-bold mb-1">
-                                    Klaim Kompensasi Saya
+                                    Ajukan Klaim
                                 </h5>
 
                                 <small class="text-muted">
-                                    Riwayat klaim yang Anda ajukan.
+                                    Ajukan klaim baru dan pantau riwayat klaim Anda.
                                 </small>
 
                             </div>
@@ -317,20 +370,7 @@
 
                 <div class="modal-content">
 
-                    <div class="modal-header">
-
-                        <h5 class="modal-title fw-bold">
-                            <i class="bi bi-eye me-2"></i>
-                            Detail Klaim Kompensasi
-                        </h5>
-
-                        <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal">
-                        </button>
-
-                    </div>
+                    @include('layouts.partials.modal-head', ['title' => 'Detail Klaim Kompensasi', 'icon' => 'bi-eye'])
 
                     <div class="modal-body">
 
@@ -410,23 +450,10 @@
 
                 <div class="modal-content">
 
-                    <div class="modal-header">
-
-                        <h5 class="modal-title fw-bold">
-                            <i class="bi bi-plus-circle text-success me-2"></i>
-                            Ajukan Klaim Kompensasi
-                        </h5>
-
-                        <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal">
-                        </button>
-
-                    </div>
+                    @include('layouts.partials.modal-head', ['title' => 'Ajukan Klaim Kompensasi', 'icon' => 'bi-plus-circle'])
 
                     <form
-                        action="{{ route('kompensasis.store') }}"
+                        action="{{ route('customer.kompensasi.store') }}"
                         method="POST"
                         id="formAjukanKompensasi">
 
@@ -441,7 +468,7 @@
                             <select name="rental_id" id="ajuanRentalId" class="form-select" required>
                                 <option value="">-- Pilih Rental --</option>
                                 @foreach($rentals as $rental)
-                                    <option value="{{ $rental->id }}" data-mobil="{{ $rental->mobil->id }}" data-mobil-name="{{ $rental->mobil->name }}" data-plate="{{ $rental->mobil->plate_number }}">
+                                    <option value="{{ $rental->id }}" data-mobil="{{ $rental->mobil->id }}" data-mobil-name="{{ $rental->mobil->name }}" data-plate="{{ $rental->mobil->plate_number }}" data-image="{{ $rental->mobil->image ? asset($rental->mobil->image) : '' }}" data-mulai="{{ $rental->tanggal_mulai->format('d/m/Y') }}" data-selesai="{{ $rental->tanggal_selesai->format('d/m/Y') }}">
                                         {{ $rental->mobil->name ?? '-' }} ({{ $rental->mobil->plate_number ?? '-' }})
                                     </option>
                                 @endforeach
@@ -451,9 +478,31 @@
                                 Mobil
                             </label>
 
-                            <input type="text" id="ajuanMobilDisplay" class="form-control" readonly>
-
                             <input type="hidden" name="mobil_id" id="ajuanMobilId">
+
+                            <div id="mobilEmpty" class="text-muted small border rounded-3 p-3">
+                                Pilih rental dulu untuk melihat mobil.
+                            </div>
+
+                            <div id="mobilCard" class="d-none border rounded-3 p-3" style="background: #f5f8f6;">
+
+                                <div class="d-flex gap-3 align-items-center">
+
+                                    <img id="mobilCardImg" src="" alt="Foto mobil" style="width: 96px; height: 72px; object-fit: cover; border-radius: 10px;">
+
+                                    <div>
+
+                                        <div id="mobilCardName" class="fw-bold"></div>
+
+                                        <small id="mobilCardPlate" class="text-muted d-block"></small>
+
+                                        <small id="mobilCardPeriod" class="text-muted d-block"></small>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
 
                             <label class="form-label fw-semibold mt-3">
                                 Jenis Kompensasi
@@ -550,6 +599,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+    @include('layouts.partials.profile-modal')
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -603,26 +654,31 @@
             return 'Rp ' + Number(value).toLocaleString('id-ID');
         }
 
-        const rentalMobilMap = {
-            @foreach($rentals as $rental)
-                {{ $rental->id }}: {
-                    mobil_id: {{ $rental->mobil_id }},
-                    mobil_name: '{{ $rental->mobil->name }}',
-                    plate: '{{ $rental->mobil->plate_number }}',
-                },
-            @endforeach
-        };
-
         $(document).ready(function() {
 
             $('#ajuanRentalId').on('change', function() {
-                const rentalId = $(this).val();
-                if (rentalMobilMap[rentalId]) {
-                    $('#ajuanMobilId').val(rentalMobilMap[rentalId].mobil_id);
-                    $('#ajuanMobilDisplay').val(rentalMobilMap[rentalId].mobil_name + ' (' + rentalMobilMap[rentalId].plate + ')');
+                const opt = $(this).find('option:selected');
+                const mobilId = opt.data('mobil');
+
+                if (mobilId) {
+                    $('#ajuanMobilId').val(mobilId);
+                    $('#mobilCardName').text(opt.data('mobil-name'));
+                    $('#mobilCardPlate').text(opt.data('plate'));
+                    $('#mobilCardPeriod').text('Disewa ' + opt.data('mulai') + ' - ' + opt.data('selesai'));
+
+                    const img = opt.data('image');
+                    if (img) {
+                        $('#mobilCardImg').attr('src', img).attr('alt', opt.data('mobil-name')).show();
+                    } else {
+                        $('#mobilCardImg').hide();
+                    }
+
+                    $('#mobilCard').removeClass('d-none');
+                    $('#mobilEmpty').addClass('d-none');
                 } else {
                     $('#ajuanMobilId').val('');
-                    $('#ajuanMobilDisplay').val('');
+                    $('#mobilCard').addClass('d-none');
+                    $('#mobilEmpty').removeClass('d-none');
                 }
             });
 
@@ -641,7 +697,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{ route('kompensasis.customerData') }}',
+                    url: '{{ route('customer.kompensasi.data') }}',
                     type: 'GET',
                 },
                 columns: [{
@@ -732,6 +788,13 @@
                 },
             });
 
+            @if(request('baru'))
+                @if(request('rental') && $rentals->contains('id', (int) request('rental')))
+                    $('#ajuanRentalId').val('{{ (int) request('rental') }}');
+                @endif
+                bootstrap.Modal.getOrCreateInstance($('#ajukanKompensasiModal')[0]).show();
+                $('#ajuanRentalId').trigger('change');
+            @endif
         });
 
         function openDetail(id) {
@@ -748,13 +811,12 @@
             }
 
             $('#detailTanggal').val(data.tanggal);
-            $('#detailJenis').val(data.jenis === 'pengembalian_dana' ? 'Pengembalian Dana' :
-                (data.jenis === 'diskon' ? 'Diskon' : 'Gratis Sewa'));
+            var jenisLabels = { pengembalian_dana: 'Pengembalian Dana', diskon: 'Diskon', gratis_sewa: 'Gratis Sewa' };
+            var statusLabels = { diajukan: 'Diajukan', disetujui: 'Disetujui', ditolak: 'Ditolak', selesai: 'Selesai' };
+            $('#detailJenis').val(jenisLabels[data.jenis] || 'Gratis Sewa');
             $('#detailMobil').val(data.mobil_name + ' (' + data.mobil_plate + ')');
             $('#detailNominal').val(formatRupiah(data.nominal));
-            $('#detailStatus').val(data.status === 'diajukan' ? 'Diajukan' :
-                (data.status === 'disetujui' ? 'Disetujui' :
-                (data.status === 'ditolak' ? 'Ditolak' : 'Selesai')));
+            $('#detailStatus').val(statusLabels[data.status] || 'Selesai');
             $('#detailStaff').val(data.staff_name);
             $('#detailAlasan').val(data.alasan);
             $('#detailCatatan').val(data.catatan || '-');
@@ -765,10 +827,27 @@
         $(document).on('submit', '#formAjukanKompensasi', function(e) {
             e.preventDefault();
 
-            const formData = new FormData(this);
+            const form = this;
+            const rentalText = $('#ajuanRentalId option:selected').text().trim();
+            const jenisText = $('#ajuanJenis option:selected').text().trim();
+
+            Swal.fire({
+                title: 'Ajukan klaim ini?',
+                html: 'Klaim <strong>' + jenisText + '</strong> untuk <strong>' + rentalText + '</strong> akan dikirim dan tidak bisa diubah.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, ajukan',
+                cancelButtonText: 'Periksa lagi',
+            }).then(function(result) {
+                if (result.isConfirmed) kirimKlaim(form);
+            });
+        });
+
+        function kirimKlaim(form) {
+            const formData = new FormData(form);
 
             $.ajax({
-                url: $(this).attr('action'),
+                url: $(form).attr('action'),
                 method: 'POST',
                 data: formData,
                 processData: false,
@@ -803,7 +882,7 @@
                     });
                 }
             });
-        });
+        }
 
     </script>
 

@@ -34,14 +34,12 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, .05);
         }
 
-        .form-control,
-        .form-select {
+        .form-control {
             border-radius: 10px;
             padding: 11px 13px;
         }
 
-        .form-control:focus,
-        .form-select:focus {
+        .form-control:focus {
             border-color: #198754;
             box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .12);
         }
@@ -90,11 +88,6 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
-
         .page-content {
             padding: 24px;
         }
@@ -105,15 +98,15 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
 
-{{-- Sidebar Layout --}}
 @include('layouts.partials.sidebar')
 
 <script>
-    // Inject navbar into sidebar layout
     document.addEventListener('DOMContentLoaded', function() {
         const mainContent = document.getElementById('mainContent');
         const pageContent = mainContent?.querySelector('.page-content');
@@ -127,7 +120,6 @@
     });
 </script>
 
-{{-- Page Content --}}
 <div class="page-content">
 
 <div class="container-fluid px-4">
@@ -269,20 +261,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-plus-circle text-success me-2"></i>
-                        Tambah Tipe Mobil
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Tambah Tipe Mobil', 'icon' => 'bi-plus-circle'])
 
                 <form
                     action="{{ route('tipe_mobils.store') }}"
@@ -357,20 +336,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-pencil-square text-primary me-2"></i>
-                        Edit Tipe Mobil
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Edit Tipe Mobil', 'icon' => 'bi-pencil-square'])
 
                 <form
                     action=""

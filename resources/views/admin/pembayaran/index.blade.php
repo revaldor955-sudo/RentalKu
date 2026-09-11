@@ -83,20 +83,10 @@
             border: 1px solid #ddd;
         }
 
-        .modal-footer .btn {
-            padding: 6px 14px;
-            min-width: 100px;
-        }
-
         .modal-content {
             border: none;
             border-radius: 18px;
             overflow: hidden;
-        }
-
-        .modal-header {
-            background: #198754;
-            color: white;
         }
 
         /* Sidebar layout base styles are in admin-sidebar.blade.php */
@@ -111,15 +101,15 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
 
-{{-- Sidebar Layout --}}
 @include('layouts.partials.sidebar')
 
 <script>
-    // Inject navbar into sidebar layout
     document.addEventListener('DOMContentLoaded', function() {
         const mainContent = document.getElementById('mainContent');
         const pageContent = mainContent?.querySelector('.page-content');
@@ -133,13 +123,10 @@
     });
 </script>
 
-{{-- Page Content --}}
 <div class="page-content">
 
 <div class="container-fluid px-4">
 
-
-    {{-- HEADER --}}
 
     <div class="mb-4">
 
@@ -156,8 +143,6 @@
 
     </div>
 
-
-    {{-- ALERT --}}
 
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show mb-4">
@@ -188,8 +173,6 @@
 
     @endif
 
-
-    {{-- TABLE --}}
 
     <div class="page-card">
 
@@ -251,17 +234,13 @@
 
     </div>
 
-</div>
+    </div>
 
 
-{{-- MODAL LIHAT BUKTI --}}
 <div class="modal fade" id="fotoPembayaranModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Bukti Pembayaran</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Bukti Pembayaran'])
             <div class="modal-body p-3 text-center">
                 <img id="fotoPembayaranPreview" src="" class="img-fluid rounded" alt="Bukti pembayaran">
             </div>
@@ -269,7 +248,6 @@
     </div>
 </div>
 
-{{-- MODAL DETAIL PEMBAYARAN --}}
 <div class="modal fade" id="detailPembayaranModal" tabindex="-1" aria-labelledby="detailPembayaranModalLabel"
     aria-hidden="true">
 
@@ -277,21 +255,10 @@
 
         <div class="modal-content">
 
-            <div class="modal-header bg-success text-white">
-
-                <h5 class="modal-title" id="detailPembayaranModalLabel">
-                    <i class="bi bi-credit-card me-2"></i>
-                    Detail Pembayaran
-                </h5>
-
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Tutup"></button>
-
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Detail Pembayaran', 'icon' => 'bi-credit-card', 'titleId' => 'detailPembayaranModalLabel'])
 
             <div class="modal-body p-4">
 
-                {{-- LOADING --}}
                 <div id="pembayaranDetailLoading" class="text-center py-5">
                     <div class="spinner-border text-success" role="status"></div>
                     <p class="text-muted mt-3 mb-0">
@@ -299,7 +266,6 @@
                     </p>
                 </div>
 
-                {{-- ERROR --}}
                 <div id="pembayaranDetailError" class="alert alert-danger d-none" role="alert">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i>
                     <span id="pembayaranDetailErrorMessage">
@@ -307,7 +273,6 @@
                     </span>
                 </div>
 
-                {{-- KONTEN --}}
                 <div id="pembayaranDetailContent" class="d-none">
 
                     <div class="row g-3">
@@ -429,51 +394,51 @@
         });
     }
 
-                    function formatRupiah(value) {
-                        return 'Rp ' + Number(value).toLocaleString('id-ID');
-                    }
+    function formatRupiah(value) {
+        return 'Rp ' + Number(value).toLocaleString('id-ID');
+    }
 
-                    function openFotoPembayaran(url) {
+    function openFotoPembayaran(url) {
         $('#fotoPembayaranPreview').attr('src', url);
         bootstrap.Modal.getOrCreateInstance($('#fotoPembayaranModal')[0]).show();
     }
 
     function statusBadge(status) {
-                        const map = {
-                            'Menunggu': 'status-menunggu',
-                            'Disetujui': 'status-disetujui',
-                            'Ditolak': 'status-ditolak',
-                        };
+        const map = {
+            'Menunggu': 'status-menunggu',
+            'Disetujui': 'status-disetujui',
+            'Ditolak': 'status-ditolak',
+        };
 
-                        const cls = map[status] || 'bg-secondary text-white';
+        const cls = map[status] || 'bg-secondary text-white';
 
-                        return '<span class="badge-status ' + cls + '">' + status + '</span>';
-                    }
+        return '<span class="badge-status ' + cls + '">' + status + '</span>';
+    }
 
-                    function pembayaranActions(data) {
-                        let html = '<div class="d-flex gap-2 justify-content-end">';
+    function pembayaranActions(data) {
+        let html = '<div class="d-flex gap-2 justify-content-end">';
 
-                        html += '<button class="btn p-1 text-primary" style="border:none;background:none;" ' +
-                            'onclick="openPembayaranDetail(' + data.id + ')" title="Detail">' +
-                            '<i class="bi bi-eye"></i></button>';
+        html += '<button class="btn p-1 text-primary" style="border:none;background:none;" ' +
+            'onclick="openPembayaranDetail(' + data.id + ')" title="Detail">' +
+            '<i class="bi bi-eye"></i></button>';
 
-                        if (data.status === 'Menunggu') {
-                            html += '<button class="btn p-1 text-success" style="border:none;background:none;" ' +
-                                'onclick="updatePembayaranStatus(' + data.id + ', \'Disetujui\')" title="Setujui">' +
-                                '<i class="bi bi-check-circle"></i></button>';
-                            html += '<button class="btn p-1 text-danger" style="border:none;background:none;" ' +
-                                'onclick="updatePembayaranStatus(' + data.id + ', \'Ditolak\')" title="Tolak">' +
-                                '<i class="bi bi-x-circle"></i></button>';
-                        }
+        if (data.status === 'Menunggu') {
+            html += '<button class="btn p-1 text-success" style="border:none;background:none;" ' +
+                'onclick="updatePembayaranStatus(' + data.id + ', \'Disetujui\')" title="Setujui">' +
+                '<i class="bi bi-check-circle"></i></button>';
+            html += '<button class="btn p-1 text-danger" style="border:none;background:none;" ' +
+                'onclick="updatePembayaranStatus(' + data.id + ', \'Ditolak\')" title="Tolak">' +
+                '<i class="bi bi-x-circle"></i></button>';
+        }
 
-                        html += '</div>';
+        html += '</div>';
 
-                        return html;
-                    }
+        return html;
+    }
 
-                    $(document).ready(function() {
+    $(document).ready(function() {
 
-                        $('#pembayaran-table').DataTable({
+        $('#pembayaran-table').DataTable({
                             processing: true,
                             serverSide: true,
                             ajax: {
@@ -519,25 +484,16 @@
                                     data: 'mobil_name',
                                     orderable: true,
                                     searchable: false,
-                                    render: function(data) {
-                                        return data;
-                                    },
                                 },
                                 {
                                     data: 'metode_name',
                                     orderable: true,
                                     searchable: false,
-                                    render: function(data) {
-                                        return data;
-                                    },
                                 },
                                 {
                                     data: 'tanggal_bayar',
                                     orderable: true,
                                     searchable: false,
-                                    render: function(data) {
-                                        return data;
-                                    },
                                 },
                                 {
                                     data: 'jumlah',
@@ -577,7 +533,6 @@
                                 info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
                                 infoEmpty: 'Tidak ada data',
                                 infoFiltered: '(difilter dari _MAX_ total data)',
-                                infoPostFix: '',
                                 loadingRecords: 'Memuat...',
                                 zeroRecords: 'Tidak ditemukan data yang cocok',
                                 emptyTable: 'Belum ada pembayaran',
@@ -588,55 +543,55 @@
                             },
                         });
 
-                    });
+    });
 
-                    function openPembayaranDetail(id) {
+    function openPembayaranDetail(id) {
 
-                        var $modal = bootstrap.Modal.getOrCreateInstance($('#detailPembayaranModal')[0]);
+        var $modal = bootstrap.Modal.getOrCreateInstance($('#detailPembayaranModal')[0]);
 
-                        var $loading = $('#pembayaranDetailLoading');
-                        var $error = $('#pembayaranDetailError');
-                        var $content = $('#pembayaranDetailContent');
+        var $loading = $('#pembayaranDetailLoading');
+        var $error = $('#pembayaranDetailError');
+        var $content = $('#pembayaranDetailContent');
 
-                        $loading.removeClass('d-none');
-                        $error.addClass('d-none');
-                        $content.addClass('d-none');
+        $loading.removeClass('d-none');
+        $error.addClass('d-none');
+        $content.addClass('d-none');
 
-                        $modal.show();
+        $modal.show();
 
-                        $.ajax({
-                            url: "{{ route('pembayarans.detail', '__ID__') }}".replace('__ID__', id),
-                            method: 'GET',
-                            success: function(data) {
-                                $('#pd-pelanggan').text(data.pelanggan);
-                                $('#pd-email').text(data.email);
-                                $('#pd-mobil').text(data.mobil);
-                                $('#pd-plat').text(data.plat);
-                                $('#pd-metode').text(data.metode);
-                                $('#pd-tanggal').text(data.tanggal_bayar);
-                                $('#pd-jumlah').text(formatRupiah(data.jumlah));
-                                $('#pd-status').html(statusBadge(data.status));
+        $.ajax({
+            url: "{{ route('pembayarans.detail', '__ID__') }}".replace('__ID__', id),
+            method: 'GET',
+            success: function(data) {
+                $('#pd-pelanggan').text(data.pelanggan);
+                $('#pd-email').text(data.email);
+                $('#pd-mobil').text(data.mobil);
+                $('#pd-plat').text(data.plat);
+                $('#pd-metode').text(data.metode);
+                $('#pd-tanggal').text(data.tanggal_bayar);
+                $('#pd-jumlah').text(formatRupiah(data.jumlah));
+                $('#pd-status').html(statusBadge(data.status));
 
-                                var $buktiContainer = $('#pd-bukti');
-                                $buktiContainer.empty();
+                var $buktiContainer = $('#pd-bukti');
+                $buktiContainer.empty();
 
-                                if (data.bukti_url) {
-                                    $buktiContainer.append('<img src="' + data.bukti_url + '" class="proof-image" alt="Bukti pembayaran">');
-                                } else {
-                                    $buktiContainer.html('<span class="text-muted">Tidak ada</span>');
-                                }
+                if (data.bukti_url) {
+                    $buktiContainer.append('<img src="' + data.bukti_url + '" class="proof-image" alt="Bukti pembayaran">');
+                } else {
+                    $buktiContainer.html('<span class="text-muted">Tidak ada</span>');
+                }
 
-                                $loading.addClass('d-none');
-                                $content.removeClass('d-none');
-                            },
-                            error: function(xhr) {
-                                $loading.addClass('d-none');
-                                $error.removeClass('d-none');
-                                $('#pembayaranDetailErrorMessage').text('Gagal memuat detail pembayaran: ' + xhr.status + ' ' + xhr.statusText);
-                            }
-                        });
+                $loading.addClass('d-none');
+                $content.removeClass('d-none');
+            },
+            error: function(xhr) {
+                $loading.addClass('d-none');
+                $error.removeClass('d-none');
+                $('#pembayaranDetailErrorMessage').text('Gagal memuat detail pembayaran: ' + xhr.status + ' ' + xhr.statusText);
+            }
+        });
 
-                    }
+    }
 </script>
 
 </body>

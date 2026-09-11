@@ -31,6 +31,8 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+// Master data: khusus admin.
+Route::middleware('admin')->group(function () {
 Route::get('roles/data', [RoleController::class, 'data'])->name('roles.data');
 
 Route::resource('roles', RoleController::class)
@@ -72,6 +74,7 @@ Route::get('/kupons/data', [KuponController::class, 'data'])
 
 Route::resource('kupons', KuponController::class)
     ->except(['create', 'edit', 'show']);
+}); // end admin master data
 
 Route::resource('mobils', MobilController::class)
     ->except(['create', 'edit', 'show', 'update', 'destroy'])
@@ -95,6 +98,8 @@ Route::middleware('admin')->group(function () {
         ->name('mobils.destroy');
 });
 
+// Master penunjang mobil: khusus admin.
+Route::middleware('admin')->group(function () {
 Route::get('kerusakan_mobils/data', [KerusakanMobilController::class, 'data'])->name('kerusakan_mobils.data');
 
 Route::resource('kerusakan_mobils', KerusakanMobilController::class)
@@ -109,24 +114,32 @@ Route::get('dokumen_mobils/data', [DokumenMobilController::class, 'data'])->name
 
 Route::resource('dokumen_mobils', DokumenMobilController::class)
     ->except(['create', 'edit', 'show']);
+}); // end admin master penunjang mobil
 
-Route::get('dendas/data', [DendaController::class, 'data'])->name('dendas.data');
+Route::get('dendas/data', [DendaController::class, 'data'])->name('dendas.data')->middleware('adminstaff');
 
 Route::resource('dendas', DendaController::class)
     ->except(['create', 'edit', 'show'])
     ->middleware('adminstaff');
 
-Route::get('kompensasis/data', [KompensasiController::class, 'data'])->name('kompensasis.data');
+Route::middleware('adminstaff')->group(function () {
+    Route::put('/dendas/{denda}/status', [DendaController::class, 'updateStatus'])
+        ->name('dendas.updateStatus');
+});
+
+Route::get('kompensasis/data', [KompensasiController::class, 'data'])->name('kompensasis.data')->middleware('adminstaff');
 
 Route::resource('kompensasis', KompensasiController::class)
     ->except(['create', 'edit', 'show'])
     ->middleware('adminstaff');
 
-Route::get('servis_mobils/data', [ServisMobilController::class, 'data'])->name('servis_mobils.data');
+Route::get('servis_mobils/data', [ServisMobilController::class, 'data'])->name('servis_mobils.data')->middleware('adminstaff');
 
 Route::resource('servis_mobils', ServisMobilController::class)
     ->middleware('adminstaff');
 
+// Master konten: khusus admin.
+Route::middleware('admin')->group(function () {
 Route::resource('banners', BannerController::class)
     ->except(['create', 'edit', 'show']);
 
@@ -136,6 +149,7 @@ Route::get('faqs/data', [FaqController::class, 'data'])->name('faqs.data');
 
 Route::resource('faqs', FaqController::class)
     ->except(['create', 'edit', 'show']);
+}); // end admin master konten
 
 Route::get('/', [HomeController::class, 'index'])
     ->middleware('guest')
@@ -186,6 +200,9 @@ Route::get('/customer/dashboard', [CustomerDashboardController::class, 'index'])
     ->middleware('customer')
     ->name('customer.dashboard');
 Route::middleware('customer')->group(function () {
+    Route::get('/customer/mobils/search', [CustomerDashboardController::class, 'search'])
+        ->name('customer.mobils.search');
+
     Route::post('/customer/rental/{mobil}', [RentalController::class, 'store'])
         ->name('rentals.store');
 
@@ -203,6 +220,12 @@ Route::middleware('customer')->group(function () {
 
     Route::get('/customer/kompensasi/create', [KompensasiController::class, 'customerCreate'])
         ->name('customer.kompensasi.create');
+
+    Route::post('/customer/kompensasi', [KompensasiController::class, 'store'])
+        ->name('customer.kompensasi.store');
+
+    Route::post('/customer/dendas/{denda}/bayar', [DendaController::class, 'customerBayar'])
+        ->name('customer.dendas.bayar');
 });
 
 Route::middleware('adminstaff')->group(function () {

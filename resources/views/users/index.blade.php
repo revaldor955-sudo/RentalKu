@@ -82,21 +82,16 @@
             font-size: 20px;
         }
 
-    .table thead th {
-        background: #f8faf9;
-        color: #6c757d;
-        font-size: 12px;
-        text-transform: uppercase;
-        white-space: nowrap;
-        border-bottom: 1px solid #e9ecef;
-        padding: 12px 16px;
-    }
-
-        .table tbody td {
-            vertical-align: middle;
+        .table thead th {
+            background: #f8faf9;
+            color: #6c757d;
+            font-size: 12px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            border-bottom: 1px solid #e9ecef;
+            padding: 12px 16px;
         }
 
-        /* Sembunyikan ikon sort di semua kolom */
         #users-table thead .dt-column-order {
             display: none !important;
         }
@@ -129,15 +124,6 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
-
-        .modal-header .btn-close {
-            filter: brightness(0) invert(1);
-        }
-
         .modal-footer .btn {
             padding: 6px 14px;
             min-width: 100px;
@@ -153,15 +139,15 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
 
-{{-- Sidebar Layout --}}
 @include('layouts.partials.sidebar')
 
 <script>
-    // Inject navbar into sidebar layout
     document.addEventListener('DOMContentLoaded', function() {
         const mainContent = document.getElementById('mainContent');
         const pageContent = mainContent?.querySelector('.page-content');
@@ -175,7 +161,6 @@
     });
 </script>
 
-{{-- Page Content --}}
 <div class="page-content">
 
 <div class="container-fluid px-4">
@@ -280,7 +265,6 @@
                 </thead>
 
                 <tbody>
-                    {{-- Diisi oleh DataTables (server-side) --}}
                 </tbody>
 
             </table>
@@ -292,23 +276,13 @@
 </div>
 
 
-{{-- MODAL EDIT (reusabel, diisi via AJAX) --}}
 <div class="modal fade" id="editUserModal" tabindex="-1">
 
     <div class="modal-dialog modal-lg modal-dialog-centered">
 
         <div class="modal-content">
 
-            <div class="modal-header">
-
-                <h5 class="modal-title">
-                    <i class="bi bi-pencil-square me-2"></i>
-                    Edit Pengguna
-                </h5>
-
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Edit Pengguna', 'icon' => 'bi-pencil-square'])
 
             <form id="editUserForm" action="" method="POST" enctype="multipart/form-data">
 
@@ -457,17 +431,7 @@
 
         <div class="modal-content">
 
-            <div class="modal-header">
-
-                <h5 class="modal-title" id="detailUserModalLabel">
-                    <i class="bi bi-person-badge me-2"></i>
-                    Detail Pengguna
-                </h5>
-
-                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                    aria-label="Tutup"></button>
-
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Detail Pengguna', 'icon' => 'bi-person-badge', 'titleId' => 'detailUserModalLabel'])
 
             <div class="modal-body p-4">
 
@@ -533,10 +497,7 @@
 <div class="modal fade" id="fotoUserModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Foto Pengguna</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Foto Pengguna'])
             <div class="modal-body p-3 text-center">
                 <img id="fotoUserPreview" src="" class="img-fluid rounded" alt="Foto pengguna">
             </div>
@@ -550,16 +511,7 @@
 
         <div class="modal-content">
 
-            <div class="modal-header">
-
-                <h5 class="modal-title">
-                    <i class="bi bi-person-plus-fill me-2"></i>
-                    Tambah Pengguna
-                </h5>
-
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Tambah Pengguna', 'icon' => 'bi-person-plus-fill'])
 
 
             <form id="tambahUserForm" action="{{ route('users.store') }}" method="POST"
@@ -789,7 +741,6 @@
             serverSide: true,
             ajax: {
                 url: '{{ route('users.data') }}',
-                type: 'GET',
             },
             columns: [{
                     data: null,
@@ -1006,48 +957,48 @@
         });
     }
 
-                        function deleteUser(id, name) {
-                            Swal.fire({
-                                title: 'Konfirmasi',
-                                text: 'Apakah Anda yakin ingin menghapus pengguna "' + name + '"?',
-                                icon: 'warning',
-                                showCancelButton: true,
-                                confirmButtonText: 'Ya, hapus',
-                                cancelButtonText: 'Batal',
-                            }).then(function(result) {
-                                if (!result.isConfirmed) return;
+    function deleteUser(id, name) {
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: 'Apakah Anda yakin ingin menghapus pengguna "' + name + '"?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus',
+            cancelButtonText: 'Batal',
+        }).then(function(result) {
+            if (!result.isConfirmed) return;
 
-                                $.ajax({
-                                    url: '{{ route('users.destroy', '__ID__') }}'.replace('__ID__', id),
-                                    method: 'DELETE',
-                                    headers: {
-                                        'X-CSRF-TOKEN': CSRF_TOKEN,
-                                        'Accept': 'application/json',
-                                        'X-Requested-With': 'XMLHttpRequest',
-                                    },
-                                    success: function(result) {
-                                        $('#users-table').DataTable().ajax.reload();
+            $.ajax({
+                url: '{{ route('users.destroy', '__ID__') }}'.replace('__ID__', id),
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                success: function(result) {
+                    $('#users-table').DataTable().ajax.reload();
 
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'Berhasil',
-                                            text: result.message,
-                                            timer: 1500,
-                                            showConfirmButton: false,
-                                        });
-                                    },
-                                    error: function(xhr) {
-                                        const result = xhr.responseJSON || {};
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Gagal',
-                                            text: result.message ||
-                                                'Terjadi kesalahan saat menghapus pengguna.',
-                                        });
-                                    }
-                                });
-                            });
-                        }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: result.message,
+                        timer: 1500,
+                        showConfirmButton: false,
+                    });
+                },
+                error: function(xhr) {
+                    const result = xhr.responseJSON || {};
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: result.message ||
+                            'Terjadi kesalahan saat menghapus pengguna.',
+                    });
+                }
+            });
+        });
+    }
 </script>
 
 </body>

@@ -74,22 +74,22 @@
             vertical-align: middle;
         }
 
-        /* Sembunyikan ikon sort di semua kolom */
         #supirs-table thead .dt-column-order {
             display: none !important;
         }
 
-        .supir-photo {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-
+        .supir-photo,
         .photo-placeholder {
             width: 50px;
             height: 50px;
             border-radius: 8px;
+        }
+
+        .supir-photo {
+            object-fit: cover;
+        }
+
+        .photo-placeholder {
             background: #e9f7ef;
             color: #198754;
             display: flex;
@@ -126,11 +126,6 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
-
         .page-content {
             padding: 24px;
         }
@@ -141,15 +136,15 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
 
-{{-- Sidebar Layout --}}
 @include('layouts.partials.sidebar')
 
 <script>
-    // Inject navbar into sidebar layout
     document.addEventListener('DOMContentLoaded', function() {
         const mainContent = document.getElementById('mainContent');
         const pageContent = mainContent?.querySelector('.page-content');
@@ -163,7 +158,6 @@
     });
 </script>
 
-{{-- Page Content --}}
 <div class="page-content">
 
 <div class="container-fluid px-4">
@@ -317,20 +311,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-plus-circle text-success me-2"></i>
-                        Tambah Supir
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Tambah Supir', 'icon' => 'bi-plus-circle'])
 
                 <form
                     action="{{ route('supirs.store') }}"
@@ -444,20 +425,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-pencil-square text-primary me-2"></i>
-                        Edit Supir
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Edit Supir', 'icon' => 'bi-pencil-square'])
 
                 <form
                     action=""
@@ -589,6 +557,8 @@
 
     var CSRF_TOKEN = '{{ csrf_token() }}';
 
+    var PHOTO_URL = '{{ asset('__PHOTO__') }}';
+
     var $flashSuccess = $('#flashSuccess');
 
     if ($flashSuccess.length) {
@@ -614,7 +584,7 @@
 
     function supirPhoto(image) {
         if (image) {
-            return '<img src="' + '{{ asset('__PHOTO__') }}'.replace('__PHOTO__', image) +
+            return '<img src="' + PHOTO_URL.replace('__PHOTO__', image) +
                 '" class="supir-photo" alt="Foto supir">';
         }
 
@@ -781,7 +751,7 @@
         $('#editStatusSupir').val(data.status);
 
         if (data.image) {
-            $('#editFotoPreview').attr('src', '{{ asset('__PHOTO__') }}'.replace('__PHOTO__', data.image)).show();
+            $('#editFotoPreview').attr('src', PHOTO_URL.replace('__PHOTO__', data.image)).show();
         } else {
             $('#editFotoPreview').hide();
         }

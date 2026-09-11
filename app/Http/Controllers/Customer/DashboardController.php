@@ -3,56 +3,121 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cabang;
+use App\Models\Kompensasi;
+use App\Models\MetodePembayaran;
 use App\Models\Mobil;
 use App\Models\Rental;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Mobil
-        $mobils = Mobil::with([
-            'brand',
-            'tipeMobil',
-            'cabang',
-            'fasilitas'
-        ])
-        ->latest()
-        ->take(6)
-        ->get();
+        $userId = auth()->id();
 
+        $mobilTersediaCount = Mobil::where('status', 'Tersedia')->count();
 
-        // Rental milik customer yang sedang login
-        $rentals = Rental::with([
-            'mobil',
-            'pembayaran'
-        ])
-        ->where('user_id', auth()->id())
-        ->latest()
-        ->get();
+        $rentalCount = Rental::where('user_id', $userId)->count();
 
+        $totalTransaksi = Rental::where('user_id', $userId)->sum('total_harga');
 
-        // Foto mobil dari Pexels
-        $response = Http::withHeaders([
-            'Authorization' => config('services.pexels.key'),
-        ])->get('https://api.pexels.com/v1/search', [
-            'query' => 'car rental',
-            'per_page' => 6,
-            'orientation' => 'landscape',
-        ]);
+        $filters = request()->only(['q', 'cabang', 'transmisi']);
 
-        $photos = [];
+        $mobils = Mobil::with(['brand', 'tipeMobil', 'cabang', 'fasilitas'])
+            ->where('status', 'Tersedia')
+            ->when($filters['q'] ?? null, function ($query, $q) {
+                $query->where('name', 'like', '%' . $q . '%');
+            })
+            ->when($filters['cabang'] ?? null, function ($query, $cabang) {
+                $query->where('cabang_id', $cabang);
+            })
+            ->when($filters['transmisi'] ?? null, function ($query, $transmisi) {
+                $query->where('transmisi', $transmisi);
+            })
+            ->latest()
+            ->take(9)
+            ->get();
 
-        if ($response->successful()) {
-            $photos = $response->json('photos', []);
-        }
+        $cabangs = Cabang::orderBy('name')->get();
 
+        $metodePembayarans = MetodePembayaran::orderBy('name')->get();
+
+        $rentals = Rental::with(['mobil', 'pembayaran', 'dendas', 'cabangAmbil', 'cabangKembali'])
+            ->where('user_id', $userId)
+            ->latest()
+            ->get();
+
+        // Grid aktivitas ala landing: tampil sebagian + tombol muat lagi.
+        $jumlahRental = max(4, (int) request()->input('jumlah_rental', 4));
+        $totalRentals = $rentals->count();
+        $rentalsTampil = $rentals->take($jumlahRental);
+
+        // Hasil verifikasi klaim yang belum dibaca customer.
+        $klaimUpdates = Kompensasi::with('mobil')
+            ->where('customer_id', $userId)
+            ->whereNull('dibaca_at')
+            ->whereIn('status', ['disetujui', 'ditolak', 'selesai'])
+            ->latest()
+            ->get();
+
+        // GoodUI #4 (social proof): 3 mobil paling sering disewa.
+        $populerIds = Rental::selectRaw('mobil_id, COUNT(*) as c')->groupBy('mobil_id')->orderByDesc('c')->limit(3)->pluck('mobil_id')->all();
+        $populerIds = array_map('intval', $populerIds);
 
         return view('customer.dashboard', compact(
             'mobils',
-            'photos',
-            'rentals'
+            'rentals',
+            'mobilTersediaCount',
+            'rentalCount',
+            'totalTransaksi',
+            'cabangs',
+            'filters',
+            'klaimUpdates',
+            'metodePembayarans',
+            'jumlahRental',
+            'totalRentals',
+            'rentalsTampil',
+            'populerIds'
         ));
+    }
+
+    /**
+     * Live search katalog (AJAX): mobil Tersedia + filter.
+     */
+    public function search(Request $request)
+    {
+        $mobils = Mobil::with(['brand', 'tipeMobil', 'cabang'])
+            ->where('status', 'Tersedia')
+            ->when($request->input('q'), function ($query, $q) {
+                $query->where(function ($qq) use ($q) {
+                    $qq->where('mobils.name', 'like', '%' . $q . '%')
+                        ->orWhereHas('brand', function ($b) use ($q) {
+                            $b->where('name', 'like', '%' . $q . '%');
+                        });
+                });
+            })
+            ->when($request->input('cabang'), function ($query, $cabang) {
+                $query->where('cabang_id', $cabang);
+            })
+            ->when($request->input('transmisi'), function ($query, $transmisi) {
+                $query->where('transmisi', $transmisi);
+            })
+            ->latest()
+            ->take(12)
+            ->get();
+
+        return response()->json($mobils->map(function ($mobil) {
+            return [
+                'id' => $mobil->id,
+                'name' => $mobil->name,
+                'image_url' => $mobil->image ? asset($mobil->image) : null,
+                'transmisi' => $mobil->transmisi,
+                'kapasitas' => $mobil->kapasitas,
+                'harga_perhari' => (float) $mobil->harga_perhari,
+                'deposit' => (float) ($mobil->deposit ?? 0),
+                'cabang' => $mobil->cabang->name ?? '-',
+            ];
+        })->values());
     }
 }

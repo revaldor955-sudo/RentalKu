@@ -103,6 +103,8 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
@@ -248,17 +250,7 @@
 
         <div class="modal-content">
 
-            <div class="modal-header bg-success text-white">
-
-                <h5 class="modal-title" id="detailRentalModalLabel">
-                    <i class="bi bi-car-front me-2"></i>
-                    Detail Rental
-                </h5>
-
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Tutup"></button>
-
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Detail Rental', 'icon' => 'bi-car-front', 'titleId' => 'detailRentalModalLabel'])
 
             <div class="modal-body p-4">
 
@@ -384,8 +376,12 @@
     const CSRF_TOKEN = '{{ csrf_token() }}';
 
     function updateRentalStatus(id, status) {
-        const text = status === 'Disetujui' ? 'Setujui pengajuan rental ini?' :
-            (status === 'Ditolak' ? 'Tolak pengajuan rental ini?' : 'Selesaikan rental ini?');
+        const confirmTexts = {
+            'Disetujui': 'Setujui pengajuan rental ini?',
+            'Ditolak': 'Tolak pengajuan rental ini?',
+            'Selesai': 'Selesaikan rental ini?',
+        };
+        const text = confirmTexts[status] || 'Ubah status rental ini?';
 
         Swal.fire({
             title: 'Konfirmasi',
@@ -560,7 +556,6 @@
                     info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
                     infoEmpty: 'Tidak ada data',
                     infoFiltered: '(difilter dari _MAX_ total data)',
-                    infoPostFix: '',
                     loadingRecords: 'Memuat...',
                     zeroRecords: 'Tidak ditemukan data yang cocok',
                     emptyTable: 'Belum ada rental',

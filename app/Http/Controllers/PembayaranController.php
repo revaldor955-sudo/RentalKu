@@ -133,6 +133,25 @@ class PembayaranController extends Controller
         ]);
     }
 
+    /**
+     * Rekening yang boleh dipakai untuk satu cabang: milik cabang itu;
+     * kalau cabang belum punya, pakai milik pusat.
+     */
+    private function metodeUntukCabang($cabangId)
+    {
+        $milikCabang = MetodePembayaran::where('cabang_id', $cabangId)
+            ->orderBy('name')
+            ->get();
+
+        if ($milikCabang->isNotEmpty()) {
+            return $milikCabang;
+        }
+
+        return MetodePembayaran::whereNull('cabang_id')
+            ->orderBy('name')
+            ->get();
+    }
+
     public function create(Rental $rental)
     {
         if ($rental->user_id != Auth::id()) {
@@ -145,7 +164,7 @@ class PembayaranController extends Controller
                 ->with('error', 'Rental belum disetujui.');
         }
 
-        $metodePembayarans = MetodePembayaran::all();
+        $metodePembayarans = $this->metodeUntukCabang($rental->cabang_ambil_id);
 
         return view('customer.pembayaran.create', compact(
             'rental',
@@ -179,6 +198,23 @@ class PembayaranController extends Controller
             'public'
         );
 
+        // Metode harus milik cabang rental (atau pusat bila cabang belum punya).
+        $metodeAllowed = $this->metodeUntukCabang($rental->cabang_ambil_id)
+            ->contains('id', (int) $validated['metode_pembayaran_id']);
+
+        if (! $metodeAllowed) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Metode pembayaran tidak tersedia untuk cabang ini.',
+                    'errors' => ['metode_pembayaran_id' => ['Metode pembayaran tidak tersedia untuk cabang ini.']],
+                ], 422);
+            }
+
+            return back()
+                ->withErrors(['metode_pembayaran_id' => 'Metode pembayaran tidak tersedia untuk cabang ini.'])
+                ->withInput();
+        }
+
         Pembayaran::create([
             'rental_id' => $rental->id,
             'metode_pembayaran_id' => $validated['metode_pembayaran_id'],
@@ -187,6 +223,12 @@ class PembayaranController extends Controller
             'bukti' => $path,
             'status' => 'Menunggu',
         ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Bukti pembayaran berhasil dikirim.',
+            ]);
+        }
 
         return redirect()
             ->route('customer.dashboard')

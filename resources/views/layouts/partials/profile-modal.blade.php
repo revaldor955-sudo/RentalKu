@@ -1,7 +1,10 @@
 {{-- MODAL PROFIL BERSAMA --}}
 {{-- Dipakai admin, staff, dan customer via @include('layouts.partials.profile-modal'). --}}
 {{-- Syarat: Bootstrap CSS + JS bundle sudah dimuat halaman masing-masing. --}}
+{{-- Style header dibawa sendiri agar rapi di halaman mana pun (termasuk via admin/staff-navbar). --}}
 {{-- Trigger: elemen apa pun dengan data-bs-toggle="modal" data-bs-target="#profileModal". --}}
+
+@include('layouts.partials.modal-head-style')
 
 <style>
     .pm-avatar {
@@ -22,10 +25,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
 
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="profileModalLabel">Profil Saya</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Profil Saya', 'titleId' => 'profileModalLabel'])
 
             <div class="modal-body">
                 <div class="d-flex align-items-center gap-3">

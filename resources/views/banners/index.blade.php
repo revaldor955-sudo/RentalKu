@@ -20,7 +20,6 @@
             background: #f5f7f6;
             color: #1f2937;
             font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
-            margin: 0;
         }
 
         .page-card {
@@ -117,11 +116,6 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
-
         .form-control,
         .form-select {
             border-radius: 10px;
@@ -143,6 +137,8 @@
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
@@ -150,7 +146,6 @@
 @include('layouts.partials.sidebar')
 
 <script>
-    // Inject navbar into sidebar layout
     document.addEventListener('DOMContentLoaded', function() {
         const mainContent = document.getElementById('mainContent');
         const pageContent = mainContent?.querySelector('.page-content');
@@ -198,7 +193,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{-- Diisi oleh DataTables (server-side) --}}
                 </tbody>
             </table>
         </div>
@@ -206,14 +200,10 @@
 
 </div>
 
-
 <div class="modal fade" id="fotoBannerModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Gambar Banner</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Gambar Banner'])
             <div class="modal-body p-3 text-center">
                 <img id="fotoBannerPreview" src="" class="img-fluid rounded" alt="Banner">
             </div>
@@ -224,10 +214,7 @@
 <div class="modal fade" id="tambahBannerModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Tambah Banner</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Tambah Banner'])
             <form id="formTambahBanner" action="{{ route('banners.store') }}" method="POST"
                 enctype="multipart/form-data">
                 @csrf
@@ -283,10 +270,7 @@
 <div class="modal fade" id="editBannerModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Edit Banner</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Edit Banner'])
             <form id="formEditBanner" action="" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
@@ -394,7 +378,7 @@
                     data: 'gambar',
                     orderable: false,
                     searchable: false,
-                    render: function(data, row) {
+                    render: function(data) {
                         if (data) {
                             const full = ASSET_BASE_URL + data;
                             return '<a href="#" onclick="openFotoBanner(\'' + full + '\');return false;">' +
