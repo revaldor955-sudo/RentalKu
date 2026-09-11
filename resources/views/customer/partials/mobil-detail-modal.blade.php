@@ -124,7 +124,6 @@
 
     <div class="row g-0">
 
-        {{-- FOTO --}}
         <div class="col-lg-6">
 
             @if($mobil->image)
@@ -143,12 +142,10 @@
 
         </div>
 
-        {{-- INFORMASI --}}
         <div class="col-lg-6">
 
             <div class="mm-content">
 
-                {{-- STATUS --}}
                 @if($mobil->status === 'Tersedia')
 
                     <span class="mm-badge mm-badge-available">
@@ -171,12 +168,9 @@
 
                 <p class="mm-subtitle">
                     <i class="bi bi-car-front me-1"></i>
-                    {{ $mobil->brand->name ?? '-' }}
-                    ·
                     {{ $mobil->tipeMobil->name ?? '-' }}
                 </p>
 
-                {{-- HARGA --}}
                 <div class="mm-price-box">
 
                     <div class="mm-price-label">
@@ -190,7 +184,6 @@
 
                 </div>
 
-                {{-- SPESIFIKASI --}}
                 <div class="row g-2 mt-2">
 
                     <div class="col-6">
@@ -355,7 +348,6 @@
 
                 </div>
 
-                {{-- TOMBOL AKSI --}}
                 <div class="mt-3">
 
                     @if($mobil->status === 'Tersedia')
@@ -477,7 +469,7 @@
                     name="tanggal_mulai"
                     class="form-control"
                     min="{{ date('Y-m-d') }}"
-                    value="{{ old('tanggal_mulai') }}"
+                    value="{{ old('tanggal_mulai', date('Y-m-d')) }}"
                     required>
 
             </div>
@@ -492,8 +484,8 @@
                     type="date"
                     name="tanggal_selesai"
                     class="form-control"
-                    min="{{ date('Y-m-d') }}"
-                    value="{{ old('tanggal_selesai') }}"
+                    min="{{ date('Y-m-d', strtotime('+1 day')) }}"
+                    value="{{ old('tanggal_selesai', date('Y-m-d', strtotime('+1 day'))) }}"
                     required>
 
             </div>
@@ -541,3 +533,64 @@
     </form>
 
 </div>
+
+{{-- GoodUI #13/#28/#33: client-side convenience untuk form sewa (validasi server tetap sumber kebenaran).
+     Delegated agar jalan di konten dinamis (inject SweetAlert via $template.html());
+     tidak bind saat load ke elemen di dalam #sewaFormTemplate. --}}
+<script>
+(function () {
+    if (window.__sewaGoodUIInit) return;
+    window.__sewaGoodUIInit = true;
+
+    function sewaFormOf(el) {
+        return el && el.closest ? el.closest('form') : null;
+    }
+
+    // Delegated change: pakai $(document).on bila jQuery ada, fallback native.
+    function onDocChange(selector, fn) {
+        if (window.jQuery) {
+            window.jQuery(document).on('change', selector, function (e) { fn(e, this); });
+        } else {
+            document.addEventListener('change', function (e) {
+                if (e.target && e.target.matches && e.target.matches(selector)) fn(e, e.target);
+            });
+        }
+    }
+
+    function clearDateError(form) {
+        form.querySelectorAll('.sewa-date-error').forEach(function (n) { n.remove(); });
+    }
+
+    // #13: cabang-kembali mengikuti cabang-ambil selama masih placeholder/kosong.
+    onDocChange('select[name="cabang_ambil_id"]', function (e, el) {
+        var form = sewaFormOf(el);
+        if (!form) return;
+        var kembali = form.querySelector('select[name="cabang_kembali_id"]');
+        if (kembali && !kembali.value) kembali.value = el.value;
+    });
+
+    // #33: hapus catatan inline saat tanggal diubah / submit diulang.
+    onDocChange('input[name="tanggal_mulai"], input[name="tanggal_selesai"]', function (e, el) {
+        var form = sewaFormOf(el);
+        if (form) clearDateError(form);
+    });
+
+    // #33: cegah submit bila rentang salah — capture agar jalan SEBELUM handler AJAX existing.
+    document.addEventListener('submit', function (e) {
+        var form = e.target;
+        if (!form || !form.querySelector) return;
+        var mulai = form.querySelector('input[name="tanggal_mulai"]');
+        var selesai = form.querySelector('input[name="tanggal_selesai"]');
+        if (!mulai || !selesai) return;
+        clearDateError(form);
+        if (mulai.value && selesai.value && selesai.value <= mulai.value) {
+            e.preventDefault();
+            e.stopPropagation();
+            var note = document.createElement('div');
+            note.className = 'sewa-date-error text-danger small mt-1';
+            note.textContent = 'Tanggal selesai harus setelah tanggal mulai.';
+            selesai.after(note);
+        }
+    }, true);
+})();
+</script>

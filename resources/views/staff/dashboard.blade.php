@@ -23,44 +23,22 @@
 
         body {
             background: #f5f7f6;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
         }
 
-        .navbar {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
+        .page-content {
+            padding: 24px;
         }
 
-        .brand {
-            font-size: 25px;
-            font-weight: 800;
-            color: #1f2937;
-        }
-
-        .brand span {
-            color: #198754;
-        }
-
-        .profile {
-            background: #f3f7f5;
-            border-radius: 12px;
-            padding: 8px 14px;
-        }
-
-        .profile-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: #198754;
-            color: white;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
+            }
         }
 
         .hero {
-            margin-top: 30px;
+            margin-top: 0;
             padding: 40px;
             border-radius: 24px;
 
@@ -83,6 +61,11 @@
         .hero p {
             color: #dcefe4;
             max-width: 700px;
+        }
+
+        .hero-icon {
+            font-size: 120px;
+            opacity: .12;
         }
 
         .stat-card {
@@ -198,100 +181,62 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-{{-- NAVBAR --}}
+@include('layouts.partials.staff-sidebar')
 
-<nav class="navbar">
+{{-- Page Content (dipindah ke #mainContent oleh staff-sidebar) --}}
+<div class="page-content">
 
-    <div class="container py-3">
+<div class="container-fluid px-4">
 
-        <div class="d-flex justify-content-between align-items-center w-100">
 
-            <a
-                href="{{ route('staff.dashboard') }}"
-                class="text-decoration-none brand"
-            >
-                Rental<span>ku</span>.
-            </a>
+<div class="hero mb-4">
 
-            <div class="d-flex align-items-center gap-3">
+    <div class="row align-items-center">
 
-                <div class="profile d-flex align-items-center gap-2"
-                     data-bs-toggle="modal"
-                     data-bs-target="#profileModal"
-                     style="cursor: pointer;">
+        <div class="col-lg-8">
 
-                    <div class="profile-icon">
+            <span class="badge bg-light text-success px-3 py-2 mb-3">
 
-                        <i class="bi bi-person-badge"></i>
+                <i class="bi bi-person-check"></i>
 
-                    </div>
+                Staff RentalKu
 
-                    <div class="d-none d-md-block">
+            </span>
 
-                        <div class="fw-bold small">
-                            {{ Auth::user()->name }}
-                        </div>
+            <h1>
 
-                        <div
-                            class="text-muted"
-                            style="font-size:12px;"
-                        >
-                            Staff
-                        </div>
+                Selamat datang,
+                {{ Auth::user()->name }} 👋
 
-                    </div>
+            </h1>
 
-                </div>
+            <p class="mt-3 mb-4">
 
-            </div>
+                Kelola operasional RentalKu mulai dari kendaraan,
+                rental pelanggan, pembayaran, hingga pemeriksaan kendaraan.
+
+            </p>
+
+        </div>
+
+
+        <div class="col-lg-4 text-center d-none d-lg-block">
+
+            <i class="bi bi-person-badge hero-icon"></i>
 
         </div>
 
     </div>
 
-</nav>
-
-
-<div class="container">
-
-
-{{-- HERO --}}
-
-<div class="hero">
-
-    <span class="badge bg-light text-success px-3 py-2 mb-3">
-
-        <i class="bi bi-person-check"></i>
-
-        Staff RentalKu
-
-    </span>
-
-    <h1>
-
-        Selamat datang,
-        {{ Auth::user()->name }} 👋
-
-    </h1>
-
-    <p class="mt-3 mb-0">
-
-        Kelola operasional RentalKu mulai dari kendaraan,
-        rental pelanggan, pembayaran, hingga pemeriksaan kendaraan.
-
-    </p>
-
 </div>
 
 
-{{-- STATISTIK --}}
-
-<div class="row g-4 mt-2">
+<div class="row g-4 mb-4">
 
     <div class="col-md-6 col-xl-3">
 
@@ -416,212 +361,81 @@
 
     </div>
 
-</div>
 
+    <div class="col-md-6 col-xl-3">
 
-{{-- MANAGEMENT STAFF --}}
+        <div class="stat-card">
 
-<section class="mt-5">
+            <div class="d-flex justify-content-between">
 
-    <h3 class="section-title mb-4">
-        Management Staff
-    </h3>
+                <div>
 
+                    <div class="text-muted">
+                        Denda Belum Bayar
+                    </div>
 
-    <div class="row g-4">
+                    <div class="stat-number text-danger">
+                        {{ $unpaidDendasCount ?? 0 }}
+                    </div>
 
+                </div>
 
-        {{-- MOBIL --}}
+                <div class="stat-icon">
 
-        <div class="col-md-6 col-lg-3">
+                    <i class="bi bi-exclamation-triangle"></i>
 
-       <a href="{{ route('staff.mobils.index') }}"
-   class="text-decoration-none text-dark">
+                </div>
 
-    <div class="menu-card">
+            </div>
 
-        <div class="menu-icon mb-3">
-            <i class="bi bi-car-front"></i>
         </div>
-
-        <h5 class="fw-bold">
-            Management Mobil
-        </h5>
-
-        <p class="text-muted mb-0">
-            Kelola seluruh data kendaraan.
-        </p>
 
     </div>
 
-</a>
 
-        </div>
+    <div class="col-md-6 col-xl-3">
 
+        <div class="stat-card">
 
-        {{-- KATEGORI & MEREK --}}
+            <div class="d-flex justify-content-between">
 
-        <div class="col-md-6 col-lg-3">
+                <div>
 
-            <a
-                href="{{ route('brands.index') }}"
-                class="text-decoration-none text-dark"
-            >
-
-                <div class="menu-card">
-
-                    <div class="menu-icon mb-3">
-
-                        <i class="bi bi-tags"></i>
-
+                    <div class="text-muted">
+                        Klaim Diajukan
                     </div>
 
-                    <h5 class="fw-bold">
-                        Kategori & Merek
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Kelola kategori dan merek mobil.
-                    </p>
+                    <div class="stat-number text-primary">
+                        {{ $claimedKompensasisCount ?? 0 }}
+                    </div>
 
                 </div>
 
-            </a>
+                <div class="stat-icon">
 
-        </div>
-
-
-        {{-- FASILITAS --}}
-
-        <div class="col-md-6 col-lg-3">
-
-            <a
-                href="{{ route('fasilitas.index') }}"
-                class="text-decoration-none text-dark"
-            >
-
-                <div class="menu-card">
-
-                    <div class="menu-icon mb-3">
-
-                        <i class="bi bi-stars"></i>
-
-                    </div>
-
-                    <h5 class="fw-bold">
-                        Management Fasilitas
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Kelola fasilitas kendaraan.
-                    </p>
+                    <i class="bi bi-cash-coin"></i>
 
                 </div>
 
-            </a>
+            </div>
 
         </div>
 
+    </div>
 
-        {{-- PENGGUNA --}}
-
-        <div class="col-md-6 col-lg-3">
-
-            <a
-                href="{{ route('users.index') }}"
-                class="text-decoration-none text-dark"
-            >
-
-                <div class="menu-card">
-
-                    <div class="menu-icon mb-3">
-
-                        <i class="bi bi-people"></i>
-
-                    </div>
-
-                    <h5 class="fw-bold">
-                        Management Pengguna
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Kelola akun pengguna RentalKu.
-                    </p>
-
-                </div>
-
-            </a>
-
-        </div>
+    </div>
 
 
-        {{-- PROMO --}}
 
-        <div class="col-md-6 col-lg-3">
+<section class="mb-5">
 
-            <a
-                href="{{ route('kupons.index') }}"
-                class="text-decoration-none text-dark"
-            >
+    <h3 class="section-title mb-4">
+        Perlu Tindakan
+    </h3>
 
-                <div class="menu-card">
+    <div class="row g-4">
 
-                    <div class="menu-icon mb-3">
-
-                        <i class="bi bi-ticket-perforated"></i>
-
-                    </div>
-
-                    <h5 class="fw-bold">
-                        Management Promo
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Kelola promo dan kupon.
-                    </p>
-
-                </div>
-
-            </a>
-
-        </div>
-
-
-        {{-- BANNER --}}
-
-        <div class="col-md-6 col-lg-3">
-
-            <a
-                href="{{ route('banners.index') }}"
-                class="text-decoration-none text-dark"
-            >
-
-                <div class="menu-card">
-
-                    <div class="menu-icon mb-3">
-
-                        <i class="bi bi-images"></i>
-
-                    </div>
-
-                    <h5 class="fw-bold">
-                        Management Banner
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Kelola banner website.
-                    </p>
-
-                </div>
-
-            </a>
-
-        </div>
-
-
-        {{-- RENTAL --}}
-
-        <div class="col-md-6 col-lg-3">
+        <div class="col-md-6 col-lg-4">
 
             <a
                 href="{{ route('rentals.index') }}"
@@ -630,19 +444,48 @@
 
                 <div class="menu-card">
 
-                    <div class="menu-icon mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
 
-                        <i class="bi bi-calendar-check"></i>
+                        <div class="menu-icon mb-0">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+
+                        <span class="badge bg-warning text-dark rounded-pill fs-6">
+                            {{ $pendingRentalsCount ?? 0 }}
+                        </span>
 
                     </div>
 
                     <h5 class="fw-bold">
-                        Management Rental
+                        Rental Menunggu
                     </h5>
 
-                    <p class="text-muted mb-0">
-                        Kelola pengajuan rental pelanggan.
+                    <p class="text-muted mb-3">
+                        Pengajuan rental yang perlu disetujui.
                     </p>
+
+                    @forelse($pendingRentals as $rental)
+
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+
+                            <div>
+                                <div class="fw-semibold">
+                                    {{ $rental->user->name ?? '-' }}
+                                </div>
+                                <small class="text-muted">
+                                    {{ $rental->mobil->name ?? '-' }} - Mulai {{ $rental->tanggal_mulai?->format('d M Y') }}
+                                </small>
+                            </div>
+
+                        </div>
+
+                    @empty
+
+                        <p class="text-muted mb-0">
+                            Semua beres.
+                        </p>
+
+                    @endforelse
 
                 </div>
 
@@ -651,9 +494,7 @@
         </div>
 
 
-        {{-- PEMBAYARAN --}}
-
-        <div class="col-md-6 col-lg-3">
+        <div class="col-md-6 col-lg-4">
 
             <a
                 href="{{ route('pembayarans.index') }}"
@@ -662,19 +503,48 @@
 
                 <div class="menu-card">
 
-                    <div class="menu-icon mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
 
-                        <i class="bi bi-credit-card"></i>
+                        <div class="menu-icon mb-0">
+                            <i class="bi bi-credit-card"></i>
+                        </div>
+
+                        <span class="badge bg-info text-dark rounded-pill fs-6">
+                            {{ $pendingPaymentsCount ?? 0 }}
+                        </span>
 
                     </div>
 
                     <h5 class="fw-bold">
-                        Management Pembayaran
+                        Pembayaran Menunggu
                     </h5>
 
-                    <p class="text-muted mb-0">
-                        Kelola pembayaran pelanggan.
+                    <p class="text-muted mb-3">
+                        Pembayaran yang perlu diverifikasi.
                     </p>
+
+                    @forelse($pendingPayments as $pembayaran)
+
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+
+                            <div>
+                                <div class="fw-semibold">
+                                    {{ $pembayaran->rental->user->name ?? '-' }}
+                                </div>
+                                <small class="text-muted">
+                                    Rp {{ number_format($pembayaran->jumlah ?? 0, 0, ',', '.') }} - {{ $pembayaran->tanggal_bayar?->format('d M Y') }}
+                                </small>
+                            </div>
+
+                        </div>
+
+                    @empty
+
+                        <p class="text-muted mb-0">
+                            Semua beres.
+                        </p>
+
+                    @endforelse
 
                 </div>
 
@@ -683,62 +553,62 @@
         </div>
 
 
-        {{-- PEMERIKSAAN --}}
-
-        <div class="col-md-6 col-lg-3">
+        <div class="col-md-6 col-lg-4">
 
             <a
-                href="{{ route('pemeriksaan-kendaraan.index') }}"
+                href="{{ route('pengembalian.index') }}"
                 class="text-decoration-none text-dark"
             >
 
                 <div class="menu-card">
 
-                    <div class="menu-icon mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
 
-                        <i class="bi bi-clipboard-check"></i>
+                        <div class="menu-icon mb-0">
+                            <i class="bi bi-arrow-return-left"></i>
+                        </div>
 
-                    </div>
-
-                    <h5 class="fw-bold">
-                        Pemeriksaan Kendaraan
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Periksa kondisi kendaraan.
-                    </p>
-
-                </div>
-
-            </a>
-
-        </div>
-
-
-        {{-- LAPORAN --}}
-
-        <div class="col-md-6 col-lg-3">
-
-            <a
-                href="{{ route('laporan.index') }}"
-                class="text-decoration-none text-dark"
-            >
-
-                <div class="menu-card">
-
-                    <div class="menu-icon mb-3">
-
-                        <i class="bi bi-file-earmark-bar-graph"></i>
+                        <span class="badge bg-danger rounded-pill fs-6">
+                            {{ $returnDueRentals->count() }}
+                        </span>
 
                     </div>
 
                     <h5 class="fw-bold">
-                        Laporan
+                        Perlu Dikembalikan
                     </h5>
 
-                    <p class="text-muted mb-0">
-                        Lihat laporan RentalKu.
+                    <p class="text-muted mb-3">
+                        Sewa yang harus sudah kembali.
                     </p>
+
+                    @forelse($returnDueRentals as $rental)
+
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+
+                            <div>
+                                <div class="fw-semibold">
+                                    {{ $rental->user->name ?? '-' }}
+                                </div>
+                                <small class="text-muted">
+                                    {{ $rental->mobil->name ?? '-' }} -
+                                    @if($rental->tanggal_selesai?->isToday())
+                                        Hari ini
+                                    @else
+                                        <span class="text-danger">Terlambat {{ $rental->tanggal_selesai?->diffInDays(today()) }} hari</span>
+                                    @endif
+                                </small>
+                            </div>
+
+                        </div>
+
+                    @empty
+
+                        <p class="text-muted mb-0">
+                            Semua beres.
+                        </p>
+
+                    @endforelse
 
                 </div>
 
@@ -751,9 +621,7 @@
 </section>
 
 
-{{-- MOBIL TERBARU --}}
-
-<section class="mt-5">
+<section class="mb-5">
 
     <h3 class="section-title mb-4">
         Mobil Terbaru
@@ -868,13 +736,79 @@
 </section>
 
 
+<section class="mb-5">
+
+    <h3 class="section-title mb-4">
+        Transaksi Terakhir
+    </h3>
+
+    <div class="table-card">
+
+        <div class="table-responsive">
+
+            <table class="table align-middle mb-0">
+
+                <thead>
+                    <tr>
+                        <th>Pelanggan</th>
+                        <th>Mobil</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @forelse($latestRentals as $rental)
+
+                        <tr>
+                            <td>{{ $rental->user->name ?? '-' }}</td>
+                            <td>{{ $rental->mobil->name ?? '-' }}</td>
+                            <td>Rp {{ number_format($rental->total_harga ?? 0, 0, ',', '.') }}</td>
+                            <td>
+                                @if($rental->status === 'Menunggu')
+                                    <span class="badge bg-warning text-dark">Menunggu</span>
+                                @elseif($rental->status === 'Disetujui')
+                                    <span class="badge bg-primary">Disetujui</span>
+                                @elseif($rental->status === 'Ditolak')
+                                    <span class="badge bg-danger">Ditolak</span>
+                                @elseif($rental->status === 'Selesai')
+                                    <span class="badge bg-secondary">Selesai</span>
+                                @else
+                                    <span class="badge bg-dark">{{ $rental->status }}</span>
+                                @endif
+                            </td>
+                        </tr>
+
+                    @empty
+
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                Belum ada transaksi.
+                            </td>
+                        </tr>
+
+                    @endforelse
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
 </div>
 
 
 @include('layouts.partials.admin-footer', ['pageTitle' => 'Staff Dashboard'])
 
-{{-- Modal profil + Bootstrap JS (dibutuhkan modal) --}}
-@include('layouts.partials.profile-modal')
+{{-- Bootstrap JS (dibutuhkan modal) --}}
+
+</div>
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

@@ -27,22 +27,8 @@
     <style>
         body {
             background: #f5f7f6;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        .navbar {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .brand {
-            font-size: 25px;
-            font-weight: 800;
-            color: #1f2937;
-        }
-
-        .brand span {
-            color: #198754;
+            font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
         }
 
         .page-card {
@@ -59,6 +45,12 @@
             border: none;
             border-radius: 10px;
             font-weight: 600;
+            padding: 10px 18px;
+        }
+
+        .modal-footer .btn {
+            padding: 6px 14px;
+            min-width: 100px;
         }
 
         .btn-green:hover {
@@ -83,6 +75,7 @@
             font-size: 12px;
             text-transform: uppercase;
             white-space: nowrap;
+            padding: 12px 16px;
         }
 
         .table tbody td {
@@ -130,27 +123,48 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
+        .page-content {
+            padding: 24px;
         }
 
-        .modal-header .btn-close {
-            filter: brightness(0) invert(1);
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
+            }
         }
     </style>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
 
-@include('layouts.partials.admin-navbar')
+{{-- Sidebar Layout --}}
+@include('layouts.partials.sidebar')
 
+<script>
+    // Inject navbar into sidebar layout
+    document.addEventListener('DOMContentLoaded', function() {
+        const mainContent = document.getElementById('mainContent');
+        const pageContent = mainContent?.querySelector('.page-content');
 
-<div class="container py-5">
+        if (mainContent && pageContent) {
+            const navbar = document.querySelector('header.topbar');
+            if (navbar) {
+                mainContent.insertBefore(navbar, pageContent);
+            }
+        }
+    });
+</script>
+
+{{-- Page Content --}}
+<div class="page-content">
+
+<div class="container-fluid px-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
 
@@ -164,23 +178,14 @@
             </p>
         </div>
 
-        <div class="d-flex gap-2">
-
-            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1"></i>
-                Dashboard
-            </a>
-
-            <button
-                class="btn btn-green px-3 py-2"
-                data-bs-toggle="modal"
-                data-bs-target="#tambahModal"
-            >
-                <i class="bi bi-plus-circle me-1"></i>
-                Tambah Promo
-            </button>
-
-        </div>
+        <button
+            type="button"
+            class="btn btn-green"
+            data-bs-toggle="modal"
+            data-bs-target="#tambahModal">
+            <i class="bi bi-plus-circle me-1"></i>
+            Tambah Promo
+        </button>
 
     </div>
 
@@ -191,7 +196,7 @@
 
 
     @if($errors->any())
-        <div class="alert alert-danger">
+        <div class="alert alert-danger mb-4">
 
             <strong>Terjadi kesalahan:</strong>
 
@@ -239,8 +244,6 @@
 </div>
 
 
-{{-- MODAL TAMBAH --}}
-
 <div
     class="modal fade"
     id="tambahModal"
@@ -251,20 +254,7 @@
 
         <div class="modal-content">
 
-            <div class="modal-header">
-
-                <h5 class="modal-title">
-                    <i class="bi bi-ticket-perforated me-2"></i>
-                    Tambah Promo
-                </h5>
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                ></button>
-
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Tambah Promo', 'icon' => 'bi-ticket-perforated'])
 
             <form
                 action="{{ route('kupons.store') }}"
@@ -420,15 +410,15 @@
                         class="btn btn-secondary"
                         data-bs-dismiss="modal"
                     >
-                        Batal
+                        <i class="bi bi-x-circle me-1"></i>Batal
                     </button>
 
                     <button
                         type="submit"
                         class="btn btn-green"
                     >
-                        <i class="bi bi-plus-circle me-1"></i>
-                        Tambah Promo
+                        <i class="bi bi-save me-1"></i>
+                        Simpan Promo
                     </button>
 
                 </div>
@@ -442,8 +432,6 @@
 </div>
 
 
-{{-- MODAL EDIT --}}
-
 <div
     class="modal fade"
     id="editKuponModal"
@@ -454,20 +442,7 @@
 
         <div class="modal-content">
 
-            <div class="modal-header">
-
-                <h5 class="modal-title">
-                    <i class="bi bi-pencil-square me-2"></i>
-                    Edit Promo
-                </h5>
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                ></button>
-
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Edit Promo', 'icon' => 'bi-pencil-square'])
 
             <form
                 action=""
@@ -618,16 +593,15 @@
                         class="btn btn-secondary"
                         data-bs-dismiss="modal"
                     >
-                        Batal
+                        <i class="bi bi-x-circle me-1"></i>Batal
                     </button>
 
                     <button
                         type="submit"
-                        form="formEditKupon"
                         class="btn btn-green"
                     >
                         <i class="bi bi-save me-1"></i>
-                        Simpan
+                        Simpan Perubahan
                     </button>
 
                 </div>
@@ -663,6 +637,18 @@
             timer: 1800,
             showConfirmButton: false,
         });
+    }
+
+    function statusBadge(status, text) {
+        const map = {
+            'waiting': 'status-waiting',
+            'expired': 'status-expired',
+            'active': 'status-active',
+        };
+
+        const cls = map[status] || 'status-waiting';
+
+        return '<span class="status ' + cls + '">' + text + '</span>';
     }
 
     function formatTanggal(value) {
@@ -751,8 +737,7 @@
                     orderable: true,
                     searchable: false,
                     render: function(data, type, row) {
-                        return '<span class="status status-' + data + '">' +
-                            row.status_text + '</span>';
+                        return statusBadge(data, row.status_text);
                     },
                 },
                 {
@@ -792,7 +777,6 @@
                 info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
                 infoEmpty: 'Tidak ada data',
                 infoFiltered: '(difilter dari _MAX_ total data)',
-                infoPostFix: '',
                 loadingRecords: 'Memuat...',
                 zeroRecords: 'Tidak ditemukan data yang cocok',
                 emptyTable: 'Belum ada promo',
@@ -970,4 +954,5 @@
 </script>
 
 </body>
+
 </html>

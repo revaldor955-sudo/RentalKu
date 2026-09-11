@@ -15,6 +15,8 @@ class Denda extends Model
         'foto_bukti',
         'syarat_dan_ketentuan',
         'status',
+        'bukti_bayar',
+        'tanggal_bayar',
     ];
 
     public function rental()

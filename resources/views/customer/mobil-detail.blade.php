@@ -23,7 +23,7 @@
 
         body {
             background: #f6f8f7;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
             color: #1f2937;
         }
 
@@ -234,12 +234,11 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-{{-- NAVBAR --}}
 <nav class="navbar">
     <div class="container py-3">
 
@@ -310,7 +309,6 @@
     </div>
 
 
-    {{-- DETAIL --}}
     <div class="detail-card">
 
         <div class="row g-0">
@@ -335,7 +333,6 @@
             </div>
 
 
-            {{-- INFORMASI --}}
             <div class="col-lg-6">
 
                 <div class="detail-content">
@@ -373,15 +370,10 @@
                    <p class="car-subtitle">
     <i class="bi bi-car-front me-1"></i>
 
-    {{ $mobil->brand->name ?? '-' }}
-
-    ·
-
     {{ $mobil->tipeMobil->name ?? '-' }}
 </p>
 
 
-                    {{-- HARGA --}}
                     <div class="price-box">
 
                         <div class="price-label">
@@ -401,7 +393,6 @@
 
 
                    
-                   {{-- SPESIFIKASI --}}
 <div class="row g-3 mt-2">
 
     <div class="col-6">
@@ -572,7 +563,6 @@
 </div>
 
 
-                    {{-- BUTTON --}}
                    <div class="mt-4">
 
     @if($mobil->status === 'Tersedia')
@@ -644,7 +634,6 @@
     </div>
 
 
-    {{-- INFORMASI TAMBAHAN --}}
     <div class="row mt-5 g-4">
 
         <div class="col-lg-7">
@@ -777,7 +766,7 @@
                     name="tanggal_mulai"
                     class="form-control"
                     min="{{ date('Y-m-d') }}"
-                    value="{{ old('tanggal_mulai') }}"
+                    value="{{ old('tanggal_mulai', date('Y-m-d')) }}"
                     required>
 
             </div>
@@ -792,8 +781,8 @@
                     type="date"
                     name="tanggal_selesai"
                     class="form-control"
-                    min="{{ date('Y-m-d') }}"
-                    value="{{ old('tanggal_selesai') }}"
+                    min="{{ date('Y-m-d', strtotime('+1 day')) }}"
+                    value="{{ old('tanggal_selesai', date('Y-m-d', strtotime('+1 day'))) }}"
                     required>
 
             </div>
@@ -849,6 +838,16 @@
 
     function openSewaPopup() {
         var $template = $('#sewaFormTemplate');
+        if (!$template.length) return;
+
+        if ($('.badge-available').length === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: 'Mobil sedang tidak tersedia.',
+            });
+            return;
+        }
 
         Swal.fire({
             title: 'Sewa {{ $mobil->name }}',
@@ -914,6 +913,67 @@
         });
     }
 
+</script>
+
+{{-- GoodUI #13/#28/#33: client-side convenience untuk form sewa (validasi server tetap sumber kebenaran).
+     Delegated agar jalan di konten dinamis (inject SweetAlert via $template.html());
+     tidak bind saat load ke elemen di dalam #sewaFormTemplate. --}}
+<script>
+(function () {
+    if (window.__sewaGoodUIInit) return;
+    window.__sewaGoodUIInit = true;
+
+    function sewaFormOf(el) {
+        return el && el.closest ? el.closest('form') : null;
+    }
+
+    // Delegated change: pakai $(document).on bila jQuery ada, fallback native.
+    function onDocChange(selector, fn) {
+        if (window.jQuery) {
+            window.jQuery(document).on('change', selector, function (e) { fn(e, this); });
+        } else {
+            document.addEventListener('change', function (e) {
+                if (e.target && e.target.matches && e.target.matches(selector)) fn(e, e.target);
+            });
+        }
+    }
+
+    function clearDateError(form) {
+        form.querySelectorAll('.sewa-date-error').forEach(function (n) { n.remove(); });
+    }
+
+    // #13: cabang-kembali mengikuti cabang-ambil selama masih placeholder/kosong.
+    onDocChange('select[name="cabang_ambil_id"]', function (e, el) {
+        var form = sewaFormOf(el);
+        if (!form) return;
+        var kembali = form.querySelector('select[name="cabang_kembali_id"]');
+        if (kembali && !kembali.value) kembali.value = el.value;
+    });
+
+    // #33: hapus catatan inline saat tanggal diubah / submit diulang.
+    onDocChange('input[name="tanggal_mulai"], input[name="tanggal_selesai"]', function (e, el) {
+        var form = sewaFormOf(el);
+        if (form) clearDateError(form);
+    });
+
+    // #33: cegah submit bila rentang salah — capture agar jalan SEBELUM handler AJAX existing.
+    document.addEventListener('submit', function (e) {
+        var form = e.target;
+        if (!form || !form.querySelector) return;
+        var mulai = form.querySelector('input[name="tanggal_mulai"]');
+        var selesai = form.querySelector('input[name="tanggal_selesai"]');
+        if (!mulai || !selesai) return;
+        clearDateError(form);
+        if (mulai.value && selesai.value && selesai.value <= mulai.value) {
+            e.preventDefault();
+            e.stopPropagation();
+            var note = document.createElement('div');
+            note.className = 'sewa-date-error text-danger small mt-1';
+            note.textContent = 'Tanggal selesai harus setelah tanggal mulai.';
+            selesai.after(note);
+        }
+    }, true);
+})();
 </script>
 
 </body>

@@ -20,22 +20,18 @@
     <style>
         body {
             background: #f5f7f6;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
         }
 
-        .navbar {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
+        .page-content {
+            padding: 24px;
         }
 
-        .brand {
-            font-size: 25px;
-            font-weight: 800;
-            color: #1f2937;
-        }
-
-        .brand span {
-            color: #198754;
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
+            }
         }
 
         .page-card {
@@ -59,17 +55,18 @@
             color: white;
         }
 
-        .car-image {
-            width: 75px;
-            height: 55px;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-
+        .car-image,
         .car-placeholder {
             width: 75px;
             height: 55px;
             border-radius: 10px;
+        }
+
+        .car-image {
+            object-fit: cover;
+        }
+
+        .car-placeholder {
             background: #e9f7ef;
             color: #198754;
             display: flex;
@@ -84,6 +81,7 @@
             font-size: 12px;
             text-transform: uppercase;
             white-space: nowrap;
+            padding: 12px 16px;
         }
 
         .table tbody td {
@@ -118,71 +116,27 @@
             overflow: hidden;
         }
 
-        .modal-header {
-            background: #198754;
-            color: white;
-        }
-
-        .modal-header .btn-close {
-            filter: brightness(0) invert(1);
-        }
-
         .form-control,
         .form-select {
             border-radius: 10px;
         }
     </style>
 
+    @include('layouts.partials.modal-head-style')
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-<nav class="navbar">
-    <div class="container py-3">
+@include('layouts.partials.staff-sidebar')
 
-        <div class="d-flex justify-content-between align-items-center w-100">
+{{-- Page Content (dipindah ke #mainContent oleh staff-sidebar) --}}
+<div class="page-content">
 
-            <a
-                href="{{ route('staff.dashboard') }}"
-                class="text-decoration-none brand"
-            >
-                Rental<span>ku</span>.
-            </a>
-
-            <div class="d-flex gap-2">
-
-                <a
-                    href="{{ route('staff.dashboard') }}"
-                    class="btn btn-outline-secondary btn-sm"
-                >
-                    <i class="bi bi-speedometer2 me-1"></i>
-                    Dashboard
-                </a>
-
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-
-                    <button
-                        type="submit"
-                        class="btn btn-outline-danger btn-sm"
-                    >
-                        <i class="bi bi-box-arrow-right me-1"></i>
-                        Keluar
-                    </button>
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-</nav>
-
-
-<div class="container py-5">
+<div class="container-fluid px-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
 
@@ -196,40 +150,22 @@
             </p>
         </div>
 
-        <div class="d-flex gap-2">
-
-            <a href="{{ route('staff.dashboard') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1"></i>
-                Dashboard
-            </a>
-
-            <button
-                type="button"
-                class="btn btn-green"
-                data-bs-toggle="modal"
-                data-bs-target="#tambahMobilModal"
-            >
-                <i class="bi bi-plus-lg me-1"></i>
-                Tambah Mobil
-            </button>
-
-        </div>
+        <button
+            type="button"
+            class="btn btn-green"
+            data-bs-toggle="modal"
+            data-bs-target="#tambahMobilModal"
+        >
+            <i class="bi bi-plus-lg me-1"></i>
+            Tambah Mobil
+        </button>
 
     </div>
 
 
     @if(session('success'))
 
-        <div class="alert alert-success alert-dismissible fade show">
-            <i class="bi bi-check-circle me-2"></i>
-            {{ session('success') }}
-
-            <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert"
-            ></button>
-        </div>
+        <span id="flashSuccess" class="d-none">{{ session('success') }}</span>
 
     @endif
 
@@ -347,13 +283,13 @@
 
                                 <td>
 
-                                    @if($mobil->status === 'Tersedia' || $mobil->status === 'tersedia')
+                                    @if($mobil->status === 'Tersedia')
 
                                         <span class="status status-tersedia">
                                             Tersedia
                                         </span>
 
-                                    @elseif($mobil->status === 'Disewa' || $mobil->status === 'disewa')
+                                    @elseif($mobil->status === 'Disewa')
 
                                         <span class="status status-disewa">
                                             Disewa
@@ -438,8 +374,8 @@
 
 </div>
 
+</div>
 
-{{-- MODAL TAMBAH MOBIL --}}
 
 <div
     class="modal fade"
@@ -451,20 +387,7 @@
 
         <div class="modal-content">
 
-            <div class="modal-header">
-
-                <h5 class="modal-title">
-                    <i class="bi bi-car-front me-2"></i>
-                    Tambah Mobil
-                </h5>
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                ></button>
-
-            </div>
+            @include('layouts.partials.modal-head', ['title' => 'Tambah Mobil', 'icon' => 'bi-car-front'])
 
             <form
                 action="{{ route('staff.mobils.store') }}"
@@ -541,62 +464,62 @@
                         </div>
 
 
-                       <div class="col-md-6">
+                        <div class="col-md-6">
 
-    <label class="form-label fw-semibold">
-        Tipe Mobil
-    </label>
+                            <label class="form-label fw-semibold">
+                                Tipe Mobil
+                            </label>
 
-    <select
-        name="tipe_mobil_id"
-        class="form-select"
-        required
-    >
+                            <select
+                                name="tipe_mobil_id"
+                                class="form-select"
+                                required
+                            >
 
-        <option value="">
-            -- Pilih Tipe --
-        </option>
+                                <option value="">
+                                    -- Pilih Tipe --
+                                </option>
 
-        @foreach($tipeMobils ?? [] as $tipe)
+                                @foreach($tipeMobils ?? [] as $tipe)
 
-            <option value="{{ $tipe->id }}">
-                {{ $tipe->name }}
-            </option>
+                                    <option value="{{ $tipe->id }}">
+                                        {{ $tipe->name }}
+                                    </option>
 
-        @endforeach
+                                @endforeach
 
-    </select>
+                            </select>
 
-</div>
+                        </div>
 
 
-<div class="col-md-6">
+                        <div class="col-md-6">
 
-    <label class="form-label fw-semibold">
-        Cabang
-    </label>
+                            <label class="form-label fw-semibold">
+                                Cabang
+                            </label>
 
-    <select
-        name="cabang_id"
-        class="form-select"
-        required
-    >
+                            <select
+                                name="cabang_id"
+                                class="form-select"
+                                required
+                            >
 
-        <option value="">
-            -- Pilih Cabang --
-        </option>
+                                <option value="">
+                                    -- Pilih Cabang --
+                                </option>
 
-        @foreach($cabangs ?? [] as $cabang)
+                                @foreach($cabangs ?? [] as $cabang)
 
-            <option value="{{ $cabang->id }}">
-                {{ $cabang->name }}
-            </option>
+                                    <option value="{{ $cabang->id }}">
+                                        {{ $cabang->name }}
+                                    </option>
 
-        @endforeach
+                                @endforeach
 
-    </select>
+                            </select>
 
-</div>
+                        </div>
 
 
                         <div class="col-md-6">
@@ -815,6 +738,18 @@
 </script>
 
 <script>
+    (function() {
+        var ok = document.getElementById('flashSuccess');
+        if (ok) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: ok.textContent,
+                timer: 1800,
+                showConfirmButton: false,
+            });
+        }
+    })();
 
     function confirmSubmit(event, message) {
         event.preventDefault();

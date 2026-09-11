@@ -7,9 +7,6 @@ use Illuminate\Http\Request;
 
 class FaqController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $faqs = Faq::all();
@@ -17,8 +14,62 @@ class FaqController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Server-side DataTables: daftar FAQ (search, sort, pagination)
      */
+    public function data(Request $request)
+    {
+        $query = Faq::query();
+
+        $recordsTotal = $query->count();
+
+        $search = $request->input('search.value');
+
+        if ($search) {
+            $query->where('faqs.pertanyaan', 'like', "%{$search}%")
+                  ->orWhere('faqs.jawaban', 'like', "%{$search}%");
+        }
+
+        $recordsFiltered = $query->count();
+
+        $columns = [
+            0 => null,
+            1 => 'faqs.pertanyaan',
+            2 => null,
+            3 => 'faqs.urutan',
+            4 => null,
+        ];
+
+        $orderColumn = $request->input('order.0.column', 3);
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
+            $query->orderBy($columns[$orderColumn], $orderDir);
+        } else {
+            $query->orderBy('faqs.urutan', 'asc');
+        }
+
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $faqs = $query->offset($start)->limit($length)->get();
+
+        $data = $faqs->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'pertanyaan' => $item->pertanyaan,
+                'jawaban' => $item->jawaban,
+                'urutan' => $item->urutan,
+            ];
+        });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
+    }
+
     public function create()
     {
         //
@@ -44,25 +95,16 @@ class FaqController extends Controller
             ->with('success', 'FAQ berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Faq $faq)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Faq $faq)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Faq $faq)
     {
         $validated = $request->validate([
@@ -80,9 +122,6 @@ class FaqController extends Controller
             ->with('success', 'FAQ berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Faq $faq)
     {
         $faq->delete();

@@ -20,26 +20,13 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     >
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
     <style>
 
         body {
             background: #f5f7f6;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        .navbar {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .brand {
-            font-size: 25px;
-            font-weight: 800;
-            color: #1f2937;
-        }
-
-        .brand span {
-            color: #198754;
+            font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
         }
 
         .page-header {
@@ -65,11 +52,6 @@
             border: 1px solid #edf0ee;
             margin-top: 25px;
             margin-bottom: 50px;
-        }
-
-        .form-title {
-            font-weight: 800;
-            color: #212529;
         }
 
         .section-title {
@@ -164,8 +146,14 @@
             font-weight: 600;
         }
 
-        footer {
-            margin-top: 50px;
+        .page-content {
+            padding: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
+            }
         }
 
     </style>
@@ -173,76 +161,20 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 
 <body>
 
 
-{{-- NAVBAR --}}
+@include('layouts.partials.staff-sidebar')
 
-<nav class="navbar">
-
-    <div class="container py-3">
-
-        <div class="d-flex justify-content-between align-items-center">
-
-            <a
-                href="{{ route('staff.dashboard') }}"
-                class="text-decoration-none brand"
-            >
-
-                Rental<span>ku</span>.
-
-            </a>
-
-
-            <div class="d-flex align-items-center gap-3">
-
-                <span class="d-none d-md-block">
-
-                    <i class="bi bi-person-circle me-1"></i>
-
-                    {{ Auth::user()->name }}
-
-                </span>
-
-
-                <form
-                    action="{{ route('logout') }}"
-                    method="POST"
-                >
-
-                    @csrf
-
-                    <button
-                        type="submit"
-                        class="btn btn-outline-danger btn-sm"
-                    >
-
-                        <i class="bi bi-box-arrow-right"></i>
-
-                        Keluar
-
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</nav>
-
-
+{{-- Page Content (dipindah ke #mainContent oleh staff-sidebar) --}}
+<div class="page-content">
 
 <div class="container">
 
-
-    {{-- HEADER --}}
 
     <div class="page-header">
 
@@ -290,8 +222,6 @@
 
 
 
-    {{-- ERROR --}}
-
     @if($errors->any())
 
         <div class="alert alert-danger alert-dismissible fade show mt-4">
@@ -330,8 +260,6 @@
 
 
 
-    {{-- FORM --}}
-
     <div class="form-card">
 
         <form
@@ -346,8 +274,6 @@
             <div class="p-4 p-md-5">
 
 
-                {{-- INFORMASI DASAR --}}
-
                 <div class="section-title">
 
                     <i class="bi bi-car-front me-2"></i>
@@ -359,8 +285,6 @@
 
                 <div class="row g-4">
 
-
-                    {{-- BRAND --}}
 
                     <div class="col-md-6">
 
@@ -411,8 +335,6 @@
 
 
 
-                    {{-- TIPE MOBIL --}}
-
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -458,8 +380,6 @@
 
 
 
-                    {{-- NAMA MOBIL --}}
-
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -492,8 +412,6 @@
 
 
 
-                    {{-- PLAT --}}
-
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -525,8 +443,6 @@
                     </div>
 
 
-
-                    {{-- TAHUN --}}
 
                     <div class="col-md-4">
 
@@ -561,8 +477,6 @@
                     </div>
 
 
-
-                    {{-- TRANSMISI --}}
 
                     <div class="col-md-4">
 
@@ -613,8 +527,6 @@
 
 
 
-                {{-- KAPASITAS --}}
-
 <div class="col-md-4">
 
     <label class="form-label">
@@ -649,8 +561,6 @@
 </div>
 
 
-
-                    {{-- WARNA --}}
 
                     <div class="col-md-6">
 
@@ -693,7 +603,6 @@
 
     <select
         name="cabang_id"
-        id="cabang_id"
         class="form-select @error('cabang_id') is-invalid @enderror"
         required
     >
@@ -722,8 +631,6 @@
 
 
 
-                {{-- HARGA --}}
-
                 <div class="section-title mt-5">
 
                     <i class="bi bi-cash-stack me-2"></i>
@@ -735,8 +642,6 @@
 
                 <div class="row g-4">
 
-
-                    {{-- HARGA PER HARI --}}
 
                     <div class="col-md-6">
 
@@ -779,8 +684,6 @@
 
 
 
-                    {{-- DEPOSIT --}}
-
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -821,8 +724,6 @@
                     </div>
 
 
-
-                    {{-- STATUS --}}
 
                     <div class="col-md-6">
 
@@ -882,8 +783,6 @@
                 </div>
 
 
-
-                {{-- FOTO --}}
 
                 <div class="section-title mt-5">
 
@@ -961,8 +860,6 @@
 
 
 
-                {{-- FASILITAS --}}
-
                 <div class="section-title mt-5">
 
                     <i class="bi bi-check2-square me-2"></i>
@@ -990,7 +887,7 @@
 
                                 <span class="form-check-label">
 
-                                    {{ $item->nama_fasilitas }}
+                                    {{ $item->name }}
 
                                 </span>
 
@@ -1015,8 +912,6 @@
                 </div>
 
 
-
-                {{-- DESKRIPSI --}}
 
                 <div class="section-title mt-5">
 
@@ -1056,8 +951,6 @@
 
 
 
-                {{-- BUTTON --}}
-
                 <div class="d-flex justify-content-end gap-2 mt-5">
 
                     <a
@@ -1094,9 +987,11 @@
 
 </div>
 
+</div>
 
 
-@include('layouts.partials.admin-footer', ['pageTitle' => 'Staff Dashboard • Tambah Data Mobil'])
+
+@include('layouts.partials.admin-footer', ['pageTitle' => 'Staff Dashboard - Tambah Data Mobil'])
 
 
 

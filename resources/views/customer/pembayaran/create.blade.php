@@ -21,7 +21,7 @@
         body {
             background: #f5f7f6;
             color: #1f2937;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
         }
 
         .navbar {
@@ -178,7 +178,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -201,7 +201,6 @@
 
         <div class="payment-card">
 
-            {{-- HEADER --}}
             <div class="payment-header">
 
                 <h2>
@@ -218,7 +217,6 @@
 
             <div class="payment-body">
 
-                {{-- ERROR --}}
                 @if($errors->any())
 
                     <div class="alert alert-danger">
@@ -242,7 +240,6 @@
                 @endif
 
 
-                {{-- INFORMASI RENTAL --}}
                 <div class="rental-info">
 
                     <h5>
@@ -357,7 +354,6 @@
                 </div>
 
 
-                {{-- FORM PEMBAYARAN --}}
                 <form
                     action="{{ route('pembayaran.store', $rental->id) }}"
                     method="POST"
@@ -367,7 +363,6 @@
                     @csrf
 
 
-                    {{-- METODE PEMBAYARAN --}}
                     <div class="mb-4">
 
                         <label class="form-label">
@@ -411,7 +406,6 @@
                     </div>
 
 
-                    {{-- DETAIL METODE --}}
                     @if($metodePembayarans->count())
 
                         <div class="mb-4" id="metodeDetail">
@@ -439,6 +433,19 @@
                                         </strong>
                                     </small>
 
+                                    @if($metode->atas_nama)
+
+                                        <div>
+                                            <small class="text-muted">
+                                                Atas nama:
+                                                <strong>
+                                                    {{ $metode->atas_nama }}
+                                                </strong>
+                                            </small>
+                                        </div>
+
+                                    @endif
+
                                 </div>
 
                             @endforeach
@@ -458,7 +465,6 @@
                     @endif
 
 
-                    {{-- TANGGAL BAYAR --}}
                     <div class="mb-4">
 
                         <label class="form-label">
@@ -484,7 +490,6 @@
                     </div>
 
 
-                    {{-- BUKTI PEMBAYARAN --}}
                     <div class="mb-4">
 
                         <label class="form-label">
@@ -522,7 +527,6 @@
                     </div>
 
 
-                    {{-- INFO --}}
                     <div class="alert alert-warning">
 
                         <i class="bi bi-info-circle me-2"></i>
@@ -538,7 +542,6 @@
                     </div>
 
 
-                    {{-- BUTTON --}}
                     <div class="d-flex justify-content-between gap-2 mt-4">
 
                         <a
@@ -576,42 +579,40 @@
 
 <script>
 
-$('#metodeSelect').on('change', function() {
-    var $select = $(this);
-    var $detailBox = $('#metodeDetail');
-    var $placeholder = $('#metode-placeholder');
+document.getElementById('metodeSelect')?.addEventListener('change', function () {
+    var detailBox = document.getElementById('metodeDetail');
+    if (!detailBox) return;
 
-    if (!$detailBox.length) return;
+    var selectedId = this.value;
 
-    var selectedId = $select.val();
+    detailBox.querySelectorAll('.metode-detail').forEach(function (el) {
+        el.classList.add('d-none');
+    });
 
-    $detailBox.find('.metode-detail').addClass('d-none');
+    var placeholder = document.getElementById('metode-placeholder');
 
     if (selectedId) {
-        $('#metode-' + selectedId).removeClass('d-none');
-        if ($placeholder.length) $placeholder.addClass('d-none');
-    } else if ($placeholder.length) {
-        $placeholder.removeClass('d-none');
+        var target = document.getElementById('metode-' + selectedId);
+        if (target) target.classList.remove('d-none');
+        if (placeholder) placeholder.classList.add('d-none');
+    } else if (placeholder) {
+        placeholder.classList.remove('d-none');
     }
 });
 
-showMetodeDetail();
+document.getElementById('metodeSelect')?.dispatchEvent(new Event('change'));
 
-function showMetodeDetail() {
-    var $select = $('#metodeSelect');
-    if (!$select.length) return;
-    $select.trigger('change');
-}
-
-$('#bukti').on('change', function(event) {
+document.getElementById('bukti')?.addEventListener('change', function (event) {
     var file = event.target.files[0];
-    var $preview = $('#preview');
+    var preview = document.getElementById('preview');
+    if (!preview) return;
 
     if (file) {
-        $preview.attr('src', URL.createObjectURL(file));
-        $preview.show();
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
     } else {
-        $preview.hide();
+        preview.removeAttribute('src');
+        preview.style.display = 'none';
     }
 });
 

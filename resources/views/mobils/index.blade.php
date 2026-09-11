@@ -17,7 +17,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link
         rel="stylesheet"
@@ -32,43 +32,12 @@
     <style>
         body {
             background: #f5f7f6;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        .navbar {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .brand {
-            font-size: 25px;
-            font-weight: 800;
-            color: #1f2937;
-        }
-
-        .brand span {
-            color: #198754;
-        }
-
-        .profile {
-            background: #f3f7f5;
-            border-radius: 12px;
-            padding: 8px 14px;
-        }
-
-        .profile-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: #198754;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
         }
 
         .page-header {
-            margin-top: 30px;
+            margin-top: 0;
             padding: 32px;
             border-radius: 22px;
             background: linear-gradient(135deg, #212529, #198754);
@@ -120,18 +89,6 @@
         .stat-number {
             font-size: 27px;
             font-weight: 800;
-        }
-
-        .content-card {
-            background: white;
-            border-radius: 20px;
-            border: 1px solid #edf0ee;
-            overflow: hidden;
-        }
-
-        .content-header {
-            padding: 22px 25px;
-            border-bottom: 1px solid #edf0ee;
         }
 
         .section-title {
@@ -205,6 +162,7 @@
             text-transform: uppercase;
             border-bottom: 1px solid #e9ecef;
             white-space: nowrap;
+            padding: 12px 16px;
         }
 
         .table tbody td {
@@ -256,28 +214,49 @@
             color: #b02a37;
         }
 
-
         .alert {
             border-radius: 12px;
             border: none;
         }
 
-        footer {
-            margin-top: 70px;
+        .page-content {
+            padding: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
+            }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
 
-{{-- NAVBAR --}}
-@include('layouts.partials.admin-navbar')
+@include('layouts.partials.sidebar')
 
+<script>
+    // Inject navbar into sidebar layout
+    document.addEventListener('DOMContentLoaded', function() {
+        const mainContent = document.getElementById('mainContent');
+        const pageContent = mainContent?.querySelector('.page-content');
 
-<div class="container">
+        if (mainContent && pageContent) {
+            const navbar = document.querySelector('header.topbar');
+            if (navbar) {
+                mainContent.insertBefore(navbar, pageContent);
+            }
+        }
+    });
+</script>
 
-    {{-- HEADER --}}
-    <div class="page-header">
+<div class="page-content">
+
+<div class="container-fluid px-4">
+
+    <div class="page-header mb-4">
 
         <div class="row align-items-center">
 
@@ -310,10 +289,9 @@
     </div>
 
 
-    {{-- ALERT --}}
     @if(session('success'))
 
-        <div class="alert alert-success mt-4">
+        <div class="alert alert-success mb-4">
             <i class="bi bi-check-circle-fill me-2"></i>
             {{ session('success') }}
         </div>
@@ -323,7 +301,7 @@
 
     @if($errors->any())
 
-        <div class="alert alert-danger mt-4">
+        <div class="alert alert-danger mb-4">
 
             <strong>
                 <i class="bi bi-exclamation-circle me-2"></i>
@@ -343,10 +321,8 @@
     @endif
 
 
-    {{-- STATISTIK --}}
-    <div class="row g-4 mt-2">
+    <div class="row g-4 mb-4">
 
-        {{-- TOTAL --}}
         <div class="col-md-6 col-xl-3">
 
             <div class="stat-card">
@@ -376,7 +352,6 @@
         </div>
 
 
-        {{-- TERSEDIA --}}
         <div class="col-md-6 col-xl-3">
 
             <div class="stat-card">
@@ -406,7 +381,6 @@
         </div>
 
 
-        {{-- DISEWA --}}
         <div class="col-md-6 col-xl-3">
 
             <div class="stat-card">
@@ -436,7 +410,6 @@
         </div>
 
 
-        {{-- MAINTENANCE --}}
         <div class="col-md-6 col-xl-3">
 
             <div class="stat-card">
@@ -468,8 +441,7 @@
     </div>
 
 
-    {{-- DATA MOBIL --}}
-    <div class="mt-5">
+    <div class="mt-4">
 
         <div class="d-flex justify-content-between align-items-center mb-4">
 
@@ -485,17 +457,13 @@
 
             </div>
 
-            <div class="d-flex gap-2">
+            <div>
 
-                <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-1"></i>
-                    Dashboard
-                </a>
-
-                <button type="button"
-                        class="btn btn-green"
-                        data-bs-toggle="modal"
-                        data-bs-target="#tambahMobilModal">
+                <button
+                    type="button"
+                    class="btn btn-green"
+                    data-bs-toggle="modal"
+                    data-bs-target="#tambahMobilModal">
 
                     <i class="bi bi-plus-circle me-1"></i>
                     Tambah Mobil
@@ -574,7 +542,16 @@
     </div>
 
 
-    {{-- MODAL TAMBAH MOBIL --}}
+    <div class="modal fade" id="fotoMobilModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                @include('layouts.partials.modal-head', ['title' => 'Foto Mobil'])
+                <div class="modal-body p-3 text-center">
+                    <img id="fotoMobilPreview" src="" class="img-fluid rounded" alt="Foto mobil">
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade"
          id="tambahMobilModal"
          tabindex="-1"
@@ -585,19 +562,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title" id="tambahMobilModalLabel">
-                        <i class="bi bi-plus-circle text-success me-2"></i>
-                        Tambah Mobil
-                    </h5>
-
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Tutup"></button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Tambah Mobil', 'icon' => 'bi-plus-circle', 'titleId' => 'tambahMobilModalLabel'])
 
                 <div class="modal-body">
 
@@ -610,7 +575,6 @@
 
                         <div class="row g-4">
 
-                            {{-- BRAND --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -639,7 +603,6 @@
                             </div>
 
 
-                            {{-- TIPE --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -668,7 +631,6 @@
                             </div>
 
 
-                            {{-- CABANG --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -697,7 +659,6 @@
                             </div>
 
 
-                            {{-- NAMA --}}
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -715,7 +676,6 @@
                             </div>
 
 
-                            {{-- PLAT --}}
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -733,7 +693,6 @@
                             </div>
 
 
-                            {{-- TAHUN --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -751,7 +710,6 @@
                             </div>
 
 
-                            {{-- TRANSMISI --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -779,7 +737,6 @@
                             </div>
 
 
-                            {{-- KAPASITAS --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -796,7 +753,6 @@
                             </div>
 
 
-                            {{-- WARNA --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -814,7 +770,6 @@
                             </div>
 
 
-                            {{-- HARGA --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -841,7 +796,6 @@
                             </div>
 
 
-                            {{-- DEPOSIT --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -868,7 +822,6 @@
                             </div>
 
 
-                            {{-- FOTO --}}
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -882,13 +835,12 @@
                                     accept=".jpg,.jpeg,.png,.svg">
 
                                 <small class="text-muted">
-                                    JPG, PNG, JPEG, SVG • Maksimal 2MB
+                                    JPG, PNG, JPEG, SVG, Maksimal 2MB
                                 </small>
 
                             </div>
 
 
-                            {{-- STATUS --}}
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -914,7 +866,6 @@
                             </div>
 
 
-                            {{-- DESKRIPSI --}}
                             <div class="col-12">
 
                                 <label class="form-label">
@@ -930,7 +881,6 @@
                             </div>
 
 
-                            {{-- FASILITAS --}}
                             <div class="col-12">
 
                                 <label class="form-label">
@@ -986,7 +936,6 @@
                     </button>
 
                     <button type="submit"
-                            form="formTambahMobil"
                             class="btn btn-green">
 
                         <i class="bi bi-save me-1"></i>
@@ -1005,7 +954,6 @@
     </div>
 
 
-    {{-- MODAL EDIT MOBIL --}}
     <div class="modal fade"
          id="editMobilModal"
          tabindex="-1"
@@ -1016,19 +964,7 @@
 
             <div class="modal-content">
 
-                <div class="modal-header">
-
-                    <h5 class="modal-title" id="editMobilModalLabel">
-                        <i class="bi bi-pencil-square text-primary me-2"></i>
-                        Edit Mobil
-                    </h5>
-
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Tutup"></button>
-
-                </div>
+                @include('layouts.partials.modal-head', ['title' => 'Edit Mobil', 'icon' => 'bi-pencil-square', 'titleId' => 'editMobilModalLabel'])
 
                 <div class="modal-body">
 
@@ -1042,7 +978,6 @@
 
                         <div class="row g-4">
 
-                            {{-- BRAND --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -1073,7 +1008,6 @@
                             </div>
 
 
-                            {{-- TIPE --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -1104,7 +1038,6 @@
                             </div>
 
 
-                            {{-- CABANG --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -1135,7 +1068,6 @@
                             </div>
 
 
-                            {{-- NAMA --}}
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -1153,7 +1085,6 @@
                             </div>
 
 
-                            {{-- PLAT --}}
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -1171,7 +1102,6 @@
                             </div>
 
 
-                            {{-- TAHUN --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -1189,7 +1119,6 @@
                             </div>
 
 
-                            {{-- TRANSMISI --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -1218,7 +1147,6 @@
                             </div>
 
 
-                            {{-- KAPASITAS --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -1236,7 +1164,6 @@
                             </div>
 
 
-                            {{-- WARNA --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -1254,7 +1181,6 @@
                             </div>
 
 
-                            {{-- HARGA --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -1281,7 +1207,6 @@
                             </div>
 
 
-                            {{-- DEPOSIT --}}
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -1308,7 +1233,6 @@
                             </div>
 
 
-                            {{-- FOTO --}}
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -1330,13 +1254,12 @@
                                     accept=".jpg,.jpeg,.png,.svg">
 
                                 <small class="text-muted">
-                                    JPG, PNG, JPEG, SVG • Maksimal 2MB • Kosongkan jika foto tidak diganti
+                                    JPG, PNG, JPEG, SVG, Maksimal 2MB, Kosongkan jika foto tidak diganti
                                 </small>
 
                             </div>
 
 
-                            {{-- STATUS --}}
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -1365,7 +1288,6 @@
                             </div>
 
 
-                            {{-- DESKRIPSI --}}
                             <div class="col-12">
 
                                 <label class="form-label">
@@ -1382,7 +1304,6 @@
                             </div>
 
 
-                            {{-- FASILITAS --}}
                             <div class="col-12">
 
                                 <label class="form-label">
@@ -1439,7 +1360,6 @@
                     </button>
 
                     <button type="submit"
-                            form="formEditMobil"
                             class="btn btn-green">
 
                         <i class="bi bi-save me-1"></i>
@@ -1455,23 +1375,7 @@
 
     </div>
 
-
-<footer class="bg-white border-top py-4">
-
-    <div class="container text-center">
-
-        <div class="fw-bold">
-            Rental<span class="text-success">ku</span>.
-        </div>
-
-        <small class="text-muted">
-            Management Mobil • RentalKu
-        </small>
-
-    </div>
-
-</footer>
-
+</div>
 
 <script
     src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
@@ -1496,10 +1400,16 @@
         return '<span class="badge-status ' + cls + '">' + status + '</span>';
     }
 
+    function openFotoMobil(url) {
+        $('#fotoMobilPreview').attr('src', url);
+        bootstrap.Modal.getOrCreateInstance($('#fotoMobilModal')[0]).show();
+    }
+
     function mobilPhoto(image) {
         if (image) {
-            return '<img src="' + '{{ asset('__PHOTO__') }}'.replace('__PHOTO__', image) +
-                '" class="car-image" alt="Foto mobil">';
+            const full = '{{ asset('__PHOTO__') }}'.replace('__PHOTO__', image);
+            return '<a href="#" onclick="openFotoMobil(\'' + full + '\');return false;">' +
+                '<img src="' + full + '" class="car-image" alt="Foto mobil"></a>';
         }
 
         return '<div class="car-placeholder"><i class="bi bi-car-front fs-5"></i></div>';
@@ -1557,25 +1467,16 @@
                     data: 'brand_name',
                     orderable: true,
                     searchable: false,
-                    render: function(data) {
-                        return data;
-                    },
                 },
                 {
                     data: 'tipe_name',
                     orderable: true,
                     searchable: false,
-                    render: function(data) {
-                        return data;
-                    },
                 },
                 {
                     data: 'cabang_name',
                     orderable: true,
                     searchable: false,
-                    render: function(data) {
-                        return data;
-                    },
                 },
                 {
                     data: 'plate_number',
@@ -1589,9 +1490,6 @@
                     data: 'tahun',
                     orderable: true,
                     searchable: false,
-                    render: function(data) {
-                        return data;
-                    },
                 },
                 {
                     data: 'harga_perhari',
@@ -1630,7 +1528,6 @@
                 info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
                 infoEmpty: 'Tidak ada data',
                 infoFiltered: '(difilter dari _MAX_ total data)',
-                infoPostFix: '',
                 loadingRecords: 'Memuat...',
                 zeroRecords: 'Tidak ditemukan data yang cocok',
                 emptyTable: 'Belum ada mobil',
@@ -1699,11 +1596,6 @@
             return;
         }
 
-        // Isi action form dengan route update
-        $('#formEditMobil').attr('action',
-            "{{ route('mobils.update', '__ID__') }}".replace('__ID__', id));
-
-        // Isi semua field
         $('#editBrandId').val(data.brand_id);
         $('#editTipeMobilId').val(data.tipe_mobil_id);
         $('#editCabangId').val(data.cabang_id);
@@ -1718,37 +1610,72 @@
         $('#editStatus').val(data.status);
         $('#editDescription').val(data.description);
 
-        // Fasilitas
-        $('#editMobilModal .edit-fasilitas-checkbox').prop('checked', false);
+        if (data.image) {
+            $('#editFotoPreview').attr('src', '{{ asset('__PHOTO__') }}'.replace('__PHOTO__', data.image)).show();
+        } else {
+            $('#editFotoPreview').hide();
+        }
 
+        $('.edit-fasilitas-checkbox').prop('checked', false);
         if (data.fasilitas_ids && data.fasilitas_ids.length) {
-            $('#editMobilModal .edit-fasilitas-checkbox').each(function() {
-                if (data.fasilitas_ids.includes(parseInt($(this).val()))) {
-                    $(this).prop('checked', true);
-                }
+            data.fasilitas_ids.forEach(function(fid) {
+                $('.edit-fasilitas-checkbox[value="' + fid + '"]').prop('checked', true);
             });
         }
 
-        // Preview foto
-        if (data.image) {
-            $('#editFotoPreview')
-                .attr('src', "{{ asset('__PHOTO__') }}".replace('__PHOTO__', data.image))
-                .show();
-        } else {
-            $('#editFotoPreview').attr('src', '').hide();
-        }
+        $('#formEditMobil').attr('action',
+            "{{ route('mobils.update', '__ID__') }}".replace('__ID__', id));
 
-        // Kosongkan input file
-        $('#editImage').val('');
-
-        // Tampilkan modal
         bootstrap.Modal.getOrCreateInstance($('#editMobilModal')[0]).show();
     }
 
-    $('#formEditMobil').on('submit', function(e) {
+    $(document).on('submit', '#formTambahMobil', function(e) {
         e.preventDefault();
 
-        const formData = new FormData(this);
+        var formData = new FormData(this);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            success: function(result) {
+                bootstrap.Modal.getInstance($('#tambahMobilModal')[0]).hide();
+                $('#formTambahMobil')[0].reset();
+                $('#mobils-table').DataTable().ajax.reload();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: result.message || 'Mobil berhasil ditambahkan.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+            },
+            error: function(xhr) {
+                var r = xhr.responseJSON || {};
+                var msg = r.errors ? Object.values(r.errors)[0][0] :
+                    (r.message || 'Terjadi kesalahan saat menambahkan mobil.');
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: msg,
+                });
+            }
+        });
+    });
+
+    $(document).on('submit', '#formEditMobil', function(e) {
+        e.preventDefault();
+
+        var formData = new FormData(this);
 
         $.ajax({
             url: $(this).attr('action'),
@@ -1762,7 +1689,7 @@
                 'X-Requested-With': 'XMLHttpRequest',
             },
             success: function(result) {
-                $('#editMobilModal').modal('hide');
+                bootstrap.Modal.getInstance($('#editMobilModal')[0]).hide();
                 $('#mobils-table').DataTable().ajax.reload();
 
                 Swal.fire({
@@ -1775,7 +1702,7 @@
             },
             error: function(xhr) {
                 const r = xhr.responseJSON || {};
-                const msg = r.errors ? Object.values(r.errors)[0][0] :
+                var msg = r.errors ? Object.values(r.errors)[0][0] :
                     (r.message || 'Terjadi kesalahan saat memperbarui mobil.');
 
                 Swal.fire({
@@ -1786,7 +1713,9 @@
             }
         });
     });
+
 </script>
 
 </body>
+
 </html>
