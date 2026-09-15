@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Dashboard Customer - RentalKu</title>
@@ -16,590 +19,2055 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     >
 
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
     <style>
+
+        /* =========================================================
+           ROOT
+        ========================================================= */
+
+        :root {
+            --rk-green: #16834b;
+            --rk-green-dark: #0f663a;
+            --rk-green-light: #e9f7ef;
+
+            --rk-cream: #f7f7f3;
+            --rk-white: #ffffff;
+
+            --rk-dark: #18201c;
+            --rk-muted: #78817b;
+
+            --rk-border: #e6ebe7;
+
+            --rk-yellow: #f4b942;
+            --rk-blue: #4d7cff;
+            --rk-red: #dc5b5b;
+
+            --rk-shadow:
+                0 15px 45px rgba(24, 32, 28, .07);
+        }
+
+
+        /* =========================================================
+           RESET
+        ========================================================= */
 
         * {
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             margin: 0;
-            background: #f5f7f6;
-            color: #1f2937;
+            background: var(--rk-cream);
+            color: var(--rk-dark);
             font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
         }
 
-        .navbar {
-            background: rgba(255,255,255,.95);
-            border-bottom: 1px solid #e9ecef;
+        a {
+            text-decoration: none;
         }
 
-        .brand {
-            font-size: 27px;
-            font-weight: 800;
-            letter-spacing: -1px;
-            color: #1f2937;
+        button,
+        a {
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .brand span {
-            color: #198754;
+
+        /* =========================================================
+           PAGE BACKGROUND DECORATION
+        ========================================================= */
+
+        .rk-page-decoration {
+            position: fixed;
+            width: 420px;
+            height: 420px;
+            border-radius: 50%;
+            background: rgba(22, 131, 75, .045);
+            filter: blur(5px);
+            pointer-events: none;
+            z-index: -1;
         }
 
-        .user-box {
-            background: #f5f8f6;
-            border-radius: 50px;
-            padding: 6px 12px 6px 7px;
+        .rk-decoration-one {
+            top: -180px;
+            right: -100px;
+        }
+
+        .rk-decoration-two {
+            bottom: -220px;
+            left: -150px;
+        }
+
+
+        /* =========================================================
+           NAVBAR
+        ========================================================= */
+
+        .rk-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+
+            background: rgba(247, 247, 243, .88);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            border-bottom: 1px solid rgba(230, 235, 231, .9);
+        }
+
+        .rk-navbar-inner {
+            min-height: 78px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 600;
+            justify-content: space-between;
+            gap: 20px;
         }
 
-        .user-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #198754;
-            color: white;
-            font-size: 16px;
-        }
-
-        .hero {
-            position: relative;
-            overflow: hidden;
-            margin-top: 30px;
-            border-radius: 28px;
-            padding: 55px;
-            min-height: 400px;
-            background:
-                linear-gradient(
-                    110deg,
-                    rgba(8,70,42,.98),
-                    rgba(25,135,84,.88)
-                );
-            color: white;
-        }
-
-        .hero::before {
-            content: "";
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: rgba(255,255,255,.06);
-            top: -120px;
-            right: 35%;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero-badge {
+        .rk-brand {
             display: inline-flex;
             align-items: center;
-            gap: 7px;
-            background: rgba(255,255,255,.14);
-            border: 1px solid rgba(255,255,255,.2);
-            color: white;
-            border-radius: 50px;
-            padding: 8px 14px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        .hero h1 {
-            font-size: 44px;
-            line-height: 1.15;
-            font-weight: 800;
-            letter-spacing: -1px;
-            margin-bottom: 18px;
-        }
-
-        .hero h1 span {
-            color: #b8f2d1;
-        }
-
-        .hero p {
-            color: #e1f4e9;
-            font-size: 16px;
-            line-height: 1.7;
-            max-width: 540px;
-            margin-bottom: 28px;
-        }
-
-        .hero-btn {
-            background: white;
-            color: #157347;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 21px;
-            font-weight: 700;
-            transition: .2s;
-        }
-
-        .hero-btn:hover {
-            background: #f1fdf5;
-            color: #11653e;
-            transform: translateY(-2px);
-        }
-
-        .hero-secondary {
-            color: white;
-            border: 1px solid rgba(255,255,255,.4);
-            border-radius: 12px;
-            padding: 11px 20px;
-            font-weight: 600;
-        }
-
-        .hero-secondary:hover {
-            background: rgba(255,255,255,.1);
-            color: white;
-        }
-
-        .hero-photo-wrapper {
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero-img {
-            width: 100%;
-            height: 290px;
-            object-fit: cover;
-            border-radius: 22px;
-            box-shadow: 0 20px 45px rgba(0,0,0,.25);
-        }
-
-        .floating-card {
-            position: absolute;
-            bottom: -15px;
-            left: -20px;
-            background: white;
-            color: #1f2937;
-            border-radius: 16px;
-            padding: 12px 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,.18);
-            display: flex;
-            align-items: center;
             gap: 10px;
+            color: var(--rk-dark);
+            font-size: 25px;
+            font-weight: 800;
+            letter-spacing: -1.2px;
         }
 
-        .floating-icon {
-            width: 40px;
-            height: 40px;
+        .rk-brand:hover {
+            color: var(--rk-dark);
+        }
+
+        .rk-brand-mark {
+            width: 38px;
+            height: 38px;
             border-radius: 12px;
-            background: #e9f7ef;
-            color: #198754;
+
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+
+            background: var(--rk-green);
+            color: white;
+
+            box-shadow: 0 7px 18px rgba(22, 131, 75, .2);
         }
 
-        .floating-card small {
-            display: block;
-            color: #6b7280;
+        .rk-brand span {
+            color: var(--rk-green);
         }
 
-        .floating-card strong {
-            font-size: 14px;
-        }
 
-        .stats {
-            margin-top: -30px;
-            position: relative;
-            z-index: 5;
-        }
+        /* =========================================================
+           USER PROFILE CHIP
+        ========================================================= */
 
-        .stat-card {
+        .rk-profile-trigger {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+
+            padding: 6px 8px 6px 6px;
+
+            border: 1px solid var(--rk-border);
             background: white;
-            border-radius: 18px;
-            padding: 20px;
-            border: 1px solid #edf0ee;
-            box-shadow: 0 8px 25px rgba(0,0,0,.05);
-            height: 100%;
+
+            border-radius: 16px;
+
+            cursor: pointer;
+
+            transition: .25s ease;
         }
 
-        .stat-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 15px;
-            background: #e9f7ef;
-            color: #198754;
+        .rk-profile-trigger:hover {
+            border-color: rgba(22, 131, 75, .3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(24, 32, 28, .06);
+        }
+
+        .rk-profile-avatar {
+            width: 38px;
+            height: 38px;
+
+            border-radius: 12px;
+
+            background: var(--rk-green);
+            color: white;
+
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 23px;
+
+            font-size: 14px;
+            font-weight: 800;
         }
 
-        .stat-title {
-            color: #6b7280;
-            font-size: 13px;
+        .rk-profile-info {
+            text-align: left;
+            line-height: 1.2;
+        }
+
+        .rk-profile-info small {
+            display: block;
+            color: var(--rk-muted);
+            font-size: 10px;
             margin-bottom: 3px;
         }
 
-        .stat-number {
-            font-size: 24px;
+        .rk-profile-info strong {
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .rk-profile-arrow {
+            color: var(--rk-muted);
+            font-size: 14px;
+            margin-left: 2px;
+        }
+
+
+        /* =========================================================
+           MAIN
+        ========================================================= */
+
+        .rk-main {
+            padding: 34px 0 70px;
+        }
+
+
+        /* =========================================================
+           WELCOME HEADER
+        ========================================================= */
+
+        .rk-welcome-row {
+            margin-bottom: 25px;
+        }
+
+        .rk-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            color: var(--rk-green);
+
+            font-size: 11px;
+            font-weight: 800;
+
+            text-transform: uppercase;
+            letter-spacing: 1.4px;
+
+            margin-bottom: 10px;
+        }
+
+        .rk-eyebrow-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--rk-green);
+            box-shadow: 0 0 0 5px rgba(22, 131, 75, .1);
+        }
+
+        .rk-welcome-title {
+            font-size: clamp(28px, 4vw, 42px);
+            line-height: 1.1;
+            letter-spacing: -1.7px;
             font-weight: 800;
             margin: 0;
         }
 
-        .section {
-            padding-top: 70px;
-            padding-bottom: 30px;
+        .rk-welcome-title span {
+            color: var(--rk-green);
         }
 
-        .section-label {
-            color: #198754;
+        .rk-welcome-description {
+            color: var(--rk-muted);
+            font-size: 14px;
+            line-height: 1.7;
+            max-width: 620px;
+            margin: 11px 0 0;
+        }
+
+
+        /* =========================================================
+           QUICK ACTION
+        ========================================================= */
+
+        .rk-quick-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+
+            background: var(--rk-dark);
+            color: white;
+
+            padding: 13px 18px;
+            border-radius: 14px;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            transition: .25s ease;
+        }
+
+        .rk-quick-action:hover {
+            background: var(--rk-green);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .rk-quick-action i {
+            font-size: 16px;
+        }
+
+
+        /* =========================================================
+           BENTO HERO
+        ========================================================= */
+
+        .rk-bento-hero {
+            display: grid;
+            grid-template-columns: 1.35fr .65fr;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .rk-hero-main {
+            position: relative;
+            min-height: 330px;
+
+            overflow: hidden;
+
+            border-radius: 28px;
+
+            background:
+                linear-gradient(
+                    120deg,
+                    #123d2a 0%,
+                    #1a8050 55%,
+                    #36a56e 100%
+                );
+
+            color: white;
+
+            padding: 42px;
+
+            box-shadow:
+                0 18px 55px rgba(15, 102, 58, .18);
+        }
+
+        .rk-hero-main::before {
+            content: "";
+
+            position: absolute;
+
+            width: 330px;
+            height: 330px;
+
+            border-radius: 50%;
+
+            right: -100px;
+            top: -150px;
+
+            background: rgba(255,255,255,.08);
+        }
+
+        .rk-hero-main::after {
+            content: "";
+
+            position: absolute;
+
+            width: 220px;
+            height: 220px;
+
+            border-radius: 50%;
+
+            right: 130px;
+            bottom: -150px;
+
+            background: rgba(255,255,255,.06);
+        }
+
+        .rk-hero-content {
+            position: relative;
+            z-index: 3;
+            max-width: 620px;
+        }
+
+        .rk-hero-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            background: rgba(255,255,255,.13);
+            border: 1px solid rgba(255,255,255,.18);
+
+            padding: 8px 12px;
+
+            border-radius: 100px;
+
+            font-size: 11px;
+            font-weight: 700;
+
+            margin-bottom: 20px;
+
+            backdrop-filter: blur(8px);
+        }
+
+        .rk-hero-label i {
+            color: #bdf2d2;
+        }
+
+        .rk-hero-title {
+            font-size: clamp(30px, 4vw, 52px);
+            line-height: 1.05;
+
+            letter-spacing: -2px;
+
+            font-weight: 800;
+
+            margin-bottom: 15px;
+        }
+
+        .rk-hero-title span {
+            color: #baf1cf;
+        }
+
+        .rk-hero-text {
+            max-width: 510px;
+
+            color: rgba(255,255,255,.76);
+
+            font-size: 14px;
+            line-height: 1.8;
+
+            margin-bottom: 25px;
+        }
+
+        .rk-hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+        }
+
+        .rk-btn-white {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            background: white;
+            color: var(--rk-green-dark);
+
+            border-radius: 13px;
+
+            padding: 12px 17px;
+
             font-size: 13px;
             font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 7px;
+
+            transition: .25s ease;
         }
 
-        .section-title {
-            font-size: 30px;
-            font-weight: 800;
-            letter-spacing: -.5px;
-            margin-bottom: 5px;
+        .rk-btn-white:hover {
+            color: var(--rk-green-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,.12);
         }
 
-        .section-desc {
-            color: #6b7280;
-            margin-bottom: 0;
+        .rk-btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            background: rgba(255,255,255,.1);
+            color: white;
+
+            border: 1px solid rgba(255,255,255,.2);
+
+            border-radius: 13px;
+
+            padding: 11px 16px;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            transition: .25s ease;
         }
 
-        .car-card {
+        .rk-btn-ghost:hover {
+            background: rgba(255,255,255,.18);
+            color: white;
+        }
+
+
+        /* =========================================================
+           HERO CAR IMAGE
+        ========================================================= */
+
+        .rk-hero-car {
+            position: absolute;
+
+            width: 430px;
+            max-width: 52%;
+
+            right: -15px;
+            bottom: -10px;
+
+            z-index: 2;
+
+            filter:
+                drop-shadow(0 30px 25px rgba(0,0,0,.25));
+
+            transform: rotate(-2deg);
+
+            transition: transform .5s ease;
+        }
+
+        .rk-hero-main:hover .rk-hero-car {
+            transform:
+                rotate(-1deg)
+                translateY(-7px)
+                scale(1.02);
+        }
+
+
+        /* =========================================================
+           SIDE BENTO
+        ========================================================= */
+
+        .rk-side-stack {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .rk-side-card {
             background: white;
-            border: 1px solid #edf0ee;
-            border-radius: 22px;
-            overflow: hidden;
-            height: 100%;
-            box-shadow: 0 7px 25px rgba(0,0,0,.045);
-            transition: all .25s ease;
-        }
+            border: 1px solid var(--rk-border);
+            border-radius: 24px;
 
-        .car-card:hover {
-            transform: translateY(-7px);
-            box-shadow: 0 18px 40px rgba(0,0,0,.10);
-        }
+            padding: 25px;
 
-        .car-photo-wrapper {
+            box-shadow: var(--rk-shadow);
+
             position: relative;
             overflow: hidden;
         }
 
-        .car-img {
-            width: 100%;
-            height: 210px;
-            object-fit: contain;
-            background: #f1f5f9;
-            display: block;
-            transition: transform .4s ease;
+        .rk-side-card-green {
+            background: #eaf7ef;
+            border-color: #d8eedf;
         }
 
-        .car-card:hover .car-img {
-            transform: scale(1.04);
-        }
+        .rk-side-icon {
+            width: 45px;
+            height: 45px;
 
-        .car-status {
-            position: absolute;
-            top: 14px;
-            left: 14px;
-            background: #198754;
+            border-radius: 14px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: var(--rk-green);
             color: white;
-            padding: 6px 11px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 700;
-        }
 
-        .car-body {
-            padding: 21px;
-        }
-
-        .car-title {
             font-size: 19px;
+
+            margin-bottom: 18px;
+        }
+
+        .rk-side-card h4 {
+            font-size: 17px;
             font-weight: 800;
             margin-bottom: 7px;
         }
 
-        .car-info {
+        .rk-side-card p {
+            color: var(--rk-muted);
+            font-size: 12px;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .rk-side-card-green p {
+            color: #527463;
+        }
+
+        .rk-side-decoration {
+            position: absolute;
+
+            width: 100px;
+            height: 100px;
+
+            border-radius: 50%;
+
+            right: -35px;
+            bottom: -35px;
+
+            background: rgba(22,131,75,.06);
+        }
+
+
+        /* =========================================================
+           STATS
+        ========================================================= */
+
+        .rk-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+
+            margin-bottom: 65px;
+        }
+
+        .rk-stat-card {
+            background: white;
+
+            border: 1px solid var(--rk-border);
+            border-radius: 21px;
+
+            padding: 20px;
+
             display: flex;
-            gap: 13px;
-            color: #6b7280;
+            align-items: center;
+            gap: 15px;
+
+            box-shadow: 0 8px 30px rgba(24,32,28,.045);
+
+            transition: .25s ease;
+        }
+
+        .rk-stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(24,32,28,.08);
+        }
+
+        .rk-stat-icon {
+            width: 52px;
+            height: 52px;
+
+            flex: 0 0 52px;
+
+            border-radius: 16px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 21px;
+        }
+
+        .rk-stat-icon.green {
+            background: #e7f6ed;
+            color: var(--rk-green);
+        }
+
+        .rk-stat-icon.yellow {
+            background: #fff5db;
+            color: #c28a18;
+        }
+
+        .rk-stat-icon.blue {
+            background: #edf2ff;
+            color: var(--rk-blue);
+        }
+
+        .rk-stat-label {
+            color: var(--rk-muted);
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .rk-stat-number {
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -.5px;
+            margin: 0;
+        }
+
+
+        /* =========================================================
+           SECTION HEADER
+        ========================================================= */
+
+        .rk-section {
+            margin-bottom: 75px;
+        }
+
+        .rk-section-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            margin-bottom: 25px;
+        }
+
+        .rk-section-label {
+            color: var(--rk-green);
+
+            font-size: 10px;
+            font-weight: 800;
+
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+
+            margin-bottom: 7px;
+        }
+
+        .rk-section-title {
+            font-size: clamp(24px, 3vw, 32px);
+            font-weight: 800;
+
+            letter-spacing: -1.2px;
+
+            margin: 0;
+        }
+
+        .rk-section-description {
+            color: var(--rk-muted);
             font-size: 13px;
+            line-height: 1.7;
+
+            margin: 7px 0 0;
+        }
+
+
+        /* =========================================================
+           RENTAL CARDS
+        ========================================================= */
+
+        .rk-rental-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .rk-rental-card {
+            background: white;
+
+            border: 1px solid var(--rk-border);
+            border-radius: 22px;
+
+            padding: 23px;
+
+            box-shadow: 0 8px 30px rgba(24,32,28,.045);
+
+            transition: .25s ease;
+        }
+
+        .rk-rental-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 38px rgba(24,32,28,.08);
+        }
+
+        .rk-rental-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+
+            gap: 15px;
+
+            margin-bottom: 20px;
+        }
+
+        .rk-rental-car-name {
+            font-size: 17px;
+            font-weight: 800;
+            margin: 0 0 4px;
+        }
+
+        .rk-rental-id {
+            color: var(--rk-muted);
+            font-size: 11px;
+        }
+
+        .rk-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+
+            border-radius: 100px;
+
+            padding: 7px 10px;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            white-space: nowrap;
+        }
+
+        .rk-status.waiting {
+            background: #fff4d7;
+            color: #9a6b08;
+        }
+
+        .rk-status.approved {
+            background: #e6f6ed;
+            color: #167244;
+        }
+
+        .rk-status.running {
+            background: #edf2ff;
+            color: #456fd6;
+        }
+
+        .rk-status.finished {
+            background: #eef0f1;
+            color: #60686b;
+        }
+
+        .rk-status.cancelled {
+            background: #fdeaea;
+            color: #b34d4d;
+        }
+
+        .rk-rental-details {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+
+            border-top: 1px solid #edf0ee;
+            border-bottom: 1px solid #edf0ee;
+
+            padding: 18px 0;
+
             margin-bottom: 18px;
         }
 
-        .car-info span {
+        .rk-detail-item {
+            padding: 0 15px;
+            border-right: 1px solid #edf0ee;
+        }
+
+        .rk-detail-item:first-child {
+            padding-left: 0;
+        }
+
+        .rk-detail-item:last-child {
+            border-right: 0;
+            padding-right: 0;
+        }
+
+        .rk-detail-label {
+            color: var(--rk-muted);
+            font-size: 10px;
+            margin-bottom: 5px;
+        }
+
+        .rk-detail-value {
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .rk-detail-value.price {
+            color: var(--rk-green);
+        }
+
+
+        /* =========================================================
+           PAYMENT BUTTONS / ALERT
+        ========================================================= */
+
+        .rk-payment-button {
             display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+
+            width: 100%;
+
+            background: var(--rk-green);
+            color: white;
+
+            border: none;
+
+            border-radius: 13px;
+
+            padding: 12px 15px;
+
+            font-size: 12px;
+            font-weight: 800;
+
+            transition: .25s ease;
+        }
+
+        .rk-payment-button:hover {
+            background: var(--rk-green-dark);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .rk-payment-alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+
+            border-radius: 13px;
+
+            padding: 13px 14px;
+
+            font-size: 11px;
+            line-height: 1.6;
+
+            margin: 0;
+        }
+
+        .rk-payment-alert i {
+            font-size: 16px;
+            margin-top: 1px;
+        }
+
+        .rk-payment-info {
+            background: #eef5ff;
+            color: #466486;
+            border: 1px solid #dce9fb;
+        }
+
+        .rk-payment-success {
+            background: #eaf7ef;
+            color: #31704c;
+            border: 1px solid #d8eedf;
+        }
+
+        .rk-payment-warning {
+            background: #fff7df;
+            color: #8b6b1b;
+            border: 1px solid #f6e7b5;
+        }
+
+        .rk-payment-danger {
+            background: #fff0f0;
+            color: #9c5050;
+            border: 1px solid #f4dada;
+        }
+
+        .rk-upload-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+
+            width: 100%;
+
+            background: #d95353;
+            color: white;
+
+            border-radius: 13px;
+
+            padding: 12px;
+
+            font-size: 12px;
+            font-weight: 800;
+
+            transition: .25s ease;
+        }
+
+        .rk-upload-button:hover {
+            background: #bb4141;
+            color: white;
+        }
+
+
+        /* =========================================================
+           EMPTY STATE
+        ========================================================= */
+
+        .rk-empty {
+            background: white;
+
+            border: 1px dashed #d8dfda;
+
+            border-radius: 24px;
+
+            padding: 55px 25px;
+
+            text-align: center;
+        }
+
+        .rk-empty-icon {
+            width: 70px;
+            height: 70px;
+
+            margin: auto;
+
+            border-radius: 21px;
+
+            background: #eef5f0;
+            color: var(--rk-green);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 28px;
+        }
+
+        .rk-empty h5 {
+            font-size: 16px;
+            font-weight: 800;
+            margin-top: 18px;
+            margin-bottom: 7px;
+        }
+
+        .rk-empty p {
+            color: var(--rk-muted);
+            font-size: 12px;
+            margin: 0;
+        }
+
+
+        /* =========================================================
+           CAR GRID
+        ========================================================= */
+
+        .rk-car-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 17px;
+        }
+
+        .rk-car-card {
+            background: white;
+
+            border: 1px solid var(--rk-border);
+            border-radius: 23px;
+
+            overflow: hidden;
+
+            height: 100%;
+
+            box-shadow: 0 8px 28px rgba(24,32,28,.045);
+
+            cursor: pointer;
+
+            transition:
+                transform .3s ease,
+                box-shadow .3s ease,
+                border-color .3s ease;
+        }
+
+        .rk-car-card:hover {
+            transform: translateY(-7px);
+
+            box-shadow:
+                0 20px 45px rgba(24,32,28,.1);
+
+            border-color: rgba(22,131,75,.22);
+        }
+
+        .rk-car-image-wrap {
+            position: relative;
+
+            height: 215px;
+
+            background:
+                radial-gradient(
+                    circle at 50% 25%,
+                    #ffffff 0%,
+                    #f0f3f1 70%,
+                    #e8ece9 100%
+                );
+
+            overflow: hidden;
+        }
+
+        .rk-car-image {
+            width: 100%;
+            height: 100%;
+
+            object-fit: contain;
+
+            padding: 14px;
+
+            transition: transform .45s ease;
+        }
+
+        .rk-car-card:hover .rk-car-image {
+            transform: scale(1.06);
+        }
+
+        .rk-car-status {
+            position: absolute;
+
+            top: 14px;
+            left: 14px;
+
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+
+            padding: 7px 10px;
+
+            background: rgba(255,255,255,.9);
+
+            border: 1px solid rgba(255,255,255,.8);
+
+            backdrop-filter: blur(8px);
+
+            border-radius: 100px;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            color: var(--rk-green);
+
+            box-shadow: 0 5px 15px rgba(0,0,0,.06);
+        }
+
+        .rk-car-status.disewa {
+            color: #5474c7;
+        }
+
+        .rk-car-status.maintenance {
+            color: #a1741c;
+        }
+
+        .rk-car-arrow {
+            position: absolute;
+
+            right: 14px;
+            bottom: 14px;
+
+            width: 36px;
+            height: 36px;
+
+            border-radius: 12px;
+
+            background: white;
+
+            color: var(--rk-dark);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            box-shadow: 0 7px 18px rgba(0,0,0,.09);
+
+            transition: .25s ease;
+        }
+
+        .rk-car-card:hover .rk-car-arrow {
+            background: var(--rk-green);
+            color: white;
+            transform: rotate(-8deg);
+        }
+
+        .rk-car-body {
+            padding: 20px;
+        }
+
+        .rk-car-name {
+            font-size: 17px;
+            font-weight: 800;
+
+            margin-bottom: 7px;
+        }
+
+        .rk-car-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+
+            color: var(--rk-muted);
+
+            font-size: 10px;
+
+            margin-bottom: 18px;
+        }
+
+        .rk-car-info span {
+            display: inline-flex;
             align-items: center;
             gap: 5px;
         }
 
-        .car-info i {
-            color: #198754;
+        .rk-car-info i {
+            color: var(--rk-green);
         }
 
-        .price-label {
-            font-size: 12px;
-            color: #6b7280;
+        .rk-car-bottom {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+
+            gap: 10px;
         }
 
-        .price {
-            color: #198754;
+        .rk-price-label {
+            color: var(--rk-muted);
+            font-size: 10px;
+            margin-bottom: 3px;
+        }
+
+        .rk-price {
+            color: var(--rk-dark);
+            font-size: 18px;
             font-weight: 800;
-            font-size: 20px;
         }
 
-        .price span {
-            font-size: 12px;
-            color: #6b7280;
+        .rk-price span {
+            color: var(--rk-muted);
+            font-size: 10px;
             font-weight: 500;
         }
 
-        .btn-rental {
-            background: #198754;
+        .rk-rent-small {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            background: var(--rk-green);
             color: white;
-            border: none;
+
             border-radius: 11px;
-            padding: 10px 15px;
-            font-size: 13px;
-            font-weight: 700;
+
+            padding: 10px 13px;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            transition: .25s ease;
         }
 
-        .btn-rental:hover {
-            background: #146c43;
+        .rk-rent-small:hover {
+            background: var(--rk-green-dark);
             color: white;
         }
 
-        .empty-card {
-            background: white;
-            border: 1px solid #edf0ee;
-            border-radius: 22px;
-            padding: 60px 20px;
-            text-align: center;
+
+        /* =========================================================
+           INFORMATION SECTION
+        ========================================================= */
+
+        .rk-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
         }
 
-        .empty-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 20px;
-            background: #e9f7ef;
-            color: #198754;
+        .rk-info-card {
+            position: relative;
+
+            background: white;
+
+            border: 1px solid var(--rk-border);
+            border-radius: 22px;
+
+            padding: 25px;
+
+            min-height: 190px;
+
+            overflow: hidden;
+
+            transition: .25s ease;
+        }
+
+        .rk-info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--rk-shadow);
+        }
+
+        .rk-info-number {
+            position: absolute;
+
+            right: 20px;
+            top: 18px;
+
+            color: #edf1ee;
+
+            font-size: 48px;
+            font-weight: 800;
+
+            line-height: 1;
+        }
+
+        .rk-info-icon {
+            width: 48px;
+            height: 48px;
+
+            border-radius: 14px;
+
+            background: var(--rk-green-light);
+            color: var(--rk-green);
+
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 30px;
-            margin: auto;
+
+            font-size: 20px;
+
+            margin-bottom: 20px;
         }
 
-        footer {
-            background: #17211d;
-            color: white;
-            margin-top: 70px;
-        }
-
-        .footer-brand {
-            font-size: 22px;
+        .rk-info-card h5 {
+            font-size: 15px;
             font-weight: 800;
+            margin-bottom: 7px;
         }
 
-        .footer-brand span {
-            color: #42c77d;
+        .rk-info-card p {
+            color: var(--rk-muted);
+            font-size: 11px;
+            line-height: 1.7;
+            margin: 0;
+            max-width: 260px;
         }
 
-        .footer-text {
-            color: #aeb8b2;
+
+        /* =========================================================
+           FOOTER
+        ========================================================= */
+
+        .rk-footer {
+            background: var(--rk-dark);
+            color: white;
+
+            margin-top: 30px;
+        }
+
+        .rk-footer-main {
+            padding: 45px 0;
+        }
+
+        .rk-footer-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+
+            font-size: 21px;
+            font-weight: 800;
+
+            color: white;
+        }
+
+        .rk-footer-brand:hover {
+            color: white;
+        }
+
+        .rk-footer-brand span {
+            color: #55ce89;
+        }
+
+        .rk-footer-icon {
+            width: 33px;
+            height: 33px;
+
+            border-radius: 10px;
+
+            background: var(--rk-green);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
             font-size: 14px;
         }
 
-        .footer-line {
-            border-color: rgba(255,255,255,.1);
+        .rk-footer-text {
+            color: #9ea9a3;
+
+            font-size: 11px;
+            line-height: 1.8;
+
+            max-width: 410px;
+
+            margin-top: 12px;
         }
+
+        .rk-footer-title {
+            font-size: 11px;
+            font-weight: 800;
+
+            color: white;
+
+            margin-bottom: 10px;
+        }
+
+        .rk-footer-copy {
+            color: #8f9a94;
+
+            font-size: 10px;
+
+            padding: 18px 0;
+
+            border-top: 1px solid rgba(255,255,255,.08);
+        }
+
+
+        /* =========================================================
+           MODAL DETAIL
+        ========================================================= */
+
+        #mobilDetailModal .modal-content {
+            border: none;
+            border-radius: 25px !important;
+            overflow: hidden;
+
+            box-shadow:
+                0 25px 80px rgba(0,0,0,.2);
+        }
+
+        #mobilDetailModal .modal-header {
+            padding: 22px 25px 10px;
+        }
+
+        #mobilDetailModal .modal-title {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        #mobilDetailModal .modal-body {
+            min-height: 180px;
+        }
+
+
+        /* =========================================================
+           SWEETALERT
+        ========================================================= */
+
+        .swal2-popup {
+            border-radius: 22px !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+        }
+
+        .swal2-title {
+            font-weight: 800 !important;
+        }
+
+        .swal2-confirm {
+            border-radius: 11px !important;
+            font-weight: 700 !important;
+        }
+
+
+        /* =========================================================
+           RESPONSIVE TABLET
+        ========================================================= */
 
         @media (max-width: 991px) {
 
-            .hero {
-                padding: 35px;
+            .rk-main {
+                padding-top: 25px;
             }
 
-            .hero h1 {
-                font-size: 36px;
+            .rk-bento-hero {
+                grid-template-columns: 1fr;
             }
 
-            .stats {
-                margin-top: 20px;
+            .rk-side-stack {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto;
             }
 
+            .rk-stat-grid {
+                margin-bottom: 55px;
+            }
+
+            .rk-car-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .rk-info-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .rk-rental-details {
+                grid-template-columns: repeat(2, 1fr);
+                row-gap: 18px;
+            }
+
+            .rk-detail-item:nth-child(2) {
+                border-right: 0;
+            }
+
+            .rk-detail-item:nth-child(3) {
+                padding-left: 0;
+            }
+
+            .rk-hero-car {
+                width: 380px;
+                max-width: 45%;
+            }
         }
 
-        @media (max-width: 576px) {
 
-            .hero {
-                padding: 27px;
-                border-radius: 22px;
+        /* =========================================================
+           RESPONSIVE MOBILE
+        ========================================================= */
+
+        @media (max-width: 767px) {
+
+            .rk-navbar-inner {
+                min-height: 68px;
             }
 
-            .hero h1 {
-                font-size: 30px;
+            .rk-brand {
+                font-size: 21px;
             }
 
-            .hero-img {
-                height: 220px;
+            .rk-brand-mark {
+                width: 34px;
+                height: 34px;
+                border-radius: 10px;
             }
 
-            .floating-card {
-                left: 10px;
-                bottom: -12px;
+            .rk-profile-info,
+            .rk-profile-arrow {
+                display: none;
             }
 
-            .section-title {
+            .rk-profile-trigger {
+                padding: 5px;
+                border-radius: 13px;
+            }
+
+            .rk-profile-avatar {
+                width: 37px;
+                height: 37px;
+            }
+
+            .rk-main {
+                padding-top: 22px;
+                padding-bottom: 50px;
+            }
+
+            .rk-welcome-title {
+                font-size: 29px;
+            }
+
+            .rk-welcome-description {
+                font-size: 12px;
+            }
+
+            .rk-quick-action {
+                margin-top: 15px;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .rk-hero-main {
+                min-height: 450px;
+                padding: 28px;
+                border-radius: 24px;
+            }
+
+            .rk-hero-title {
+                font-size: 34px;
+            }
+
+            .rk-hero-text {
+                font-size: 12px;
+                max-width: 100%;
+            }
+
+            .rk-hero-car {
+                width: 400px;
+                max-width: 90%;
+                right: -55px;
+                bottom: -8px;
+                opacity: .92;
+            }
+
+            .rk-side-stack {
+                grid-template-columns: 1fr;
+            }
+
+            .rk-side-card {
+                border-radius: 21px;
+            }
+
+            .rk-stat-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-bottom: 50px;
+            }
+
+            .rk-stat-card {
+                padding: 16px;
+            }
+
+            .rk-section {
+                margin-bottom: 55px;
+            }
+
+            .rk-section-head {
+                display: block;
+            }
+
+            .rk-section-title {
                 font-size: 25px;
             }
 
+            .rk-car-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .rk-car-image-wrap {
+                height: 225px;
+            }
+
+            .rk-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .rk-rental-top {
+                flex-direction: column;
+            }
+
+            .rk-rental-details {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .rk-detail-item {
+                padding: 0 10px;
+            }
+
+            .rk-detail-item:nth-child(3) {
+                padding-left: 0;
+            }
+
+            .rk-detail-item:nth-child(2),
+            .rk-detail-item:nth-child(4) {
+                border-right: 0;
+            }
+
+            .rk-footer-main {
+                padding: 38px 0;
+            }
         }
 
-        .car-card[data-mobil-id] {
-            cursor: pointer;
+
+        @media (max-width: 420px) {
+
+            .container {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .rk-hero-main {
+                min-height: 470px;
+            }
+
+            .rk-hero-title {
+                font-size: 30px;
+            }
+
+            .rk-hero-buttons {
+                flex-direction: column;
+            }
+
+            .rk-btn-white,
+            .rk-btn-ghost {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .rk-rental-card {
+                padding: 17px;
+            }
+
+            .rk-rental-details {
+                gap: 15px 0;
+            }
+
+            .rk-detail-item {
+                border-right: 0 !important;
+                padding-left: 0 !important;
+            }
+        }
+
+
+        /* =========================================================
+           REDUCED MOTION
+        ========================================================= */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+            }
+
         }
 
     </style>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
+
 
 <body>
 
 
-<nav class="navbar navbar-expand-lg sticky-top">
+    {{-- DECORATION BACKGROUND --}}
+    <div class="rk-page-decoration rk-decoration-one"></div>
+    <div class="rk-page-decoration rk-decoration-two"></div>
 
-    <div class="container py-3">
 
-        <a href="{{ url('/') }}" class="text-decoration-none brand">
-            Rental<span>ku</span>.
-        </a>
+    {{-- =========================================================
+         NAVBAR CUSTOMER
+    ========================================================== --}}
 
-        <div class="d-flex align-items-center gap-3">
+    <nav class="rk-navbar">
 
-            <div class="user-box d-none d-md-flex"
-                 data-bs-toggle="modal"
-                 data-bs-target="#profileModal"
-                 style="cursor: pointer;">
+        <div class="container">
 
-                <div class="user-icon">
-                    <i class="bi bi-person"></i>
+            <div class="rk-navbar-inner">
+
+                <a
+                    href="{{ url('/') }}"
+                    class="rk-brand"
+                >
+
+                    <div class="rk-brand-mark">
+                        <i class="bi bi-car-front-fill"></i>
+                    </div>
+
+                    Rental<span>ku</span>.
+
+                </a>
+
+
+                <div
+                    class="rk-profile-trigger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#profileModal"
+                    title="Buka profil"
+                >
+
+                    <div class="rk-profile-avatar">
+
+                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+
+                    </div>
+
+                    <div class="rk-profile-info">
+
+                        <small>
+                            Customer
+                        </small>
+
+                        <strong>
+                            {{ Auth::user()->name }}
+                        </strong>
+
+                    </div>
+
+                    <i class="bi bi-chevron-down rk-profile-arrow"></i>
+
                 </div>
-
-                <span>
-                    {{ Auth::user()->name }}
-                </span>
 
             </div>
 
         </div>
 
-    </div>
-
-</nav>
+    </nav>
 
 
-<div class="container">
+
+    {{-- =========================================================
+         MAIN
+    ========================================================== --}}
+
+    <main class="rk-main">
+
+        <div class="container">
 
 
-<section class="hero">
+            {{-- =================================================
+                 WELCOME
+            ================================================== --}}
 
-    <div class="row align-items-center">
+            <div class="row align-items-end rk-welcome-row">
 
-        <div class="col-lg-6">
+                <div class="col-lg-8">
 
-            <div class="hero-content">
+                    <div class="rk-eyebrow">
 
-                <div class="hero-badge">
+                        <span class="rk-eyebrow-dot"></span>
 
-                    <i class="bi bi-stars"></i>
+                        Dashboard Customer
 
-                    Dashboard Customer
+                    </div>
+
+                    <h1 class="rk-welcome-title">
+
+                        Halo,
+                        <span>{{ Auth::user()->name }}</span> 👋
+
+                    </h1>
+
+                    <p class="rk-welcome-description">
+
+                        Kelola perjalananmu dengan mudah.
+                        Temukan kendaraan yang sesuai, lihat rental,
+                        dan pantau pembayaranmu di satu tempat.
+
+                    </p>
 
                 </div>
 
-                <h1>
-                    Halo,
-                    <span>{{ Auth::user()->name }}</span> 👋
-                </h1>
 
-                <p>
-
-                    Siap untuk perjalanan berikutnya?
-
-                    Temukan mobil yang nyaman, aman,
-                    dan sesuai dengan kebutuhanmu
-                    hanya di RentalKu.
-
-                </p>
-
-                <div class="d-flex flex-wrap gap-2">
+                <div class="col-lg-4 text-lg-end">
 
                     <a
                         href="#mobil"
-                        class="btn hero-btn"
+                        class="rk-quick-action"
                     >
 
-                        <i class="bi bi-car-front-fill me-1"></i>
+                        <i class="bi bi-search"></i>
 
                         Cari Mobil
 
                     </a>
 
-                    <a
-                        href="#informasi"
-                        class="btn hero-secondary"
+                </div>
+
+            </div>
+
+
+
+            {{-- =================================================
+                 BENTO HERO
+            ================================================== --}}
+
+            <div class="rk-bento-hero">
+
+
+                {{-- HERO UTAMA --}}
+
+                <div class="rk-hero-main">
+
+                    <div class="rk-hero-content">
+
+                        <div class="rk-hero-label">
+
+                            <i class="bi bi-stars"></i>
+
+                            Perjalanan lebih nyaman
+
+                        </div>
+
+
+                        <h2 class="rk-hero-title">
+
+                            Temukan mobil
+                            untuk perjalanan
+                            <span>berikutnya.</span>
+
+                        </h2>
+
+
+                        <p class="rk-hero-text">
+
+                            Pilih kendaraan favoritmu,
+                            lihat detailnya, tentukan jadwal,
+                            lalu ajukan rental dengan mudah
+                            melalui RentalKu.
+
+                        </p>
+
+
+                        <div class="rk-hero-buttons">
+
+                            <a
+                                href="#mobil"
+                                class="rk-btn-white"
+                            >
+
+                                <i class="bi bi-car-front-fill"></i>
+
+                                Lihat Mobil
+
+                            </a>
+
+
+                            <a
+                                href="#informasi"
+                                class="rk-btn-ghost"
+                            >
+
+                                Pelajari Rental
+
+                                <i class="bi bi-arrow-right"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- FOTO MOBIL --}}
+
+                    <img
+                        src="https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
+                        class="rk-hero-car"
+                        alt="Mobil RentalKu"
                     >
 
-                        Pelajari RentalKu
+                </div>
 
-                    </a>
+
+
+                {{-- SIDE BENTO --}}
+
+                <div class="rk-side-stack">
+
+
+                    <div class="rk-side-card rk-side-card-green">
+
+                        <div class="rk-side-icon">
+
+                            <i class="bi bi-shield-check"></i>
+
+                        </div>
+
+                        <h4>
+                            Rental Lebih Tenang
+                        </h4>
+
+                        <p>
+                            Semua proses rental dapat
+                            kamu pantau langsung dari
+                            dashboard customer.
+                        </p>
+
+                        <div class="rk-side-decoration"></div>
+
+                    </div>
+
+
+                    <div class="rk-side-card">
+
+                        <div class="rk-side-icon">
+
+                            <i class="bi bi-wallet2"></i>
+
+                        </div>
+
+                        <h4>
+                            Pembayaran Praktis
+                        </h4>
+
+                        <p>
+                            Setelah rental disetujui,
+                            lakukan pembayaran dan
+                            upload bukti dengan mudah.
+                        </p>
+
+                        <div class="rk-side-decoration"></div>
+
+                    </div>
 
                 </div>
 
             </div>
 
-        </div>
 
 
-        <div class="col-lg-6 mt-5 mt-lg-0">
+            {{-- =================================================
+                 STATS
+            ================================================== --}}
 
-            <div class="hero-photo-wrapper">
+            <div class="rk-stat-grid">
 
-                <img
-                    src="https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
-                    class="hero-img"
-                    alt="Mobil RentalKu"
-                >
 
-                <div class="floating-card">
+                {{-- MOBIL --}}
 
-                    <div class="floating-icon">
+                <div class="rk-stat-card">
 
-                        <i class="bi bi-shield-check"></i>
+                    <div class="rk-stat-icon green">
+
+                        <i class="bi bi-car-front-fill"></i>
 
                     </div>
 
                     <div>
 
-                        <small>Rental mudah & aman</small>
+                        <div class="rk-stat-label">
+                            Mobil Tersedia
+                        </div>
 
-                        <strong>Siap menemani perjalananmu</strong>
+                        <p class="rk-stat-number">
+                            {{ $mobils->count() }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {{-- RENTAL --}}
+
+                <div class="rk-stat-card">
+
+                    <div class="rk-stat-icon yellow">
+
+                        <i class="bi bi-calendar-check-fill"></i>
+
+                    </div>
+
+                    <div>
+
+                        <div class="rk-stat-label">
+                            Rental Saya
+                        </div>
+
+                        <p class="rk-stat-number">
+                            0
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {{-- TRANSAKSI --}}
+
+                <div class="rk-stat-card">
+
+                    <div class="rk-stat-icon blue">
+
+                        <i class="bi bi-wallet2"></i>
+
+                    </div>
+
+                    <div>
+
+                        <div class="rk-stat-label">
+                            Total Transaksi
+                        </div>
+
+                        <p class="rk-stat-number">
+                            Rp 0
+                        </p>
 
                     </div>
 
@@ -607,551 +2075,830 @@
 
             </div>
 
-        </div>
-
-    </div>
-
-</section>
 
 
-<div class="row g-3 stats">
+            {{-- =================================================
+                 RENTAL SAYA
+            ================================================== --}}
 
-    <div class="col-md-4">
+            <section class="rk-section">
 
-        <div class="stat-card">
+                <div class="rk-section-head">
 
-            <div class="d-flex align-items-center gap-3">
+                    <div>
 
-                <div class="stat-icon">
-                    <i class="bi bi-car-front-fill"></i>
-                </div>
+                        <div class="rk-section-label">
+                            Aktivitas Rental
+                        </div>
 
-                <div>
+                        <h2 class="rk-section-title">
+                            Rental Saya
+                        </h2>
 
-                    <div class="stat-title">
-                        Mobil Tersedia
+                        <p class="rk-section-description">
+                            Lihat status rental dan lakukan pembayaran kendaraanmu.
+                        </p>
+
                     </div>
 
-                    <p class="stat-number">
-                        {{ $mobils->count() }}
-                    </p>
-
                 </div>
 
-            </div>
 
-        </div>
-
-    </div>
+                @if($rentals->count())
 
 
-    <div class="col-md-4">
+                    <div class="rk-rental-list">
 
-        <div class="stat-card">
 
-            <div class="d-flex align-items-center gap-3">
+                        @foreach($rentals as $rental)
 
-                <div class="stat-icon">
-                    <i class="bi bi-calendar-check-fill"></i>
-                </div>
 
-                <div>
+                            <div class="rk-rental-card">
 
-                    <div class="stat-title">
-                        Rental Saya
+
+                                {{-- HEADER RENTAL --}}
+
+                                <div class="rk-rental-top">
+
+                                    <div>
+
+                                        <h5 class="rk-rental-car-name">
+
+                                            {{ $rental->mobil->name ?? 'Mobil' }}
+
+                                        </h5>
+
+                                        <div class="rk-rental-id">
+
+                                            Rental #{{ $rental->id }}
+
+                                        </div>
+
+                                    </div>
+
+
+                                    {{-- STATUS --}}
+
+                                    @if($rental->status === 'Menunggu')
+
+                                        <span class="rk-status waiting">
+
+                                            <i class="bi bi-hourglass-split"></i>
+
+                                            Menunggu
+
+                                        </span>
+
+                                    @elseif($rental->status === 'Disetujui')
+
+                                        <span class="rk-status approved">
+
+                                            <i class="bi bi-check-circle-fill"></i>
+
+                                            Disetujui
+
+                                        </span>
+
+                                    @elseif($rental->status === 'Berjalan')
+
+                                        <span class="rk-status running">
+
+                                            <i class="bi bi-car-front-fill"></i>
+
+                                            Berjalan
+
+                                        </span>
+
+                                    @elseif($rental->status === 'Selesai')
+
+                                        <span class="rk-status finished">
+
+                                            <i class="bi bi-check2-circle"></i>
+
+                                            Selesai
+
+                                        </span>
+
+                                    @else
+
+                                        <span class="rk-status cancelled">
+
+                                            <i class="bi bi-x-circle"></i>
+
+                                            Dibatalkan
+
+                                        </span>
+
+                                    @endif
+
+                                </div>
+
+
+
+                                {{-- DETAIL RENTAL --}}
+
+                                <div class="rk-rental-details">
+
+
+                                    <div class="rk-detail-item">
+
+                                        <div class="rk-detail-label">
+                                            Tanggal Mulai
+                                        </div>
+
+                                        <div class="rk-detail-value">
+
+                                            {{ $rental->tanggal_mulai->format('d/m/Y') }}
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="rk-detail-item">
+
+                                        <div class="rk-detail-label">
+                                            Tanggal Selesai
+                                        </div>
+
+                                        <div class="rk-detail-value">
+
+                                            {{ $rental->tanggal_selesai->format('d/m/Y') }}
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="rk-detail-item">
+
+                                        <div class="rk-detail-label">
+                                            Jumlah Hari
+                                        </div>
+
+                                        <div class="rk-detail-value">
+
+                                            {{ $rental->jumlah_hari }} Hari
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="rk-detail-item">
+
+                                        <div class="rk-detail-label">
+                                            Total Harga
+                                        </div>
+
+                                        <div class="rk-detail-value price">
+
+                                            Rp
+                                            {{ number_format($rental->total_harga, 0, ',', '.') }}
+
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+
+
+
+                                {{-- =================================================
+                                     PEMBAYARAN
+                                ================================================== --}}
+
+                                @if($rental->status === 'Disetujui')
+
+
+                                    @if(!$rental->pembayaran)
+
+                                        <a
+                                            href="{{ route('pembayaran.create', $rental->id) }}"
+                                            class="rk-payment-button"
+                                        >
+
+                                            <i class="bi bi-credit-card"></i>
+
+                                            Bayar Sekarang
+
+                                        </a>
+
+
+                                    @elseif($rental->pembayaran->status === 'Menunggu')
+
+
+                                        <div class="rk-payment-alert rk-payment-info">
+
+                                            <i class="bi bi-clock-history"></i>
+
+                                            <div>
+
+                                                Bukti pembayaran sudah dikirim
+                                                dan sedang menunggu verifikasi admin.
+
+                                            </div>
+
+                                        </div>
+
+
+                                    @elseif($rental->pembayaran->status === 'Disetujui')
+
+
+                                        <div class="rk-payment-alert rk-payment-success">
+
+                                            <i class="bi bi-check-circle-fill"></i>
+
+                                            <div>
+
+                                                Pembayaran sudah diverifikasi admin.
+
+                                            </div>
+
+                                        </div>
+
+
+                                    @elseif($rental->pembayaran->status === 'Ditolak')
+
+
+                                        <a
+                                            href="{{ route('pembayaran.create', $rental->id) }}"
+                                            class="rk-upload-button"
+                                        >
+
+                                            <i class="bi bi-arrow-repeat"></i>
+
+                                            Upload Ulang Pembayaran
+
+                                        </a>
+
+                                    @endif
+
+
+                                @elseif($rental->status === 'Menunggu')
+
+
+                                    <div class="rk-payment-alert rk-payment-warning">
+
+                                        <i class="bi bi-hourglass-split"></i>
+
+                                        <div>
+
+                                            Menunggu persetujuan admin sebelum
+                                            melakukan pembayaran.
+
+                                        </div>
+
+                                    </div>
+
+
+                                @elseif($rental->status === 'Ditolak')
+
+
+                                    <div class="rk-payment-alert rk-payment-danger">
+
+                                        <i class="bi bi-x-circle"></i>
+
+                                        <div>
+
+                                            Pengajuan rental ditolak.
+
+                                        </div>
+
+                                    </div>
+
+
+                                @elseif($rental->status === 'Selesai')
+
+
+                                    <div class="rk-payment-alert">
+
+                                        <i class="bi bi-check2-circle"></i>
+
+                                        <div>
+
+                                            Rental telah selesai.
+
+                                        </div>
+
+                                    </div>
+
+                                @endif
+
+
+                            </div>
+
+
+                        @endforeach
+
+
                     </div>
 
-                    <p class="stat-number">
-                        0
-                    </p>
 
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
+                @else
 
 
-    <div class="col-md-4">
+                    <div class="rk-empty">
 
-        <div class="stat-card">
+                        <div class="rk-empty-icon">
 
-            <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-calendar-x"></i>
 
-                <div class="stat-icon">
-                    <i class="bi bi-wallet2"></i>
-                </div>
+                        </div>
 
-                <div>
+                        <h5>
+                            Belum Ada Rental
+                        </h5>
 
-                    <div class="stat-title">
-                        Total Transaksi
+                        <p>
+                            Rental yang kamu lakukan akan muncul di sini.
+                        </p>
+
                     </div>
 
-                    <p class="stat-number">
-                        Rp 0
-                    </p>
+
+                @endif
+
+            </section>
+
+
+
+            {{-- =================================================
+                 MOBIL
+            ================================================== --}}
+
+            <section
+                class="rk-section"
+                id="mobil"
+            >
+
+                <div class="rk-section-head">
+
+                    <div>
+
+                        <div class="rk-section-label">
+                            Pilihan Rental
+                        </div>
+
+                        <h2 class="rk-section-title">
+                            Mobil Pilihan Untukmu
+                        </h2>
+
+                        <p class="rk-section-description">
+                            Temukan kendaraan yang cocok untuk menemani perjalananmu.
+                        </p>
+
+                    </div>
 
                 </div>
 
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
 
 
-<section id="mobil" class="section">
-    <section class="section pt-4">
+                <div class="rk-car-grid">
 
-    <div class="mb-4">
 
-        <div class="section-label">
-            Aktivitas Rental
-        </div>
+                    @forelse($mobils as $index => $mobil)
 
-        <h2 class="section-title">
-            Rental Saya
-        </h2>
 
-        <p class="section-desc">
-            Lihat status rental dan lakukan pembayaran kendaraanmu.
-        </p>
+                        <div
+                            class="rk-car-card"
+                            data-mobil-id="{{ $mobil->id }}"
+                            role="button"
+                            title="Lihat detail {{ $mobil->name }}"
+                        >
 
-    </div>
 
-    @if($rentals->count())
+                            {{-- FOTO --}}
 
-        <div class="row g-4">
+                            <div class="rk-car-image-wrap">
 
-            @foreach($rentals as $rental)
 
-                <div class="col-lg-6">
+                                @if($mobil->image)
 
-                    <div class="stat-card">
+                                    <img
+                                        src="{{ asset($mobil->image) }}"
+                                        class="rk-car-image"
+                                        alt="{{ $mobil->name }}"
+                                    >
 
-                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                @else
 
-                            <div>
+                                    <img
+                                        src="https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
+                                        class="rk-car-image"
+                                        alt="{{ $mobil->name }}"
+                                    >
 
-                                <h5 class="fw-bold mb-1">
-                                    {{ $rental->mobil->name ?? 'Mobil' }}
+                                @endif
+
+
+
+                                {{-- STATUS --}}
+
+                                @if($mobil->status == 'Tersedia')
+
+                                    <div class="rk-car-status">
+
+                                        <i class="bi bi-check-circle-fill"></i>
+
+                                        Tersedia
+
+                                    </div>
+
+                                @elseif($mobil->status == 'Disewa')
+
+                                    <div class="rk-car-status disewa">
+
+                                        <i class="bi bi-calendar-check-fill"></i>
+
+                                        Disewa
+
+                                    </div>
+
+                                @else
+
+                                    <div class="rk-car-status maintenance">
+
+                                        <i class="bi bi-tools"></i>
+
+                                        Maintenance
+
+                                    </div>
+
+                                @endif
+
+
+
+                                <div class="rk-car-arrow">
+
+                                    <i class="bi bi-arrow-up-right"></i>
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            {{-- CONTENT --}}
+
+                            <div class="rk-car-body">
+
+
+                                <h5 class="rk-car-name">
+
+                                    {{ $mobil->name }}
+
                                 </h5>
 
-                                <small class="text-muted">
-                                    Rental #{{ $rental->id }}
-                                </small>
+
+                                <div class="rk-car-info">
+
+                                    <span>
+
+                                        <i class="bi bi-gear-fill"></i>
+
+                                        {{ $mobil->transmisi }}
+
+                                    </span>
+
+
+                                    <span>
+
+                                        <i class="bi bi-people-fill"></i>
+
+                                        {{ $mobil->kapasitas }} orang
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <div class="rk-car-bottom">
+
+
+                                    <div>
+
+                                        <div class="rk-price-label">
+                                            Mulai dari
+                                        </div>
+
+                                        <div class="rk-price">
+
+                                            Rp
+                                            {{ number_format($mobil->harga_perhari, 0, ',', '.') }}
+
+                                            <span>
+                                                /hari
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <button
+                                        type="button"
+                                        class="rk-rent-small"
+                                    >
+
+                                        Sewa
+
+                                    </button>
+
+
+                                </div>
+
 
                             </div>
 
-                            @if($rental->status === 'Menunggu')
-
-                                <span class="badge bg-warning text-dark">
-                                    Menunggu
-
-                                </span>
-
-                            @elseif($rental->status === 'Disetujui')
-
-                                <span class="badge bg-success">
-                                    Disetujui
-
-                                </span>
-
-                            @elseif($rental->status === 'Berjalan')
-
-                                <span class="badge bg-primary">
-                                    Berjalan
-
-                                </span>
-
-                            @elseif($rental->status === 'Selesai')
-
-                                <span class="badge bg-secondary">
-                                    Selesai
-
-                                </span>
-
-                            @else
-
-                                <span class="badge bg-danger">
-                                    Dibatalkan
-                                </span>
-
-                            @endif
 
                         </div>
 
 
-                        <div class="row g-3 mb-3">
+                    @empty
 
-                            <div class="col-6">
 
-                                <small class="text-muted d-block">
-                                    Tanggal Mulai
-                                </small>
+                        <div class="rk-empty" style="grid-column: 1 / -1;">
 
-                                <strong>
-                                    {{ $rental->tanggal_mulai->format('d/m/Y') }}
-                                </strong>
+                            <div class="rk-empty-icon">
+
+                                <i class="bi bi-car-front"></i>
 
                             </div>
 
-                            <div class="col-6">
+                            <h5>
+                                Belum Ada Mobil
+                            </h5>
 
-                                <small class="text-muted d-block">
-                                    Tanggal Selesai
-                                </small>
-
-                                <strong>
-                                    {{ $rental->tanggal_selesai->format('d/m/Y') }}
-                                </strong>
-
-                            </div>
-
-                            <div class="col-6">
-
-                                <small class="text-muted d-block">
-                                    Jumlah Hari
-                                </small>
-
-                                <strong>
-                                    {{ $rental->jumlah_hari }} Hari
-                                </strong>
-
-                            </div>
-
-                            <div class="col-6">
-
-                                <small class="text-muted d-block">
-                                    Total Harga
-                                </small>
-
-                                <strong class="text-success">
-                                    Rp {{ number_format($rental->total_harga, 0, ',', '.') }}
-                                </strong>
-
-                            </div>
+                            <p>
+                                Mobil yang tersedia akan muncul di halaman ini.
+                            </p>
 
                         </div>
 
 
-                   {{-- TOMBOL PEMBAYARAN --}}
+                    @endforelse
 
-@if($rental->status === 'Disetujui')
 
-    @if(!$rental->pembayaran)
+                </div>
 
-        <a
-            href="{{ route('pembayaran.create', $rental->id) }}"
-            class="btn btn-success w-100"
-        >
-            <i class="bi bi-credit-card me-1"></i>
-            Bayar Sekarang
-        </a>
+            </section>
 
-    @elseif($rental->pembayaran->status === 'Menunggu')
 
-        <div class="alert alert-info mb-0">
-            <i class="bi bi-clock-history me-1"></i>
-            Bukti pembayaran sudah dikirim dan sedang
-            menunggu verifikasi admin.
-        </div>
 
-   @elseif($rental->pembayaran->status === 'Disetujui')
+            {{-- =================================================
+                 INFORMASI
+            ================================================== --}}
 
-    <div class="alert alert-success mb-0">
-        <i class="bi bi-check-circle-fill me-1"></i>
-        Pembayaran sudah diverifikasi admin.
-    </div>
+            <section
+                class="rk-section"
+                id="informasi"
+            >
 
-    @elseif($rental->pembayaran->status === 'Ditolak')
+                <div class="rk-section-head">
 
-        <a
-            href="{{ route('pembayaran.create', $rental->id) }}"
-            class="btn btn-danger w-100"
-        >
-            <i class="bi bi-arrow-repeat me-1"></i>
-            Upload Ulang Pembayaran
-        </a>
+                    <div>
 
-    @endif
+                        <div class="rk-section-label">
+                            Kenapa RentalKu?
+                        </div>
 
-@elseif($rental->status === 'Menunggu')
+                        <h2 class="rk-section-title">
+                            Dibuat untuk perjalananmu.
+                        </h2>
 
-    <div class="alert alert-warning mb-0">
-        <i class="bi bi-hourglass-split me-1"></i>
-        Menunggu persetujuan admin sebelum melakukan pembayaran.
-    </div>
-
-@elseif($rental->status === 'Ditolak')
-
-    <div class="alert alert-danger mb-0">
-        <i class="bi bi-x-circle me-1"></i>
-        Pengajuan rental ditolak.
-    </div>
-
-@elseif($rental->status === 'Selesai')
-
-    <div class="alert alert-secondary mb-0">
-        <i class="bi bi-check2-circle me-1"></i>
-        Rental telah selesai.
-    </div>
-
-@endif
+                        <p class="rk-section-description">
+                            Semua kebutuhan rental tersedia dalam satu tempat.
+                        </p>
 
                     </div>
 
                 </div>
 
-            @endforeach
+
+
+                <div class="rk-info-grid">
+
+
+                    <div class="rk-info-card">
+
+                        <div class="rk-info-number">
+                            01
+                        </div>
+
+                        <div class="rk-info-icon">
+
+                            <i class="bi bi-shield-check"></i>
+
+                        </div>
+
+                        <h5>
+                            Aman & Terpercaya
+                        </h5>
+
+                        <p>
+                            RentalKu menyediakan kendaraan
+                            untuk membantu perjalananmu dengan nyaman.
+                        </p>
+
+                    </div>
+
+
+
+                    <div class="rk-info-card">
+
+                        <div class="rk-info-number">
+                            02
+                        </div>
+
+                        <div class="rk-info-icon">
+
+                            <i class="bi bi-lightning-charge"></i>
+
+                        </div>
+
+                        <h5>
+                            Proses Mudah
+                        </h5>
+
+                        <p>
+                            Pilih mobil sesuai kebutuhanmu
+                            dan lakukan proses rental dengan mudah.
+                        </p>
+
+                    </div>
+
+
+
+                    <div class="rk-info-card">
+
+                        <div class="rk-info-number">
+                            03
+                        </div>
+
+                        <div class="rk-info-icon">
+
+                            <i class="bi bi-headset"></i>
+
+                        </div>
+
+                        <h5>
+                            Siap Membantu
+                        </h5>
+
+                        <p>
+                            Tim RentalKu siap membantu
+                            kebutuhan rental kendaraanmu.
+                        </p>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
 
         </div>
 
-    @else
-
-        <div class="empty-card">
-
-            <div class="empty-icon">
-
-                <i class="bi bi-calendar-x"></i>
-
-            </div>
-
-            <h5 class="fw-bold mt-4">
-                Belum Ada Rental
-            </h5>
-
-            <p class="text-muted mb-0">
-                Rental yang kamu lakukan akan muncul di sini.
-            </p>
-
-        </div>
-
-    @endif
-
-</section>
-
-    <div class="mb-4">
-
-        <div class="section-label">
-            Pilihan Rental
-        </div>
-
-        <h2 class="section-title">
-            Mobil Pilihan Untukmu
-        </h2>
-
-        <p class="section-desc">
-            Temukan kendaraan yang cocok untuk menemani
-            perjalananmu bersama RentalKu.
-        </p>
-
-    </div>
+    </main>
 
 
-    <div class="row g-4">
 
-        @forelse($mobils as $index => $mobil)
+    {{-- =========================================================
+         FOOTER
+    ========================================================== --}}
 
-            <div class="col-md-6 col-lg-4">
+    <footer class="rk-footer">
 
-                <div class="car-card" data-mobil-id="{{ $mobil->id }}" role="button" title="Lihat detail {{ $mobil->name }}">
+        <div class="container">
 
-                    {{-- FOTO --}}
+            <div class="rk-footer-main">
 
-                  <div class="car-photo-wrapper">
-
-    @if($mobil->image)
-        <img
-            src="{{ asset($mobil->image) }}"
-            class="car-img"
-            alt="{{ $mobil->name }}"
-        >
-    @else
-        <img
-            src="https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
-            class="car-img"
-            alt="{{ $mobil->name }}"
-        >
-    @endif
-
-    <div class="car-status">
-
-        @if($mobil->status == 'Tersedia')
-            <i class="bi bi-check-circle-fill me-1"></i>
-            Tersedia
-        @elseif($mobil->status == 'Disewa')
-            <i class="bi bi-calendar-check-fill me-1"></i>
-            Disewa
-        @else
-            <i class="bi bi-tools me-1"></i>
-            Maintenance
-        @endif
-
-    </div>
-
-</div>
+                <div class="row g-4">
 
 
-                    {{-- DETAIL MOBIL --}}
+                    <div class="col-lg-7">
 
-                    <div class="car-body">
+                        <a
+                            href="{{ url('/') }}"
+                            class="rk-footer-brand"
+                        >
 
-    <h5 class="car-title">
-        {{ $mobil->name }}
-    </h5>
+                            <div class="rk-footer-icon">
 
-    <div class="car-info">
+                                <i class="bi bi-car-front-fill"></i>
 
-        <span>
-            <i class="bi bi-car-front-fill"></i>
-            {{ $mobil->transmisi }}
-        </span>
+                            </div>
 
-        <span>
-            <i class="bi bi-people-fill"></i>
-            {{ $mobil->kapasitas }} orang
-        </span>
+                            Rental<span>ku</span>.
 
-    </div>
+                        </a>
 
-    <div class="d-flex justify-content-between align-items-end">
+                        <p class="rk-footer-text">
 
-        <div>
+                            Solusi rental mobil yang nyaman,
+                            mudah, dan terpercaya untuk menemani
+                            setiap perjalananmu.
 
-            <div class="price-label">
-                Mulai dari
-            </div>
+                        </p>
 
-            <div class="price">
-                Rp {{ number_format($mobil->harga_perhari, 0, ',', '.') }}
-                <span>/hari</span>
-            </div>
+                    </div>
 
-        </div>
 
-        <button
-            type="button"
-            class="btn btn-rental"
-        >
-            Sewa
-        </button>
+                    <div class="col-lg-5">
 
-    </div>
+                        <div class="rk-footer-title">
+                            Dashboard Customer
+                        </div>
 
-</div>
+                        <div class="rk-footer-text mt-0">
+
+                            Kelola rental, lihat status kendaraan,
+                            dan lakukan pembayaran langsung
+                            melalui dashboard RentalKu.
+
+                        </div>
+
+                    </div>
+
 
                 </div>
 
             </div>
 
 
-        @empty
+            <div class="rk-footer-copy">
 
-            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
 
-                <div class="empty-card">
+                    <span>
+                        &copy; {{ date('Y') }} RentalKu.
+                        Semua hak dilindungi.
+                    </span>
 
-                    <div class="empty-icon">
+                    <span>
+                        <i class="bi bi-images me-1"></i>
+                        Foto kendaraan menggunakan Pexels API
+                    </span>
 
-                        <i class="bi bi-car-front"></i>
+                </div>
 
-                    </div>
+            </div>
 
-                    <h5 class="fw-bold mt-4">
-                        Belum Ada Mobil
+        </div>
+
+    </footer>
+
+
+
+    {{-- =========================================================
+         MODAL DETAIL MOBIL
+    ========================================================== --}}
+
+    <div
+        class="modal fade"
+        id="mobilDetailModal"
+        tabindex="-1"
+        aria-labelledby="mobilDetailModalLabel"
+        aria-hidden="true"
+    >
+
+        <div
+            class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
+        >
+
+            <div class="modal-content">
+
+
+                <div class="modal-header border-0">
+
+                    <h5
+                        class="modal-title"
+                        id="mobilDetailModalLabel"
+                    >
+                        Detail Mobil
                     </h5>
 
-                    <p class="text-muted mb-0">
-                        Mobil yang tersedia akan muncul di halaman ini.
-                    </p>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Tutup"
+                    ></button>
 
                 </div>
 
-            </div>
 
-        @endforelse
+                <div
+                    class="modal-body p-0"
+                    id="mobilDetailModalBody"
+                ></div>
 
-    </div>
-
-</section>
-
-
-<section id="informasi" class="py-5">
-
-    <div class="row g-4">
-
-        <div class="col-md-4">
-
-            <div class="stat-card h-100">
-
-                <div class="stat-icon mb-3">
-
-                    <i class="bi bi-shield-check"></i>
-
-                </div>
-
-                <h5 class="fw-bold">
-                    Aman & Terpercaya
-                </h5>
-
-                <p class="text-muted small mb-0">
-                    RentalKu menyediakan kendaraan
-                    untuk membantu perjalananmu dengan nyaman.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="col-md-4">
-
-            <div class="stat-card h-100">
-
-                <div class="stat-icon mb-3">
-
-                    <i class="bi bi-clock-history"></i>
-
-                </div>
-
-                <h5 class="fw-bold">
-                    Proses Mudah
-                </h5>
-
-                <p class="text-muted small mb-0">
-                    Pilih mobil sesuai kebutuhanmu
-                    dan lakukan proses rental dengan mudah.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="col-md-4">
-
-            <div class="stat-card h-100">
-
-                <div class="stat-icon mb-3">
-
-                    <i class="bi bi-headset"></i>
-
-                </div>
-
-                <h5 class="fw-bold">
-                    Siap Membantu
-                </h5>
-
-                <p class="text-muted small mb-0">
-                    Tim RentalKu siap membantu
-                    kebutuhan rental kendaraanmu.
-                </p>
 
             </div>
 
@@ -1159,207 +2906,303 @@
 
     </div>
 
-</section>
-
-</div>
 
 
-<footer>
+    {{-- =========================================================
+         MODAL PROFILE
+    ========================================================== --}}
 
-    <div class="container py-5">
+    @include('layouts.partials.profile-modal')
 
-        <div class="row g-4">
 
-            <div class="col-md-6">
 
-                <div class="footer-brand">
-                    Rental<span>ku</span>.
+    {{-- BOOTSTRAP --}}
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+
+    {{-- SWEETALERT --}}
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/sweetalert2@11"
+    ></script>
+
+
+
+    <script>
+
+        /* =========================================================
+           DETAIL MOBIL VIA AJAX
+        ========================================================= */
+
+        var $mobilDetailModalBody = $('#mobilDetailModalBody');
+
+
+        function openMobilDetail(mobilId) {
+
+            $mobilDetailModalBody.html(`
+
+                <div class="text-center py-5">
+
+                    <div
+                        class="spinner-border text-success"
+                        role="status"
+                    ></div>
+
+                    <div class="mt-3 text-muted small">
+                        Memuat detail mobil...
+                    </div>
+
                 </div>
 
-                <p class="footer-text mt-2 mb-0">
-                    Solusi rental mobil yang nyaman,
-                    mudah, dan terpercaya untuk perjalananmu.
-                </p>
-
-            </div>
+            `);
 
 
-            <div class="col-md-6 text-md-end">
+            $.ajax({
 
-                <div class="footer-text">
-                    <i class="bi bi-images me-1"></i>
-                    Foto kendaraan menggunakan Pexels API
-                </div>
+                url: '/mobils/' + mobilId,
 
-                <div class="footer-text mt-2">
-                    &copy; {{ date('Y') }} RentalKu.
-                    Semua hak dilindungi.
-                </div>
+                headers: {
 
-            </div>
+                    'Accept': 'application/json',
 
-        </div>
+                    'X-Requested-With': 'XMLHttpRequest'
 
-        <hr class="footer-line my-4">
+                }
 
-        <div class="footer-text text-center">
-            Dashboard Customer RentalKu
-        </div>
+            })
 
-    </div>
+            .done(function(html) {
 
-</footer>
+                $mobilDetailModalBody.html(html);
 
 
-{{-- MODAL DETAIL MOBIL (diisi via AJAX, tanpa reload halaman) --}}
-<div
-    class="modal fade"
-    id="mobilDetailModal"
-    tabindex="-1"
-    aria-labelledby="mobilDetailModalLabel"
-    aria-hidden="true">
+                bootstrap.Modal
+                    .getOrCreateInstance(
+                        $('#mobilDetailModal')[0]
+                    )
+                    .show();
 
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+            })
 
-        <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+            .fail(function() {
 
-            <div class="modal-header border-0 pb-0">
+                $mobilDetailModalBody.html(`
 
-                <h5 class="modal-title fw-bold" id="mobilDetailModalLabel">
-                    Detail Mobil
-                </h5>
+                    <div class="alert alert-danger m-4">
 
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Tutup"></button>
+                        <i class="bi bi-exclamation-triangle me-1"></i>
 
-            </div>
+                        Gagal memuat detail mobil.
+                        Silakan coba lagi.
 
-            <div class="modal-body p-0" id="mobilDetailModalBody"></div>
+                    </div>
 
-        </div>
+                `);
 
-    </div>
+            });
 
-</div>
+        }
 
 
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-{{-- Modal profil bersama (admin/staff/customer) --}}
-@include('layouts.partials.profile-modal')
+        /* =========================================================
+           CLICK CARD MOBIL
+        ========================================================= */
 
-<script
-    src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        $(document).on(
+            'click',
+            '[data-mobil-id]',
+            function() {
 
-<script>
+                openMobilDetail(
+                    $(this).data('mobil-id')
+                );
 
-    // Buka modal detail mobil via AJAX — tanpa reload halaman.
-    var $mobilDetailModalBody = $('#mobilDetailModalBody');
-
-    function openMobilDetail(mobilId) {
-        $mobilDetailModalBody.html('<div class="text-center py-5"><div class="spinner-border text-success" role="status"></div></div>');
-
-        $.ajax({
-            url: '/mobils/' + mobilId,
-            headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
             }
-        })
-        .done(function(html) {
-            $mobilDetailModalBody.html(html);
-            bootstrap.Modal.getOrCreateInstance($('#mobilDetailModal')[0]).show();
-        })
-        .fail(function() {
-            $mobilDetailModalBody.html('<div class="alert alert-danger m-3 mb-0"><i class="bi bi-exclamation-triangle me-1"></i> Gagal memuat detail mobil. Silakan coba lagi.</div>');
-        });
-    }
+        );
 
-    // Klik kartu mobil (atau tombol "Sewa") di dashboard → buka modal
-    $(document).on('click', '[data-mobil-id]', function() {
-        openMobilDetail($(this).data('mobil-id'));
-    });
 
-    // Popup form sewa (SweetAlert) — template di-inject dari konten modal
-    function openSewaPopup() {
-        var $template = $('#sewaFormTemplate');
-        if (!$template.length) return;
 
-        var $carTitle = $('.mobil-modal .mm-title');
+        /* =========================================================
+           POPUP SEWA
+        ========================================================= */
 
-        Swal.fire({
-            title: $carTitle.length ? $carTitle.text().trim() : 'Sewa Mobil',
-            html: $template.html(),
-            width: 600,
-            showConfirmButton: false,
-            didOpen: function() {
-                var $form = $('#swal2-html-container form');
-                if (!$form.length) return;
+        function openSewaPopup() {
 
-                $form.on('submit', function(event) {
-                    event.preventDefault();
+            var $template = $('#sewaFormTemplate');
 
-                    var formData = new FormData($form[0]);
 
-                    Swal.showLoading();
+            if (!$template.length) {
+                return;
+            }
 
-                    $.ajax({
-                        url: $form.attr('action'),
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        data: formData,
-                        processData: false,
-                        contentType: false
-                    })
-                    .done(function(data, textStatus, xhr) {
-                        Swal.hideLoading();
 
-                        if (xhr.status !== 200) {
-                            var firstError = data.errors
-                                ? Object.values(data.errors).flat()[0]
-                                : (data.message || 'Terjadi kesalahan.');
+            var $carTitle = $('.mobil-modal .mm-title');
 
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Gagal',
-                                text: firstError,
+
+            Swal.fire({
+
+                title: $carTitle.length
+                    ? $carTitle.text().trim()
+                    : 'Sewa Mobil',
+
+                html: $template.html(),
+
+                width: 600,
+
+                showConfirmButton: false,
+
+                customClass: {
+
+                    popup: 'rk-swal-popup'
+
+                },
+
+                didOpen: function() {
+
+
+                    var $form =
+                        $('#swal2-html-container form');
+
+
+                    if (!$form.length) {
+                        return;
+                    }
+
+
+                    $form.on(
+                        'submit',
+                        function(event) {
+
+                            event.preventDefault();
+
+
+                            var formData =
+                                new FormData($form[0]);
+
+
+                            Swal.showLoading();
+
+
+                            $.ajax({
+
+                                url: $form.attr('action'),
+
+                                method: 'POST',
+
+                                headers: {
+
+                                    'Accept':
+                                        'application/json',
+
+                                    'X-Requested-With':
+                                        'XMLHttpRequest'
+
+                                },
+
+                                data: formData,
+
+                                processData: false,
+
+                                contentType: false
+
+                            })
+
+                            .done(function(
+                                data,
+                                textStatus,
+                                xhr
+                            ) {
+
+
+                                Swal.hideLoading();
+
+
+                                if (xhr.status !== 200) {
+
+                                    var firstError =
+                                        data.errors
+                                            ? Object.values(
+                                                data.errors
+                                            ).flat()[0]
+                                            : (
+                                                data.message ||
+                                                'Terjadi kesalahan.'
+                                            );
+
+
+                                    Swal.fire({
+
+                                        icon: 'error',
+
+                                        title: 'Gagal',
+
+                                        text: firstError
+
+                                    });
+
+
+                                    return;
+
+                                }
+
+
+                                Swal.fire({
+
+                                    icon: 'success',
+
+                                    title: 'Berhasil!',
+
+                                    text:
+                                        data.message ||
+                                        'Pengajuan sewa mobil berhasil dibuat.',
+
+                                    confirmButtonText: 'OK'
+
+                                })
+
+                                .then(function() {
+
+                                    window.location.reload();
+
+                                });
+
+                            })
+
+
+                            .fail(function() {
+
+                                Swal.hideLoading();
+
+
+                                Swal.fire({
+
+                                    icon: 'error',
+
+                                    title: 'Gagal',
+
+                                    text:
+                                        'Terjadi kesalahan. Silakan coba lagi.'
+
+                                });
+
                             });
-                            return;
+
                         }
+                    );
 
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: data.message || 'Pengajuan sewa mobil berhasil dibuat.',
-                            confirmButtonText: 'OK',
-                        }).then(function() {
-                            window.location.reload();
-                        });
-                    })
-                    .fail(function() {
-                        Swal.hideLoading();
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: 'Terjadi kesalahan. Silakan coba lagi.',
-                        });
-                    });
-                });
-            }
-        });
-    }
+                }
 
-    }
+            });
 
-</script>
+        }
+
+    </script>
 
 
 </body>
+
 </html>
