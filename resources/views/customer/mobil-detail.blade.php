@@ -190,7 +190,14 @@
             font-weight: 700;
             width: 100%;
         }
-
+.swal2-container textarea[name="catatan"] {
+    pointer-events: auto !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    cursor: text !important;
+    position: relative;
+    z-index: 9999;
+}
         .btn-rental:hover {
             background: #146c43;
             color: white;
@@ -798,19 +805,18 @@
 
             </div>
 
-            <div class="col-12">
+          <div class="col-12">
+    <label class="form-label fw-semibold">
+        Catatan
+    </label>
 
-                <label class="form-label fw-semibold">
-                    Catatan
-                </label>
-
-                <textarea
-                    name="catatan"
-                    class="form-control"
-                    rows="3"
-                    placeholder="Catatan tambahan jika diperlukan...">{{ old('catatan') }}</textarea>
-
-            </div>
+    <textarea
+        name="catatan"
+        class="form-control"
+        placeholder="Catatan tambahan jika diperlukan..."
+        rows="4"
+    ></textarea>
+</div>
 
             <div class="col-12">
 
@@ -842,31 +848,61 @@
 
 </div>
 
-<script
-    src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
 
 <script>
-
     function openSewaPopup() {
-        var $template = $('#sewaFormTemplate');
+        var template = $('#sewaFormTemplate').html();
 
         Swal.fire({
             title: 'Sewa {{ $mobil->name }}',
-            html: $template.html(),
+            html: template,
             width: 600,
             showConfirmButton: false,
-            didOpen: function() {
-                var $form = $('#swal2-html-container form');
+            focusConfirm: false,
+            allowOutsideClick: false,
+            stopKeydownPropagation: true,
 
-                $form.on('submit', function(event) {
+            didOpen: function () {
+                const popup = Swal.getPopup();
+                const form = popup.querySelector('form');
+                const catatan = popup.querySelector(
+                    'textarea[name="catatan"]'
+                );
+
+                if (catatan) {
+                    catatan.disabled = false;
+                    catatan.readOnly = false;
+                    catatan.tabIndex = 0;
+
+                    catatan.style.pointerEvents = 'auto';
+                    catatan.style.userSelect = 'text';
+                    catatan.style.cursor = 'text';
+
+                    // Fokus ke textarea saat diklik
+                    catatan.addEventListener('click', function (event) {
+                        event.stopPropagation();
+                        catatan.focus();
+                    });
+
+                    // Izinkan pengetikan keyboard
+                    catatan.addEventListener('keydown', function (event) {
+                        event.stopPropagation();
+                    });
+                }
+
+                $(form).on('submit', function (event) {
                     event.preventDefault();
 
-                    var formData = new FormData($form[0]);
+                    var formData = new FormData(form);
 
                     Swal.showLoading();
 
                     $.ajax({
-                        url: $form.attr('action'),
+                        url: form.action,
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
@@ -876,37 +912,33 @@
                         processData: false,
                         contentType: false
                     })
-                    .done(function(data, textStatus, xhr) {
-                        Swal.hideLoading();
-
-                        if (xhr.status !== 200) {
-                            var firstError = data.errors
-                                ? Object.values(data.errors).flat()[0]
-                                : (data.message || 'Terjadi kesalahan.');
-
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Gagal',
-                                text: firstError,
-                            });
-                            return;
-                        }
-
+                    .done(function (data) {
                         Swal.fire({
                             icon: 'success',
                             title: 'Berhasil!',
-                            text: data.message || 'Pengajuan sewa mobil berhasil dibuat.',
-                            confirmButtonText: 'OK',
-                        }).then(function() {
-                            window.location.href = '{{ route('customer.dashboard') }}';
+                            text: data.message ||
+                                'Pengajuan sewa berhasil dibuat.',
+                            confirmButtonText: 'OK'
+                        }).then(function () {
+                            window.location.href =
+                                '{{ route("customer.dashboard") }}';
                         });
                     })
-                    .fail(function() {
-                        Swal.hideLoading();
+                    .fail(function (xhr) {
+                        let message = 'Terjadi kesalahan.';
+
+                        if (xhr.responseJSON?.errors) {
+                            message = Object.values(
+                                xhr.responseJSON.errors
+                            ).flat()[0];
+                        } else if (xhr.responseJSON?.message) {
+                            message = xhr.responseJSON.message;
+                        }
+
                         Swal.fire({
                             icon: 'error',
                             title: 'Gagal',
-                            text: 'Koneksi bermasalah. Silakan coba lagi.',
+                            text: message
                         });
                     });
                 });

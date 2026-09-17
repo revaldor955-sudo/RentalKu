@@ -12,76 +12,127 @@ class RentalController extends Controller
     /**
      * Simpan pengajuan rental customer
      */
-    public function store(Request $request, Mobil $mobil)
-    {
-        if ($mobil->status !== 'Tersedia') {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Mobil sedang tidak tersedia.',
-                ], 422);
-            }
-
-            return back()
-                ->with('error', 'Mobil sedang tidak tersedia.');
-        }
-
-        $validated = $request->validate([
-            'cabang_ambil_id' => 'nullable|exists:cabangs,id',
-            'cabang_kembali_id' => 'nullable|exists:cabangs,id',
-            'tanggal_mulai' => 'required|date|after_or_equal:today',
-            'tanggal_selesai' => 'required|date|after:tanggal_mulai',
-            'catatan' => 'nullable|string|max:500',
-        ], [
-            'cabang_ambil_id.exists' => 'Cabang ambil tidak valid.',
-            'cabang_kembali_id.exists' => 'Cabang kembali tidak valid.',
-            'tanggal_mulai.required' => 'Tanggal mulai wajib diisi.',
-            'tanggal_mulai.after_or_equal' => 'Tanggal mulai tidak boleh sebelum hari ini.',
-            'tanggal_selesai.required' => 'Tanggal selesai wajib diisi.',
-            'tanggal_selesai.after' => 'Tanggal selesai harus setelah tanggal mulai.',
-            'catatan.max' => 'Catatan maksimal 500 karakter.',
-        ]);
-
-        $tanggalMulai = Carbon::parse($validated['tanggal_mulai']);
-        $tanggalSelesai = Carbon::parse($validated['tanggal_selesai']);
-
-        $jumlahHari = $tanggalMulai->diffInDays($tanggalSelesai);
-
-        $hargaRental = $jumlahHari * $mobil->harga_perhari;
-
-        $subtotal = $hargaRental;
-
-        $deposit = $mobil->deposit;
-
-        $totalHarga = $subtotal + $deposit;
-
-        Rental::create([
-            'user_id' => auth()->id(),
-            'mobil_id' => $mobil->id,
-            'cabang_ambil_id' => $validated['cabang_ambil_id'] ?? $mobil->cabang_id,
-            'cabang_kembali_id' => $validated['cabang_kembali_id'] ?? $mobil->cabang_id,
-            'tanggal_mulai' => $tanggalMulai,
-            'tanggal_selesai' => $tanggalSelesai,
-            'jumlah_hari' => $jumlahHari,
-            'harga_perhari' => $mobil->harga_perhari,
-            'subtotal' => $subtotal,
-            'deposit' => $deposit,
-            'total_harga' => $totalHarga,
-            'status' => 'Menunggu',
-            'catatan' => $validated['catatan'] ?? null,
-        ]);
-
+    
+/**
+ * Simpan pengajuan rental customer
+ */
+public function store(Request $request, Mobil $mobil)
+{
+    if (!auth()->check()) {
         if ($request->expectsJson()) {
             return response()->json([
-                'success' => true,
-                'message' => 'Pengajuan sewa mobil berhasil dibuat.',
-            ]);
+                'success' => false,
+                'message' => 'Silakan login terlebih dahulu.',
+            ], 401);
         }
 
         return redirect()
-            ->route('customer.dashboard')
-            ->with('success', 'Pengajuan sewa mobil berhasil dibuat.');
+            ->route('login')
+            ->with('error', 'Silakan login terlebih dahulu.');
     }
+
+    if ($mobil->status !== 'Tersedia') {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Mobil sedang tidak tersedia.',
+            ], 422);
+        }
+
+        return back()->with('error', 'Mobil sedang tidak tersedia.');
+    }
+
+    $validated = $request->validate([
+        'tanggal_mulai' => [
+            'required',
+            'date',
+            'after_or_equal:today',
+        ],
+
+        'tanggal_selesai' => [
+            'required',
+            'date',
+            'after:tanggal_mulai',
+        ],
+
+        'catatan' => [
+            'nullable',
+            'string',
+            'max:500',
+        ],
+    ], [
+        'tanggal_mulai.required' => 'Tanggal mulai wajib diisi.',
+        'tanggal_mulai.after_or_equal' =>
+            'Tanggal mulai tidak boleh sebelum hari ini.',
+
+        'tanggal_selesai.required' =>
+            'Tanggal selesai wajib diisi.',
+
+        'tanggal_selesai.after' =>
+            'Tanggal selesai harus setelah tanggal mulai.',
+
+        'catatan.max' =>
+            'Catatan maksimal 500 karakter.',
+    ]);
+
+    $tanggalMulai = Carbon::parse(
+        $validated['tanggal_mulai']
+    );
+
+    $tanggalSelesai = Carbon::parse(
+        $validated['tanggal_selesai']
+    );
+
+    $jumlahHari = $tanggalMulai->diffInDays(
+        $tanggalSelesai
+    );
+
+    $hargaPerhari = (float) $mobil->harga_perhari;
+
+    $deposit = (float) ($mobil->deposit ?? 0);
+
+    $subtotal = $jumlahHari * $hargaPerhari;
+
+    $totalHarga = $subtotal + $deposit;
+
+    Rental::create([
+        'user_id' => auth()->id(),
+
+        'mobil_id' => $mobil->id,
+
+        'tanggal_mulai' => $tanggalMulai->format('Y-m-d'),
+
+        'tanggal_selesai' => $tanggalSelesai->format('Y-m-d'),
+
+        'jumlah_hari' => $jumlahHari,
+
+        'harga_perhari' => $hargaPerhari,
+
+        'subtotal' => $subtotal,
+
+        'deposit' => $deposit,
+
+        'total_harga' => $totalHarga,
+
+        'status' => 'Menunggu',
+
+        'catatan' => $validated['catatan'] ?? null,
+    ]);
+
+    if ($request->expectsJson()) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengajuan sewa mobil berhasil dibuat.',
+        ], 200);
+    }
+
+    return redirect()
+        ->route('customer.dashboard')
+        ->with(
+            'success',
+            'Pengajuan sewa mobil berhasil dibuat.'
+        );
+}
 
     /**
      * Menampilkan semua rental untuk Admin

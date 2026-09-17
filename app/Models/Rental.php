@@ -11,8 +11,6 @@ class Rental extends Model
     protected $fillable = [
         'user_id',
         'mobil_id',
-        'cabang_ambil_id',
-        'cabang_kembali_id',
         'tanggal_mulai',
         'tanggal_selesai',
         'jumlah_hari',
@@ -35,26 +33,25 @@ class Rental extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(
+            User::class,
+            'user_id'
+        );
     }
 
     public function mobil()
     {
-        return $this->belongsTo(Mobil::class);
-    }
-
-    public function cabangAmbil()
-    {
-        return $this->belongsTo(Cabang::class, 'cabang_ambil_id');
-    }
-
-    public function cabangKembali()
-    {
-        return $this->belongsTo(Cabang::class, 'cabang_kembali_id');
+        return $this->belongsTo(
+            Mobil::class,
+            'mobil_id'
+        );
     }
 
     public function pembayaran()
     {
-        return $this->hasOne(Pembayaran::class, 'rental_id');
+        return $this->hasOne(
+            Pembayaran::class,
+            'rental_id'
+        );
     }
 }

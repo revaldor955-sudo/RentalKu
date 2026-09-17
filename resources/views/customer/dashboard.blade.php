@@ -2599,15 +2599,14 @@
                                     </div>
 
 
-                                    <button
-                                        type="button"
-                                        class="rk-rent-small"
-                                    >
-
-                                        Sewa
-
-                                    </button>
-
+                              <button
+    type="button"
+    class="rk-rent-small"
+    data-mobil-id="{{ $mobil->id }}"
+>
+    <i class="bi bi-calendar-check me-1"></i>
+    Sewa
+</button>
 
                                 </div>
 
@@ -2923,12 +2922,11 @@
     ></script>
 
 
-    {{-- SWEETALERT --}}
+  {{-- JQUERY --}}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-    <script
-        src="https://cdn.jsdelivr.net/npm/sweetalert2@11"
-    ></script>
-
+{{-- SWEETALERT --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
     <script>
@@ -3012,196 +3010,236 @@
            CLICK CARD MOBIL
         ========================================================= */
 
-        $(document).on(
-            'click',
-            '[data-mobil-id]',
-            function() {
+       /* =========================================================
+   CLICK CARD DAN TOMBOL SEWA
+========================================================= */
 
-                openMobilDetail(
-                    $(this).data('mobil-id')
-                );
+// Klik tombol Sewa
+$(document).on('click', '.rk-rent-small', function(event) {
 
-            }
-        );
+    event.preventDefault();
+    event.stopPropagation();
 
+    var mobilId = $(this).data('mobil-id');
 
+    if (!mobilId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Mobil Tidak Ditemukan',
+            text: 'ID mobil tidak tersedia.'
+        });
 
-        /* =========================================================
-           POPUP SEWA
-        ========================================================= */
+        return;
+    }
 
-        function openSewaPopup() {
+    // Buka detail mobil terlebih dahulu
+    openMobilDetail(mobilId);
 
-            var $template = $('#sewaFormTemplate');
-
-
-            if (!$template.length) {
-                return;
-            }
-
-
-            var $carTitle = $('.mobil-modal .mm-title');
+});
 
 
+// Klik kartu mobil
+$(document).on('click', '.rk-car-card', function(event) {
+
+    // Jangan jalankan ketika yang diklik tombol Sewa
+    if ($(event.target).closest('.rk-rent-small').length) {
+        return;
+    }
+
+    var mobilId = $(this).data('mobil-id');
+
+    if (mobilId) {
+        openMobilDetail(mobilId);
+    }
+
+});
+
+
+
+      
+
+    /*
+    |--------------------------------------------------------------------------
+    | POPUP SEWA MOBIL RENTALKU
+    |--------------------------------------------------------------------------
+    */
+
+    window.openSewaPopup = function () {
+
+        const $template = $('#sewaFormTemplate');
+
+        if (!$template.length) {
             Swal.fire({
+                icon: 'error',
+                title: 'Form Tidak Ditemukan',
+                text: 'Form sewa mobil belum tersedia. Silakan muat ulang halaman.'
+            });
 
-                title: $carTitle.length
-                    ? $carTitle.text().trim()
-                    : 'Sewa Mobil',
+            return;
+        }
 
-                html: $template.html(),
+        const formHtml = $template.html();
 
-                width: 600,
+        Swal.fire({
+            title: 'Form Sewa Mobil',
+            html: formHtml,
+            width: 650,
+            showConfirmButton: false,
+            showCloseButton: true,
+            focusConfirm: false,
+            customClass: {
+                popup: 'rounded-4'
+            },
 
-                showConfirmButton: false,
+            didOpen: function () {
 
-                customClass: {
+                const $swal = $('#swal2-html-container');
+                const $form = $swal.find('form');
 
-                    popup: 'rk-swal-popup'
+                if (!$form.length) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Form Error',
+                        text: 'Form sewa tidak ditemukan.'
+                    });
 
-                },
+                    return;
+                }
 
-                didOpen: function() {
+                // Pastikan tanggal selesai tidak sebelum tanggal mulai
+                $form.find('input[name="tanggal_mulai"]').on('change', function () {
 
+                    const tanggalMulai = $(this).val();
+                    const $tanggalSelesai =
+                        $form.find('input[name="tanggal_selesai"]');
 
-                    var $form =
-                        $('#swal2-html-container form');
+                    $tanggalSelesai.attr('min', tanggalMulai);
 
+                    if ($tanggalSelesai.val() &&
+                        $tanggalSelesai.val() <= tanggalMulai) {
 
-                    if (!$form.length) {
+                        $tanggalSelesai.val('');
+                    }
+                });
+
+                // Submit form menggunakan AJAX
+                $form.on('submit', function (event) {
+
+                    event.preventDefault();
+
+                    const formElement = this;
+                    const formData = new FormData(formElement);
+                    const actionUrl = $form.attr('action');
+
+                    const tanggalMulai =
+                        $form.find('input[name="tanggal_mulai"]').val();
+
+                    const tanggalSelesai =
+                        $form.find('input[name="tanggal_selesai"]').val();
+
+                    if (!tanggalMulai || !tanggalSelesai) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Data Belum Lengkap',
+                            text: 'Silakan isi tanggal mulai dan tanggal selesai.'
+                        });
+
                         return;
                     }
 
+                    if (tanggalSelesai <= tanggalMulai) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Tanggal Tidak Valid',
+                            text: 'Tanggal selesai harus setelah tanggal mulai.'
+                        });
 
-                    $form.on(
-                        'submit',
-                        function(event) {
+                        return;
+                    }
 
-                            event.preventDefault();
-
-
-                            var formData =
-                                new FormData($form[0]);
-
-
+                    Swal.fire({
+                        title: 'Mengirim Pengajuan...',
+                        text: 'Mohon tunggu sebentar.',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: function () {
                             Swal.showLoading();
+                        }
+                    });
 
+                    $.ajax({
+                        url: actionUrl,
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
 
-                            $.ajax({
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
 
-                                url: $form.attr('action'),
+                        success: function (response) {
 
-                                method: 'POST',
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: response.message ||
+                                    'Pengajuan sewa mobil berhasil dibuat.',
+                                confirmButtonText: 'OK'
+                            }).then(function () {
 
-                                headers: {
-
-                                    'Accept':
-                                        'application/json',
-
-                                    'X-Requested-With':
-                                        'XMLHttpRequest'
-
-                                },
-
-                                data: formData,
-
-                                processData: false,
-
-                                contentType: false
-
-                            })
-
-                            .done(function(
-                                data,
-                                textStatus,
-                                xhr
-                            ) {
-
-
-                                Swal.hideLoading();
-
-
-                                if (xhr.status !== 200) {
-
-                                    var firstError =
-                                        data.errors
-                                            ? Object.values(
-                                                data.errors
-                                            ).flat()[0]
-                                            : (
-                                                data.message ||
-                                                'Terjadi kesalahan.'
-                                            );
-
-
-                                    Swal.fire({
-
-                                        icon: 'error',
-
-                                        title: 'Gagal',
-
-                                        text: firstError
-
-                                    });
-
-
-                                    return;
-
-                                }
-
-
-                                Swal.fire({
-
-                                    icon: 'success',
-
-                                    title: 'Berhasil!',
-
-                                    text:
-                                        data.message ||
-                                        'Pengajuan sewa mobil berhasil dibuat.',
-
-                                    confirmButtonText: 'OK'
-
-                                })
-
-                                .then(function() {
-
-                                    window.location.reload();
-
-                                });
-
-                            })
-
-
-                            .fail(function() {
-
-                                Swal.hideLoading();
-
-
-                                Swal.fire({
-
-                                    icon: 'error',
-
-                                    title: 'Gagal',
-
-                                    text:
-                                        'Terjadi kesalahan. Silakan coba lagi.'
-
-                                });
+                                window.location.href =
+                                    '{{ route("customer.dashboard") }}';
 
                             });
 
+                        },
+
+                        error: function (xhr) {
+
+                            let errorMessage =
+                                'Terjadi kesalahan. Silakan coba lagi.';
+
+                            if (xhr.responseJSON) {
+
+                                const response =
+                                    xhr.responseJSON;
+
+                                if (response.errors) {
+
+                                    const errors =
+                                        Object.values(response.errors)
+                                            .flat();
+
+                                    if (errors.length > 0) {
+                                        errorMessage = errors[0];
+                                    }
+
+                                } else if (response.message) {
+
+                                    errorMessage = response.message;
+
+                                }
+                            }
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Pengajuan Gagal',
+                                text: errorMessage,
+                                confirmButtonText: 'Mengerti'
+                            });
+
                         }
-                    );
+                    });
 
-                }
+                });
 
-            });
+            }
+        });
 
-        }
-
-    </script>
-
+    };
+</script>
 
 </body>
 
