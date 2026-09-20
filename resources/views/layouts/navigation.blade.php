@@ -12,9 +12,24 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+                  <!-- Navigation Links -->
+<div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+
+    <x-nav-link :href="route('dashboard')"
+                :active="request()->routeIs('dashboard')">
+        {{ __('Dashboard') }}
+    </x-nav-link>
+
+    @if(Auth::user()->roles_id == 1)
+
+        <x-nav-link :href="route('admin.landing-settings.edit')"
+                    :active="request()->routeIs('admin.landing-settings.*')">
+            {{ __('Pengaturan Landing Page') }}
+        </x-nav-link>
+
+    @endif
+
+</div>
                 </div>
             </div>
 
@@ -71,6 +86,17 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
         </div>
+        @if(Auth::user()->roles_id == 1)
+
+    <x-responsive-nav-link
+        :href="route('admin.landing-settings.edit')"
+        :active="request()->routeIs('admin.landing-settings.*')">
+
+        {{ __('Pengaturan Landing Page') }}
+
+    </x-responsive-nav-link>
+
+@endif
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">

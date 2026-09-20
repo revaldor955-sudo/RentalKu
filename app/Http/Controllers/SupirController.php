@@ -4,29 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Supir;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class SupirController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $supirs = Supir::all();
+        $supirs = Supir::latest()->get();
+
         return view('supirs.index', compact('supirs'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return redirect()->route('supirs.index');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -36,48 +29,49 @@ class SupirController extends Controller
             'tarif_perhari' => 'required|numeric|min:0',
             'status' => 'required|in:tersedia,tidak tersedia',
         ], [
-            'name.required' => 'Nama supir wajib diisi',
-            'phone.required' => 'Nomor HP wajib diisi',
-            'phone.max' => 'Nomor HP maksimal 20 karakter',
-            'image.mimes' => 'Foto harus berupa gambar (jpg, png, svg)',
-            'image.max' => 'Ukuran foto maksimal 2MB',
-            'tarif_perhari.required' => 'Tarif per hari wajib diisi',
-            'tarif_perhari.numeric' => 'Tarif per hari harus berupa angka',
-            'status.required' => 'Status wajib dipilih',
+            'name.required' => 'Nama supir wajib diisi.',
+            'phone.required' => 'Nomor HP wajib diisi.',
+            'phone.max' => 'Nomor HP maksimal 20 karakter.',
+            'image.mimes' => 'Foto harus berupa JPG, JPEG, PNG, atau SVG.',
+            'image.max' => 'Ukuran foto maksimal 2 MB.',
+            'tarif_perhari.required' => 'Tarif per hari wajib diisi.',
+            'tarif_perhari.numeric' => 'Tarif harus berupa angka.',
+            'status.required' => 'Status wajib dipilih.',
         ]);
+
+        $this->prepareUploadFolder();
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('images/supirs'), $imageName);
+
+            $imageName = time() . '_' . uniqid() . '.' .
+                $image->getClientOriginalExtension();
+
+            $image->move(
+                public_path('images/supirs'),
+                $imageName
+            );
+
             $validated['image'] = 'images/supirs/' . $imageName;
         }
 
         Supir::create($validated);
 
-        return redirect()->route('supirs.index')
+        return redirect()
+            ->route('supirs.index')
             ->with('success', 'Supir berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Supir $supir)
     {
-        //
+        return redirect()->route('supirs.index');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Supir $supir)
     {
-        //
+        return redirect()->route('supirs.index');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Supir $supir)
     {
         $validated = $request->validate([
@@ -87,37 +81,71 @@ class SupirController extends Controller
             'tarif_perhari' => 'required|numeric|min:0',
             'status' => 'required|in:tersedia,tidak tersedia',
         ], [
-            'name.required' => 'Nama supir wajib diisi',
-            'phone.required' => 'Nomor HP wajib diisi',
-            'phone.max' => 'Nomor HP maksimal 20 karakter',
-            'image.mimes' => 'Foto harus berupa gambar (jpg, png, svg)',
-            'image.max' => 'Ukuran foto maksimal 2MB',
-            'tarif_perhari.required' => 'Tarif per hari wajib diisi',
-            'tarif_perhari.numeric' => 'Tarif per hari harus berupa angka',
-            'status.required' => 'Status wajib dipilih',
+            'name.required' => 'Nama supir wajib diisi.',
+            'phone.required' => 'Nomor HP wajib diisi.',
+            'phone.max' => 'Nomor HP maksimal 20 karakter.',
+            'image.mimes' => 'Foto harus berupa JPG, JPEG, PNG, atau SVG.',
+            'image.max' => 'Ukuran foto maksimal 2 MB.',
+            'tarif_perhari.required' => 'Tarif per hari wajib diisi.',
+            'tarif_perhari.numeric' => 'Tarif harus berupa angka.',
+            'status.required' => 'Status wajib dipilih.',
         ]);
 
+        $this->prepareUploadFolder();
+
         if ($request->hasFile('image')) {
+
+            if ($supir->image) {
+                $oldImage = public_path($supir->image);
+
+                if (File::exists($oldImage)) {
+                    File::delete($oldImage);
+                }
+            }
+
             $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('images/supirs'), $imageName);
+
+            $imageName = time() . '_' . uniqid() . '.' .
+                $image->getClientOriginalExtension();
+
+            $image->move(
+                public_path('images/supirs'),
+                $imageName
+            );
+
             $validated['image'] = 'images/supirs/' . $imageName;
         }
 
         $supir->update($validated);
 
-        return redirect()->route('supirs.index')
-            ->with('success', 'Supir berhasil diperbarui.');
+        return redirect()
+            ->route('supirs.index')
+            ->with('success', 'Data supir berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Supir $supir)
     {
+        if ($supir->image) {
+            $imagePath = public_path($supir->image);
+
+            if (File::exists($imagePath)) {
+                File::delete($imagePath);
+            }
+        }
+
         $supir->delete();
 
-        return redirect()->route('supirs.index')
+        return redirect()
+            ->route('supirs.index')
             ->with('success', 'Supir berhasil dihapus.');
+    }
+
+    private function prepareUploadFolder()
+    {
+        $folder = public_path('images/supirs');
+
+        if (!File::exists($folder)) {
+            File::makeDirectory($folder, 0755, true);
+        }
     }
 }

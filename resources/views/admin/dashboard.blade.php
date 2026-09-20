@@ -1226,7 +1226,129 @@ body::after {
         .3s ease;
 
 }
+/* =========================================================
+   MANAGEMENT SUPIR CARD
+========================================================= */
 
+.management-card {
+    position: relative;
+    display: block;
+    height: 100%;
+    min-height: 220px;
+    padding: 25px;
+    overflow: hidden;
+    text-decoration: none;
+    border-radius: 22px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(16, 27, 21, .94),
+            rgba(7, 13, 10, .96)
+        );
+    border: 1px solid rgba(255, 255, 255, .07);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, .28);
+    transition:
+        transform .35s ease,
+        border-color .35s ease,
+        box-shadow .35s ease;
+}
+
+.management-card::before {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    right: -80px;
+    bottom: -100px;
+    border-radius: 50%;
+    background: rgba(54, 255, 145, .10);
+    filter: blur(25px);
+    transition: .35s ease;
+}
+
+.management-card:hover {
+    transform: translateY(-9px);
+    border-color: rgba(54, 255, 145, .45);
+    box-shadow:
+        0 22px 55px rgba(0, 0, 0, .42),
+        0 0 35px rgba(54, 255, 145, .10);
+}
+
+.management-card:hover::before {
+    background: rgba(54, 255, 145, .20);
+}
+
+.card-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 62px;
+    height: 62px;
+    margin-bottom: 20px;
+    border-radius: 18px;
+    color: #36ff91;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(54, 255, 145, .16),
+            rgba(54, 255, 145, .04)
+        );
+    border: 1px solid rgba(54, 255, 145, .22);
+    font-size: 27px;
+    box-shadow: 0 0 22px rgba(54, 255, 145, .10);
+    transition: .35s ease;
+}
+
+.card-icon i {
+    filter:
+        drop-shadow(0 0 7px rgba(54, 255, 145, .8));
+}
+
+.management-card:hover .card-icon {
+    transform: scale(1.08) rotate(-3deg);
+    box-shadow:
+        0 0 25px rgba(54, 255, 145, .25),
+        inset 0 0 20px rgba(54, 255, 145, .08);
+}
+
+.card-arrow {
+    position: absolute;
+    top: 22px;
+    right: 23px;
+    color: #506158;
+    font-size: 20px;
+    transition: .3s ease;
+}
+
+.management-card:hover .card-arrow {
+    color: #36ff91;
+    transform: translate(3px, -3px);
+    filter: drop-shadow(0 0 8px #36ff91);
+}
+
+.card-content {
+    position: relative;
+    z-index: 2;
+}
+
+.card-content h3 {
+    margin-bottom: 10px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.card-content p {
+    margin-bottom: 0;
+    color: #75857c;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.management-card:hover .card-content h3 {
+    color: #36ff91;
+}
 
 .rk-btn:hover {
 
@@ -1892,7 +2014,27 @@ body::after {
 
         </div>
 
+{{-- SUPIR --}}
+<div class="col-md-6 col-lg-3">
+    <a href="{{ route('supirs.index') }}" class="management-card">
 
+        <div class="card-icon">
+            <i class="bi bi-person-badge-fill"></i>
+        </div>
+
+        <div class="card-arrow">
+            <i class="bi bi-arrow-up-right"></i>
+        </div>
+
+        <div class="card-content">
+            <h3>Manajemen Supir</h3>
+            <p>
+                Kelola data supir dan tarif layanan RentalKu.
+            </p>
+        </div>
+
+    </a>
+</div>
         {{-- BRAND --}}
 
         <div class="col-md-6 col-lg-3">
@@ -2051,7 +2193,29 @@ body::after {
             </a>
 
         </div>
+{{-- PENGATURAN LANDING PAGE --}}
+<div class="col-md-6 col-lg-3">
 
+    <a
+        href="{{ route('admin.landing-settings.edit') }}"
+        class="rk-menu-card"
+    >
+
+        <div class="rk-menu-icon">
+            <i class="bi bi-window-stack"></i>
+        </div>
+
+        <h5>
+            Pengaturan Landing Page
+        </h5>
+
+        <p class="mb-0">
+            Kelola konten dan informasi halaman utama RentalKu.
+        </p>
+
+    </a>
+
+</div>
 
         {{-- RENTAL --}}
 

@@ -7,6 +7,7 @@ use App\Models\Cabang;
 use App\Models\Fasilitas;
 use App\Models\Mobil;
 use App\Models\TipeMobil;
+use App\Models\Supir;
 use Illuminate\Http\Request;
 
 class MobilController extends Controller
@@ -240,25 +241,48 @@ class MobilController extends Controller
     /**
      * Detail mobil
      */
-    public function show(Request $request, $id)
-    {
-        $mobil = Mobil::with([
-            'brand',
-            'tipeMobil',
-            'cabang',
-            'fasilitas',
-        ])->findOrFail($id);
+   /**
+ * Detail mobil
+ */
+public function show(Request $request, $id)
+{
+    $mobil = Mobil::with([
+        'brand',
+        'tipeMobil',
+        'cabang',
+        'fasilitas',
+    ])->findOrFail($id);
 
-        $cabangs = Cabang::orderBy('name')->get();
+    // Mengambil semua cabang
+    $cabangs = Cabang::orderBy('name')->get();
 
-        // Permintaan AJAX (modal detail mobil di dashboard customer):
-        // kembalikan partial view agar tidak reload seluruh halaman.
-        if ($request->ajax() || $request->wantsJson()) {
-            return view('customer.partials.mobil-detail-modal', compact('mobil', 'cabangs'));
-        }
+    // Mengambil supir yang tersedia
+    $supirs = Supir::where('status', 'tersedia')
+        ->orderBy('name')
+        ->get();
 
-        return view('customer.mobil-detail', compact('mobil', 'cabangs'));
+    // Permintaan AJAX untuk modal detail mobil customer
+    if ($request->ajax() || $request->wantsJson()) {
+
+        return view(
+            'customer.partials.mobil-detail-modal',
+            compact(
+                'mobil',
+                'cabangs',
+                'supirs'
+            )
+        );
     }
+
+    return view(
+        'customer.mobil-detail',
+        compact(
+            'mobil',
+            'cabangs',
+            'supirs'
+        )
+    );
+}
 
     /**
      * Form edit

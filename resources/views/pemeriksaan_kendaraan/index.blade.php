@@ -165,13 +165,17 @@
                                     Tanggal
                                 </th>
 
-                                <th>
-                                    Kerusakan
-                                </th>
+                              <th>
+    Kerusakan
+</th>
 
-                                <th class="text-end pe-4">
-                                    Aksi
-                                </th>
+<th>
+    Foto Bukti
+</th>
+
+<th class="text-end pe-4">
+    Aksi
+</th>
 
                             </tr>
 
@@ -555,91 +559,172 @@
             $('#pemeriksaan-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: {
-                    url: "{{ route('pemeriksaan-kendaraan.data') }}",
-                    type: 'GET',
-                },
-                columns: [{
-                        data: null,
-                        orderable: false,
-                        searchable: false,
-                        className: 'px-3',
-                        width: '70px',
-                        render: function(data, type, row, meta) {
-                            return meta.row + meta.settings._iDisplayStart + 1;
-                        },
-                    },
-                    {
-                        data: null,
-                        orderable: true,
-                        searchable: false,
-                        render: function(data) {
-                            return '<div class="fw-bold">' + data.user_name + '</div>' +
-                                '<small class="text-muted">' + data.user_email + '</small>';
-                        },
-                    },
-                    {
-                        data: null,
-                        orderable: true,
-                        searchable: false,
-                        render: function(data) {
-                            return '<div class="fw-bold">' + data.mobil_name + '</div>' +
-                                '<small class="text-muted">' + data.mobil_plate + '</small>';
-                        },
-                    },
-                    {
-                        data: 'jenis',
-                        orderable: true,
-                        searchable: false,
-                        render: function(data) {
-                            return '<span class="badge-jenis">' +
-                                (data === 'sebelum_sewa' ? 'Sebelum Sewa' : 'Setelah Sewa') +
-                                '</span>';
-                        },
-                    },
-                    {
-                        data: 'kondisi',
-                        orderable: true,
-                        searchable: false,
-                        render: function(data) {
-                            return '<span class="status status-' + data + '">' +
-                                (data === 'baik' ? 'Baik' : 'Rusak') + '</span>';
-                        },
-                    },
-                    {
-                        data: 'tanggal',
-                        orderable: true,
-                        searchable: false,
-                    },
-                    {
-                        data: 'kerusakan',
-                        orderable: false,
-                        searchable: false,
-                        render: function(data) {
-                            if (!data || !data.length) return '<span class="text-muted">-</span>';
-                            return data.map(function(k) {
-                                return '<span class="badge bg-danger me-1">' + k + '</span>';
-                            }).join('');
-                        },
-                    },
-                    {
-                        data: null,
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-end pe-4',
-                        width: '140px',
-                        render: function(data) {
-                            return '<div class="d-flex justify-content-end gap-2">' +
-                                '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
-                                'onclick="openEditModal(' + data.id + ')">' +
-                                '<i class="bi bi-pencil-square"></i></button>' +
-                                '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" ' +
-                                'onclick="hapusPemeriksaan(' + data.id + ')">' +
-                                '<i class="bi bi-trash"></i></button>' +
-                                '</div>';
-                        },
-                    },
-                ],
+               
+ajax: {
+    url: "{{ route('pemeriksaan-kendaraan.data') }}",
+    type: 'GET',
+    dataType: 'json',
+    headers: {
+        'Accept': 'application/json',
+    },
+    error: function(xhr, status, error) {
+
+        console.error('STATUS:', xhr.status);
+        console.error('ERROR:', error);
+        console.error('RESPONSE:', xhr.responseText);
+
+        let pesan = 'Gagal memuat data pemeriksaan.';
+
+        if (xhr.status === 500) {
+            pesan = 'Terjadi error pada server Laravel. Cek terminal atau log Laravel.';
+        } else if (xhr.status === 419) {
+            pesan = 'Sesi halaman telah kedaluwarsa. Silakan refresh halaman.';
+        } else if (xhr.status === 403) {
+            pesan = 'Kamu tidak memiliki izin mengakses data ini.';
+        } else if (xhr.status === 404) {
+            pesan = 'Route data pemeriksaan tidak ditemukan.';
+        }
+
+        alert(
+            pesan +
+            '\n\nStatus HTTP: ' + xhr.status +
+            '\n\nBuka F12 → Console untuk melihat detail.'
+        );
+    },
+},
+              
+
+columns: [
+    {
+        data: null,
+        orderable: false,
+        searchable: false,
+        className: 'px-3',
+        width: '70px',
+        render: function(data, type, row, meta) {
+            return meta.row + meta.settings._iDisplayStart + 1;
+        },
+    },
+
+    // Pelanggan
+    {
+        data: null,
+        orderable: true,
+        searchable: false,
+        render: function(data) {
+            return '<div class="fw-bold">' + (data.user_name || '-') + '</div>' +
+                '<small class="text-muted">' + (data.user_email || '-') + '</small>';
+        },
+    },
+
+    // Mobil
+    {
+        data: null,
+        orderable: true,
+        searchable: false,
+        render: function(data) {
+            return '<div class="fw-bold">' + (data.mobil_name || '-') + '</div>' +
+                '<small class="text-muted">' + (data.mobil_plate || '-') + '</small>';
+        },
+    },
+
+    // Jenis
+    {
+        data: 'jenis',
+        orderable: true,
+        searchable: false,
+        render: function(data) {
+            return '<span class="badge-jenis">' +
+                (data === 'sebelum_sewa' ? 'Sebelum Sewa' : 'Setelah Sewa') +
+                '</span>';
+        },
+    },
+
+    // Kondisi
+    {
+        data: 'kondisi',
+        orderable: true,
+        searchable: false,
+        render: function(data) {
+            return '<span class="status status-' + data + '">' +
+                (data === 'baik' ? 'Baik' : 'Rusak') +
+                '</span>';
+        },
+    },
+
+    // Tanggal
+    {
+        data: 'tanggal',
+        orderable: true,
+        searchable: false,
+    },
+
+    // Kerusakan
+    {
+        data: 'kerusakan',
+        orderable: false,
+        searchable: false,
+        render: function(data) {
+            if (!data || data.trim() === '') {
+                return '<span class="text-muted">Tidak ada kerusakan</span>';
+            }
+
+            return '<span class="text-danger fw-semibold">' +
+                data +
+                '</span>';
+        },
+    },
+
+    // Foto Bukti
+    {
+        data: 'foto_bukti',
+        orderable: false,
+        searchable: false,
+        render: function(data) {
+            if (!data) {
+                return '<span class="text-muted">Tidak ada foto</span>';
+            }
+
+            const fotoUrl = "{{ asset('storage') }}/" + data;
+
+            return `
+                <a href="${fotoUrl}" target="_blank" title="Lihat Foto Bukti">
+                    <img src="${fotoUrl}"
+                         alt="Foto Bukti"
+                         style="width: 65px;
+                                height: 50px;
+                                object-fit: cover;
+                                border-radius: 8px;
+                                border: 1px solid #ddd;">
+                </a>
+            `;
+        },
+    },
+
+    // Aksi
+    {
+        data: null,
+        orderable: false,
+        searchable: false,
+        className: 'text-end pe-4',
+        width: '140px',
+        render: function(data) {
+            return '<div class="d-flex justify-content-end gap-2">' +
+
+                '<button type="button" class="btn p-1 text-primary" ' +
+                'style="border:none;background:none;" ' +
+                'onclick="openEditModal(' + data.id + ')">' +
+                '<i class="bi bi-pencil-square"></i></button>' +
+
+                '<button type="button" class="btn p-1 text-danger" ' +
+                'style="border:none;background:none;" ' +
+                'onclick="hapusPemeriksaan(' + data.id + ')">' +
+                '<i class="bi bi-trash"></i></button>' +
+
+                '</div>';
+        },
+    },
+],
                 order: [
                     [5, 'desc']
                 ],

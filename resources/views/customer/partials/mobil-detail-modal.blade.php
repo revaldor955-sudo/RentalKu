@@ -11,6 +11,28 @@
         display: block;
     }
 
+
+.swal2-container {
+    z-index: 20000 !important;
+}
+
+#formSewaContainer {
+    pointer-events: auto !important;
+}
+
+#formSewaContainer form {
+    display: block !important;
+    pointer-events: auto !important;
+}
+
+#formSewaContainer input,
+#formSewaContainer textarea,
+#formSewaContainer select {
+    pointer-events: auto !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    opacity: 1 !important;
+}
     .mobil-modal .mm-content {
         padding: 28px;
     }
@@ -87,6 +109,24 @@
         margin-bottom: 6px;
     }
 
+#formSewaContainer {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 1;
+}
+
+#formSewaContainer form {
+    pointer-events: auto !important;
+}
+
+#formSewaContainer input,
+#formSewaContainer textarea,
+#formSewaContainer select {
+    pointer-events: auto !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    opacity: 1 !important;
+}
     .mobil-modal .mm-spec-title {
         color: #6b7280;
         font-size: 12px;
@@ -111,7 +151,29 @@
         background: #157347;
         color: #fff;
     }
+/* Memastikan input modal SweetAlert bisa diklik dan diketik */
+.swal2-container {
+    z-index: 20000 !important;
+    pointer-events: auto !important;
+}
 
+.swal2-popup {
+    pointer-events: auto !important;
+}
+
+.swal2-html-container {
+    pointer-events: auto !important;
+}
+
+.swal2-popup input,
+.swal2-popup textarea,
+.swal2-popup select {
+    pointer-events: auto !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    cursor: text !important;
+    opacity: 1 !important;
+}
     @media (min-width: 992px) {
         .mobil-modal .mm-photo {
             height: 100%;
@@ -400,7 +462,7 @@
 <div id="sewaFormTemplate" class="d-none">
 
     <form
-        action="{{ route('rentals.store', $mobil->id) }}"
+      action="{{ route('rentals.checkout', $mobil->id) }}"
         method="POST"
         id="sewaForm">
 
@@ -497,41 +559,101 @@
                     required>
 
             </div>
+<div class="col-12">
 
-            <div class="col-12">
+    <label class="form-label fw-semibold">
+        Pilihan Supir
+    </label>
 
-                <label class="form-label fw-semibold">
-                    Catatan
-                </label>
+    <select
+        name="supir_id"
+        id="supir_id"
+        class="form-select">
 
-                <textarea
-                    name="catatan"
-                    class="form-control"
-                    rows="3"
-                    placeholder="Catatan tambahan jika diperlukan...">{{ old('catatan') }}</textarea>
+        <option value="">
+            Tanpa Supir
+        </option>
 
-            </div>
+        @foreach($supirs as $supir)
 
-            <div class="col-12">
+            <option
+                value="{{ $supir->id }}"
+                data-tarif="{{ $supir->tarif_perhari }}">
 
-                <div class="alert alert-success py-2 mb-0">
+                {{ $supir->name }}
+                - Rp {{ number_format($supir->tarif_perhari, 0, ',', '.') }}/hari
 
-                    <small>
-                        <i class="bi bi-info-circle me-1"></i>
-                        Harga: Rp {{ number_format($mobil->harga_perhari, 0, ',', '.') }}/hari.
-                        Deposit Rp {{ number_format($mobil->deposit, 0, ',', '.') }}
-                        ditambahkan ke total.
-                    </small>
+            </option>
 
-                </div>
+        @endforeach
 
-            </div>
+    </select>
+
+    <small class="text-muted">
+        Pilih supir jika ingin menggunakan layanan supir.
+    </small>
+
+</div>
+
+{{-- KODE PROMO --}}
+<div class="col-12">
+    <label class="form-label fw-semibold">
+        Kode Promo
+    </label>
+
+    <input
+        type="text"
+        name="kode_promo"
+        id="kode_promo"
+        class="form-control"
+        placeholder="Masukkan kode promo jika ada"
+        maxlength="50"
+        autocomplete="off"
+    >
+
+    <small class="text-muted">
+        Masukkan kode promo jika ada.
+    </small>
+</div>
+            <div class="mb-3">
+    <label for="catatan" class="form-label">
+        Catatan
+    </label>
+
+    <textarea
+        name="catatan"
+        id="catatan"
+        class="form-control"
+        rows="4"
+        placeholder="Catatan tambahan jika diperlukan..."
+    ></textarea>
+</div>
+
+           <div class="col-12">
+
+    <div class="alert alert-success py-2 mb-0">
+
+        <small>
+            <i class="bi bi-info-circle me-1"></i>
+
+            Harga mobil:
+            Rp {{ number_format($mobil->harga_perhari, 0, ',', '.') }}/hari.
+
+            Deposit:
+            Rp {{ number_format($mobil->deposit ?? 0, 0, ',', '.') }}.
+
+            Biaya supir akan ditambahkan jika dipilih.
+        </small>
+
+    </div>
+
+</div>
 
             <div class="col-12">
 
                 <button type="submit" class="btn btn-success w-100 py-2">
                     <i class="bi bi-calendar-check me-1"></i>
-                    Ajukan Sewa
+                 Lanjut ke Checkout
                 </button>
 
             </div>
@@ -541,3 +663,97 @@
     </form>
 
 </div>
+
+
+<script>
+
+
+function openSewaPopup() {
+    const template = document.getElementById('sewaFormTemplate');
+    const form = template?.querySelector('#sewaForm');
+
+    if (!form) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Form tidak ditemukan',
+            text: 'Form sewa belum tersedia.'
+        });
+        return;
+    }
+
+    // Buat tempat untuk mengembalikan form
+    const placeholder = document.createElement('span');
+    placeholder.style.display = 'none';
+
+    form.parentNode.insertBefore(placeholder, form);
+
+    Swal.fire({
+        title: 'Ajukan Sewa Mobil',
+        html: '<div id="formSewaContainer"></div>',
+        width: '900px',
+        showConfirmButton: false,
+        showCloseButton: true,
+        allowOutsideClick: false,
+        allowEscapeKey: true,
+        focusConfirm: false,
+
+        didOpen: () => {
+            const container = document.getElementById('formSewaContainer');
+
+            // Pindahkan form ASLI ke SweetAlert
+            container.appendChild(form);
+
+            // Pastikan form tampil dan bisa digunakan
+            form.style.display = 'block';
+            form.style.visibility = 'visible';
+            form.style.pointerEvents = 'auto';
+
+            // Aktifkan seluruh input
+            form.querySelectorAll('input, textarea, select').forEach(input => {
+                input.disabled = false;
+                input.readOnly = false;
+                input.style.pointerEvents = 'auto';
+                input.style.userSelect = 'text';
+                input.style.opacity = '1';
+            });
+
+            // Pastikan kolom dapat diketik
+            const kodePromo = form.querySelector('[name="kode_promo"]');
+            const catatan = form.querySelector('[name="catatan"]');
+
+            [kodePromo, catatan].forEach(input => {
+                if (input) {
+                    input.removeAttribute('readonly');
+                    input.removeAttribute('disabled');
+                    input.style.pointerEvents = 'auto';
+                    input.style.cursor = 'text';
+                }
+            });
+
+            // Validasi tanggal
+            const mulai = form.querySelector('[name="tanggal_mulai"]');
+            const selesai = form.querySelector('[name="tanggal_selesai"]');
+
+            if (mulai && selesai) {
+                mulai.addEventListener('change', function() {
+                    selesai.min = this.value;
+
+                    if (selesai.value && selesai.value < this.value) {
+                        selesai.value = '';
+                    }
+                });
+            }
+        },
+
+        didClose: () => {
+            // Kembalikan form ke template semula
+            if (placeholder.parentNode) {
+                placeholder.parentNode.insertBefore(form, placeholder.nextSibling);
+                form.style.display = '';
+            }
+
+            placeholder.remove();
+        }
+    });
+}
+</script>

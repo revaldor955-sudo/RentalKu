@@ -707,7 +707,7 @@
 <div id="sewaFormTemplate" class="d-none">
 
     <form
-        action="{{ route('rentals.store', $mobil->id) }}"
+      action="{{ route('rentals.checkout', $mobil->id) }}"
         method="POST"
         id="sewaForm">
 
@@ -848,104 +848,119 @@
 
 </div>
 
+    </div>
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
 
 <script>
     function openSewaPopup() {
-        var template = $('#sewaFormTemplate').html();
+
+      var template = $('#sewaFormTemplate').last().html();
 
         Swal.fire({
             title: 'Sewa {{ $mobil->name }}',
             html: template,
             width: 600,
             showConfirmButton: false,
+            showCloseButton: true,
             focusConfirm: false,
             allowOutsideClick: false,
-            stopKeydownPropagation: true,
+            // stopKeydownPropagation: true,
 
-            didOpen: function () {
-                const popup = Swal.getPopup();
-                const form = popup.querySelector('form');
-                const catatan = popup.querySelector(
-                    'textarea[name="catatan"]'
-                );
+          didOpen: function () {
 
-                if (catatan) {
-                    catatan.disabled = false;
-                    catatan.readOnly = false;
-                    catatan.tabIndex = 0;
+    const popup = Swal.getPopup();
+    const form = popup.querySelector('form');
 
-                    catatan.style.pointerEvents = 'auto';
-                    catatan.style.userSelect = 'text';
-                    catatan.style.cursor = 'text';
+    // Aktifkan input, select, textarea, dan tombol
+    const fields = popup.querySelectorAll(
+        'input, select, textarea, button'
+    );
 
-                    // Fokus ke textarea saat diklik
-                    catatan.addEventListener('click', function (event) {
-                        event.stopPropagation();
-                        catatan.focus();
-                    });
+    fields.forEach(function (field) {
+        field.disabled = false;
+        field.readOnly = false;
+        field.style.pointerEvents = 'auto';
+    });
 
-                    // Izinkan pengetikan keyboard
-                    catatan.addEventListener('keydown', function (event) {
-                        event.stopPropagation();
-                    });
-                }
+    // Kode promo
+    const kodePromo = popup.querySelector(
+        'input[name="kode_promo"]'
+    );
 
-                $(form).on('submit', function (event) {
-                    event.preventDefault();
-
-                    var formData = new FormData(form);
-
-                    Swal.showLoading();
-
-                    $.ajax({
-                        url: form.action,
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        data: formData,
-                        processData: false,
-                        contentType: false
-                    })
-                    .done(function (data) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: data.message ||
-                                'Pengajuan sewa berhasil dibuat.',
-                            confirmButtonText: 'OK'
-                        }).then(function () {
-                            window.location.href =
-                                '{{ route("customer.dashboard") }}';
-                        });
-                    })
-                    .fail(function (xhr) {
-                        let message = 'Terjadi kesalahan.';
-
-                        if (xhr.responseJSON?.errors) {
-                            message = Object.values(
-                                xhr.responseJSON.errors
-                            ).flat()[0];
-                        } else if (xhr.responseJSON?.message) {
-                            message = xhr.responseJSON.message;
-                        }
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: message
-                        });
-                    });
-                });
-            }
-        });
+    if (kodePromo) {
+        kodePromo.removeAttribute('readonly');
+        kodePromo.removeAttribute('disabled');
+        kodePromo.disabled = false;
+        kodePromo.readOnly = false;
+        kodePromo.style.pointerEvents = 'auto';
+        kodePromo.style.cursor = 'text';
     }
 
+    // Catatan
+    const catatan = popup.querySelector(
+        'textarea[name="catatan"]'
+    );
+
+    if (catatan) {
+        catatan.removeAttribute('readonly');
+        catatan.removeAttribute('disabled');
+        catatan.disabled = false;
+        catatan.readOnly = false;
+        catatan.style.pointerEvents = 'auto';
+        catatan.style.cursor = 'text';
+    }
+
+    // Validasi tanggal
+    const tanggalMulai = popup.querySelector(
+        'input[name="tanggal_mulai"]'
+    );
+
+    const tanggalSelesai = popup.querySelector(
+        'input[name="tanggal_selesai"]'
+    );
+
+    if (tanggalMulai && tanggalSelesai) {
+
+        tanggalMulai.addEventListener('change', function () {
+
+            tanggalSelesai.min = tanggalMulai.value;
+
+            if (
+                tanggalSelesai.value &&
+                tanggalSelesai.value < tanggalMulai.value
+            ) {
+                tanggalSelesai.value = '';
+            }
+
+        });
+
+    }
+
+    // Submit form
+    $(form).on('submit', function () {
+
+        const tombol = form.querySelector(
+            'button[type="submit"]'
+        );
+
+        if (tombol) {
+
+            tombol.disabled = true;
+
+            tombol.innerHTML =
+                '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
+
+        }
+
+    });
+
+}
+});
+    }
+    
 </script>
 
 </body>

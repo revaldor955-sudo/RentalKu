@@ -16,8 +16,20 @@ class Supir extends Model
         'status',
     ];
 
-    public function rental()
+    protected $casts = [
+        'tarif_perhari' => 'decimal:2',
+    ];
+
+    public function rentals()
     {
-        return $this->belongsToMany(Rental::class, 'rental_supir', 'supir_id', 'rental_id');
+        return $this->belongsToMany(
+            Rental::class,
+            'rental_supir',
+            'supir_id',
+            'rental_id'
+        )->withPivot([
+            'tarif_perhari',
+            'sub_total',
+        ])->withTimestamps();
     }
 }

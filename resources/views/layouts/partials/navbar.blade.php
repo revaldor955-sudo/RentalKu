@@ -34,11 +34,19 @@
                 <span>05</span>
                 FAQ
             </a>
+            
 
             <a href="{{ url('/#kontak') }}" class="rk-nav-link">
                 <span>06</span>
                 Kontak
             </a>
+
+              {{-- <a href="{{ url('/#cabang') }}" class="rk-nav-link">
+                <span>06</span>
+                Cabang
+            </a> --}}
+
+
 
         </div>
 

@@ -4,138 +4,612 @@ namespace App\Http\Controllers;
 
 use App\Models\Mobil;
 use App\Models\Rental;
+use App\Models\Supir;
+use App\Models\Kupon;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class RentalController extends Controller
 {
     /**
      * Simpan pengajuan rental customer
      */
-    
-/**
- * Simpan pengajuan rental customer
- */
-public function store(Request $request, Mobil $mobil)
-{
-    if (!auth()->check()) {
+    public function store(Request $request, Mobil $mobil)
+    {
+        if (!auth()->check()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Silakan login terlebih dahulu.',
+                ], 401);
+            }
+
+            return redirect()
+                ->route('login')
+                ->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        if ($mobil->status !== 'Tersedia') {
+            return $this->errorResponse(
+                $request,
+                'Mobil sedang tidak tersedia.'
+            );
+        }
+
+        $validated = $request->validate([
+            'tanggal_mulai' => [
+                'required',
+                'date',
+                'after_or_equal:today',
+            ],
+            'tanggal_selesai' => [
+                'required',
+                'date',
+                'after:tanggal_mulai',
+            ],
+            'supir_id' => [
+                'nullable',
+                'exists:supirs,id',
+            ],
+            'kode_promo' => [
+                'nullable',
+                'string',
+                'max:50',
+            ],
+            'catatan' => [
+                'nullable',
+                'string',
+                'max:500',
+            ],
+        ], [
+            'tanggal_mulai.required' =>
+                'Tanggal mulai wajib diisi.',
+            'tanggal_mulai.after_or_equal' =>
+                'Tanggal mulai tidak boleh sebelum hari ini.',
+            'tanggal_selesai.required' =>
+                'Tanggal selesai wajib diisi.',
+            'tanggal_selesai.after' =>
+                'Tanggal selesai harus setelah tanggal mulai.',
+            'supir_id.exists' =>
+                'Supir yang dipilih tidak tersedia.',
+            'catatan.max' =>
+                'Catatan maksimal 500 karakter.',
+        ]);
+
+        $tanggalMulai = Carbon::parse(
+            $validated['tanggal_mulai']
+        );
+
+        $tanggalSelesai = Carbon::parse(
+            $validated['tanggal_selesai']
+        );
+
+        $jumlahHari = $tanggalMulai->diffInDays(
+            $tanggalSelesai
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Mengecek jadwal rental mobil
+        |--------------------------------------------------------------------------
+        */
+
+        $rentalBertabrakan = Rental::where(
+            'mobil_id',
+            $mobil->id
+        )
+            ->whereIn('status', [
+                'Menunggu',
+                'Disetujui',
+                'Berjalan',
+            ])
+            ->where(function ($query) use (
+                $tanggalMulai,
+                $tanggalSelesai
+            ) {
+                $query->whereDate(
+                    'tanggal_mulai',
+                    '<',
+                    $tanggalSelesai
+                )->whereDate(
+                    'tanggal_selesai',
+                    '>',
+                    $tanggalMulai
+                );
+            })
+            ->exists();
+
+        if ($rentalBertabrakan) {
+            return $this->errorResponse(
+                $request,
+                'Mobil sudah memiliki jadwal rental pada tanggal tersebut.'
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Mengambil dan mengecek supir
+        |--------------------------------------------------------------------------
+        */
+
+        $supir = null;
+
+        if (!empty($validated['supir_id'])) {
+            $supir = Supir::findOrFail(
+                $validated['supir_id']
+            );
+
+            if (strtolower($supir->status) !== 'tersedia') {
+                return $this->errorResponse(
+                    $request,
+                    'Supir yang dipilih sedang tidak tersedia.'
+                );
+            }
+
+            $supirBertabrakan = Rental::whereHas(
+                'supirs',
+                function ($query) use ($supir) {
+                    $query->where(
+                        'supirs.id',
+                        $supir->id
+                    );
+                }
+            )
+                ->whereIn('rentals.status', [
+                    'Menunggu',
+                    'Disetujui',
+                    'Berjalan',
+                ])
+                ->where(function ($query) use (
+                    $tanggalMulai,
+                    $tanggalSelesai
+                ) {
+                    $query->whereDate(
+                        'tanggal_mulai',
+                        '<',
+                        $tanggalSelesai
+                    )->whereDate(
+                        'tanggal_selesai',
+                        '>',
+                        $tanggalMulai
+                    );
+                })
+                ->exists();
+
+            if ($supirBertabrakan) {
+                return $this->errorResponse(
+                    $request,
+                    'Supir sudah memiliki jadwal rental pada tanggal tersebut.'
+                );
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Perhitungan harga
+        |--------------------------------------------------------------------------
+        */
+
+        $hargaPerhari = (float) $mobil->harga_perhari;
+
+        $deposit = (float) (
+            $mobil->deposit ?? 0
+        );
+
+        $subtotalMobil = $jumlahHari * $hargaPerhari;
+
+        $subtotalSupir = 0;
+
+        if ($supir) {
+            $subtotalSupir =
+                $jumlahHari * (float) $supir->tarif_perhari;
+        }
+
+        $subtotalSewa =
+            $subtotalMobil + $subtotalSupir;
+
+        $kodePromo = !empty($validated['kode_promo'])
+            ? strtoupper(trim($validated['kode_promo']))
+            : null;
+
+        $diskon = 0;
+        $kupon = null;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Validasi dan perhitungan promo
+        |--------------------------------------------------------------------------
+        */
+
+        if ($kodePromo) {
+            $promoResult = $this->calculatePromo(
+                $kodePromo,
+                $subtotalSewa
+            );
+
+            if (!$promoResult['success']) {
+                return $this->errorResponse(
+                    $request,
+                    $promoResult['message']
+                );
+            }
+
+            $kupon = $promoResult['kupon'];
+            $diskon = $promoResult['diskon'];
+        }
+
+        $totalHarga = max(
+            0,
+            $subtotalSewa + $deposit - $diskon
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Simpan rental dan promo
+        |--------------------------------------------------------------------------
+        */
+
+        $rental = DB::transaction(function () use (
+            $validated,
+            $mobil,
+            $tanggalMulai,
+            $tanggalSelesai,
+            $jumlahHari,
+            $hargaPerhari,
+            $deposit,
+            $subtotalMobil,
+            $subtotalSupir,
+            $totalHarga,
+            $diskon,
+            $kodePromo,
+            $supir,
+            $kupon
+        ) {
+            $rental = Rental::create([
+                'user_id' => auth()->id(),
+                'mobil_id' => $mobil->id,
+                'tanggal_mulai' =>
+                    $tanggalMulai->format('Y-m-d'),
+                'tanggal_selesai' =>
+                    $tanggalSelesai->format('Y-m-d'),
+                'jumlah_hari' => $jumlahHari,
+                'harga_perhari' => $hargaPerhari,
+                'subtotal' => $subtotalMobil,
+                'deposit' => $deposit,
+                'kode_promo' => $kodePromo,
+                'diskon' => $diskon,
+                'total_harga' => $totalHarga,
+                'status' => 'Menunggu',
+                'catatan' =>
+                    $validated['catatan'] ?? null,
+            ]);
+
+            if ($supir) {
+                $rental->supirs()->attach(
+                    $supir->id,
+                    [
+                        'tarif_perhari' =>
+                            $supir->tarif_perhari,
+                        'sub_total' =>
+                            $subtotalSupir,
+                    ]
+                );
+            }
+
+            if ($kupon) {
+                $kuponLock = Kupon::where(
+                    'id',
+                    $kupon->id
+                )
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($kuponLock) {
+                    $kuponLock->increment('terpakai');
+                }
+            }
+
+            return $rental;
+        });
+
         if ($request->expectsJson()) {
             return response()->json([
-                'success' => false,
-                'message' => 'Silakan login terlebih dahulu.',
-            ], 401);
+                'success' => true,
+                'message' =>
+                    'Pengajuan sewa mobil berhasil dibuat.',
+                'rental_id' => $rental->id,
+            ]);
         }
 
         return redirect()
-            ->route('login')
-            ->with('error', 'Silakan login terlebih dahulu.');
+            ->route('customer.dashboard')
+            ->with(
+                'success',
+                'Pengajuan sewa mobil berhasil dibuat.'
+            );
     }
-
-    if ($mobil->status !== 'Tersedia') {
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Mobil sedang tidak tersedia.',
-            ], 422);
-        }
-
-        return back()->with('error', 'Mobil sedang tidak tersedia.');
-    }
-
-    $validated = $request->validate([
-        'tanggal_mulai' => [
-            'required',
-            'date',
-            'after_or_equal:today',
-        ],
-
-        'tanggal_selesai' => [
-            'required',
-            'date',
-            'after:tanggal_mulai',
-        ],
-
-        'catatan' => [
-            'nullable',
-            'string',
-            'max:500',
-        ],
-    ], [
-        'tanggal_mulai.required' => 'Tanggal mulai wajib diisi.',
-        'tanggal_mulai.after_or_equal' =>
-            'Tanggal mulai tidak boleh sebelum hari ini.',
-
-        'tanggal_selesai.required' =>
-            'Tanggal selesai wajib diisi.',
-
-        'tanggal_selesai.after' =>
-            'Tanggal selesai harus setelah tanggal mulai.',
-
-        'catatan.max' =>
-            'Catatan maksimal 500 karakter.',
-    ]);
-
-    $tanggalMulai = Carbon::parse(
-        $validated['tanggal_mulai']
-    );
-
-    $tanggalSelesai = Carbon::parse(
-        $validated['tanggal_selesai']
-    );
-
-    $jumlahHari = $tanggalMulai->diffInDays(
-        $tanggalSelesai
-    );
-
-    $hargaPerhari = (float) $mobil->harga_perhari;
-
-    $deposit = (float) ($mobil->deposit ?? 0);
-
-    $subtotal = $jumlahHari * $hargaPerhari;
-
-    $totalHarga = $subtotal + $deposit;
-
-    Rental::create([
-        'user_id' => auth()->id(),
-
-        'mobil_id' => $mobil->id,
-
-        'tanggal_mulai' => $tanggalMulai->format('Y-m-d'),
-
-        'tanggal_selesai' => $tanggalSelesai->format('Y-m-d'),
-
-        'jumlah_hari' => $jumlahHari,
-
-        'harga_perhari' => $hargaPerhari,
-
-        'subtotal' => $subtotal,
-
-        'deposit' => $deposit,
-
-        'total_harga' => $totalHarga,
-
-        'status' => 'Menunggu',
-
-        'catatan' => $validated['catatan'] ?? null,
-    ]);
-
-    if ($request->expectsJson()) {
-        return response()->json([
-            'success' => true,
-            'message' => 'Pengajuan sewa mobil berhasil dibuat.',
-        ], 200);
-    }
-
-    return redirect()
-        ->route('customer.dashboard')
-        ->with(
-            'success',
-            'Pengajuan sewa mobil berhasil dibuat.'
-        );
-}
 
     /**
-     * Menampilkan semua rental untuk Admin
+     * Menampilkan halaman checkout rental
+     */
+    public function checkout(
+        Request $request,
+        Mobil $mobil
+    ) {
+        $isAjax =
+            $request->ajax() ||
+            $request->expectsJson();
+
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'tanggal_mulai' => [
+                    'required',
+                    'date',
+                    'after_or_equal:today',
+                ],
+                'tanggal_selesai' => [
+                    'required',
+                    'date',
+                    'after:tanggal_mulai',
+                ],
+                'supir_id' => [
+                    'nullable',
+                    'exists:supirs,id',
+                ],
+                'kode_promo' => [
+                    'nullable',
+                    'string',
+                    'max:50',
+                ],
+                'catatan' => [
+                    'nullable',
+                    'string',
+                    'max:500',
+                ],
+            ],
+            [
+                'tanggal_mulai.required' =>
+                    'Tanggal mulai wajib diisi.',
+                'tanggal_mulai.after_or_equal' =>
+                    'Tanggal mulai tidak boleh sebelum hari ini.',
+                'tanggal_selesai.required' =>
+                    'Tanggal selesai wajib diisi.',
+                'tanggal_selesai.after' =>
+                    'Tanggal selesai harus setelah tanggal mulai.',
+                'supir_id.exists' =>
+                    'Supir yang dipilih tidak tersedia.',
+                'catatan.max' =>
+                    'Catatan maksimal 500 karakter.',
+            ]
+        );
+
+        if ($validator->fails()) {
+            if ($isAjax) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data checkout belum valid.',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
+            return back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $validated = $validator->validated();
+
+        $tanggalMulai = Carbon::parse(
+            $validated['tanggal_mulai']
+        );
+
+        $tanggalSelesai = Carbon::parse(
+            $validated['tanggal_selesai']
+        );
+
+        $jumlahHari = $tanggalMulai->diffInDays(
+            $tanggalSelesai
+        );
+
+        $supir = null;
+
+        if (!empty($validated['supir_id'])) {
+            $supir = Supir::findOrFail(
+                $validated['supir_id']
+            );
+
+            if (strtolower($supir->status) !== 'tersedia') {
+                if ($isAjax) {
+                    return response()->json([
+                        'success' => false,
+                        'message' =>
+                            'Supir sedang tidak tersedia.',
+                    ], 422);
+                }
+
+                return back()->with(
+                    'error',
+                    'Supir sedang tidak tersedia.'
+                );
+            }
+        }
+
+        $hargaPerhari = (float) $mobil->harga_perhari;
+
+        $deposit = (float) (
+            $mobil->deposit ?? 0
+        );
+
+        $subtotalMobil =
+            $jumlahHari * $hargaPerhari;
+
+        $subtotalSupir = $supir
+            ? $jumlahHari * (float) $supir->tarif_perhari
+            : 0;
+
+        $subtotalSewa =
+            $subtotalMobil + $subtotalSupir;
+
+        $kodePromo = !empty($validated['kode_promo'])
+            ? strtoupper(trim($validated['kode_promo']))
+            : null;
+
+        $diskon = 0;
+
+        if ($kodePromo) {
+            $promoResult = $this->calculatePromo(
+                $kodePromo,
+                $subtotalSewa
+            );
+
+            if (!$promoResult['success']) {
+                if ($isAjax) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $promoResult['message'],
+                    ], 422);
+                }
+
+                return back()
+                    ->with(
+                        'error',
+                        $promoResult['message']
+                    )
+                    ->withInput();
+            }
+
+            $diskon = $promoResult['diskon'];
+        }
+
+        $totalHarga = max(
+            0,
+            $subtotalSewa + $deposit - $diskon
+        );
+
+        session([
+            'checkout_rental' => [
+                'mobil_id' => $mobil->id,
+                'tanggal_mulai' =>
+                    $validated['tanggal_mulai'],
+                'tanggal_selesai' =>
+                    $validated['tanggal_selesai'],
+                'jumlah_hari' =>
+                    $jumlahHari,
+                'supir_id' =>
+                    $validated['supir_id'] ?? null,
+                'kode_promo' =>
+                    $kodePromo,
+                'catatan' =>
+                    $validated['catatan'] ?? null,
+                'harga_perhari' =>
+                    $hargaPerhari,
+                'subtotal_mobil' =>
+                    $subtotalMobil,
+                'subtotal_supir' =>
+                    $subtotalSupir,
+                'deposit' =>
+                    $deposit,
+                'diskon' =>
+                    $diskon,
+                'total_harga' =>
+                    $totalHarga,
+            ],
+        ]);
+
+        $checkoutUrl = route(
+            'rentals.checkout',
+            $mobil->id
+        );
+
+        if ($isAjax) {
+            return response()->json([
+                'success' => true,
+                'message' =>
+                    'Data checkout berhasil disiapkan.',
+                'redirect' => $checkoutUrl,
+            ]);
+        }
+
+        return view(
+            'customer.checkout',
+            compact(
+                'mobil',
+                'supir',
+                'jumlahHari',
+                'subtotalMobil',
+                'subtotalSupir',
+                'deposit',
+                'diskon',
+                'totalHarga'
+            )
+        );
+    }
+
+ /**
+ * Konfirmasi checkout dan simpan rental
+ */
+public function confirmCheckout(
+    Request $request,
+    Mobil $mobil
+) {
+    $checkout = session('checkout_rental');
+
+    if (!$checkout) {
+        return redirect()
+            ->route('customer.dashboard')
+            ->with(
+                'error',
+                'Data checkout tidak ditemukan.'
+            );
+    }
+
+    /*
+    |--------------------------------------------------------------
+    | Ambil kode promo dari input checkout
+    |--------------------------------------------------------------
+    */
+
+    $kodePromo = $request->input(
+        'kode_promo',
+        $checkout['kode_promo'] ?? null
+    );
+
+    $request->merge([
+        'tanggal_mulai' =>
+            $checkout['tanggal_mulai'],
+
+        'tanggal_selesai' =>
+            $checkout['tanggal_selesai'],
+
+        'supir_id' =>
+            $checkout['supir_id'] ?? null,
+
+        'kode_promo' =>
+            $kodePromo,
+
+        'catatan' =>
+            $checkout['catatan'] ?? null,
+    ]);
+
+    $response = $this->store(
+        $request,
+        $mobil
+    );
+
+    if (
+        $response instanceof
+        \Illuminate\Http\RedirectResponse
+    ) {
+        session()->forget('checkout_rental');
+    }
+
+    return $response;
+}
+    /**
+     * Menampilkan halaman rental admin/staff
      */
     public function index()
     {
@@ -143,13 +617,23 @@ public function store(Request $request, Mobil $mobil)
     }
 
     /**
-     * Server-side DataTables: daftar rental (search, sort, pagination)
+     * DataTables rental
      */
     public function data(Request $request)
     {
         $query = Rental::query()
-            ->leftJoin('users', 'rentals.user_id', '=', 'users.id')
-            ->leftJoin('mobils', 'rentals.mobil_id', '=', 'mobils.id')
+            ->leftJoin(
+                'users',
+                'rentals.user_id',
+                '=',
+                'users.id'
+            )
+            ->leftJoin(
+                'mobils',
+                'rentals.mobil_id',
+                '=',
+                'mobils.id'
+            )
             ->select(
                 'rentals.*',
                 'users.name as user_name',
@@ -158,21 +642,46 @@ public function store(Request $request, Mobil $mobil)
                 'mobils.plate_number as mobil_plate'
             );
 
-        if ($request->has('status') && $request->status) {
-            $query->where('rentals.status', $request->status);
+        if ($request->filled('status')) {
+            $query->where(
+                'rentals.status',
+                $request->status
+            );
         }
 
-        $recordsTotal = $query->count();
+        $recordsTotal = Rental::count();
 
-        $search = $request->input('search.value');
+        $search = $request->input(
+            'search.value'
+        );
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('users.name', 'like', "%{$search}%")
-                    ->orWhere('users.email', 'like', "%{$search}%")
-                    ->orWhere('mobils.name', 'like', "%{$search}%")
-                    ->orWhere('mobils.plate_number', 'like', "%{$search}%")
-                    ->orWhere('rentals.status', 'like', "%{$search}%");
+                $q->where(
+                    'users.name',
+                    'like',
+                    "%{$search}%"
+                )
+                    ->orWhere(
+                        'users.email',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'mobils.name',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'mobils.plate_number',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'rentals.status',
+                        'like',
+                        "%{$search}%"
+                    );
             });
         }
 
@@ -189,119 +698,380 @@ public function store(Request $request, Mobil $mobil)
             7 => null,
         ];
 
-        $orderColumn = $request->input('order.0.column', 3);
-        $orderDir = $request->input('order.0.dir', 'desc');
+        $orderColumn = $request->input(
+            'order.0.column',
+            3
+        );
 
-        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
-            $query->orderBy($columns[$orderColumn], $orderDir);
+        $orderDir = $request->input(
+            'order.0.dir',
+            'desc'
+        );
+
+        if (
+            isset($columns[$orderColumn]) &&
+            $columns[$orderColumn]
+        ) {
+            $query->orderBy(
+                $columns[$orderColumn],
+                $orderDir === 'asc'
+                    ? 'asc'
+                    : 'desc'
+            );
         } else {
-            $query->orderBy('rentals.tanggal_mulai', 'desc');
+            $query->orderBy(
+                'rentals.tanggal_mulai',
+                'desc'
+            );
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(
+            0,
+            (int) $request->input('start', 0)
+        );
 
-        $rentals = $query->offset($start)->limit($length)->get();
+        $length = (int) $request->input(
+            'length',
+            10
+        );
+
+        $length = $length > 0
+            ? $length
+            : 10;
+
+        $rentals = $query
+            ->offset($start)
+            ->limit($length)
+            ->get();
 
         $data = $rentals->map(function ($rental) {
             return [
                 'id' => $rental->id,
-                'user_name' => $rental->user_name ?? '-',
-                'user_email' => $rental->user_email ?? '-',
-                'mobil_name' => $rental->mobil_name ?? '-',
-                'mobil_plate' => $rental->mobil_plate ?? '-',
-                'tanggal_mulai' => $rental->tanggal_mulai?->format('d/m/Y'),
-                'tanggal_selesai' => $rental->tanggal_selesai?->format('d/m/Y'),
-                'jumlah_hari' => $rental->jumlah_hari,
-                'total_harga' => (float) $rental->total_harga,
-                'status' => $rental->status,
+
+                'user_name' =>
+                    $rental->user_name ?? '-',
+
+                'user_email' =>
+                    $rental->user_email ?? '-',
+
+                'mobil_name' =>
+                    $rental->mobil_name ?? '-',
+
+                'mobil_plate' =>
+                    $rental->mobil_plate ?? '-',
+
+                'tanggal_mulai' =>
+                    $rental->tanggal_mulai
+                        ? Carbon::parse(
+                            $rental->tanggal_mulai
+                        )->format('d/m/Y')
+                        : '-',
+
+                'tanggal_selesai' =>
+                    $rental->tanggal_selesai
+                        ? Carbon::parse(
+                            $rental->tanggal_selesai
+                        )->format('d/m/Y')
+                        : '-',
+
+                'jumlah_hari' =>
+                    $rental->jumlah_hari,
+
+                'total_harga' =>
+                    (float) $rental->total_harga,
+
+                'status' =>
+                    $rental->status,
             ];
         });
 
         return response()->json([
-            'draw' => (int) $request->input('draw'),
-            'recordsTotal' => $recordsTotal,
-            'recordsFiltered' => $recordsFiltered,
-            'data' => $data,
+            'draw' =>
+                (int) $request->input('draw'),
+
+            'recordsTotal' =>
+                $recordsTotal,
+
+            'recordsFiltered' =>
+                $recordsFiltered,
+
+            'data' =>
+                $data,
         ]);
     }
 
     /**
-     * Detail rental untuk modal popup (AJAX)
+     * Detail rental untuk AJAX
      */
     public function detail(Rental $rental)
     {
         $rental->load([
             'user',
             'mobil',
-            'cabangAmbil',
-            'cabangKembali',
             'pembayaran',
+            'rating',
+            'supirs',
         ]);
 
         return response()->json([
             'id' => $rental->id,
-            'pelanggan' => $rental->user->name ?? '-',
-            'email' => $rental->user->email ?? '-',
-            'mobil' => $rental->mobil->name ?? '-',
-            'plat' => $rental->mobil->plate_number ?? '-',
-            'cabang_ambil' => $rental->cabangAmbil->name ?? '-',
-            'cabang_kembali' => $rental->cabangKembali->name ?? '-',
-            'tanggal_mulai' => $rental->tanggal_mulai?->format('d/m/Y'),
-            'tanggal_selesai' => $rental->tanggal_selesai?->format('d/m/Y'),
-            'jumlah_hari' => $rental->jumlah_hari,
-            'harga_perhari' => (float) $rental->harga_perhari,
-            'subtotal' => (float) $rental->subtotal,
-            'deposit' => (float) $rental->deposit,
-            'total_harga' => (float) $rental->total_harga,
-            'status' => $rental->status,
-            'catatan' => $rental->catatan ?? '-',
+
+            'pelanggan' =>
+                $rental->user->name ?? '-',
+
+            'email' =>
+                $rental->user->email ?? '-',
+
+            'mobil' =>
+                $rental->mobil->name ?? '-',
+
+            'plat' =>
+                $rental->mobil->plate_number ?? '-',
+
+            'tanggal_mulai' =>
+                $rental->tanggal_mulai
+                    ? $rental->tanggal_mulai->format('d/m/Y')
+                    : '-',
+
+            'tanggal_selesai' =>
+                $rental->tanggal_selesai
+                    ? $rental->tanggal_selesai->format('d/m/Y')
+                    : '-',
+
+            'jumlah_hari' =>
+                $rental->jumlah_hari,
+
+            'harga_perhari' =>
+                (float) $rental->harga_perhari,
+
+            'subtotal' =>
+                (float) $rental->subtotal,
+
+            'deposit' =>
+                (float) $rental->deposit,
+
+            'kode_promo' =>
+                $rental->kode_promo ?? '-',
+
+            'diskon' =>
+                (float) ($rental->diskon ?? 0),
+
+            'total_harga' =>
+                (float) $rental->total_harga,
+
+            'status' =>
+                $rental->status,
+
+            'catatan' =>
+                $rental->catatan ?? '-',
+
+            'pembayaran' =>
+                $rental->pembayaran,
+
+            'rating' =>
+                $rental->rating,
+
+            'supirs' =>
+                $rental->supirs,
         ]);
     }
 
     /**
-     * Update status rental oleh Admin
+     * Update status rental
      */
-    public function updateStatus(Request $request, Rental $rental)
-    {
+    public function updateStatus(
+        Request $request,
+        Rental $rental
+    ) {
         $request->validate([
-            'status' => 'required|in:Disetujui,Ditolak,Selesai',
+            'status' => [
+                'required',
+                'in:Disetujui,Ditolak,Berjalan,Selesai',
+            ],
         ]);
 
         $status = $request->status;
 
-        if ($status === 'Ditolak') {
-            $rental->update(['status' => 'Ditolak']);
-            $rental->mobil->update(['status' => 'Tersedia']);
-
-            return response()->json([
-                'message' => 'Pengajuan rental berhasil ditolak.',
-            ]);
-        }
-
         if ($status === 'Disetujui') {
-            if ($rental->mobil->status !== 'Tersedia') {
+            if (
+                $rental->mobil &&
+                $rental->mobil->status !== 'Tersedia'
+            ) {
                 return response()->json([
-                    'message' => 'Mobil sedang tidak tersedia.',
+                    'message' =>
+                        'Mobil sedang tidak tersedia.',
                 ], 422);
             }
 
-            $rental->update(['status' => 'Disetujui']);
-            $rental->mobil->update(['status' => 'Disewa']);
+            $rental->update([
+                'status' => 'Disetujui',
+            ]);
+
+            if ($rental->mobil) {
+                $rental->mobil->update([
+                    'status' => 'Disewa',
+                ]);
+            }
 
             return response()->json([
-                'message' => 'Rental berhasil disetujui. Mobil sekarang berstatus "Disewa".',
+                'message' =>
+                    'Rental berhasil disetujui.',
             ]);
         }
 
+        if ($status === 'Ditolak') {
+            $rental->update([
+                'status' => 'Ditolak',
+            ]);
+
+            if ($rental->mobil) {
+                $rental->mobil->update([
+                    'status' => 'Tersedia',
+                ]);
+            }
+
+            return response()->json([
+                'message' =>
+                    'Pengajuan rental berhasil ditolak.',
+            ]);
+        }
+
+        if ($status === 'Berjalan') {
+            $rental->update([
+                'status' => 'Berjalan',
+            ]);
+
+            return response()->json([
+                'message' =>
+                    'Rental sekarang berstatus berjalan.',
+            ]);
+        }
 
         if ($status === 'Selesai') {
-            $rental->update(['status' => 'Selesai']);
-            $rental->mobil->update(['status' => 'Tersedia']);
+            $rental->update([
+                'status' => 'Selesai',
+            ]);
+
+            if ($rental->mobil) {
+                $rental->mobil->update([
+                    'status' => 'Tersedia',
+                ]);
+            }
 
             return response()->json([
-                'message' => 'Rental berhasil diselesaikan. Mobil sekarang berstatus "Tersedia".',
+                'message' =>
+                    'Rental berhasil diselesaikan.',
             ]);
         }
+
+        return response()->json([
+            'message' => 'Status tidak valid.',
+        ], 422);
+    }
+
+    /**
+     * Validasi dan hitung promo
+     */
+    private function calculatePromo(
+        string $kodePromo,
+        float $subtotalSewa
+    ): array {
+        $kupon = Kupon::whereRaw(
+            'UPPER(code) = ?',
+            [$kodePromo]
+        )->first();
+
+        if (!$kupon) {
+            return [
+                'success' => false,
+                'message' => 'Kode promo tidak ditemukan.',
+            ];
+        }
+
+        $sekarang = Carbon::now();
+
+        if (
+            $kupon->active_at &&
+            $sekarang->lt($kupon->active_at)
+        ) {
+            return [
+                'success' => false,
+                'message' => 'Kode promo belum aktif.',
+            ];
+        }
+
+        if (
+            $kupon->expired_at &&
+            $sekarang->gt($kupon->expired_at)
+        ) {
+            return [
+                'success' => false,
+                'message' => 'Kode promo sudah kedaluwarsa.',
+            ];
+        }
+
+        if (
+            $kupon->kuota !== null &&
+            $kupon->terpakai >= $kupon->kuota
+        ) {
+            return [
+                'success' => false,
+                'message' => 'Kuota promo sudah habis.',
+            ];
+        }
+
+        if (
+            $subtotalSewa <
+            (float) $kupon->minimal_pembelian
+        ) {
+            return [
+                'success' => false,
+                'message' =>
+                    'Minimal pembelian untuk promo belum terpenuhi.',
+            ];
+        }
+
+        if ($kupon->jenis === 'persen') {
+            $persentase = min(
+                100,
+                max(0, (float) $kupon->value)
+            );
+
+            $diskon =
+                $subtotalSewa * ($persentase / 100);
+        } else {
+            $diskon = (float) $kupon->value;
+        }
+
+        $diskon = min(
+            $diskon,
+            $subtotalSewa
+        );
+
+        return [
+            'success' => true,
+            'kupon' => $kupon,
+            'diskon' => $diskon,
+        ];
+    }
+
+    /**
+     * Response error JSON atau redirect
+     */
+    private function errorResponse(
+        Request $request,
+        string $message
+    ) {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+            ], 422);
+        }
+
+        return back()->with(
+            'error',
+            $message
+        );
     }
 }

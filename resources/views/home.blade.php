@@ -1141,7 +1141,76 @@ html {
         0 20px 50px rgba(0,0,0,.2);
 }
 
+/* ============================================================
+   INFORMASI CABANG
+============================================================ */
 
+.rk-branch-card {
+    height: 100%;
+    padding: 28px;
+    border-radius: 24px;
+    background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, .06),
+        rgba(255, 255, 255, .02)
+    );
+    border: 1px solid rgba(255, 255, 255, .08);
+    transition: .3s ease;
+}
+
+.rk-branch-card:hover {
+    transform: translateY(-7px);
+    border-color: rgba(57, 245, 138, .35);
+    box-shadow:
+        0 20px 55px rgba(0, 0, 0, .25),
+        0 0 25px rgba(57, 245, 138, .06);
+}
+
+.rk-branch-icon {
+    width: 58px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 22px;
+    border-radius: 17px;
+    color: var(--rk-green);
+    background: rgba(57, 245, 138, .08);
+    border: 1px solid rgba(57, 245, 138, .15);
+    font-size: 24px;
+}
+
+.rk-branch-name {
+    color: #f5fff9;
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 18px;
+}
+
+.rk-branch-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 14px;
+    color: #9eaea6;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.rk-branch-info i {
+    color: var(--rk-green);
+    font-size: 17px;
+    margin-top: 3px;
+}
+
+.rk-branch-empty {
+    padding: 35px;
+    border-radius: 20px;
+    text-align: center;
+    color: #9eaea6;
+    background: rgba(255, 255, 255, .035);
+    border: 1px solid rgba(255, 255, 255, .08);
+}
 .rk-feature-number {
     position: absolute;
 
@@ -1848,29 +1917,24 @@ html {
 
                                     <i class="bi bi-patch-check-fill"></i>
 
-                                    Rental mobil mudah & terpercaya
+                                   <span>
+    {{ $landing['hero_badge'] ?? 'Rental mobil mudah & terpercaya' }}
+</span>
 
                                 </div>
 
 
                                 <h1 class="rk-hero-title">
 
-                                    Perjalanan lebih mudah
-
-                                    <span>
-                                        dengan Rentalku.
-                                    </span>
+                                 {{ $landing['hero_title'] ?? 'Perjalanan lebih mudah dengan RentalKu.' }}
 
                                 </h1>
 
+<p class="rk-hero-description">
 
-                                <p class="rk-hero-description">
+    {{ $landing['hero_description'] ?? 'Temukan mobil yang sesuai kebutuhanmu. Pilih kendaraan, tentukan tanggal rental, dan lakukan rental dengan mudah secara online.' }}
 
-                                    Temukan mobil yang sesuai kebutuhanmu.
-                                    Pilih kendaraan, tentukan tanggal rental,
-                                    dan lakukan rental dengan mudah secara online.
-
-                                </p>
+</p>
 
 
                                 <div class="rk-hero-buttons">
@@ -2060,31 +2124,23 @@ html {
 
                 <div class="rk-hero-copy">
 
-                    <div class="rk-eyebrow">
+                   <div class="rk-eyebrow">
 
-                        <i class="bi bi-patch-check-fill"></i>
+    <i class="bi bi-patch-check-fill"></i>
 
-                        Rental mobil mudah & terpercaya
+    {{ $landing['hero_badge'] ?? 'Rental mobil mudah & terpercaya' }}
 
-                    </div>
-
+</div>
 
                     <h1 class="rk-hero-title">
 
-                        Perjalanan lebih mudah
+    {{ $landing['hero_title'] ?? 'Perjalanan lebih mudah bersama RentalKu.' }}
 
-                        <span>
-                            dengan Rentalku.
-                        </span>
-
-                    </h1>
-
+</h1>
 
                     <p class="rk-hero-description">
 
-                        Temukan mobil yang sesuai kebutuhanmu.
-                        Pilih kendaraan, tentukan tanggal rental,
-                        dan lakukan rental dengan mudah secara online.
+                      {{ $landing['hero_description'] ?? 'Temukan mobil pilihan untuk perjalananmu.' }}
 
                     </p>
 
@@ -2190,7 +2246,119 @@ html {
 
                     </div>
 
+{{-- {{-- ============================================================
+     KONTAK RENTALKU
+============================================================ --}}
 
+{{-- <section class="rk-section" id="kontak">
+
+    <div class="container">
+
+        <div class="rk-section-head rk-center rk-reveal">
+
+            <div class="rk-kicker">
+                Hubungi Kami
+            </div>
+
+            <h2 class="rk-section-title">
+                Siap Membantu Perjalananmu
+            </h2>
+
+            <p class="rk-section-description">
+                Hubungi RentalKu untuk mendapatkan informasi
+                mengenai ketersediaan mobil dan layanan rental.
+            </p>
+
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-lg-6 rk-reveal">
+
+                <div class="rk-branch-card h-100">
+
+                    <div class="rk-branch-icon">
+                        <i class="bi bi-headset"></i>
+                    </div>
+
+                    <div class="rk-branch-name">
+                        Informasi Kontak
+                    </div>
+
+                    @if ($kontak)
+
+                        <div class="rk-branch-info">
+                            <i class="bi bi-geo-alt-fill"></i>
+
+                            <span>
+                                {{ $kontak->address ?: 'Alamat belum tersedia.' }}
+                            </span>
+                        </div>
+
+                        <div class="rk-branch-info">
+                            <i class="bi bi-telephone-fill"></i>
+
+                            <span>
+                                {{ $kontak->phone ?: 'Nomor telepon belum tersedia.' }}
+                            </span>
+                        </div>
+
+                    @else
+
+                        <div class="rk-branch-info">
+                            <i class="bi bi-info-circle"></i>
+
+                            <span>
+                                Informasi kontak belum tersedia.
+                            </span>
+                        </div>
+
+                    @endif
+
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-6 rk-reveal">
+
+                <div class="rk-branch-card h-100">
+
+                    <div class="rk-branch-icon">
+                        <i class="bi bi-clock-fill"></i>
+                    </div>
+
+                    <div class="rk-branch-name">
+                        Jam Operasional
+                    </div>
+
+                    <div class="rk-branch-info">
+                        <i class="bi bi-calendar-check"></i>
+
+                        <span>
+                            Senin – Sabtu<br>
+                            08.00 – 17.00 WIB
+                        </span>
+                    </div>
+
+                    <div class="rk-branch-info">
+                        <i class="bi bi-calendar-x"></i>
+
+                        <span>
+                            Minggu<br>
+                            Dengan perjanjian
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>  --}}
                     {{-- TANGGAL MULAI --}}
 
                     <div class="rk-search-field">
@@ -2279,6 +2447,122 @@ html {
 
 </section>
 
+{{-- ============================================================
+     INFORMASI CABANG RENTAL
+============================================================ --}}
+
+<section
+    class="rk-section rk-section-soft"
+    id="cabang"
+>
+
+    <div class="container">
+
+        <div class="rk-section-head rk-center rk-reveal">
+
+            <div class="rk-kicker">
+                Lokasi RentalKu
+            </div>
+
+            <h2 class="rk-section-title">
+                Temukan Cabang RentalKu
+            </h2>
+
+            <p class="rk-section-description">
+                Pilih cabang RentalKu yang paling dekat dengan lokasi
+                dan kebutuhan perjalananmu.
+            </p>
+
+        </div>
+
+
+        <div class="row g-4">
+
+            @forelse ($cabangs as $cabang)
+
+                <div class="col-md-6 col-lg-4 rk-reveal">
+
+                    <div class="rk-branch-card">
+
+                        <div class="rk-branch-icon">
+
+                            <i class="bi bi-geo-alt-fill"></i>
+
+                        </div>
+
+
+                        <div class="rk-branch-name">
+
+                            {{ $cabang->name }}
+
+                        </div>
+
+
+                        <div class="rk-branch-info">
+
+                            <i class="bi bi-geo-alt-fill"></i>
+
+                            <span>
+                                {{ $cabang->address ?: 'Alamat belum tersedia.' }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="rk-branch-info">
+
+                            <i class="bi bi-telephone-fill"></i>
+
+                            <span>
+                                {{ $cabang->phone ?: 'Nomor telepon belum tersedia.' }}
+                            </span>
+
+                        </div>
+
+
+                        @if (!empty($cabang->address))
+
+                            <a
+                                href="https://www.google.com/maps/search/?api=1&query={{ urlencode($cabang->address) }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="rk-btn-outline mt-3"
+                            >
+
+                                <i class="bi bi-map"></i>
+
+                                Lihat Lokasi
+
+                            </a>
+
+                        @endif
+
+                    </div>
+
+                </div>
+
+            @empty
+
+                <div class="col-12">
+
+                    <div class="rk-branch-empty">
+
+                        <i class="bi bi-geo-alt fs-2 d-block mb-3"></i>
+
+                        Belum ada informasi cabang rental.
+
+                    </div>
+
+                </div>
+
+            @endforelse
+
+        </div>
+
+    </div>
+
+</section>
+
 
 
 {{-- ============================================================
@@ -2295,17 +2579,13 @@ html {
                 Brand Pilihan
             </div>
 
-            <h2 class="rk-section-title">
-                Pilihan brand untukmu.
-            </h2>
+          <h2 class="rk-section-title">
+    {{ $landing['brand_title'] ?? 'Pilihan brand untukmu.' }}
+</h2>
 
-            <p class="rk-section-description">
-
-                Berbagai pilihan merek kendaraan tersedia
-                untuk memenuhi kebutuhan perjalananmu.
-
-            </p>
-
+<p class="rk-section-description">
+    {{ $landing['brand_description'] ?? 'Berbagai pilihan merek kendaraan tersedia untuk memenuhi kebutuhan perjalananmu.' }}
+</p>
         </div>
 
 
@@ -2364,7 +2644,120 @@ html {
 
 </section>
 
+{{-- ============================================================
+     PROMO DINAMIS DARI KUPON
+============================================================ --}}
 
+@if ($kupons->count())
+
+<section class="rk-section rk-section-soft" id="promo">
+
+    <div class="container">
+
+        <div class="rk-section-head rk-center rk-reveal">
+
+            <div class="rk-kicker">
+                Promo Spesial
+            </div>
+
+           <h2 class="rk-section-title">
+    {{ $landing['promo_title'] ?? 'Hemat perjalananmu.' }}
+</h2>
+
+<p class="rk-section-description">
+    {{ $landing['promo_description'] ?? 'Gunakan kode kupon pilihan dan dapatkan penawaran menarik dari RentalKu.' }}
+</p>
+
+        </div>
+
+        <div class="row g-4">
+
+            @foreach ($kupons as $kupon)
+
+                <div class="col-md-6 col-lg-4 rk-reveal">
+
+                    <div class="rk-feature h-100">
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+
+                            <div class="rk-feature-icon mb-0">
+
+                                <i class="bi bi-ticket-perforated"></i>
+
+                            </div>
+
+                            <span class="badge rounded-pill text-bg-success">
+                                Promo Aktif
+                            </span>
+
+                        </div>
+
+                        <h4>
+                            @if ($kupon->jenis === 'persen')
+                                Diskon {{ $kupon->value }}%
+                            @else
+                                Potongan Rp {{ number_format($kupon->value, 0, ',', '.') }}
+                            @endif
+                        </h4>
+
+                        <p class="mb-3">
+                            Gunakan kupon ini saat melakukan
+                            pemesanan mobil di RentalKu.
+                        </p>
+
+                        <div class="p-3 rounded-3 mb-3"
+                             style="background: rgba(57,245,138,.08);
+                                    border: 1px dashed rgba(57,245,138,.45);">
+
+                            <div class="small text-secondary mb-1">
+                                Kode Kupon
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <strong style="color: var(--rk-green); letter-spacing: 1px;">
+                                    {{ $kupon->code }}
+                                </strong>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-outline-success"
+                                    onclick="salinKupon('{{ $kupon->code }}')"
+                                >
+                                    <i class="bi bi-copy"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        @if ($kupon->minimal_pembelian)
+                            <small class="text-secondary d-block mb-1">
+                                Minimal pembelian:
+                                Rp {{ number_format($kupon->minimal_pembelian, 0, ',', '.') }}
+                            </small>
+                        @endif
+
+                        @if ($kupon->expired_at)
+                            <small class="text-secondary d-block">
+                                Berlaku sampai:
+                                {{ \Carbon\Carbon::parse($kupon->expired_at)->format('d M Y') }}
+                            </small>
+                        @endif
+
+                    </div>
+
+                </div>
+
+            @endforeach
+
+        </div>
+
+    </div>
+
+</section>
+
+@endif
 
 {{-- ============================================================
      TENTANG
@@ -2398,18 +2791,15 @@ html {
                         </small>
 
 
-                        <h3>
-                            Rental mobil tanpa ribet.
-                        </h3>
+                      <h3>
+    {{ $landing['about_title'] ?? 'Rental mobil tanpa ribet.' }}
+</h3>
 
+<p>
 
-                        <p>
+    {{ $landing['about_description'] ?? 'Kami menghadirkan pengalaman rental mobil yang praktis dengan proses pemesanan yang mudah dan transparan.' }}
 
-                            Kami menghadirkan pengalaman rental mobil
-                            yang praktis dengan proses pemesanan yang
-                            mudah dan transparan.
-
-                        </p>
+</p>
 
                     </div>
 
@@ -2427,21 +2817,13 @@ html {
                     </div>
 
 
-                    <h2 class="rk-section-title">
+                  <h2 class="rk-section-title">
+    {{ $landing['feature_title'] ?? 'Lebih nyaman. Lebih mudah.' }}
+</h2>
 
-                        Lebih nyaman.
-                        <br>
-                        Lebih mudah.
-
-                    </h2>
-
-
-                    <p class="rk-section-description">
-
-                        Semua kebutuhan rental mobil kamu
-                        kami buat sesederhana mungkin.
-
-                    </p>
+<p class="rk-section-description">
+    {{ $landing['feature_description'] ?? 'Semua kebutuhan rental mobil kamu kami buat sesederhana mungkin.' }}
+</p>
 
                 </div>
 
@@ -2619,16 +3001,12 @@ html {
 
 
             <h2 class="rk-section-title">
-                Semudah itu untuk berangkat.
-            </h2>
+    {{ $landing['steps_title'] ?? 'Semudah itu untuk berangkat.' }}
+</h2>
 
-
-            <p class="rk-section-description">
-
-                Proses sederhana untuk mendapatkan mobil
-                yang kamu butuhkan.
-
-            </p>
+<p class="rk-section-description">
+    {{ $landing['steps_description'] ?? 'Proses sederhana untuk mendapatkan mobil yang kamu butuhkan.' }}
+</p>
 
         </div>
 
@@ -2772,17 +3150,13 @@ html {
                 </div>
 
 
-                <h2 class="rk-section-title">
-                    Apa kata pelanggan?
-                </h2>
+               <h2 class="rk-section-title">
+    {{ $landing['testimonial_title'] ?? 'Apa kata pelanggan?' }}
+</h2>
 
-
-                <p class="rk-section-description">
-
-                    Pengalaman pelanggan menjadi bagian penting
-                    dari perjalanan Rentalku.
-
-                </p>
+<p class="rk-section-description">
+    {{ $landing['testimonial_description'] ?? 'Pengalaman pelanggan menjadi bagian penting dari perjalanan RentalKu.' }}
+</p>
 
             </div>
 
@@ -2816,7 +3190,7 @@ html {
 
                             <div class="rk-rating-quote">
 
-                                "{{ $rating->ulasan ?? 'Pelayanan sangat baik.' }}"
+"{{ $rating->komentar ?? 'Pelayanan sangat baik.' }}"
 
                             </div>
 
@@ -2828,7 +3202,7 @@ html {
                                     <img
                                         src="{{ asset('storage/' . $rating->foto_user) }}"
                                         class="rk-rating-avatar"
-                                        alt="{{ $rating->nama }}"
+                                   alt="{{ $rating->nama ?? 'Pengguna RentalKu' }}"
                                     >
 
                                 @else
@@ -2846,14 +3220,14 @@ html {
 
                                     <div class="rk-rating-name">
 
-                                        {{ $rating->nama }}
+                                    {{ $rating->nama ?? 'Pengguna RentalKu' }}
 
                                     </div>
 
 
                                     <div class="rk-rating-car">
 
-                                        {{ $rating->nama_mobil }}
+                                  {{ $rating->nama_mobil ?? 'Mobil RentalKu' }}
 
                                     </div>
 
@@ -2895,17 +3269,13 @@ html {
             </div>
 
 
-            <h2 class="rk-section-title">
-                Pertanyaan yang sering ditanyakan.
-            </h2>
+           <h2 class="rk-section-title">
+    {{ $landing['faq_title'] ?? 'Pertanyaan yang sering ditanyakan.' }}
+</h2>
 
-
-            <p class="rk-section-description">
-
-                Temukan jawaban dari beberapa pertanyaan
-                yang sering ditanyakan pelanggan.
-
-            </p>
+<p class="rk-section-description">
+    {{ $landing['faq_description'] ?? 'Temukan jawaban dari beberapa pertanyaan yang sering ditanyakan pelanggan.' }}
+</p>
 
         </div>
 
@@ -2991,20 +3361,17 @@ html {
                     </div>
 
 
-                    <h2>
+<h2>
 
-                        Siap memulai
-                        perjalananmu?
+    {{ $landing['cta_title'] ?? 'Siap memulai perjalananmu?' }}
 
-                    </h2>
+</h2>
 
+<p>
 
-                    <p>
+    {{ $landing['cta_description'] ?? 'Pilih mobil favoritmu dan lakukan rental dengan mudah bersama RentalKu.' }}
 
-                        Pilih mobil favoritmu dan lakukan rental
-                        dengan mudah bersama Rentalku.
-
-                    </p>
+</p>
 
                 </div>
 
@@ -3459,8 +3826,17 @@ $(function () {
 
     }
 
+         window.salinKupon = function (kode) {
+            navigator.clipboard.writeText(kode)
+                .then(function () {
+                    alert('Kode kupon berhasil disalin: ' + kode);
+                })
+                .catch(function () {
+                    alert('Gagal menyalin kode kupon.');
+                });
+        };
 
-});
+    }); // Penutup $(function () {
 
 </script>
 

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Rating;
+use App\Models\Supir;
 
 class Rental extends Model
 {
@@ -18,6 +20,8 @@ class Rental extends Model
         'subtotal',
         'deposit',
         'total_harga',
+        'kode_promo',
+        'diskon',
         'status',
         'catatan',
     ];
@@ -54,4 +58,27 @@ class Rental extends Model
             'rental_id'
         );
     }
+    
+public function rating()
+{
+    return $this->hasOne(
+        Rating::class,
+        'booking_id',
+        'id'
+    );
+}
+
+
+public function supirs()
+{
+    return $this->belongsToMany(
+        Supir::class,
+        'rental_supir',
+        'rental_id',
+        'supir_id'
+    )->withPivot([
+        'tarif_perhari',
+        'sub_total',
+    ]);
+}
 }

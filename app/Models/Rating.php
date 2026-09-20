@@ -9,16 +9,16 @@ class Rating extends Model
     protected $table = 'ratings';
 
     protected $fillable = [
-        'rental_id',
+        'booking_id',
         'customer_id',
         'staff_id',
         'rating',
         'komentar',
     ];
 
-    public function rental()
+    public function booking()
     {
-        return $this->belongsTo(Rental::class, 'rental_id');
+        return $this->belongsTo(Rental::class, 'booking_id');
     }
 
     public function customer()

@@ -99,7 +99,7 @@ class PemeriksaanKendaraanController extends Controller
                 'jenis' => $p->jenis,
                 'kondisi' => $p->kondisi,
                 'tanggal' => $p->tanggal?->format('d/m/Y H:i'),
-                'kerusakan' => $kerusakan->pluck('jenis_kerusakan')->all(),
+             'kerusakan' => $kerusakan->pluck('jenis_kerusakan')->implode(', '),
                 'kerusakan_ids' => $kerusakan->keys()->all(),
                 'keterangan' => $kerusakan->mapWithKeys(fn ($k) => [$k->id => $k->pivot->keterangan])->all(),
                 'catatan' => $p->catatan ?? '-',
