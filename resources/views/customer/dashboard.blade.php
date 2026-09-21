@@ -2066,7 +2066,7 @@
                         </div>
 
                         <p class="rk-stat-number">
-                            Rp 0
+                            Rp {{ number_format($rentals->sum('total_harga'), 0, ',', '.') }}
                         </p>
 
                     </div>
@@ -2267,136 +2267,125 @@
 
 
                                 {{-- =================================================
-                                     PEMBAYARAN
+                                     PEMBAYARAN DAN RATING
                                 ================================================== --}}
 
-                                @if($rental->status === 'Disetujui')
+                                @if ($rental->status === 'Menunggu')
 
+                                    <div class="rk-payment-alert rk-payment-warning">
+                                        <i class="bi bi-hourglass-split"></i>
+                                        <div>
+                                            <strong>Menunggu Persetujuan Admin</strong>
+                                            <br>
+                                            Pengajuan rental sedang diperiksa oleh admin.
+                                        </div>
+                                    </div>
 
-                                    @if(!$rental->pembayaran)
+                                @elseif ($rental->status === 'Disetujui')
 
-                                        <a
-                                            href="{{ route('pembayaran.create', $rental->id) }}"
-                                            class="rk-payment-button"
-                                        >
+                                    @if (!$rental->pembayaran)
 
+                                        <div class="rk-payment-alert rk-payment-success mb-3">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            <div>
+                                                <strong>Rental Disetujui</strong>
+                                                <br>
+                                                Silakan lakukan pembayaran untuk melanjutkan rental.
+                                            </div>
+                                        </div>
+
+                                        <a href="{{ route('pembayaran.create', $rental->id) }}"
+                                           class="rk-payment-button">
                                             <i class="bi bi-credit-card"></i>
-
                                             Bayar Sekarang
-
                                         </a>
 
-
-                                    @elseif($rental->pembayaran->status === 'Menunggu')
-
+                                    @elseif ($rental->pembayaran->status === 'Menunggu')
 
                                         <div class="rk-payment-alert rk-payment-info">
-
                                             <i class="bi bi-clock-history"></i>
-
                                             <div>
-
-                                                Bukti pembayaran sudah dikirim
-                                                dan sedang menunggu verifikasi admin.
-
+                                                Bukti pembayaran sudah dikirim dan sedang menunggu
+                                                verifikasi admin.
                                             </div>
-
                                         </div>
 
-
-                                    @elseif($rental->pembayaran->status === 'Disetujui')
-
+                                    @elseif ($rental->pembayaran->status === 'Disetujui')
 
                                         <div class="rk-payment-alert rk-payment-success">
-
                                             <i class="bi bi-check-circle-fill"></i>
-
                                             <div>
-
-                                                Pembayaran sudah diverifikasi admin.
-
+                                                Pembayaran sudah diverifikasi oleh admin.
+                                                <br>
+                                                Silakan menunggu proses rental.
                                             </div>
-
                                         </div>
 
+                                    @elseif ($rental->pembayaran->status === 'Ditolak')
 
-                                    @elseif($rental->pembayaran->status === 'Ditolak')
+                                        <div class="rk-payment-alert rk-payment-danger mb-3">
+                                            <i class="bi bi-x-circle"></i>
+                                            <div>
+                                                Pembayaran ditolak oleh admin. Silakan upload ulang
+                                                bukti pembayaran.
+                                            </div>
+                                        </div>
 
-
-                                        <a
-                                            href="{{ route('pembayaran.create', $rental->id) }}"
-                                            class="rk-upload-button"
-                                        >
-
+                                        <a href="{{ route('pembayaran.create', $rental->id) }}"
+                                           class="rk-upload-button">
                                             <i class="bi bi-arrow-repeat"></i>
-
                                             Upload Ulang Pembayaran
-
                                         </a>
 
                                     @endif
 
+                                @elseif ($rental->status === 'Berjalan')
 
-                                @elseif($rental->status === 'Menunggu')
-
-
-                                    <div class="rk-payment-alert rk-payment-warning">
-
-                                        <i class="bi bi-hourglass-split"></i>
-
+                                    <div class="rk-payment-alert rk-payment-info">
+                                        <i class="bi bi-car-front-fill"></i>
                                         <div>
-
-                                            Menunggu persetujuan admin sebelum
-                                            melakukan pembayaran.
-
+                                            Rental sedang berjalan. Selamat menikmati perjalananmu!
                                         </div>
-
                                     </div>
 
+                                @elseif ($rental->status === 'Selesai')
 
-                                @elseif($rental->status === 'Ditolak')
+                                    <div class="rk-payment-alert rk-payment-success mb-3">
+                                        <i class="bi bi-check2-circle"></i>
+                                        <div>
+                                            Rental telah selesai.
+                                        </div>
+                                    </div>
 
+                                    @if (!$rental->rating)
+
+                                        <a href="{{ route('customer.ratings.create', $rental->id) }}"
+                                           class="rk-payment-button">
+                                            <i class="bi bi-star-fill"></i>
+                                            Berikan Rating
+                                        </a>
+
+                                    @else
+
+                                        <div class="rk-payment-alert rk-payment-success">
+                                            <i class="bi bi-star-fill"></i>
+                                            <div>
+                                                Kamu sudah memberikan ulasan untuk rental ini.
+                                            </div>
+                                        </div>
+
+                                    @endif
+
+                                @elseif ($rental->status === 'Ditolak')
 
                                     <div class="rk-payment-alert rk-payment-danger">
-
                                         <i class="bi bi-x-circle"></i>
-
                                         <div>
-
-                                            Pengajuan rental ditolak.
-
+                                            Pengajuan rental ditolak oleh admin.
                                         </div>
-
                                     </div>
 
-
-                             
-@elseif($rental->status === 'Selesai')
-
-    <div class="rk-payment-alert rk-payment-success mb-3">
-        <i class="bi bi-check2-circle"></i>
-        <div>
-            Rental telah selesai.
-        </div>
-    </div>
-
-    @if (!$rental->rating)
-        <a
-            href="{{ route('customer.ratings.create', $rental->id) }}"
-            class="rk-payment-button"
-        >
-            <i class="bi bi-star-fill"></i>
-            Berikan Ulasan
-        </a>
-    @else
-        <div class="rk-payment-alert rk-payment-success">
-            <i class="bi bi-star-fill"></i>
-            <div>
-                Kamu sudah memberikan ulasan untuk rental ini.
-            </div>
-        </div>
-    @endif
-@endif
+                                @endif
 
                                 {{-- TOMBOL ULASAN UNTUK RENTAL SELESAI --}}
 

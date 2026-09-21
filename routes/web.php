@@ -162,9 +162,15 @@ Route::middleware('customer')->group(function () {
     Route::post('/customer/pembayaran/{rental}', [PembayaranController::class, 'store'])
         ->name('pembayaran.store');
 
-        Route::post('/customer/checkout/{mobil}', [RentalController::class, 'checkout'])
+      // MENYIAPKAN CHECKOUT DARI FORM RENTAL
+Route::post('/customer/checkout/{mobil}', [RentalController::class, 'checkout'])
     ->name('rentals.checkout');
 
+// MENAMPILKAN HALAMAN CHECKOUT
+Route::get('/customer/checkout/{mobil}', [RentalController::class, 'showCheckout'])
+    ->name('rentals.checkout.show');
+
+// KONFIRMASI DAN MENYIMPAN RENTAL
 Route::post('/customer/checkout/confirm/{mobil}', [RentalController::class, 'confirmCheckout'])
     ->name('rentals.checkout.confirm');
 });

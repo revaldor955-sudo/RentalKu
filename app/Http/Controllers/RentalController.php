@@ -519,11 +519,10 @@ class RentalController extends Controller
             ],
         ]);
 
-        $checkoutUrl = route(
-            'rentals.checkout',
-            $mobil->id
-        );
-
+$checkoutUrl = route(
+    'rentals.checkout.show',
+    ['mobil' => $mobil->id]
+);
         if ($isAjax) {
             return response()->json([
                 'success' => true,
@@ -547,6 +546,46 @@ class RentalController extends Controller
             )
         );
     }
+
+
+    /**
+ * Menampilkan halaman checkout rental
+ */
+public function showCheckout(Mobil $mobil)
+{
+    $checkout = session('checkout_rental');
+
+if (!$checkout) {
+    return redirect()
+        ->route('customer.dashboard')
+        ->with('error', 'Data checkout tidak ditemukan. Silakan ulangi proses booking.');
+}
+
+    if ((int) ($checkout['mobil_id'] ?? 0) !== (int) $mobil->id) {
+        return redirect()
+            ->route('home')
+            ->with('error', 'Data checkout tidak sesuai dengan mobil.');
+    }
+
+    $supir = null;
+
+    if (!empty($checkout['supir_id'])) {
+        $supir = Supir::find($checkout['supir_id']);
+    }
+
+    return view('customer.checkout', [
+        'mobil' => $mobil,
+        'checkout' => $checkout,
+        'supir' => $supir,
+        'jumlahHari' => $checkout['jumlah_hari'] ?? 0,
+        'subtotalMobil' => $checkout['subtotal_mobil'] ?? 0,
+        'subtotalSupir' => $checkout['subtotal_supir'] ?? 0,
+        'deposit' => $checkout['deposit'] ?? 0,
+        'diskon' => $checkout['diskon'] ?? 0,
+        'totalHarga' => $checkout['total_harga'] ?? 0,
+    ]);
+}
+
 
  /**
  * Konfirmasi checkout dan simpan rental
