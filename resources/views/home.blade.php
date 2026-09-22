@@ -3295,7 +3295,7 @@ html {
                             class="accordion-button {{ $key !== 0 ? 'collapsed' : '' }}"
                             type="button"
                             data-bs-toggle="collapse"
-                            data-bs-target="#rkFaq{{ $faq->id_faq }}"
+                            data-bs-target="#rkFaq{{ $faq->id }}"
                         >
 
                             {{ $faq->pertanyaan }}
@@ -3306,7 +3306,7 @@ html {
 
 
                     <div
-                        id="rkFaq{{ $faq->id_faq }}"
+                        id="rkFaq{{ $faq->id }}"
                         class="accordion-collapse collapse {{ $key === 0 ? 'show' : '' }}"
                         data-bs-parent="#faqAccordion"
                     >

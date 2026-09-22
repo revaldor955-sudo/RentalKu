@@ -1,7 +1,5 @@
-{{-- NAVBAR ADMIN --}}
-{{-- Partial self-contained: memuat style navbar dan markup navbar. --}}
-{{-- Bootstrap CSS/JS TIDAK dimuat di sini — setiap halaman memuatnya sendiri di <head>. --}}
-{{-- Dipakai oleh SEMUA halaman admin via @include('layouts.partials.admin-navbar'). --}}
+
+{{-- NAVBAR ADMIN RENTALKU --}}
 
 <style>
     .navbar {
@@ -16,6 +14,22 @@
     }
 
     .brand span {
+        color: #198754;
+    }
+
+    .nav-link-custom {
+        color: #526158;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        padding: 10px 14px;
+        border-radius: 10px;
+        transition: .2s;
+    }
+
+    .nav-link-custom:hover,
+    .nav-link-custom.active {
+        background: #e8f8ef;
         color: #198754;
     }
 
@@ -48,18 +62,57 @@
 
         <div class="d-flex justify-content-between align-items-center w-100">
 
-            <a href="{{ route('admin.dashboard') }}" class="text-decoration-none brand">
+            {{-- LOGO --}}
+
+            <a href="{{ route('admin.dashboard') }}"
+                class="text-decoration-none brand">
+
                 Rental<span>ku</span>.
+
             </a>
+
+
+            {{-- MENU --}}
 
             <div class="d-flex gap-2 align-items-center">
 
-                <a href="#" class="user-box d-none d-md-flex text-decoration-none text-dark"
-                   data-bs-toggle="modal" data-bs-target="#profileModal">
+                <a href="{{ route('admin.dashboard') }}"
+                    class="nav-link-custom d-none d-md-block">
+
+                    <i class="bi bi-grid me-1"></i>
+
+                    Dashboard
+
+                </a>
+
+
+                <a href="{{ route('faqs.index') }}"
+                    class="nav-link-custom">
+
+                    <i class="bi bi-question-circle me-1"></i>
+
+                    FAQ
+
+                </a>
+
+
+                {{-- PROFIL --}}
+
+                <a href="#"
+                    class="user-box d-none d-md-flex text-decoration-none text-dark"
+                    data-bs-toggle="modal"
+                    data-bs-target="#profileModal">
+
                     <div class="user-icon">
+
                         <i class="bi bi-person"></i>
+
                     </div>
-                    <span>{{ Auth::user()?->name ?? 'Admin' }}</span>
+
+                    <span>
+                        {{ Auth::user()?->name ?? 'Admin' }}
+                    </span>
+
                 </a>
 
             </div>
@@ -69,5 +122,7 @@
     </div>
 </nav>
 
-{{-- MODAL PROFIL (partial bersama admin/staff/customer) --}}
+
+{{-- MODAL PROFIL --}}
+
 @include('layouts.partials.profile-modal')
