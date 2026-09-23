@@ -23,7 +23,7 @@
 
         body {
             background: #f6f8f7;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
             color: #1f2937;
         }
 
@@ -190,17 +190,23 @@
             font-weight: 700;
             width: 100%;
         }
-.swal2-container textarea[name="catatan"] {
-    pointer-events: auto !important;
-    user-select: text !important;
-    -webkit-user-select: text !important;
-    cursor: text !important;
-    position: relative;
-    z-index: 9999;
-}
+
         .btn-rental:hover {
             background: #146c43;
             color: white;
+        }
+
+        .btn-back {
+            border: 1px solid #dfe5e1;
+            background: white;
+            color: #374151;
+            border-radius: 13px;
+            padding: 13px 20px;
+            font-weight: 600;
+        }
+
+        .btn-back:hover {
+            background: #f5f7f6;
         }
 
         .section-title {
@@ -228,7 +234,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -307,6 +313,7 @@
 
         <div class="row g-0">
 
+            {{-- FOTO --}}
             <div class="col-lg-6 p-3 p-md-4">
 
                @if($mobil->image)
@@ -363,10 +370,6 @@
                    <p class="car-subtitle">
     <i class="bi bi-car-front me-1"></i>
 
-    {{ $mobil->brand->name ?? '-' }}
-
-    ·
-
     {{ $mobil->tipeMobil->name ?? '-' }}
 </p>
 
@@ -390,7 +393,7 @@
 
 
                    
-                   <div class="row g-3 mt-2">
+<div class="row g-3 mt-2">
 
     <div class="col-6">
 
@@ -686,7 +689,7 @@
 <div id="sewaFormTemplate" class="d-none">
 
     <form
-      action="{{ route('rentals.checkout', $mobil->id) }}"
+        action="{{ route('rentals.store', $mobil->id) }}"
         method="POST"
         id="sewaForm">
 
@@ -763,7 +766,7 @@
                     name="tanggal_mulai"
                     class="form-control"
                     min="{{ date('Y-m-d') }}"
-                    value="{{ old('tanggal_mulai') }}"
+                    value="{{ old('tanggal_mulai', date('Y-m-d')) }}"
                     required>
 
             </div>
@@ -778,24 +781,25 @@
                     type="date"
                     name="tanggal_selesai"
                     class="form-control"
-                    min="{{ date('Y-m-d') }}"
-                    value="{{ old('tanggal_selesai') }}"
+                    min="{{ date('Y-m-d', strtotime('+1 day')) }}"
+                    value="{{ old('tanggal_selesai', date('Y-m-d', strtotime('+1 day'))) }}"
                     required>
 
             </div>
 
-          <div class="col-12">
-    <label class="form-label fw-semibold">
-        Catatan
-    </label>
+            <div class="col-12">
 
-    <textarea
-        name="catatan"
-        class="form-control"
-        placeholder="Catatan tambahan jika diperlukan..."
-        rows="4"
-    ></textarea>
-</div>
+                <label class="form-label fw-semibold">
+                    Catatan
+                </label>
+
+                <textarea
+                    name="catatan"
+                    class="form-control"
+                    rows="3"
+                    placeholder="Catatan tambahan jika diperlukan...">{{ old('catatan') }}</textarea>
+
+            </div>
 
             <div class="col-12">
 
@@ -827,100 +831,149 @@
 
 </div>
 
-    </div>
-
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script
+    src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    function openSewaPopup() {
 
-      var template = $('#sewaFormTemplate').last().html();
+    function openSewaPopup() {
+        var $template = $('#sewaFormTemplate');
+        if (!$template.length) return;
+
+        if ($('.badge-available').length === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: 'Mobil sedang tidak tersedia.',
+            });
+            return;
+        }
 
         Swal.fire({
             title: 'Sewa {{ $mobil->name }}',
-            html: template,
+            html: $template.html(),
             width: 600,
             showConfirmButton: false,
-            showCloseButton: true,
-            focusConfirm: false,
-            allowOutsideClick: false,
+            didOpen: function() {
+                var $form = $('#swal2-html-container form');
 
-          didOpen: function () {
+                $form.on('submit', function(event) {
+                    event.preventDefault();
 
-    const popup = Swal.getPopup();
-    const form = popup.querySelector('form');
+                    var formData = new FormData($form[0]);
 
-    const fields = popup.querySelectorAll(
-        'input, select, textarea, button'
-    );
+                    Swal.showLoading();
 
-    fields.forEach(function (field) {
-        field.disabled = false;
-        field.readOnly = false;
-        field.style.pointerEvents = 'auto';
-    });
+                    $.ajax({
+                        url: $form.attr('action'),
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        data: formData,
+                        processData: false,
+                        contentType: false
+                    })
+                    .done(function(data, textStatus, xhr) {
+                        Swal.hideLoading();
 
-    const catatan = popup.querySelector(
-        'textarea[name="catatan"]'
-    );
+                        if (xhr.status !== 200) {
+                            var firstError = data.errors
+                                ? Object.values(data.errors).flat()[0]
+                                : (data.message || 'Terjadi kesalahan.');
 
-    if (catatan) {
-        catatan.removeAttribute('readonly');
-        catatan.removeAttribute('disabled');
-        catatan.disabled = false;
-        catatan.readOnly = false;
-        catatan.style.pointerEvents = 'auto';
-        catatan.style.cursor = 'text';
-    }
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: firstError,
+                            });
+                            return;
+                        }
 
-    const tanggalMulai = popup.querySelector(
-        'input[name="tanggal_mulai"]'
-    );
-
-    const tanggalSelesai = popup.querySelector(
-        'input[name="tanggal_selesai"]'
-    );
-
-    if (tanggalMulai && tanggalSelesai) {
-
-        tanggalMulai.addEventListener('change', function () {
-
-            tanggalSelesai.min = tanggalMulai.value;
-
-            if (
-                tanggalSelesai.value &&
-                tanggalSelesai.value < tanggalMulai.value
-            ) {
-                tanggalSelesai.value = '';
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: data.message || 'Pengajuan sewa mobil berhasil dibuat.',
+                            confirmButtonText: 'OK',
+                        }).then(function() {
+                            window.location.href = '{{ route('customer.dashboard') }}';
+                        });
+                    })
+                    .fail(function() {
+                        Swal.hideLoading();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Koneksi bermasalah. Silakan coba lagi.',
+                        });
+                    });
+                });
             }
-
         });
-
     }
 
-    $(form).on('submit', function () {
+</script>
 
-        const tombol = form.querySelector(
-            'button[type="submit"]'
-        );
+{{-- GoodUI #13/#28/#33: client-side convenience untuk form sewa (validasi server tetap sumber kebenaran).
+     Delegated agar jalan di konten dinamis (inject SweetAlert via $template.html());
+     tidak bind saat load ke elemen di dalam #sewaFormTemplate. --}}
+<script>
+(function () {
+    if (window.__sewaGoodUIInit) return;
+    window.__sewaGoodUIInit = true;
 
-        if (tombol) {
+    function sewaFormOf(el) {
+        return el && el.closest ? el.closest('form') : null;
+    }
 
-            tombol.disabled = true;
-
-            tombol.innerHTML =
-                '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
-
+    // Delegated change: pakai $(document).on bila jQuery ada, fallback native.
+    function onDocChange(selector, fn) {
+        if (window.jQuery) {
+            window.jQuery(document).on('change', selector, function (e) { fn(e, this); });
+        } else {
+            document.addEventListener('change', function (e) {
+                if (e.target && e.target.matches && e.target.matches(selector)) fn(e, e.target);
+            });
         }
+    }
 
+    function clearDateError(form) {
+        form.querySelectorAll('.sewa-date-error').forEach(function (n) { n.remove(); });
+    }
+
+    // #13: cabang-kembali mengikuti cabang-ambil selama masih placeholder/kosong.
+    onDocChange('select[name="cabang_ambil_id"]', function (e, el) {
+        var form = sewaFormOf(el);
+        if (!form) return;
+        var kembali = form.querySelector('select[name="cabang_kembali_id"]');
+        if (kembali && !kembali.value) kembali.value = el.value;
     });
 
-}
-});
-    }
-    
+    // #33: hapus catatan inline saat tanggal diubah / submit diulang.
+    onDocChange('input[name="tanggal_mulai"], input[name="tanggal_selesai"]', function (e, el) {
+        var form = sewaFormOf(el);
+        if (form) clearDateError(form);
+    });
+
+    // #33: cegah submit bila rentang salah — capture agar jalan SEBELUM handler AJAX existing.
+    document.addEventListener('submit', function (e) {
+        var form = e.target;
+        if (!form || !form.querySelector) return;
+        var mulai = form.querySelector('input[name="tanggal_mulai"]');
+        var selesai = form.querySelector('input[name="tanggal_selesai"]');
+        if (!mulai || !selesai) return;
+        clearDateError(form);
+        if (mulai.value && selesai.value && selesai.value <= mulai.value) {
+            e.preventDefault();
+            e.stopPropagation();
+            var note = document.createElement('div');
+            note.className = 'sewa-date-error text-danger small mt-1';
+            note.textContent = 'Tanggal selesai harus setelah tanggal mulai.';
+            selesai.after(note);
+        }
+    }, true);
+})();
 </script>
 
 </body>

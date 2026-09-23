@@ -5,13 +5,16 @@ use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CabangController;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboardController;
+use App\Http\Controllers\DendaController;
 use App\Http\Controllers\DokumenMobilController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\FasilitasController;
 use App\Http\Controllers\FotoMobilController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KerusakanMobilController;
+use App\Http\Controllers\KompensasiController;
 use App\Http\Controllers\KuponController;
+use App\Http\Controllers\ServisMobilController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\MetodePembayaranController;
 use App\Http\Controllers\MobilController;
@@ -25,10 +28,12 @@ use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 use App\Http\Controllers\SupirController;
 use App\Http\Controllers\TipeMobilController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\CustomerRatingController;
-use App\Http\Controllers\Admin\LandingSettingController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
+// Master data: khusus admin.
+Route::middleware('admin')->group(function () {
+Route::get('roles/data', [RoleController::class, 'data'])->name('roles.data');
 
 Route::resource('roles', RoleController::class)
     ->except(['create', 'edit', 'show']);
@@ -38,8 +43,12 @@ Route::get('brands/data', [BrandController::class, 'data'])->name('brands.data')
 Route::resource('brands', BrandController::class)
     ->except(['create', 'edit']);
 
+Route::get('tipe_mobils/data', [TipeMobilController::class, 'data'])->name('tipe_mobils.data');
+
 Route::resource('tipe_mobils', TipeMobilController::class)
     ->except(['create', 'edit', 'show']);
+
+Route::get('cabangs/data', [CabangController::class, 'data'])->name('cabangs.data');
 
 Route::resource('cabangs', CabangController::class)
     ->except(['create', 'edit', 'show']);
@@ -50,19 +59,22 @@ Route::get('/fasilitas/data', [FasilitasController::class, 'data'])
 Route::resource('fasilitas', FasilitasController::class)
     ->except(['create', 'edit', 'show']);
 
+Route::get('metode_pembayarans/data', [MetodePembayaranController::class, 'data'])->name('metode_pembayarans.data');
+
 Route::resource('metode_pembayarans', MetodePembayaranController::class)
     ->except(['create', 'edit', 'show']);
 
-Route::middleware(['auth'])->group(function () {
-    Route::resource('supirs', SupirController::class)
-        ->except(['create', 'edit', 'show']);
-});
+Route::get('supirs/data', [SupirController::class, 'data'])->name('supirs.data');
+
+Route::resource('supirs', SupirController::class)
+    ->except(['create', 'edit', 'show']);
 
 Route::get('/kupons/data', [KuponController::class, 'data'])
     ->name('kupons.data');
 
 Route::resource('kupons', KuponController::class)
     ->except(['create', 'edit', 'show']);
+}); // end admin master data
 
 Route::resource('mobils', MobilController::class)
     ->except(['create', 'edit', 'show', 'update', 'destroy'])
@@ -86,26 +98,61 @@ Route::middleware('admin')->group(function () {
         ->name('mobils.destroy');
 });
 
+// Master penunjang mobil: khusus admin.
+Route::middleware('admin')->group(function () {
+Route::get('kerusakan_mobils/data', [KerusakanMobilController::class, 'data'])->name('kerusakan_mobils.data');
+
 Route::resource('kerusakan_mobils', KerusakanMobilController::class)
     ->except(['create', 'edit', 'show']);
+
+Route::get('foto_mobils/data', [FotoMobilController::class, 'data'])->name('foto_mobils.data');
 
 Route::resource('foto_mobils', FotoMobilController::class)
     ->except(['create', 'edit', 'show']);
 
+Route::get('dokumen_mobils/data', [DokumenMobilController::class, 'data'])->name('dokumen_mobils.data');
+
 Route::resource('dokumen_mobils', DokumenMobilController::class)
     ->except(['create', 'edit', 'show']);
+}); // end admin master penunjang mobil
 
+Route::get('dendas/data', [DendaController::class, 'data'])->name('dendas.data')->middleware('adminstaff');
+
+Route::resource('dendas', DendaController::class)
+    ->except(['create', 'edit', 'show'])
+    ->middleware('adminstaff');
+
+Route::middleware('adminstaff')->group(function () {
+    Route::put('/dendas/{denda}/status', [DendaController::class, 'updateStatus'])
+        ->name('dendas.updateStatus');
+});
+
+Route::get('kompensasis/data', [KompensasiController::class, 'data'])->name('kompensasis.data')->middleware('adminstaff');
+
+Route::resource('kompensasis', KompensasiController::class)
+    ->except(['create', 'edit', 'show'])
+    ->middleware('adminstaff');
+
+Route::get('servis_mobils/data', [ServisMobilController::class, 'data'])->name('servis_mobils.data')->middleware('adminstaff');
+
+Route::resource('servis_mobils', ServisMobilController::class)
+    ->middleware('adminstaff');
+
+// Master konten: khusus admin.
+Route::middleware('admin')->group(function () {
 Route::resource('banners', BannerController::class)
     ->except(['create', 'edit', 'show']);
 
 Route::get('banners/data', [BannerController::class, 'data'])->name('banners.data');
 
-Route::middleware('adminstaff')->group(function () {
-    Route::resource('faqs', FaqController::class)
-        ->except(['create', 'edit', 'show']);
-});
+Route::get('faqs/data', [FaqController::class, 'data'])->name('faqs.data');
+
+Route::resource('faqs', FaqController::class)
+    ->except(['create', 'edit', 'show']);
+}); // end admin master konten
 
 Route::get('/', [HomeController::class, 'index'])
+    ->middleware('guest')
     ->name('home');
 
 Route::get('/dashboard', function () {
@@ -153,6 +200,9 @@ Route::get('/customer/dashboard', [CustomerDashboardController::class, 'index'])
     ->middleware('customer')
     ->name('customer.dashboard');
 Route::middleware('customer')->group(function () {
+    Route::get('/customer/mobils/search', [CustomerDashboardController::class, 'search'])
+        ->name('customer.mobils.search');
+
     Route::post('/customer/rental/{mobil}', [RentalController::class, 'store'])
         ->name('rentals.store');
 
@@ -162,14 +212,20 @@ Route::middleware('customer')->group(function () {
     Route::post('/customer/pembayaran/{rental}', [PembayaranController::class, 'store'])
         ->name('pembayaran.store');
 
-    Route::post('/customer/checkout/{mobil}', [RentalController::class, 'checkout'])
-        ->name('rentals.checkout');
+    Route::get('/customer/kompensasi', [KompensasiController::class, 'customerIndex'])
+        ->name('customer.kompensasi.index');
 
-    Route::get('/customer/checkout/{mobil}', [RentalController::class, 'showCheckout'])
-        ->name('rentals.checkout.show');
+    Route::get('/customer/kompensasi/data', [KompensasiController::class, 'customerData'])
+        ->name('customer.kompensasi.data');
 
-    Route::post('/customer/checkout/confirm/{mobil}', [RentalController::class, 'confirmCheckout'])
-        ->name('rentals.checkout.confirm');
+    Route::get('/customer/kompensasi/create', [KompensasiController::class, 'customerCreate'])
+        ->name('customer.kompensasi.create');
+
+    Route::post('/customer/kompensasi', [KompensasiController::class, 'store'])
+        ->name('customer.kompensasi.store');
+
+    Route::post('/customer/dendas/{denda}/bayar', [DendaController::class, 'customerBayar'])
+        ->name('customer.dendas.bayar');
 });
 
 Route::middleware('adminstaff')->group(function () {
@@ -230,22 +286,9 @@ Route::middleware('adminstaff')->group(function () {
 });
 
 Route::middleware('adminstaff')->group(function () {
+
     Route::get('/laporan', [LaporanController::class, 'index'])
         ->name('laporan.index');
 });
-
-Route::middleware(['auth', 'customer'])->group(function () {
-    Route::get('/customer/ratings/create/{rental}', [CustomerRatingController::class, 'create'])
-        ->name('customer.ratings.create');
-
-    Route::post('/customer/ratings/{rental}', [CustomerRatingController::class, 'store'])
-        ->name('customer.ratings.store');
-});
-
-Route::get('/admin/landing-settings', [LandingSettingController::class, 'edit'])
-    ->name('admin.landing-settings.edit');
-
-Route::put('/admin/landing-settings', [LandingSettingController::class, 'update'])
-    ->name('admin.landing-settings.update');
 
 require __DIR__.'/auth.php';

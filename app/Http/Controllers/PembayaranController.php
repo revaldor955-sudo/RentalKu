@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class PembayaranController extends Controller
 {
-    /**
-     * MANAGEMENT PEMBAYARAN ADMIN
-     */
     public function index()
     {
         return view('admin.pembayaran.index');
@@ -50,21 +47,29 @@ class PembayaranController extends Controller
         $columns = [
             0 => null,
             1 => 'users.name',
-            2 => 'mobils.name',
-            3 => 'metode_pembayarans.name',
-            4 => 'pembayarans.tanggal_bayar',
-            5 => 'pembayarans.jumlah',
-            6 => null,
+            2 => null,
+            3 => 'mobils.name',
+            4 => 'metode_pembayarans.name',
+            5 => 'pembayarans.tanggal_bayar',
+            6 => 'pembayarans.jumlah',
             7 => 'pembayarans.status',
             8 => null,
         ];
 
-        $orderColumn = $request->input('order.0.column', 4);
-        $orderDir = $request->input('order.0.dir', 'desc');
+        $orders = $request->input('order', [['column' => 5, 'dir' => 'desc']]);
+        $applied = false;
 
-        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
-            $query->orderBy($columns[$orderColumn], $orderDir);
-        } else {
+        foreach ($orders as $o) {
+            $c = $o['column'] ?? null;
+            $d = (($o['dir'] ?? 'asc') === 'desc') ? 'desc' : 'asc';
+
+            if (isset($columns[$c]) && $columns[$c]) {
+                $query->orderBy($columns[$c], $d);
+                $applied = true;
+            }
+        }
+
+        if (! $applied) {
             $query->orderBy('pembayarans.tanggal_bayar', 'desc');
         }
 
@@ -94,8 +99,16 @@ class PembayaranController extends Controller
         ]);
     }
 
+    /**
+     * Detail pembayaran untuk modal popup (AJAX)
+     */
     public function detail(Pembayaran $pembayaran)
     {
+        // Ownership check: customer hanya bisa lihat pembayaran rental sendiri
+        if (auth()->user()->roles_id === 3 && $pembayaran->rental->user_id !== auth()->id()) {
+            abort(403, 'Anda tidak memiliki akses ke pembayaran ini.');
+        }
+
         $pembayaran->load([
             'rental.user',
             'rental.mobil',
@@ -120,6 +133,25 @@ class PembayaranController extends Controller
         ]);
     }
 
+    /**
+     * Rekening yang boleh dipakai untuk satu cabang: milik cabang itu;
+     * kalau cabang belum punya, pakai milik pusat.
+     */
+    private function metodeUntukCabang($cabangId)
+    {
+        $milikCabang = MetodePembayaran::where('cabang_id', $cabangId)
+            ->orderBy('name')
+            ->get();
+
+        if ($milikCabang->isNotEmpty()) {
+            return $milikCabang;
+        }
+
+        return MetodePembayaran::whereNull('cabang_id')
+            ->orderBy('name')
+            ->get();
+    }
+
     public function create(Rental $rental)
     {
         if ($rental->user_id != Auth::id()) {
@@ -132,7 +164,7 @@ class PembayaranController extends Controller
                 ->with('error', 'Rental belum disetujui.');
         }
 
-        $metodePembayarans = MetodePembayaran::all();
+        $metodePembayarans = $this->metodeUntukCabang($rental->cabang_ambil_id);
 
         return view('customer.pembayaran.create', compact(
             'rental',
@@ -166,6 +198,23 @@ class PembayaranController extends Controller
             'public'
         );
 
+        // Metode harus milik cabang rental (atau pusat bila cabang belum punya).
+        $metodeAllowed = $this->metodeUntukCabang($rental->cabang_ambil_id)
+            ->contains('id', (int) $validated['metode_pembayaran_id']);
+
+        if (! $metodeAllowed) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Metode pembayaran tidak tersedia untuk cabang ini.',
+                    'errors' => ['metode_pembayaran_id' => ['Metode pembayaran tidak tersedia untuk cabang ini.']],
+                ], 422);
+            }
+
+            return back()
+                ->withErrors(['metode_pembayaran_id' => 'Metode pembayaran tidak tersedia untuk cabang ini.'])
+                ->withInput();
+        }
+
         Pembayaran::create([
             'rental_id' => $rental->id,
             'metode_pembayaran_id' => $validated['metode_pembayaran_id'],
@@ -175,6 +224,12 @@ class PembayaranController extends Controller
             'status' => 'Menunggu',
         ]);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Bukti pembayaran berhasil dikirim.',
+            ]);
+        }
+
         return redirect()
             ->route('customer.dashboard')
             ->with('success', 'Bukti pembayaran berhasil dikirim.');
@@ -182,6 +237,11 @@ class PembayaranController extends Controller
 
     public function updateStatus(Request $request, Pembayaran $pembayaran)
     {
+        // Ownership check: customer tidak boleh update status
+        if (auth()->user()->roles_id === 3) {
+            abort(403, 'Anda tidak memiliki akses untuk mengubah status pembayaran.');
+        }
+
         $validated = $request->validate([
             'status' => 'required|in:Disetujui,Ditolak'
         ]);

@@ -2,21 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class PemeriksaanMobil extends Model
 {
-    use HasFactory;
-
     protected $table = 'pemeriksaan_mobils';
 
     protected $fillable = [
         'rental_id',
         'mobil_id',
-        'booking_id',
         'jenis',
         'kondisi',
         'catatan',
@@ -24,21 +18,17 @@ class PemeriksaanMobil extends Model
         'tanggal',
     ];
 
-    protected $casts = [
-        'tanggal' => 'datetime',
-    ];
-
-    public function rental(): BelongsTo
+    public function rental()
     {
         return $this->belongsTo(Rental::class, 'rental_id');
     }
 
-    public function mobil(): BelongsTo
+    public function mobil()
     {
         return $this->belongsTo(Mobil::class, 'mobil_id');
     }
 
-    public function kerusakan(): BelongsToMany
+    public function kerusakan()
     {
         return $this->belongsToMany(
             KerusakanMobil::class,

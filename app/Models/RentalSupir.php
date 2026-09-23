@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class RentalSupir extends Model
 {
-        protected $fillable = [
+    protected $table = 'rental_supir';
+
+    protected $fillable = [
         'rental_id',
         'supir_id',
         'tarif_perhari',

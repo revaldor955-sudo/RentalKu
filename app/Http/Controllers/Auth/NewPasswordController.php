@@ -16,7 +16,10 @@ use Illuminate\View\View;
 
 class NewPasswordController extends Controller
 {
-        public function create(Request $request): View
+    /**
+     * Display the password reset view.
+     */
+    public function create(Request $request): View
     {
         return view('auth.reset-password', ['request' => $request]);
     }

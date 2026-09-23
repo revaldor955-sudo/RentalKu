@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pembayaran extends Model
 {
-        protected $fillable = [
+    protected $table = 'pembayarans';
+
+    protected $fillable = [
         'rental_id',
         'metode_pembayaran_id',
         'tanggal_bayar',

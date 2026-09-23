@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Faq extends Model
 {
-        protected $fillable = [
+    protected $table = 'faqs';
+
+    protected $fillable = [
         'pertanyaan',
         'jawaban',
         'urutan',

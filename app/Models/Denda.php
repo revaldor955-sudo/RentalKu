@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Denda extends Model
 {
-        protected $fillable = [
+    protected $table = 'dendas';
+
+    protected $fillable = [
         'rental_id',
         'jenis',
         'nominal',

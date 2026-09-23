@@ -1,5 +1,5 @@
-
-
+{{-- FOOTER ADMIN/STAFF --}}
+{{-- Dipakai via @include('layouts.partials.admin-footer', ['pageTitle' => 'Management Mobil']) --}}
 <footer class="bg-white border-top py-4">
 
     <div class="container text-center">

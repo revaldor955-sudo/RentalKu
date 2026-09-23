@@ -5,571 +5,216 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Manajemen FAQ - RentalKu</title>
+    <title>Management FAQ - RentalKu</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet">
-
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/css/dataTables.bootstrap5.min.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --rk-green: #20c77a;
-            --rk-dark: #15251f;
-            --rk-bg: #f5f7f6;
-            --rk-border: #e9eeeb;
-        }
-
         body {
-            background: var(--rk-bg);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            color: #26352e;
-        }
-
-        .page-wrapper {
-            padding: 36px 28px;
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 30px;
+            background: #f5f7f6;
+            font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
+            color: #1f2937;
+            margin: 0;
         }
 
         .page-title {
-            font-size: 28px;
             font-weight: 800;
-            color: var(--rk-dark);
-            margin: 0;
         }
 
-        .page-subtitle {
-            color: #89958e;
-            font-size: 13px;
-            margin-top: 8px;
+        .page-card {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #edf0ee;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .05);
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            padding: 11px 13px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .12);
         }
 
         .btn-green {
-            background: var(--rk-green);
+            background: #198754;
+            color: white;
             border: none;
-            color: #fff;
-            padding: 13px 20px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 13px;
-            transition: .2s;
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 10px 18px;
         }
 
         .btn-green:hover {
-            background: #16a966;
-            color: #fff;
-            transform: translateY(-1px);
-        }
-
-        .stat-card {
-            background: #fff;
-            border: 1px solid var(--rk-border);
-            border-radius: 18px;
-            padding: 22px;
-            height: 100%;
-        }
-
-        .stat-icon {
-            width: 46px;
-            height: 46px;
-            border-radius: 14px;
-            background: #e6faef;
-            color: #18ad68;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 21px;
-            margin-bottom: 18px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #8a978f;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .stat-number {
-            font-size: 27px;
-            font-weight: 800;
-            color: var(--rk-dark);
-        }
-
-        .content-card {
-            background: #fff;
-            border: 1px solid var(--rk-border);
-            border-radius: 20px;
-            overflow: hidden;
-        }
-
-        .card-heading {
-            padding: 24px 26px;
-            border-bottom: 1px solid var(--rk-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .card-heading h5 {
-            font-size: 16px;
-            font-weight: 800;
-            margin: 0;
-        }
-
-        .table-responsive {
-            width: 100%;
-        }
-
-        .table {
-            margin: 0;
-            min-width: 850px;
+            background: #146c43;
+            color: white;
         }
 
         .table thead th {
-            background: #f9fbfa;
-            color: #8b9890;
-            font-size: 11px;
-            font-weight: 800;
+            background: #f8faf9;
+            color: #6c757d;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: .5px;
-            padding: 18px 22px;
-            border-bottom: 1px solid var(--rk-border);
-            white-space: nowrap;
+            border-bottom: 1px solid #e9ecef;
+            padding: 12px 16px;
         }
 
         .table tbody td {
-            padding: 20px 22px;
             vertical-align: middle;
-            font-size: 13px;
-            border-bottom: 1px solid #f0f3f1;
         }
 
-        .table tbody tr:last-child td {
-            border-bottom: none;
+        /* Sembunyikan ikon sort di semua kolom */
+        #faqs-table thead .dt-column-order {
+            display: none !important;
         }
 
-        .table tbody tr:hover {
-            background: #fcfefd;
-        }
-
-        .number-badge {
-            width: 32px;
-            height: 32px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: #effaf4;
-            color: #18a965;
-            border-radius: 10px;
-            font-weight: 800;
-            font-size: 12px;
-        }
-
-        .question-text {
-            font-weight: 700;
-            color: #26352e;
-            max-width: 280px;
-            line-height: 1.6;
-        }
-
-        .answer-text {
-            color: #87948c;
-            max-width: 300px;
-            line-height: 1.7;
-        }
-
-        .order-badge {
-            background: #f1f4f2;
-            color: #6d7c72;
-            border-radius: 8px;
-            padding: 6px 10px;
-            font-weight: 700;
-            font-size: 11px;
-        }
-
-        .action-group {
-            display: flex;
-            gap: 7px;
-        }
-
-        .btn-action {
-            width: 35px;
-            height: 35px;
-            border: none;
-            border-radius: 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: .2s;
-        }
-
-        .btn-edit {
-            background: #fff5df;
-            color: #e3a329;
-        }
-
-        .btn-edit:hover {
-            background: #ffe8b6;
-        }
-
-        .btn-delete {
-            background: #fff0f0;
-            color: #e25e5e;
-        }
-
-        .btn-delete:hover {
-            background: #ffdede;
-        }
-
-        .empty-state {
-            padding: 70px 20px;
-            text-align: center;
-        }
-
-        .empty-icon {
-            width: 65px;
-            height: 65px;
-            background: #effaf4;
-            color: #20c77a;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 20px;
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
-
-        .empty-state h6 {
-            font-weight: 800;
-            font-size: 16px;
-        }
-
-        .empty-state p {
-            color: #9aa69f;
-            font-size: 13px;
+        .modal-footer .btn {
+            padding: 6px 14px;
+            min-width: 100px;
         }
 
         .modal-content {
             border: none;
-            border-radius: 20px;
+            border-radius: 18px;
             overflow: hidden;
         }
 
-        .modal-header {
-            padding: 24px 28px;
-            border-bottom: 1px solid var(--rk-border);
+        .page-content {
+            padding: 24px;
         }
 
-        .modal-title {
-            font-size: 17px;
-            font-weight: 800;
-            color: var(--rk-dark);
-        }
-
-        .modal-body {
-            padding: 28px;
-        }
-
-        .form-label {
-            font-size: 12px;
-            font-weight: 800;
-            color: #425148;
-            margin-bottom: 9px;
-        }
-
-        .form-control {
-            border: 1px solid #e1e9e4;
-            border-radius: 11px;
-            padding: 12px 14px;
-            font-size: 13px;
-            font-family: inherit;
-        }
-
-        .form-control:focus {
-            border-color: var(--rk-green);
-            box-shadow: 0 0 0 3px rgba(32, 199, 122, .1);
-        }
-
-        textarea.form-control {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .modal-footer {
-            padding: 18px 28px;
-            border-top: 1px solid var(--rk-border);
-        }
-
-        .btn-cancel {
-            border: 1px solid #e1e9e4;
-            background: #fff;
-            color: #65746b;
-            border-radius: 11px;
-            padding: 12px 18px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .btn-submit {
-            border: none;
-            background: var(--rk-green);
-            color: #fff;
-            border-radius: 11px;
-            padding: 12px 22px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .btn-submit:hover {
-            background: #16a966;
-            color: #fff;
-        }
-
-        .alert {
-            border: none;
-            border-radius: 13px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        @media (max-width: 768px) {
-            .page-wrapper {
-                padding: 25px 15px;
-            }
-
-            .page-header {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-
-            .page-title {
-                font-size: 23px;
-            }
-
-            .card-heading {
-                padding: 20px;
-            }
-
-            .modal-body {
-                padding: 22px;
-            }
-
-            .modal-header,
-            .modal-footer {
-                padding: 20px 22px;
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
             }
         }
     </style>
+
+    @include('layouts.partials.modal-head-style')
 </head>
 
 <body>
 
-    @include('layouts.partials.admin-navbar')
+@include('layouts.partials.sidebar')
 
-    <main class="page-wrapper">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mainContent = document.getElementById('mainContent');
+        const pageContent = mainContent?.querySelector('.page-content');
 
-        <div class="page-header">
+        if (mainContent && pageContent) {
+            const navbar = document.querySelector('header.topbar');
+            if (navbar) {
+                mainContent.insertBefore(navbar, pageContent);
+            }
+        }
+    });
+</script>
 
-            <div>
-                <h1 class="page-title">
-                    Manajemen FAQ
-                </h1>
+<div class="page-content">
 
-                <p class="page-subtitle">
-                    Kelola pertanyaan dan jawaban yang ditampilkan pada website RentalKu.
-                </p>
-            </div>
+<div class="container-fluid px-4">
 
-            <button type="button"
-                class="btn btn-green"
-                data-bs-toggle="modal"
-                data-bs-target="#modalTambah">
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-                <i class="bi bi-plus-lg me-2"></i>
-                Tambah FAQ
+        <div>
+            <h2 class="page-title mb-1">
+                Management FAQ
+            </h2>
 
-            </button>
-
-        </div>
-
-
-        @if (session('success'))
-
-            <div class="alert alert-success alert-dismissible fade show mb-4"
-                role="alert">
-
-                <i class="bi bi-check-circle-fill me-2"></i>
-
-                {{ session('success') }}
-
-                <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert">
-                </button>
-
-            </div>
-
-        @endif
-
-
-        @if ($errors->any())
-
-            <div class="alert alert-danger alert-dismissible fade show mb-4"
-                role="alert">
-
-                <strong>
-                    <i class="bi bi-exclamation-circle me-2"></i>
-                    Terdapat kesalahan:
-                </strong>
-
-                <ul class="mb-0 mt-2">
-
-                    @foreach ($errors->all() as $error)
-
-                        <li>{{ $error }}</li>
-
-                    @endforeach
-
-                </ul>
-
-                <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert">
-                </button>
-
-            </div>
-
-        @endif
-
-
-        <div class="row g-4 mb-4">
-
-            <div class="col-md-4">
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        <i class="bi bi-question-circle"></i>
-                    </div>
-
-                    <div class="stat-label">
-                        TOTAL FAQ
-                    </div>
-
-                    <div class="stat-number">
-                        {{ $faqs->count() }}
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="col-md-4">
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        <i class="bi bi-chat-left-text"></i>
-                    </div>
-
-                    <div class="stat-label">
-                        DATA PERTANYAAN
-                    </div>
-
-                    <div class="stat-number">
-                        {{ $faqs->count() }}
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="col-md-4">
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        <i class="bi bi-check2-circle"></i>
-                    </div>
-
-                    <div class="stat-label">
-                        STATUS
-                    </div>
-
-                    <div class="stat-number"
-                        style="font-size: 20px; padding-top: 5px;">
-
-                        Aktif
-
-                    </div>
-
-                </div>
-
-            </div>
+            <p class="text-muted mb-0">
+                Kelola pertanyaan yang sering diajukan (FAQ).
+            </p>
 
         </div>
 
+        <button
+            type="button"
+            class="btn btn-green"
+            data-bs-toggle="modal"
+            data-bs-target="#tambahFaqModal">
 
-        <div class="content-card">
+            <i class="bi bi-plus-circle me-1"></i>
+            Tambah FAQ
 
-            <div class="card-heading">
+        </button>
 
-                <div>
+    </div>
 
-                    <h5>
-                        <i class="bi bi-list-check me-2"
-                            style="color: #20c77a;"></i>
 
-                        Daftar Pertanyaan FAQ
+    @if(session('success'))
+        <span id="flashSuccess" class="d-none">{{ session('success') }}</span>
+    @endif
 
-                    </h5>
 
-                    <small class="text-muted"
-                        style="font-size: 11px;">
+    @if($errors->any())
 
-                        Kelola seluruh FAQ RentalKu
+        <div class="alert alert-danger mb-4">
 
-                    </small>
+            <strong>
+                Terdapat kesalahan:
+            </strong>
+
+            <ul class="mb-0 mt-2">
+
+                @foreach($errors->all() as $error)
+
+                    <li>{{ $error }}</li>
+
+                @endforeach
+
+            </ul>
+
+        </div>
+
+    @endif
+
+
+    <div class="row g-4">
+
+        <div class="col-lg-12">
+
+            <div class="page-card">
+
+                <div class="p-4 border-bottom">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <h5 class="fw-bold mb-1">
+                                Daftar FAQ
+                            </h5>
+
+                            <small class="text-muted">
+                                Seluruh pertanyaan yang terdaftar.
+                            </small>
+
+                        </div>
+
+                    </div>
 
                 </div>
-
-                <span class="badge rounded-pill"
-                    style="background: #e7f9ef; color: #16a966; padding: 9px 13px;">
-
-                    {{ $faqs->count() }} Data
-
-                </span>
-
-            </div>
-
-
-            @if ($faqs->count() > 0)
 
                 <div class="table-responsive">
 
-                    <table class="table">
+                    <table class="table align-middle mb-0" id="faqs-table">
 
                         <thead>
 
                             <tr>
 
-                                <th style="width: 80px;">
+                                <th class="px-3 py-3">
                                     No
                                 </th>
 
@@ -581,11 +226,11 @@
                                     Jawaban
                                 </th>
 
-                                <th style="width: 100px;">
+                                <th>
                                     Urutan
                                 </th>
 
-                                <th style="width: 130px;">
+                                <th class="text-center">
                                     Aksi
                                 </th>
 
@@ -593,469 +238,94 @@
 
                         </thead>
 
-
                         <tbody>
-
-                            @foreach ($faqs as $faq)
-
-                                <tr>
-
-                                    <td>
-
-                                        <span class="number-badge">
-
-                                            {{ $loop->iteration }}
-
-                                        </span>
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <div class="question-text">
-
-                                            {{ $faq->pertanyaan }}
-
-                                        </div>
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <div class="answer-text">
-
-                                            {{ $faq->jawaban }}
-
-                                        </div>
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <span class="order-badge">
-
-                                            {{ $faq->urutan ?? 0 }}
-
-                                        </span>
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <div class="action-group">
-
-                                            <button type="button"
-                                                class="btn-action btn-edit"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#modalEdit{{ $faq->id }}"
-                                                title="Edit FAQ">
-
-                                                <i class="bi bi-pencil-square"></i>
-
-                                            </button>
-
-
-                                            <button type="button"
-                                                class="btn-action btn-delete"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#modalHapus{{ $faq->id }}"
-                                                title="Hapus FAQ">
-
-                                                <i class="bi bi-trash3"></i>
-
-                                            </button>
-
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-
-
-                                <div class="modal fade"
-                                    id="modalEdit{{ $faq->id }}"
-                                    tabindex="-1"
-                                    aria-hidden="true">
-
-                                    <div class="modal-dialog modal-dialog-centered">
-
-                                        <div class="modal-content">
-
-                                            <div class="modal-header">
-
-                                                <h5 class="modal-title">
-
-                                                    <i class="bi bi-pencil-square me-2"
-                                                        style="color: #20c77a;"></i>
-
-                                                    Edit FAQ
-
-                                                </h5>
-
-                                                <button type="button"
-                                                    class="btn-close"
-                                                    data-bs-dismiss="modal">
-                                                </button>
-
-                                            </div>
-
-
-                                            <form action="{{ route('faqs.update', $faq->id) }}"
-                                                method="POST">
-
-                                                @csrf
-
-                                                @method('PUT')
-
-
-                                                <div class="modal-body">
-
-                                                    <div class="mb-3">
-
-                                                        <label class="form-label">
-                                                            Pertanyaan
-                                                        </label>
-
-                                                        <textarea name="pertanyaan"
-                                                            class="form-control"
-                                                            rows="3"
-                                                            required>{{ old('pertanyaan', $faq->pertanyaan) }}</textarea>
-
-                                                    </div>
-
-
-                                                    <div class="mb-3">
-
-                                                        <label class="form-label">
-                                                            Jawaban
-                                                        </label>
-
-                                                        <textarea name="jawaban"
-                                                            class="form-control"
-                                                            rows="5"
-                                                            required>{{ old('jawaban', $faq->jawaban) }}</textarea>
-
-                                                    </div>
-
-
-                                                    <div class="mb-2">
-
-                                                        <label class="form-label">
-                                                            Urutan
-                                                        </label>
-
-                                                        <input type="number"
-                                                            name="urutan"
-                                                            class="form-control"
-                                                            min="0"
-                                                            value="{{ old('urutan', $faq->urutan ?? 0) }}">
-
-                                                    </div>
-
-                                                </div>
-
-
-                                                <div class="modal-footer">
-
-                                                    <button type="button"
-                                                        class="btn-cancel"
-                                                        data-bs-dismiss="modal">
-
-                                                        Batal
-
-                                                    </button>
-
-                                                    <button type="submit"
-                                                        class="btn-submit">
-
-                                                        <i class="bi bi-check-lg me-1"></i>
-
-                                                        Simpan Perubahan
-
-                                                    </button>
-
-                                                </div>
-
-                                            </form>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-
-                                <div class="modal fade"
-                                    id="modalHapus{{ $faq->id }}"
-                                    tabindex="-1"
-                                    aria-hidden="true">
-
-                                    <div class="modal-dialog modal-dialog-centered">
-
-                                        <div class="modal-content">
-
-                                            <div class="modal-header">
-
-                                                <h5 class="modal-title">
-
-                                                    <i class="bi bi-trash3 me-2"
-                                                        style="color: #e25e5e;"></i>
-
-                                                    Hapus FAQ
-
-                                                </h5>
-
-                                                <button type="button"
-                                                    class="btn-close"
-                                                    data-bs-dismiss="modal">
-                                                </button>
-
-                                            </div>
-
-
-                                            <div class="modal-body text-center">
-
-                                                <div style="font-size: 45px; color: #e25e5e; margin-bottom: 15px;">
-
-                                                    <i class="bi bi-exclamation-circle"></i>
-
-                                                </div>
-
-                                                <h6 style="font-weight: 800;">
-
-                                                    Yakin ingin menghapus FAQ ini?
-
-                                                </h6>
-
-                                                <p class="text-muted"
-                                                    style="font-size: 13px; line-height: 1.7;">
-
-                                                    Data FAQ yang dihapus tidak dapat dikembalikan.
-
-                                                </p>
-
-                                                <div class="p-3 rounded-3 text-start"
-                                                    style="background: #fff7f7;">
-
-                                                    <small style="font-size: 12px; color: #9a7777;">
-
-                                                        {{ $faq->pertanyaan }}
-
-                                                    </small>
-
-                                                </div>
-
-                                            </div>
-
-
-                                            <div class="modal-footer">
-
-                                                <button type="button"
-                                                    class="btn-cancel"
-                                                    data-bs-dismiss="modal">
-
-                                                    Batal
-
-                                                </button>
-
-
-                                                <form action="{{ route('faqs.destroy', $faq->id) }}"
-                                                    method="POST">
-
-                                                    @csrf
-
-                                                    @method('DELETE')
-
-                                                    <button type="submit"
-                                                        class="btn-submit"
-                                                        style="background: #e25e5e;">
-
-                                                        <i class="bi bi-trash3 me-1"></i>
-
-                                                        Hapus FAQ
-
-                                                    </button>
-
-                                                </form>
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            @endforeach
-
+                            {{-- Diisi oleh DataTables (server-side) --}}
                         </tbody>
 
                     </table>
 
                 </div>
 
-            @else
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-
-                        <i class="bi bi-question-circle"></i>
-
-                    </div>
-
-                    <h6>
-
-                        Belum Ada Data FAQ
-
-                    </h6>
-
-                    <p>
-
-                        Tambahkan pertanyaan dan jawaban pertama untuk website RentalKu.
-
-                    </p>
-
-                    <button type="button"
-                        class="btn btn-green mt-2"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modalTambah">
-
-                        <i class="bi bi-plus-lg me-2"></i>
-
-                        Tambah FAQ
-
-                    </button>
-
-                </div>
-
-            @endif
+            </div>
 
         </div>
 
-    </main>
+    </div>
 
 
-    <div class="modal fade"
-        id="modalTambah"
-        tabindex="-1"
-        aria-hidden="true">
+    <div
+        class="modal fade"
+        id="tambahFaqModal"
+        tabindex="-1">
 
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
 
             <div class="modal-content">
 
-                <div class="modal-header">
+                @include('layouts.partials.modal-head', ['title' => 'Tambah FAQ', 'icon' => 'bi-plus-circle'])
 
-                    <h5 class="modal-title">
-
-                        <i class="bi bi-plus-circle me-2"
-                            style="color: #20c77a;"></i>
-
-                        Tambah FAQ Baru
-
-                    </h5>
-
-                    <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
-                    </button>
-
-                </div>
-
-
-                <form action="{{ route('faqs.store') }}"
-                    method="POST">
+                <form
+                    action="{{ route('faqs.store') }}"
+                    method="POST"
+                    id="formTambahFaq">
 
                     @csrf
 
-
                     <div class="modal-body">
 
-                        <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            Pertanyaan
+                        </label>
 
-                            <label class="form-label">
+                        <textarea
+                            name="pertanyaan"
+                            class="form-control"
+                            rows="3"
+                            placeholder="Masukkan pertanyaan..."
+                            required></textarea>
 
-                                Pertanyaan
+                        <label class="form-label fw-semibold mt-3">
+                            Jawaban
+                        </label>
 
-                                <span style="color: #e25e5e;">*</span>
+                        <textarea
+                            name="jawaban"
+                            class="form-control"
+                            rows="4"
+                            placeholder="Masukkan jawaban..."
+                            required></textarea>
 
-                            </label>
+                        <label class="form-label fw-semibold mt-3">
+                            Urutan
+                        </label>
 
-                            <textarea name="pertanyaan"
-                                class="form-control"
-                                rows="3"
-                                placeholder="Contoh: Bagaimana cara menyewa mobil di RentalKu?"
-                                required>{{ old('pertanyaan') }}</textarea>
-
-                        </div>
-
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-
-                                Jawaban
-
-                                <span style="color: #e25e5e;">*</span>
-
-                            </label>
-
-                            <textarea name="jawaban"
-                                class="form-control"
-                                rows="5"
-                                placeholder="Tuliskan jawaban untuk pertanyaan tersebut..."
-                                required>{{ old('jawaban') }}</textarea>
-
-                        </div>
-
-
-                        <div class="mb-2">
-
-                            <label class="form-label">
-
-                                Urutan Tampilan
-
-                            </label>
-
-                            <input type="number"
-                                name="urutan"
-                                class="form-control"
-                                min="0"
-                                value="{{ old('urutan', 0) }}"
-                                placeholder="0">
-
-                            <small class="text-muted"
-                                style="font-size: 11px;">
-
-                                Angka lebih kecil akan ditampilkan terlebih dahulu.
-
-                            </small>
-
-                        </div>
+                        <input
+                            type="number"
+                            name="urutan"
+                            class="form-control"
+                            placeholder="0"
+                            min="0"
+                            value="0">
 
                     </div>
 
-
                     <div class="modal-footer">
 
-                        <button type="button"
-                            class="btn-cancel"
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
                             data-bs-dismiss="modal">
 
+                            <i class="bi bi-x-circle me-1"></i>
                             Batal
 
                         </button>
 
-                        <button type="submit"
-                            class="btn-submit">
+                        <button
+                            type="submit"
+                            class="btn btn-green">
 
-                            <i class="bi bi-check-lg me-1"></i>
-
+                            <i class="bi bi-save me-1"></i>
                             Simpan FAQ
 
                         </button>
@@ -1071,8 +341,360 @@
     </div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-    </script>
+    <div
+        class="modal fade"
+        id="editFaqModal"
+        tabindex="-1">
+
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+
+            <div class="modal-content">
+
+                @include('layouts.partials.modal-head', ['title' => 'Edit FAQ', 'icon' => 'bi-pencil-square'])
+
+                <form
+                    action=""
+                    method="POST"
+                    id="formEditFaq">
+
+                    @csrf
+                    @method('PUT')
+
+                    <div class="modal-body">
+
+                        <label class="form-label fw-semibold">
+                            Pertanyaan
+                        </label>
+
+                        <textarea
+                            name="pertanyaan"
+                            id="editPertanyaan"
+                            class="form-control"
+                            rows="3"
+                            placeholder="Masukkan pertanyaan..."
+                            required></textarea>
+
+                        <label class="form-label fw-semibold mt-3">
+                            Jawaban
+                        </label>
+
+                        <textarea
+                            name="jawaban"
+                            id="editJawaban"
+                            class="form-control"
+                            rows="4"
+                            placeholder="Masukkan jawaban..."
+                            required></textarea>
+
+                        <label class="form-label fw-semibold mt-3">
+                            Urutan
+                        </label>
+
+                        <input
+                            type="number"
+                            name="urutan"
+                            id="editUrutan"
+                            class="form-control"
+                            placeholder="0"
+                            min="0"
+                            value="0">
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                            <i class="bi bi-x-circle me-1"></i>
+                            Batal
+
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="btn btn-green">
+
+                            <i class="bi bi-save me-1"></i>
+                            Simpan Perubahan
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/js/dataTables.bootstrap5.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+    var CSRF_TOKEN = '{{ csrf_token() }}';
+
+    var $flashSuccess = $('#flashSuccess');
+
+    if ($flashSuccess.length) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: $flashSuccess.text(),
+            timer: 1800,
+            showConfirmButton: false,
+        });
+    }
+
+    $(document).ready(function() {
+
+        $('#faqs-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{{ route('faqs.data') }}',
+                type: 'GET',
+            },
+            columns: [{
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    className: 'px-3',
+                    width: '70px',
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    },
+                },
+                {
+                    data: 'pertanyaan',
+                    orderable: true,
+                    searchable: true,
+                    render: function(data) {
+                        return '<strong>' + data + '</strong>';
+                    },
+                },
+                {
+                    data: 'jawaban',
+                    orderable: false,
+                    searchable: true,
+                    render: function(data) {
+                        return data
+                            ? data
+                            : '<span class="text-muted">Belum ada jawaban.</span>';
+                    },
+                },
+                {
+                    data: 'urutan',
+                    orderable: true,
+                    searchable: false,
+                },
+                {
+                    data: 'id',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center',
+                    width: '140px',
+                    render: function(data, type, row) {
+                        return '<div class="d-flex justify-content-center gap-2">' +
+                            '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
+                            'title="Edit" onclick="editFaq(' + data + ')">' +
+                            '<i class="bi bi-pencil-square"></i></button>' +
+                            '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" ' +
+                            'title="Hapus" onclick="deleteFaq(' + data +
+                            ', \'' + row.pertanyaan.replace(/'/g, "\\'") + '\')">' +
+                            '<i class="bi bi-trash"></i></button>' +
+                            '</div>';
+                    },
+                },
+            ],
+            order: [
+                [3, 'asc']
+            ],
+            language: {
+                processing: 'Memproses...',
+                search: 'Cari:',
+                lengthMenu: 'Tampilkan _MENU_ data',
+                info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                infoEmpty: 'Tidak ada data',
+                infoFiltered: '(difilter dari _MAX_ total data)',
+                loadingRecords: 'Memuat...',
+                zeroRecords: 'Tidak ditemukan data yang cocok',
+                emptyTable: 'Belum ada FAQ',
+                aria: {
+                    sortAscending: ': aktifkan untuk urut naik',
+                    sortDescending: ': aktifkan untuk urut turun',
+                },
+            },
+        });
+
+    });
+
+    function deleteFaq(id, pertanyaan) {
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: 'Apakah Anda yakin ingin menghapus FAQ "' + pertanyaan.substring(0, 50) + '..."?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus',
+            cancelButtonText: 'Batal',
+        }).then(function(result) {
+            if (!result.isConfirmed) return;
+
+            $.ajax({
+                url: "{{ route('faqs.destroy', '__ID__') }}".replace('__ID__', id),
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                success: function(result) {
+                    $('#faqs-table').DataTable().ajax.reload();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: (result && result.message) ? result.message : 'FAQ berhasil dihapus.',
+                        timer: 1500,
+                        showConfirmButton: false,
+                    });
+                },
+                error: function(xhr) {
+                    const result = xhr.responseJSON || {};
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: result.message ||
+                            'Terjadi kesalahan saat menghapus FAQ.',
+                    });
+                }
+            });
+        });
+    }
+
+    function editFaq(id) {
+        const data = $('#faqs-table').DataTable().rows().data().toArray()
+            .find(r => r.id == id);
+
+        if (!data) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: 'Data FAQ tidak ditemukan.',
+            });
+            return;
+        }
+
+        $('#editPertanyaan').val(data.pertanyaan);
+        $('#editJawaban').val(data.jawaban);
+        $('#editUrutan').val(data.urutan);
+
+        $('#formEditFaq').attr('action',
+            "{{ route('faqs.update', '__ID__') }}".replace('__ID__', id));
+
+        bootstrap.Modal.getOrCreateInstance($('#editFaqModal')[0]).show();
+    }
+
+    $(document).on('submit', '#formTambahFaq', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            success: function(result) {
+                bootstrap.Modal.getInstance($('#tambahFaqModal')[0]).hide();
+                $('#formTambahFaq')[0].reset();
+                $('#faqs-table').DataTable().ajax.reload();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: result.message || 'FAQ berhasil ditambahkan.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+            },
+            error: function(xhr) {
+                const r = xhr.responseJSON || {};
+                const msg = r.errors ? Object.values(r.errors)[0][0] :
+                    (r.message || 'Terjadi kesalahan saat menambahkan FAQ.');
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: msg,
+                });
+            }
+        });
+    });
+
+    $(document).on('submit', '#formEditFaq', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            method: 'PUT',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            success: function(result) {
+                bootstrap.Modal.getInstance($('#editFaqModal')[0]).hide();
+                $('#faqs-table').DataTable().ajax.reload();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: result.message || 'FAQ berhasil diperbarui.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+            },
+            error: function(xhr) {
+                const r = xhr.responseJSON || {};
+                const msg = r.errors ? Object.values(r.errors)[0][0] :
+                    (r.message || 'Terjadi kesalahan saat memperbarui FAQ.');
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: msg,
+                });
+            }
+        });
+    });
+
+</script>
 
 </body>
 

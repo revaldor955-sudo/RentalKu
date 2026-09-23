@@ -8,19 +8,82 @@ use Illuminate\Http\Request;
 
 class FotoMobilController extends Controller
 {
-        public function index()
+    public function index()
     {
-        $fotoMobils = FotoMobil::all();
         $mobils = Mobil::all();
-        return view('foto_mobils.index', compact('fotoMobils', 'mobils'));
+        return view('foto_mobils.index', compact('mobils'));
     }
 
-        public function create()
+    /**
+     * Server-side DataTables: daftar foto mobil (search, sort, pagination)
+     */
+    public function data(Request $request)
+    {
+        $query = FotoMobil::query()
+            ->leftJoin('mobils', 'foto_mobils.mobil_id', '=', 'mobils.id')
+            ->select('foto_mobils.*')
+            ->with('mobil');
+
+        $recordsTotal = $query->count();
+
+        $search = $request->input('search.value');
+
+        if ($search) {
+            $query->whereHas('mobil', function ($mq) use ($search) {
+                $mq->where('name', 'like', "%{$search}%")
+                   ->orWhere('plate_number', 'like', "%{$search}%");
+            });
+        }
+
+        $recordsFiltered = $query->count();
+
+        $columns = [
+            0 => null,
+            1 => 'mobils.name',
+            2 => 'mobils.plate_number',
+        ];
+
+        $orderColumn = $request->input('order.0.column', 1);
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
+            $query->orderBy($columns[$orderColumn], $orderDir);
+        } else {
+            $query->orderBy('foto_mobils.created_at', 'desc');
+        }
+
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $fotoMobils = $query->offset($start)->limit($length)->get();
+
+        $data = $fotoMobils->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'mobil_id' => $item->mobil_id,
+                'mobil_name' => $item->mobil->name ?? '-',
+                'mobil_plate' => $item->mobil->plate_number ?? '-',
+                'url' => $item->url,
+            ];
+        });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
+    }
+
+    public function create()
     {
         //
     }
 
-        public function store(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'mobil_id' => 'required|exists:mobils,id',
@@ -39,21 +102,27 @@ class FotoMobilController extends Controller
 
         FotoMobil::create($validated);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Foto mobil berhasil ditambahkan.',
+            ]);
+        }
+
         return redirect()->route('foto_mobils.index')
             ->with('success', 'Foto mobil berhasil ditambahkan.');
     }
 
-        public function show(FotoMobil $fotoMobil)
+    public function show(FotoMobil $fotoMobil)
     {
         //
     }
 
-        public function edit(FotoMobil $fotoMobil)
+    public function edit(FotoMobil $fotoMobil)
     {
         //
     }
 
-        public function update(Request $request, FotoMobil $fotoMobil)
+    public function update(Request $request, FotoMobil $fotoMobil)
     {
         $validated = $request->validate([
             'mobil_id' => 'required|exists:mobils,id',
@@ -73,13 +142,25 @@ class FotoMobilController extends Controller
 
         $fotoMobil->update($validated);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Foto mobil berhasil diperbarui.',
+            ]);
+        }
+
         return redirect()->route('foto_mobils.index')
             ->with('success', 'Foto mobil berhasil diperbarui.');
     }
 
-        public function destroy(FotoMobil $fotoMobil)
+    public function destroy(Request $request, FotoMobil $fotoMobil)
     {
         $fotoMobil->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Foto mobil berhasil dihapus.',
+            ]);
+        }
 
         return redirect()->route('foto_mobils.index')
             ->with('success', 'Foto mobil berhasil dihapus.');

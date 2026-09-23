@@ -17,6 +17,9 @@ class UserController extends Controller
         return view('users.index', compact('roles'));
     }
 
+    /**
+     * Server-side DataTables: daftar pengguna (search, sort, pagination)
+     */
     public function data(Request $request)
     {
         $query = User::query()
@@ -87,6 +90,9 @@ class UserController extends Controller
         ]);
     }
 
+    /**
+     * Detail pengguna untuk modal popup (AJAX)
+     */
     public function detail(User $user)
     {
         $user->load('role');
@@ -128,6 +134,7 @@ class UserController extends Controller
             'photo.max' => 'Ukuran foto maksimal 2 MB.',
         ]);
         if ($request->hasFile('photo')) {
+
             $folder = public_path('images/users');
 
             if (! File::exists($folder)) {
@@ -135,8 +142,11 @@ class UserController extends Controller
             }
 
             $photo = $request->file('photo');
+
             $photoName = time().'_'.$photo->getClientOriginalName();
+
             $photo->move($folder, $photoName);
+
             $validated['photo'] = 'images/users/'.$photoName;
         }
 
@@ -162,6 +172,7 @@ class UserController extends Controller
         ]);
 
         if ($request->hasFile('photo')) {
+
             if ($user->photo && File::exists(public_path($user->photo))) {
                 File::delete(public_path($user->photo));
             }
@@ -173,8 +184,11 @@ class UserController extends Controller
             }
 
             $photo = $request->file('photo');
+
             $photoName = time().'_'.$photo->getClientOriginalName();
+
             $photo->move($folder, $photoName);
+
             $validated['photo'] = 'images/users/'.$photoName;
         }
 

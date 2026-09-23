@@ -7,7 +7,10 @@ use Illuminate\Http\Request;
 
 class FasilitasController extends Controller
 {
-        public function index()
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
     {
         $fasilitas = Fasilitas::all();
         return view('fasilitas.index', compact('fasilitas'));
@@ -64,12 +67,18 @@ class FasilitasController extends Controller
         ]);
     }
 
-        public function create()
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
     {
         //
     }
 
-        public function store(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -89,17 +98,26 @@ class FasilitasController extends Controller
             ->with('success', 'Fasilitas berhasil ditambahkan.');
     }
 
-        public function show(Fasilitas $fasilita)
+    /**
+     * Display the specified resource.
+     */
+    public function show(Fasilitas $fasilita)
     {
         //
     }
 
-        public function edit(Fasilitas $fasilita)
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Fasilitas $fasilita)
     {
         //
     }
 
-        public function update(Request $request, Fasilitas $fasilita)
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Fasilitas $fasilita)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -119,7 +137,10 @@ class FasilitasController extends Controller
             ->with('success', 'Fasilitas berhasil diperbarui.');
     }
 
-        public function destroy(Request $request, Fasilitas $fasilita)
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Request $request, Fasilitas $fasilita)
     {
         $fasilita->delete();
 

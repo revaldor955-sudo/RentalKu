@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class PemeriksaanKerusakan extends Model
 {
-    protected $fillable = ['pemeriksaan_id', 'kerusakan_id', 'keterangan'];
+    protected $table = 'pemeriksaan_kerusakans';
+    protected $fillable = [
+        'pemeriksaan_id',
+        'kerusakan_id',
+        'keterangan',
+    ];
 
     public function pemeriksaan()
     {

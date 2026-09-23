@@ -20,26 +20,13 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     >
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
     <style>
 
         body {
             background: #f5f7f6;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        .navbar {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .brand {
-            font-size: 25px;
-            font-weight: 800;
-            color: #1f2937;
-        }
-
-        .brand span {
-            color: #198754;
+            font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
         }
 
         .page-header {
@@ -65,11 +52,6 @@
             border: 1px solid #edf0ee;
             margin-top: 25px;
             margin-bottom: 50px;
-        }
-
-        .form-title {
-            font-weight: 800;
-            color: #212529;
         }
 
         .section-title {
@@ -164,73 +146,35 @@
             font-weight: 600;
         }
 
-        footer {
-            margin-top: 50px;
+        .page-content {
+            padding: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
+            }
         }
 
     </style>
 
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
+
 
 <body>
 
-<nav class="navbar">
 
-    <div class="container py-3">
+@include('layouts.partials.staff-sidebar')
 
-        <div class="d-flex justify-content-between align-items-center">
-
-            <a
-                href="{{ route('staff.dashboard') }}"
-                class="text-decoration-none brand"
-            >
-
-                Rental<span>ku</span>.
-
-            </a>
-
-            <div class="d-flex align-items-center gap-3">
-
-                <span class="d-none d-md-block">
-
-                    <i class="bi bi-person-circle me-1"></i>
-
-                    {{ Auth::user()->name }}
-
-                </span>
-
-                <form
-                    action="{{ route('logout') }}"
-                    method="POST"
-                >
-
-                    @csrf
-
-                    <button
-                        type="submit"
-                        class="btn btn-outline-danger btn-sm"
-                    >
-
-                        <i class="bi bi-box-arrow-right"></i>
-
-                        Keluar
-
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</nav>
+{{-- Page Content (dipindah ke #mainContent oleh staff-sidebar) --}}
+<div class="page-content">
 
 <div class="container">
+
 
     <div class="page-header">
 
@@ -246,11 +190,13 @@
 
                 </span>
 
+
                 <h1 class="mb-2">
 
                     Tambah Mobil
 
                 </h1>
+
 
                 <p>
 
@@ -259,6 +205,7 @@
                 </p>
 
             </div>
+
 
             <div class="d-none d-md-block">
 
@@ -273,6 +220,8 @@
 
     </div>
 
+
+
     @if($errors->any())
 
         <div class="alert alert-danger alert-dismissible fade show mt-4">
@@ -284,6 +233,7 @@
                 Terdapat kesalahan:
 
             </div>
+
 
             <ul class="mb-0">
 
@@ -297,6 +247,7 @@
 
             </ul>
 
+
             <button
                 type="button"
                 class="btn-close"
@@ -306,6 +257,8 @@
         </div>
 
     @endif
+
+
 
     <div class="form-card">
 
@@ -317,7 +270,9 @@
 
             @csrf
 
+
             <div class="p-4 p-md-5">
+
 
                 <div class="section-title">
 
@@ -327,7 +282,9 @@
 
                 </div>
 
+
                 <div class="row g-4">
+
 
                     <div class="col-md-6">
 
@@ -339,6 +296,7 @@
 
                         </label>
 
+
                         <select
                             name="brand_id"
                             class="form-select @error('brand_id') is-invalid @enderror"
@@ -347,6 +305,7 @@
                             <option value="">
                                 -- Pilih Brand --
                             </option>
+
 
                             @foreach($brands as $brand)
 
@@ -363,6 +322,7 @@
 
                         </select>
 
+
                         @error('brand_id')
 
                             <div class="invalid-feedback">
@@ -373,6 +333,8 @@
 
                     </div>
 
+
+
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -382,6 +344,7 @@
                             <span class="required">*</span>
 
                         </label>
+
 
                         <select
                             name="tipe_mobil_id"
@@ -404,6 +367,7 @@
 @endforeach
                         </select>
 
+
                         @error('tipe_mobil_id')
 
                             <div class="invalid-feedback">
@@ -413,6 +377,8 @@
                         @enderror
 
                     </div>
+
+
 
                     <div class="col-md-6">
 
@@ -424,6 +390,7 @@
 
                         </label>
 
+
                         <input
                             type="text"
                             name="name"
@@ -431,6 +398,7 @@
                             class="form-control @error('name') is-invalid @enderror"
                             placeholder="Contoh: Toyota Avanza"
                         >
+
 
                         @error('name')
 
@@ -442,6 +410,8 @@
 
                     </div>
 
+
+
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -452,6 +422,7 @@
 
                         </label>
 
+
                         <input
                             type="text"
                             name="plate_number"
@@ -459,6 +430,7 @@
                             class="form-control @error('plate_number') is-invalid @enderror"
                             placeholder="Contoh: KB 1234 AB"
                         >
+
 
                         @error('plate_number')
 
@@ -470,6 +442,8 @@
 
                     </div>
 
+
+
                     <div class="col-md-4">
 
                         <label class="form-label">
@@ -479,6 +453,7 @@
                             <span class="required">*</span>
 
                         </label>
+
 
                         <input
                             type="number"
@@ -490,6 +465,7 @@
                             placeholder="2024"
                         >
 
+
                         @error('tahun')
 
                             <div class="invalid-feedback">
@@ -500,6 +476,8 @@
 
                     </div>
 
+
+
                     <div class="col-md-4">
 
                         <label class="form-label">
@@ -509,6 +487,7 @@
                             <span class="required">*</span>
 
                         </label>
+
 
                         <select
                             name="transmisi"
@@ -535,6 +514,7 @@
 
                         </select>
 
+
                         @error('transmisi')
 
                             <div class="invalid-feedback">
@@ -544,6 +524,8 @@
                         @enderror
 
                     </div>
+
+
 
 <div class="col-md-4">
 
@@ -578,6 +560,8 @@
 
 </div>
 
+
+
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -588,6 +572,7 @@
 
                         </label>
 
+
                         <input
                             type="text"
                             name="warna"
@@ -595,6 +580,7 @@
                             class="form-control @error('warna') is-invalid @enderror"
                             placeholder="Contoh: Hitam"
                         >
+
 
                         @error('warna')
 
@@ -606,6 +592,8 @@
 
                     </div>
 
+
+
                  <div class="col-md-6">
 
     <label class="form-label">
@@ -615,7 +603,6 @@
 
     <select
         name="cabang_id"
-        id="cabang_id"
         class="form-select @error('cabang_id') is-invalid @enderror"
         required
     >
@@ -642,6 +629,8 @@
 
 </div>
 
+
+
                 <div class="section-title mt-5">
 
                     <i class="bi bi-cash-stack me-2"></i>
@@ -650,7 +639,9 @@
 
                 </div>
 
+
                 <div class="row g-4">
+
 
                     <div class="col-md-6">
 
@@ -661,6 +652,7 @@
                             <span class="required">*</span>
 
                         </label>
+
 
                         <div class="input-group">
 
@@ -679,6 +671,7 @@
 
                         </div>
 
+
                         @error('harga_perhari')
 
                             <div class="text-danger small mt-1">
@@ -689,6 +682,8 @@
 
                     </div>
 
+
+
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -698,6 +693,7 @@
                             <span class="required">*</span>
 
                         </label>
+
 
                         <div class="input-group">
 
@@ -716,6 +712,7 @@
 
                         </div>
 
+
                         @error('deposit')
 
                             <div class="text-danger small mt-1">
@@ -726,6 +723,8 @@
 
                     </div>
 
+
+
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -735,6 +734,7 @@
                             <span class="required">*</span>
 
                         </label>
+
 
                         <select
                             name="status"
@@ -768,6 +768,7 @@
 
                         </select>
 
+
                         @error('status')
 
                             <div class="invalid-feedback">
@@ -778,7 +779,10 @@
 
                     </div>
 
+
                 </div>
+
+
 
                 <div class="section-title mt-5">
 
@@ -788,7 +792,9 @@
 
                 </div>
 
+
                 <div class="row g-4">
+
 
                     <div class="col-md-6">
 
@@ -798,6 +804,7 @@
 
                         </label>
 
+
                         <input
                             type="file"
                             name="image"
@@ -806,11 +813,13 @@
                             accept=".jpg,.jpeg,.png,.svg"
                         >
 
+
                         <small class="text-muted">
 
                             Format: JPG, JPEG, PNG, SVG. Maksimal 2MB.
 
                         </small>
+
 
                         @error('image')
 
@@ -821,6 +830,7 @@
                         @enderror
 
                     </div>
+
 
                     <div class="col-md-6">
 
@@ -845,7 +855,10 @@
 
                     </div>
 
+
                 </div>
+
+
 
                 <div class="section-title mt-5">
 
@@ -854,6 +867,7 @@
                     Fasilitas Mobil
 
                 </div>
+
 
                 <div class="row g-3">
 
@@ -873,7 +887,7 @@
 
                                 <span class="form-check-label">
 
-                                    {{ $item->nama_fasilitas }}
+                                    {{ $item->name }}
 
                                 </span>
 
@@ -897,6 +911,8 @@
 
                 </div>
 
+
+
                 <div class="section-title mt-5">
 
                     <i class="bi bi-card-text me-2"></i>
@@ -904,6 +920,7 @@
                     Deskripsi
 
                 </div>
+
 
                 <div>
 
@@ -913,12 +930,14 @@
 
                     </label>
 
+
                     <textarea
                         name="description"
                         rows="5"
                         class="form-control @error('description') is-invalid @enderror"
                         placeholder="Masukkan deskripsi mobil..."
                     >{{ old('description') }}</textarea>
+
 
                     @error('description')
 
@@ -929,6 +948,8 @@
                     @enderror
 
                 </div>
+
+
 
                 <div class="d-flex justify-content-end gap-2 mt-5">
 
@@ -943,6 +964,7 @@
 
                     </a>
 
+
                     <button
                         type="submit"
                         class="btn btn-green"
@@ -956,6 +978,7 @@
 
                 </div>
 
+
             </div>
 
         </form>
@@ -964,7 +987,13 @@
 
 </div>
 
-@include('layouts.partials.admin-footer', ['pageTitle' => 'Staff Dashboard • Tambah Data Mobil'])
+</div>
+
+
+
+@include('layouts.partials.admin-footer', ['pageTitle' => 'Staff Dashboard - Tambah Data Mobil'])
+
+
 
 <script>
 
@@ -985,6 +1014,8 @@
     });
 
 </script>
+
+
 
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">

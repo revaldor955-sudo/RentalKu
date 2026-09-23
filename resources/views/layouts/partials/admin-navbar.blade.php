@@ -1,120 +1,85 @@
-
-{{-- NAVBAR ADMIN RENTALKU --}}
+{{-- NAVBAR ADMIN (for sidebar layout) --}}
+{{-- Top bar that sits above main content, next to sidebar --}}
+{{-- Bootstrap CSS/JS TIDAK dimuat di sini — setiap halaman memuatnya sendiri di <head>. --}}
+{{-- Dipakai oleh SEMUA halaman admin via @include('layouts.partials.admin-navbar'). --}}
 
 <style>
-    .navbar {
-        background: white;
-        border-bottom: 1px solid #e9ecef;
+    .topbar {
+        background: #fff;
+        border-bottom: 1px solid #edf0ee;
+        height: 64px;
+        position: sticky;
+        top: 0;
+        z-index: 1020;
     }
 
-    .brand {
-        font-size: 25px;
+    .topbar-brand {
+        font-size: 20px;
         font-weight: 800;
         color: #1f2937;
-    }
-
-    .brand span {
-        color: #198754;
-    }
-
-    .nav-link-custom {
-        color: #526158;
-        font-size: 13px;
-        font-weight: 600;
         text-decoration: none;
-        padding: 10px 14px;
-        border-radius: 10px;
-        transition: .2s;
     }
 
-    .nav-link-custom:hover,
-    .nav-link-custom.active {
-        background: #e8f8ef;
+    .topbar-brand span {
         color: #198754;
     }
 
-    .user-box {
-        background: #f5f8f6;
-        border-radius: 50px;
-        padding: 6px 12px 6px 7px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 14px;
-        font-weight: 600;
+    /* Profil hanya di sidebar */
+
+    /* Toggle drawer + brand hanya di bawah breakpoint sidebar (1024px) */
+    #mobileSidebarToggle {
+        display: none;
     }
 
-    .user-icon {
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #198754;
-        color: white;
-        font-size: 16px;
+    .topbar-brand {
+        display: none;
+    }
+
+    @media (max-width: 1023.98px) {
+        #mobileSidebarToggle {
+            display: inline-block;
+        }
+
+        .topbar-brand {
+            display: block;
+        }
     }
 </style>
 
-<nav class="navbar">
-    <div class="container py-3">
+<header class="topbar" role="banner">
+    <div class="container-fluid px-4 h-100">
+        <div class="d-flex align-items-center gap-3 h-100">
+            {{-- Sidebar toggle for mobile --}}
+            <button
+                class="btn btn-sm btn-outline-secondary me-3"
+                type="button"
+                id="mobileSidebarToggle"
+                aria-label="Buka menu navigasi"
+                aria-expanded="false"
+                aria-controls="adminSidebar"
+            >
+                <i class="bi bi-list" aria-hidden="true"></i>
+            </button>
 
-        <div class="d-flex justify-content-between align-items-center w-100">
-
-            <a href="{{ route('admin.dashboard') }}"
-                class="text-decoration-none brand">
-
+            {{-- Page title / Brand (shown on mobile) --}}
+            <a href="{{ route('admin.dashboard') }}" class="topbar-brand">
                 Rental<span>ku</span>.
-
             </a>
 
-
-            <div class="d-flex gap-2 align-items-center">
-
-                <a href="{{ route('admin.dashboard') }}"
-                    class="nav-link-custom d-none d-md-block">
-
-                    <i class="bi bi-grid me-1"></i>
-
-                    Dashboard
-
-                </a>
-
-
-                <a href="{{ route('faqs.index') }}"
-                    class="nav-link-custom">
-
-                    <i class="bi bi-question-circle me-1"></i>
-
-                    FAQ
-
-                </a>
-
-
-                <a href="#"
-                    class="user-box d-none d-md-flex text-decoration-none text-dark"
-                    data-bs-toggle="modal"
-                    data-bs-target="#profileModal">
-
-                    <div class="user-icon">
-
-                        <i class="bi bi-person"></i>
-
-                    </div>
-
-                    <span>
-                        {{ Auth::user()?->name ?? 'Admin' }}
-                    </span>
-
-                </a>
-
+            <div class="d-flex align-items-center gap-3 flex-grow-1">
+                {{-- Breadcrumb / Page title area --}}
+                <div class="d-none d-md-block flex-grow-1">
+                    @if(isset($pageTitle))
+                        <h1 class="h5 mb-0 fw-bold text-dark">{{ $pageTitle }}</h1>
+                    @else
+                        <h1 class="h5 mb-0 fw-bold text-dark">Dashboard</h1>
+                    @endif
+                </div>
             </div>
 
         </div>
-
     </div>
-</nav>
+</header>
 
-
+{{-- MODAL PROFIL (partial bersama admin/staff/customer) --}}
 @include('layouts.partials.profile-modal')

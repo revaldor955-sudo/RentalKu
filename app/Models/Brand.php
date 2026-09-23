@@ -7,7 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Brand extends Model
 {
-    protected $fillable = ['name', 'logo', 'description'];
+    protected $table = 'brands';
+    protected $fillable = [
+        'name',
+        'logo',
+        'description'
+    ];
 
     public function mobils()
     {

@@ -10,6 +10,7 @@
         background: #f8faf9;
         display: block;
     }
+
     .mobil-modal .mm-content {
         padding: 28px;
     }
@@ -86,25 +87,6 @@
         margin-bottom: 6px;
     }
 
-#formSewaContainer {
-    pointer-events: auto !important;
-    position: relative;
-    z-index: 1;
-}
-
-#formSewaContainer form {
-    display: block !important;
-    pointer-events: auto !important;
-}
-
-#formSewaContainer input,
-#formSewaContainer textarea,
-#formSewaContainer select {
-    pointer-events: auto !important;
-    user-select: text !important;
-    -webkit-user-select: text !important;
-    opacity: 1 !important;
-}
     .mobil-modal .mm-spec-title {
         color: #6b7280;
         font-size: 12px;
@@ -129,29 +111,7 @@
         background: #157347;
         color: #fff;
     }
-/* Memastikan input modal SweetAlert bisa diklik dan diketik */
-.swal2-container {
-    z-index: 20000 !important;
-    pointer-events: auto !important;
-}
 
-.swal2-popup {
-    pointer-events: auto !important;
-}
-
-.swal2-html-container {
-    pointer-events: auto !important;
-}
-
-.swal2-popup input,
-.swal2-popup textarea,
-.swal2-popup select {
-    pointer-events: auto !important;
-    user-select: text !important;
-    -webkit-user-select: text !important;
-    cursor: text !important;
-    opacity: 1 !important;
-}
     @media (min-width: 992px) {
         .mobil-modal .mm-photo {
             height: 100%;
@@ -164,7 +124,6 @@
 
     <div class="row g-0">
 
-        {{-- FOTO --}}
         <div class="col-lg-6">
 
             @if($mobil->image)
@@ -183,12 +142,10 @@
 
         </div>
 
-        {{-- INFORMASI --}}
         <div class="col-lg-6">
 
             <div class="mm-content">
 
-                {{-- STATUS --}}
                 @if($mobil->status === 'Tersedia')
 
                     <span class="mm-badge mm-badge-available">
@@ -211,12 +168,9 @@
 
                 <p class="mm-subtitle">
                     <i class="bi bi-car-front me-1"></i>
-                    {{ $mobil->brand->name ?? '-' }}
-                    ·
                     {{ $mobil->tipeMobil->name ?? '-' }}
                 </p>
 
-                {{-- HARGA --}}
                 <div class="mm-price-box">
 
                     <div class="mm-price-label">
@@ -230,7 +184,6 @@
 
                 </div>
 
-                {{-- SPESIFIKASI --}}
                 <div class="row g-2 mt-2">
 
                     <div class="col-6">
@@ -395,7 +348,6 @@
 
                 </div>
 
-                {{-- TOMBOL AKSI --}}
                 <div class="mt-3">
 
                     @if($mobil->status === 'Tersedia')
@@ -440,7 +392,7 @@
 <div id="sewaFormTemplate" class="d-none">
 
     <form
-      action="{{ route('rentals.checkout', $mobil->id) }}"
+        action="{{ route('rentals.store', $mobil->id) }}"
         method="POST"
         id="sewaForm">
 
@@ -517,7 +469,7 @@
                     name="tanggal_mulai"
                     class="form-control"
                     min="{{ date('Y-m-d') }}"
-                    value="{{ old('tanggal_mulai') }}"
+                    value="{{ old('tanggal_mulai', date('Y-m-d')) }}"
                     required>
 
             </div>
@@ -532,106 +484,46 @@
                     type="date"
                     name="tanggal_selesai"
                     class="form-control"
-                    min="{{ date('Y-m-d') }}"
-                    value="{{ old('tanggal_selesai') }}"
+                    min="{{ date('Y-m-d', strtotime('+1 day')) }}"
+                    value="{{ old('tanggal_selesai', date('Y-m-d', strtotime('+1 day'))) }}"
                     required>
 
             </div>
-<div class="col-12">
 
-    <label class="form-label fw-semibold">
-        Pilihan Supir
-    </label>
+            <div class="col-12">
 
-    <select
-        name="supir_id"
-        id="supir_id"
-        class="form-select">
+                <label class="form-label fw-semibold">
+                    Catatan
+                </label>
 
-        <option value="">
-            Tanpa Supir
-        </option>
+                <textarea
+                    name="catatan"
+                    class="form-control"
+                    rows="3"
+                    placeholder="Catatan tambahan jika diperlukan...">{{ old('catatan') }}</textarea>
 
-        @foreach($supirs as $supir)
+            </div>
 
-            <option
-                value="{{ $supir->id }}"
-                data-tarif="{{ $supir->tarif_perhari }}">
+            <div class="col-12">
 
-                {{ $supir->name }}
-                - Rp {{ number_format($supir->tarif_perhari, 0, ',', '.') }}/hari
+                <div class="alert alert-success py-2 mb-0">
 
-            </option>
+                    <small>
+                        <i class="bi bi-info-circle me-1"></i>
+                        Harga: Rp {{ number_format($mobil->harga_perhari, 0, ',', '.') }}/hari.
+                        Deposit Rp {{ number_format($mobil->deposit, 0, ',', '.') }}
+                        ditambahkan ke total.
+                    </small>
 
-        @endforeach
+                </div>
 
-    </select>
-
-    <small class="text-muted">
-        Pilih supir jika ingin menggunakan layanan supir.
-    </small>
-
-</div>
-
-{{-- KODE PROMO --}}
-<div class="col-12">
-    <label class="form-label fw-semibold">
-        Kode Promo
-    </label>
-
-    <input
-        type="text"
-        name="kode_promo"
-        id="kode_promo"
-        class="form-control"
-        placeholder="Masukkan kode promo jika ada"
-        maxlength="50"
-        autocomplete="off"
-    >
-
-    <small class="text-muted">
-        Masukkan kode promo jika ada.
-    </small>
-</div>
-            <div class="mb-3">
-    <label for="catatan" class="form-label">
-        Catatan
-    </label>
-
-    <textarea
-        name="catatan"
-        id="catatan"
-        class="form-control"
-        rows="4"
-        placeholder="Catatan tambahan jika diperlukan..."
-    ></textarea>
-</div>
-
-           <div class="col-12">
-
-    <div class="alert alert-success py-2 mb-0">
-
-        <small>
-            <i class="bi bi-info-circle me-1"></i>
-
-            Harga mobil:
-            Rp {{ number_format($mobil->harga_perhari, 0, ',', '.') }}/hari.
-
-            Deposit:
-            Rp {{ number_format($mobil->deposit ?? 0, 0, ',', '.') }}.
-
-            Biaya supir akan ditambahkan jika dipilih.
-        </small>
-
-    </div>
-
-</div>
+            </div>
 
             <div class="col-12">
 
                 <button type="submit" class="btn btn-success w-100 py-2">
                     <i class="bi bi-calendar-check me-1"></i>
-                 Lanjut ke Checkout
+                    Ajukan Sewa
                 </button>
 
             </div>
@@ -642,88 +534,63 @@
 
 </div>
 
-
+{{-- GoodUI #13/#28/#33: client-side convenience untuk form sewa (validasi server tetap sumber kebenaran).
+     Delegated agar jalan di konten dinamis (inject SweetAlert via $template.html());
+     tidak bind saat load ke elemen di dalam #sewaFormTemplate. --}}
 <script>
+(function () {
+    if (window.__sewaGoodUIInit) return;
+    window.__sewaGoodUIInit = true;
 
-function openSewaPopup() {
-    const template = document.getElementById('sewaFormTemplate');
-    const form = template?.querySelector('#sewaForm');
-
-    if (!form) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Form tidak ditemukan',
-            text: 'Form sewa belum tersedia.'
-        });
-        return;
+    function sewaFormOf(el) {
+        return el && el.closest ? el.closest('form') : null;
     }
 
-    const placeholder = document.createElement('span');
-    placeholder.style.display = 'none';
-
-    form.parentNode.insertBefore(placeholder, form);
-
-    Swal.fire({
-        title: 'Ajukan Sewa Mobil',
-        html: '<div id="formSewaContainer"></div>',
-        width: '900px',
-        showConfirmButton: false,
-        showCloseButton: true,
-        allowOutsideClick: false,
-        allowEscapeKey: true,
-        focusConfirm: false,
-
-        didOpen: () => {
-            const container = document.getElementById('formSewaContainer');
-
-            container.appendChild(form);
-
-            form.style.display = 'block';
-            form.style.visibility = 'visible';
-            form.style.pointerEvents = 'auto';
-
-            form.querySelectorAll('input, textarea, select').forEach(input => {
-                input.disabled = false;
-                input.readOnly = false;
-                input.style.pointerEvents = 'auto';
-                input.style.userSelect = 'text';
-                input.style.opacity = '1';
+    // Delegated change: pakai $(document).on bila jQuery ada, fallback native.
+    function onDocChange(selector, fn) {
+        if (window.jQuery) {
+            window.jQuery(document).on('change', selector, function (e) { fn(e, this); });
+        } else {
+            document.addEventListener('change', function (e) {
+                if (e.target && e.target.matches && e.target.matches(selector)) fn(e, e.target);
             });
-
-            const kodePromo = form.querySelector('[name="kode_promo"]');
-            const catatan = form.querySelector('[name="catatan"]');
-
-            [kodePromo, catatan].forEach(input => {
-                if (input) {
-                    input.removeAttribute('readonly');
-                    input.removeAttribute('disabled');
-                    input.style.pointerEvents = 'auto';
-                    input.style.cursor = 'text';
-                }
-            });
-
-            const mulai = form.querySelector('[name="tanggal_mulai"]');
-            const selesai = form.querySelector('[name="tanggal_selesai"]');
-
-            if (mulai && selesai) {
-                mulai.addEventListener('change', function() {
-                    selesai.min = this.value;
-
-                    if (selesai.value && selesai.value < this.value) {
-                        selesai.value = '';
-                    }
-                });
-            }
-        },
-
-        didClose: () => {
-            if (placeholder.parentNode) {
-                placeholder.parentNode.insertBefore(form, placeholder.nextSibling);
-                form.style.display = '';
-            }
-
-            placeholder.remove();
         }
+    }
+
+    function clearDateError(form) {
+        form.querySelectorAll('.sewa-date-error').forEach(function (n) { n.remove(); });
+    }
+
+    // #13: cabang-kembali mengikuti cabang-ambil selama masih placeholder/kosong.
+    onDocChange('select[name="cabang_ambil_id"]', function (e, el) {
+        var form = sewaFormOf(el);
+        if (!form) return;
+        var kembali = form.querySelector('select[name="cabang_kembali_id"]');
+        if (kembali && !kembali.value) kembali.value = el.value;
     });
-}
+
+    // #33: hapus catatan inline saat tanggal diubah / submit diulang.
+    onDocChange('input[name="tanggal_mulai"], input[name="tanggal_selesai"]', function (e, el) {
+        var form = sewaFormOf(el);
+        if (form) clearDateError(form);
+    });
+
+    // #33: cegah submit bila rentang salah — capture agar jalan SEBELUM handler AJAX existing.
+    document.addEventListener('submit', function (e) {
+        var form = e.target;
+        if (!form || !form.querySelector) return;
+        var mulai = form.querySelector('input[name="tanggal_mulai"]');
+        var selesai = form.querySelector('input[name="tanggal_selesai"]');
+        if (!mulai || !selesai) return;
+        clearDateError(form);
+        if (mulai.value && selesai.value && selesai.value <= mulai.value) {
+            e.preventDefault();
+            e.stopPropagation();
+            var note = document.createElement('div');
+            note.className = 'sewa-date-error text-danger small mt-1';
+            note.textContent = 'Tanggal selesai harus setelah tanggal mulai.';
+            selesai.after(note);
+        }
+    }, true);
+})();
 </script>

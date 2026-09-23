@@ -6,7 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class TipeMobil extends Model
 {
-    protected $fillable = ['name', 'description'];
+    protected $table = 'tipe_mobils';
+    protected $fillable = [
+        'name',
+        'description'
+    ];
 
     public function mobils()
     {
