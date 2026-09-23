@@ -17,6 +17,8 @@ use App\Http\Controllers\KuponController;
 use App\Http\Controllers\ServisMobilController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\MetodePembayaranController;
+use App\Http\Controllers\Admin\LandingSettingController;
+use App\Http\Controllers\CustomerRatingController;
 use App\Http\Controllers\MobilController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\PemeriksaanKendaraanController;
@@ -203,6 +205,13 @@ Route::middleware('customer')->group(function () {
     Route::get('/customer/mobils/search', [CustomerDashboardController::class, 'search'])
         ->name('customer.mobils.search');
 
+    Route::get('/customer/checkout/{mobil}', [RentalController::class, 'showCheckout'])
+        ->name('rentals.checkout.show');
+    Route::post('/customer/checkout/{mobil}', [RentalController::class, 'checkout'])
+        ->name('rentals.checkout');
+    Route::post('/customer/checkout/confirm/{mobil}', [RentalController::class, 'confirmCheckout'])
+        ->name('rentals.checkout.confirm');
+
     Route::post('/customer/rental/{mobil}', [RentalController::class, 'store'])
         ->name('rentals.store');
 
@@ -289,6 +298,22 @@ Route::middleware('adminstaff')->group(function () {
 
     Route::get('/laporan', [LaporanController::class, 'index'])
         ->name('laporan.index');
+});
+
+Route::middleware(['auth', 'customer'])->group(function () {
+    Route::get('/customer/ratings/create/{rental}', [CustomerRatingController::class, 'create'])
+        ->name('customer.ratings.create');
+
+    Route::post('/customer/ratings/{rental}', [CustomerRatingController::class, 'store'])
+        ->name('customer.ratings.store');
+});
+
+Route::middleware('admin')->group(function () {
+    Route::get('/admin/landing-settings', [LandingSettingController::class, 'edit'])
+        ->name('admin.landing-settings.edit');
+
+    Route::put('/admin/landing-settings', [LandingSettingController::class, 'update'])
+        ->name('admin.landing-settings.update');
 });
 
 require __DIR__.'/auth.php';
