@@ -17,6 +17,12 @@ class Kompensasi extends Model
         'tanggal',
         'status',
         'catatan',
+        'dibaca_at',
+    ];
+
+    protected $casts = [
+        'tanggal' => 'date',
+        'nominal' => 'decimal:2',
     ];
 
     public function mobil()

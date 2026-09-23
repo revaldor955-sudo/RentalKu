@@ -9,7 +9,7 @@
         </div>
 
         <small class="text-muted">
-            {{ $pageTitle ?? 'RentalKu' }} • RentalKu
+            {{ $pageTitle ?? 'RentalKu' }} - RentalKu
         </small>
 
     </div>
