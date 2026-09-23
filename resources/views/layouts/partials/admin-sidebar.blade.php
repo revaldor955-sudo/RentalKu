@@ -696,6 +696,14 @@
                             <span class="nav-text">Metode Pembayaran</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.landing-settings.edit') }}"
+                           class="nav-link {{ request()->routeIs('admin.landing-settings*') ? 'active' : '' }}"
+                           aria-current="{{ request()->routeIs('admin.landing-settings*') ? 'page' : 'false' }}">
+                            <i class="bi bi-sliders nav-icon" aria-hidden="true"></i>
+                            <span class="nav-text">Landing Settings</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </nav>
