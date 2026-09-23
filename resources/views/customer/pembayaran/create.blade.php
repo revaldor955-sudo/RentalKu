@@ -21,7 +21,7 @@
         body {
             background: #f5f7f6;
             color: #1f2937;
-            font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         .navbar {
@@ -178,7 +178,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -193,7 +193,6 @@
 
     </div>
 </nav>
-
 
 <div class="container">
 
@@ -213,7 +212,6 @@
                 </p>
 
             </div>
-
 
             <div class="payment-body">
 
@@ -239,7 +237,6 @@
 
                 @endif
 
-
                 <div class="rental-info">
 
                     <h5>
@@ -261,7 +258,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <div class="info-label">
@@ -273,7 +269,6 @@
                             </div>
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -287,7 +282,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <div class="info-label">
@@ -300,7 +294,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <div class="info-label">
@@ -312,7 +305,6 @@
                             </div>
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -327,7 +319,6 @@
                         </div>
 
                     </div>
-
 
                     <div class="total-box">
 
@@ -353,7 +344,6 @@
 
                 </div>
 
-
                 <form
                     action="{{ route('pembayaran.store', $rental->id) }}"
                     method="POST"
@@ -361,7 +351,6 @@
                 >
 
                     @csrf
-
 
                     <div class="mb-4">
 
@@ -405,7 +394,6 @@
 
                     </div>
 
-
                     @if($metodePembayarans->count())
 
                         <div class="mb-4" id="metodeDetail">
@@ -433,19 +421,6 @@
                                         </strong>
                                     </small>
 
-                                    @if($metode->atas_nama)
-
-                                        <div>
-                                            <small class="text-muted">
-                                                Atas nama:
-                                                <strong>
-                                                    {{ $metode->atas_nama }}
-                                                </strong>
-                                            </small>
-                                        </div>
-
-                                    @endif
-
                                 </div>
 
                             @endforeach
@@ -463,7 +438,6 @@
                         </div>
 
                     @endif
-
 
                     <div class="mb-4">
 
@@ -488,7 +462,6 @@
                         @enderror
 
                     </div>
-
 
                     <div class="mb-4">
 
@@ -517,7 +490,6 @@
 
                         @enderror
 
-
                         <img
                             id="preview"
                             class="preview-image"
@@ -525,7 +497,6 @@
                         >
 
                     </div>
-
 
                     <div class="alert alert-warning">
 
@@ -541,7 +512,6 @@
 
                     </div>
 
-
                     <div class="d-flex justify-content-between gap-2 mt-4">
 
                         <a
@@ -551,7 +521,6 @@
                             <i class="bi bi-arrow-left me-1"></i>
                             Kembali
                         </a>
-
 
                         <button
                             type="submit"
@@ -576,43 +545,44 @@
 
 </div>
 
-
 <script>
 
-document.getElementById('metodeSelect')?.addEventListener('change', function () {
-    var detailBox = document.getElementById('metodeDetail');
-    if (!detailBox) return;
+$('#metodeSelect').on('change', function() {
+    var $select = $(this);
+    var $detailBox = $('#metodeDetail');
+    var $placeholder = $('#metode-placeholder');
 
-    var selectedId = this.value;
+    if (!$detailBox.length) return;
 
-    detailBox.querySelectorAll('.metode-detail').forEach(function (el) {
-        el.classList.add('d-none');
-    });
+    var selectedId = $select.val();
 
-    var placeholder = document.getElementById('metode-placeholder');
+    $detailBox.find('.metode-detail').addClass('d-none');
 
     if (selectedId) {
-        var target = document.getElementById('metode-' + selectedId);
-        if (target) target.classList.remove('d-none');
-        if (placeholder) placeholder.classList.add('d-none');
-    } else if (placeholder) {
-        placeholder.classList.remove('d-none');
+        $('#metode-' + selectedId).removeClass('d-none');
+        if ($placeholder.length) $placeholder.addClass('d-none');
+    } else if ($placeholder.length) {
+        $placeholder.removeClass('d-none');
     }
 });
 
-document.getElementById('metodeSelect')?.dispatchEvent(new Event('change'));
+showMetodeDetail();
 
-document.getElementById('bukti')?.addEventListener('change', function (event) {
+function showMetodeDetail() {
+    var $select = $('#metodeSelect');
+    if (!$select.length) return;
+    $select.trigger('change');
+}
+
+$('#bukti').on('change', function(event) {
     var file = event.target.files[0];
-    var preview = document.getElementById('preview');
-    if (!preview) return;
+    var $preview = $('#preview');
 
     if (file) {
-        preview.src = URL.createObjectURL(file);
-        preview.style.display = 'block';
+        $preview.attr('src', URL.createObjectURL(file));
+        $preview.show();
     } else {
-        preview.removeAttribute('src');
-        preview.style.display = 'none';
+        $preview.hide();
     }
 });
 

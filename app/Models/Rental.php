@@ -6,13 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Rental extends Model
 {
-    protected $table = 'rentals';
-
     protected $fillable = [
         'user_id',
         'mobil_id',
-        'cabang_ambil_id',
-        'cabang_kembali_id',
         'tanggal_mulai',
         'tanggal_selesai',
         'jumlah_hari',
@@ -20,6 +16,8 @@ class Rental extends Model
         'subtotal',
         'deposit',
         'total_harga',
+        'kode_promo',
+        'diskon',
         'status',
         'catatan',
     ];
@@ -35,22 +33,12 @@ class Rental extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function mobil()
     {
-        return $this->belongsTo(Mobil::class);
-    }
-
-    public function cabangAmbil()
-    {
-        return $this->belongsTo(Cabang::class, 'cabang_ambil_id');
-    }
-
-    public function cabangKembali()
-    {
-        return $this->belongsTo(Cabang::class, 'cabang_kembali_id');
+        return $this->belongsTo(Mobil::class, 'mobil_id');
     }
 
     public function pembayaran()
@@ -58,13 +46,13 @@ class Rental extends Model
         return $this->hasOne(Pembayaran::class, 'rental_id');
     }
 
-    public function dendas()
+    public function rating()
     {
-        return $this->hasMany(Denda::class, 'rental_id');
+        return $this->hasOne(Rating::class, 'booking_id');
     }
 
-    public function kompensasis()
+    public function supirs()
     {
-        return $this->hasMany(Kompensasi::class, 'rental_id');
+        return $this->belongsToMany(Supir::class, 'rental_supir', 'rental_id', 'supir_id')->withPivot(['tarif_perhari', 'sub_total']);
     }
 }

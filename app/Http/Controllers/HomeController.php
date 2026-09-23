@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cabang;
 use App\Models\Mobil;
+use App\Models\LandingSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -12,22 +13,36 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        // Input invalid diabaikan, bukan error — landing tidak boleh 422.
         $cabangId = $request->query('cabang');
         $cabangAktif = null;
+
         if ($cabangId !== null && $cabangId !== '') {
             $cabangAktif = Cabang::find($cabangId);
         }
 
-        $mulai = $this->tanggalValid($request->query('tanggal_mulai'), minDate: Carbon::today());
-        $selesai = $this->tanggalValid($request->query('tanggal_selesai'));
-        if ($mulai === null || $selesai === null || $selesai->lt($mulai)) {
+        $kontak = DB::table('cabangs')->orderBy('id')->first();
+
+        $mulai = $this->tanggalValid(
+            $request->query('tanggal_mulai'),
+            minDate: Carbon::today()
+        );
+
+        $selesai = $this->tanggalValid(
+            $request->query('tanggal_selesai')
+        );
+
+        if (
+            $mulai === null ||
+            $selesai === null ||
+            $selesai->lt($mulai)
+        ) {
             $mulai = null;
             $selesai = null;
         }
 
         $jumlah = (int) $request->query('jumlah', 6);
         $jumlah = max(1, min(48, $jumlah));
+
         $punyaFilter = $cabangAktif !== null || $mulai !== null;
 
         $totalTersedia = Mobil::where('status', 'Tersedia')->count();
@@ -38,7 +53,7 @@ class HomeController extends Controller
                 $query->where('cabang_id', $cabangAktif->id);
             })
             ->when($mulai !== null, function ($query) use ($mulai, $selesai) {
-                // Rental Menunggu/Disetujui yang overlap membuat mobil tidak tersedia.
+                // Hanya rental Menunggu/Disetujui yang memblokir tanggal (Selesai/Ditolak bebas).
                 $query->whereDoesntHave('rentals', function ($q) use ($mulai, $selesai) {
                     $q->whereIn('status', ['Menunggu', 'Disetujui'])
                         ->where('tanggal_mulai', '<=', $selesai)
@@ -49,61 +64,40 @@ class HomeController extends Controller
             ->when(! $punyaFilter, fn ($query) => $query->limit($jumlah))
             ->get();
 
-        // AJAX: kembalikan partial hasil saja, query section lain dilewati.
         if ($request->ajax() || $request->wantsJson()) {
-            return view('home.partials.hasil-pencarian', compact(
-                'mobils',
-                'punyaFilter',
-                'cabangAktif',
-                'mulai',
-                'selesai',
-                'jumlah',
-                'totalTersedia'
-            ));
+            return view('home.partials.hasil-pencarian', compact('mobils', 'punyaFilter', 'cabangAktif', 'mulai', 'selesai', 'jumlah', 'totalTersedia'));
         }
 
-        $banners = DB::table('banners')
-            ->where('status', 'aktif')
-            ->orderBy('urutan')
-            ->get();
+        $banners = DB::table('banners')->where('status', 'aktif')->orderBy('urutan')->get();
 
-        $brands = DB::table('brands')
-            ->orderBy('name')
-            ->get();
+        $brands = DB::table('brands')->orderBy('name')->get();
 
-        $cabangs = DB::table('cabangs')
-            ->orderBy('name')
-            ->get();
+        $cabangs = DB::table('cabangs')->orderBy('name')->get();
 
         $ratings = DB::table('ratings')
             ->join('users', 'ratings.customer_id', '=', 'users.id')
-            ->select(
-                'ratings.*',
-                'users.name',
-                'users.photo as foto_user'
-            )
+            ->select('ratings.*', 'users.name', 'users.photo as foto_user')
             ->latest('ratings.id')
             ->limit(6)
             ->get();
 
-        $faqs = DB::table('faqs')
-            ->orderBy('urutan')
-            ->get();
+        $faqs = DB::table('faqs')->orderBy('urutan')->get();
 
-        return view('home', compact(
-            'banners',
-            'mobils',
-            'brands',
-            'ratings',
-            'faqs',
-            'cabangs',
-            'cabangAktif',
-            'mulai',
-            'selesai',
-            'punyaFilter',
-            'jumlah',
-            'totalTersedia'
-        ));
+        $kupons = DB::table('kupons')
+            ->where(function ($query) {
+                $query->whereNull('active_at')
+                    ->orWhere('active_at', '<=', now());
+            })
+            ->where(function ($query) {
+                $query->whereNull('expired_at')
+                    ->orWhere('expired_at', '>=', now());
+            })
+            ->whereColumn('terpakai', '<', 'kuota')
+            ->orderByDesc('id')
+            ->get();
+        $landing = LandingSetting::pluck('value', 'key')->toArray();
+
+        return view('home', compact('banners', 'mobils', 'brands', 'ratings', 'faqs', 'cabangs', 'kupons', 'cabangAktif', 'mulai', 'selesai', 'punyaFilter', 'jumlah', 'totalTersedia', 'landing', 'kontak'));
     }
 
     private function tanggalValid(?string $nilai, ?Carbon $minDate = null): ?Carbon
@@ -114,6 +108,10 @@ class HomeController extends Controller
 
         try {
             $tanggal = Carbon::createFromFormat('Y-m-d', $nilai)->startOfDay();
+
+            if ($tanggal->format('Y-m-d') !== $nilai) {
+                return null;
+            }
         } catch (\Throwable) {
             return null;
         }

@@ -6,9 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Mobil extends Model
 {
-    protected $table = 'mobils';
-
-    protected $fillable = [
+        protected $fillable = [
         'brand_id',
         'tipe_mobil_id',
         'cabang_id',

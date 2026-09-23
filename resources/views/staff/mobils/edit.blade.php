@@ -1,3 +1,4 @@
+```blade
 <!DOCTYPE html>
 <html lang="id">
 
@@ -12,16 +13,29 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         body {
             background: #f5f7f6;
-            font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .navbar {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .brand {
+            font-size: 25px;
+            font-weight: 800;
+            color: #1f2937;
+        }
+
+        .brand span {
+            color: #198754;
         }
 
         .page-header {
@@ -103,6 +117,14 @@
             font-weight: 500;
         }
 
+        .current-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 15px;
+            border: 1px solid #dee2e6;
+        }
+
         .image-preview {
             width: 100%;
             height: 220px;
@@ -141,14 +163,8 @@
             font-weight: 600;
         }
 
-        .page-content {
-            padding: 24px;
-        }
-
-        @media (max-width: 1024px) {
-            .page-content {
-                padding: 16px;
-            }
+        footer {
+            margin-top: 50px;
         }
     </style>
 
@@ -156,10 +172,51 @@
 
 <body>
 
-@include('layouts.partials.staff-sidebar')
+<nav class="navbar">
 
-{{-- Page Content (dipindah ke #mainContent oleh staff-sidebar) --}}
-<div class="page-content">
+    <div class="container py-3">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <a href="{{ route('staff.dashboard') }}"
+               class="text-decoration-none brand">
+
+                Rental<span>ku</span>.
+
+            </a>
+
+            <div class="d-flex align-items-center gap-3">
+
+                <span class="d-none d-md-block">
+
+                    <i class="bi bi-person-circle me-1"></i>
+
+                    {{ Auth::user()->name }}
+
+                </span>
+
+                <form action="{{ route('logout') }}" method="POST">
+
+                    @csrf
+
+                    <button type="submit"
+                            class="btn btn-outline-danger btn-sm">
+
+                        <i class="bi bi-box-arrow-right"></i>
+
+                        Keluar
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</nav>
 
 <div class="container">
 
@@ -199,7 +256,6 @@
 
     </div>
 
-
     @if($errors->any())
 
         <div class="alert alert-danger alert-dismissible fade show mt-4">
@@ -231,7 +287,6 @@
 
     @endif
 
-
     <div class="form-card">
 
         <form action="{{ route('staff.mobils.update', $mobil->id) }}"
@@ -251,7 +306,6 @@
                     Informasi Mobil
 
                 </div>
-
 
                 <div class="row g-4">
 
@@ -289,7 +343,6 @@
 
                     </div>
 
-
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -324,7 +377,6 @@
 
                     </div>
 
-
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -344,7 +396,6 @@
                         @enderror
 
                     </div>
-
 
                     <div class="col-md-6">
 
@@ -366,7 +417,6 @@
 
                     </div>
 
-
                     <div class="col-md-4">
 
                         <label class="form-label">
@@ -387,7 +437,6 @@
                         @enderror
 
                     </div>
-
 
                     <div class="col-md-4">
 
@@ -422,7 +471,6 @@
 
                     </div>
 
-
                     <div class="col-md-4">
 
                         <label class="form-label">
@@ -451,7 +499,6 @@
 
                     </div>
 
-
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -471,7 +518,6 @@
                         @enderror
 
                     </div>
-
 
                     <div class="col-md-6">
 
@@ -509,7 +555,6 @@
 
                 </div>
 
-
                 <div class="section-title mt-5">
 
                     <i class="bi bi-cash-stack me-2"></i>
@@ -517,7 +562,6 @@
                     Harga dan Status
 
                 </div>
-
 
                 <div class="row g-4">
 
@@ -549,7 +593,6 @@
 
                     </div>
 
-
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -577,7 +620,6 @@
                         @enderror
 
                     </div>
-
 
                     <div class="col-md-6">
 
@@ -615,7 +657,6 @@
 
                 </div>
 
-
                 <div class="section-title mt-5">
 
                     <i class="bi bi-image me-2"></i>
@@ -623,7 +664,6 @@
                     Foto Mobil
 
                 </div>
-
 
                 <div class="row g-4">
 
@@ -651,7 +691,6 @@
                         @enderror
 
                     </div>
-
 
                     <div class="col-md-6">
 
@@ -683,7 +722,6 @@
 
                 </div>
 
-
                 <div class="section-title mt-5">
 
                     <i class="bi bi-check2-square me-2"></i>
@@ -691,7 +729,6 @@
                     Fasilitas Mobil
 
                 </div>
-
 
                 <div class="row g-3">
 
@@ -716,7 +753,7 @@
 
                                 <span class="form-check-label">
 
-                                    {{ $item->name }}
+                                    {{ $item->nama_fasilitas }}
 
                                 </span>
 
@@ -740,7 +777,6 @@
 
                 </div>
 
-
                 <div class="section-title mt-5">
 
                     <i class="bi bi-card-text me-2"></i>
@@ -748,7 +784,6 @@
                     Deskripsi
 
                 </div>
-
 
                 <div>
 
@@ -768,7 +803,6 @@
                     @enderror
 
                 </div>
-
 
                 <div class="d-flex justify-content-end gap-2 mt-5">
 
@@ -800,11 +834,7 @@
 
 </div>
 
-</div>
-
-
-@include('layouts.partials.admin-footer', ['pageTitle' => 'Staff Dashboard - Edit Data Mobil'])
-
+@include('layouts.partials.admin-footer', ['pageTitle' => 'Staff Dashboard • Edit Data Mobil'])
 
 <script>
 
@@ -822,7 +852,6 @@ $('#image').on('change', function(event) {
 });
 
 </script>
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

@@ -6,9 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Kompensasi extends Model
 {
-    protected $table = 'kompensasis';
-
-    protected $fillable = [
+        protected $fillable = [
         'mobil_id',
         'rental_id',
         'customer_id',

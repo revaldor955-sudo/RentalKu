@@ -6,18 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class MetodePembayaran extends Model
 {
-    protected $table = 'metode_pembayarans';
-    protected $fillable = [
-        'name',
-        'nomor_akun',
-        'cabang_id',
-        'atas_nama',
-    ];
-
-    public function cabang()
-    {
-        return $this->belongsTo(Cabang::class, 'cabang_id');
-    }
+    protected $fillable = ['name', 'nomor_akun'];
 
     public function pembayaran()
     {

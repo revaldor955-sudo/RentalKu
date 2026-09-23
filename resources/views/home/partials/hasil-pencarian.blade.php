@@ -1,4 +1,4 @@
-{{-- Dipakai oleh home.blade.php via @include dan HomeController::index() saat AJAX --}}
+
 @php
     $bulanIndo = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 @endphp
@@ -63,7 +63,6 @@
 
 </div>
 
-
 <div class="row g-4">
 
     @forelse($mobils as $mobil)
@@ -81,13 +80,11 @@
                         class="car-image" alt="{{ $mobil->name }}">
                 @endif
 
-
                 <div class="car-content">
 
                     <div class="car-title">
                         {{ $mobil->name }}
                     </div>
-
 
                     <div class="car-info mb-4">
 
@@ -107,7 +104,6 @@
                         </span>
 
                     </div>
-
 
                     <div class="d-flex justify-content-between align-items-center">
 
