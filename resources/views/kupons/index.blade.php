@@ -149,7 +149,6 @@
 
 @include('layouts.partials.admin-navbar')
 
-
 <div class="container py-5">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -184,11 +183,9 @@
 
     </div>
 
-
     @if(session('success'))
         <span id="flashSuccess" class="d-none">{{ session('success') }}</span>
     @endif
-
 
     @if($errors->any())
         <div class="alert alert-danger">
@@ -203,7 +200,6 @@
 
         </div>
     @endif
-
 
     <div class="page-card">
 
@@ -227,7 +223,7 @@
                 </thead>
 
                 <tbody>
-                    {{-- Diisi oleh DataTables (server-side) --}}
+
                 </tbody>
 
             </table>
@@ -237,9 +233,6 @@
     </div>
 
 </div>
-
-
-{{-- MODAL TAMBAH --}}
 
 <div
     class="modal fade"
@@ -294,7 +287,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label fw-bold">
@@ -323,7 +315,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label fw-bold">
@@ -340,7 +331,6 @@
                             >
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -359,7 +349,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label fw-bold">
@@ -377,7 +366,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label fw-bold">
@@ -392,7 +380,6 @@
                             >
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -440,9 +427,6 @@
     </div>
 
 </div>
-
-
-{{-- MODAL EDIT --}}
 
 <div
     class="modal fade"
@@ -639,7 +623,6 @@
     </div>
 
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
 

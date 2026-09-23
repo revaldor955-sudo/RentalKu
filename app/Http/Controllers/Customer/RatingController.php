@@ -16,15 +16,10 @@ class RatingController extends Controller
 
         abort_unless($rental->status === 'Selesai', 403);
 
-        $sudahMemberiUlasan = Rating::where(
-            'booking_id',
-            $rental->id
-        )->exists();
+        $sudahMemberiUlasan = Rating::where('booking_id', $rental->id)->exists();
 
         if ($sudahMemberiUlasan) {
-            return redirect()
-                ->route('customer.dashboard')
-                ->with('error', 'Pengajuan ini sudah memiliki ulasan.');
+            return redirect()->route('customer.dashboard')->with('error', 'Pengajuan ini sudah memiliki ulasan.');
         }
 
         return view('customer.ratings.create', compact('rental'));
@@ -36,15 +31,10 @@ class RatingController extends Controller
 
         abort_unless($rental->status === 'Selesai', 403);
 
-        $sudahMemberiUlasan = Rating::where(
-            'booking_id',
-            $rental->id
-        )->exists();
+        $sudahMemberiUlasan = Rating::where('booking_id', $rental->id)->exists();
 
         if ($sudahMemberiUlasan) {
-            return redirect()
-                ->route('customer.dashboard')
-                ->with('error', 'Pengajuan ini sudah memiliki ulasan.');
+            return redirect()->route('customer.dashboard')->with('error', 'Pengajuan ini sudah memiliki ulasan.');
         }
 
         $validated = $request->validate([
@@ -60,8 +50,6 @@ class RatingController extends Controller
             'komentar' => $validated['komentar'] ?? null,
         ]);
 
-        return redirect()
-            ->route('customer.dashboard')
-            ->with('success', 'Ulasan berhasil dikirim.');
+        return redirect()->route('customer.dashboard')->with('success', 'Ulasan berhasil dikirim.');
     }
 }

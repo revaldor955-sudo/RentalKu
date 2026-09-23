@@ -27,12 +27,7 @@
             --background: #f6f8f7;
         }
 
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            margin: 0;
             background: var(--background);
             color: var(--dark);
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -575,7 +570,6 @@
 
     </main>
 
-    {{-- MODAL TAMBAH SUPIR --}}
     <div class="modal fade"
         id="tambahSupirModal"
         tabindex="-1"
@@ -713,7 +707,6 @@
 
     </div>
 
-    {{-- MODAL EDIT SUPIR --}}
     @foreach($supirs as $supir)
 
         <div class="modal fade"

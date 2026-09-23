@@ -119,10 +119,8 @@
 
     @include('layouts.partials.admin-navbar')
 
-
     <div class="container py-5">
 
-        {{-- Kop laporan khusus cetak --}}
         <div class="print-header">
             <h2 class="fw-bold mb-1">Laporan Pendapatan RentalKu.</h2>
             <p class="mb-1">
@@ -133,7 +131,6 @@
                 Dicetak: {{ now()->translatedFormat('d F Y, H:i') }}
             </small>
         </div>
-
 
         <div class="mb-4 no-print">
 
@@ -154,8 +151,6 @@
 
         </div>
 
-
-        {{-- Filter periode --}}
         <form method="GET" action="{{ route('laporan.index') }}" class="page-card p-4 mb-4 no-print">
 
             <div class="row g-3 align-items-end">
@@ -195,8 +190,6 @@
 
         </form>
 
-
-        {{-- Kartu ringkasan --}}
         <div class="row g-3 mb-4">
             <div class="col-md-3 col-6">
                 <div class="summary-card p-4">
@@ -236,7 +229,6 @@
 
         </div>
 
-        {{-- grafik + breakdown metode --}}
         <div class="row g-3 mb-4">
                 <div class="col-lg-8">
                     <div class="page-card p-4 no-print">
@@ -269,7 +261,6 @@
                     </div>
                 </div>
             </div>
-
 
             @php
                 // Gabungkan 3 sumber jadi satu aliran kas, urut tanggal.
@@ -304,7 +295,7 @@
                     ]))
                     ->sortBy('tanggal');
             @endphp
-            
+
             @if ($arus->isNotEmpty())
                 <div class="page-card p-4">
                     <div class="table-responsive">
@@ -395,8 +386,6 @@
                 </div>
             @endif
 
-
-            {{-- Tombol cetak --}}
             @if ($arus->isNotEmpty())
                 <div class="text-center mt-4 no-print">
 
@@ -407,7 +396,6 @@
 
                 </div>
             @endif
-
 
         </div>
 
@@ -442,7 +430,6 @@
             });
         </script>
 
-        {{-- Bootstrap JS: dibutuhkan modal profil di navbar --}}
         <script
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

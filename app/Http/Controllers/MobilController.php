@@ -12,9 +12,6 @@ use Illuminate\Http\Request;
 
 class MobilController extends Controller
 {
-    /**
-     * Menampilkan data mobil
-     */
     public function index()
     {
         $mobils = Mobil::with(['brand', 'tipeMobil', 'cabang', 'fasilitas'])
@@ -26,28 +23,11 @@ class MobilController extends Controller
         $cabangs = Cabang::all();
         $fasilitas = Fasilitas::all();
 
-        if (request()->is('staff/mobils')) {
-            return view('staff.mobils.index', compact(
-                'mobils',
-                'brands',
-                'tipeMobils',
-                'cabangs',
-                'fasilitas'
-            ));
-        }
+        $view = request()->is('staff/mobils') ? 'staff.mobils.index' : 'mobils.index';
 
-        return view('mobils.index', compact(
-            'mobils',
-            'brands',
-            'tipeMobils',
-            'cabangs',
-            'fasilitas'
-        ));
+        return view($view, compact('mobils', 'brands', 'tipeMobils', 'cabangs', 'fasilitas'));
     }
 
-    /**
-     * Server-side DataTables: daftar mobil (search, sort, pagination)
-     */
     public function data(Request $request)
     {
         $query = Mobil::query()
@@ -202,30 +182,19 @@ class MobilController extends Controller
 
         $validated['transmisi'] = ucfirst(strtolower($validated['transmisi']));
 
-        // Upload gambar
         if ($request->hasFile('image')) {
-
             $image = $request->file('image');
-
             $imageName = time().'_'.$image->getClientOriginalName();
-
-            $image->move(
-                public_path('images/mobils'),
-                $imageName
-            );
-
+            $image->move(public_path('images/mobils'), $imageName);
             $validated['image'] = 'images/mobils/'.$imageName;
         }
 
-        // Simpan mobil
         $mobil = Mobil::create($validated);
 
-        // Simpan fasilitas
         if ($request->has('fasilitas')) {
             $mobil->fasilitas()->sync($request->fasilitas);
         }
 
-        // Jika Staff
         if ($request->is('staff/mobils')) {
             return redirect()
                 ->route('staff.mobils.index')
@@ -238,55 +207,28 @@ class MobilController extends Controller
             ->with('success', 'Mobil berhasil ditambahkan.');
     }
 
-    /**
-     * Detail mobil
-     */
-   /**
- * Detail mobil
- */
-public function show(Request $request, $id)
-{
-    $mobil = Mobil::with([
-        'brand',
-        'tipeMobil',
-        'cabang',
-        'fasilitas',
-    ])->findOrFail($id);
+    public function show(Request $request, $id)
+    {
+        $mobil = Mobil::with([
+            'brand',
+            'tipeMobil',
+            'cabang',
+            'fasilitas',
+        ])->findOrFail($id);
 
-    // Mengambil semua cabang
-    $cabangs = Cabang::orderBy('name')->get();
+        $cabangs = Cabang::orderBy('name')->get();
 
-    // Mengambil supir yang tersedia
-    $supirs = Supir::where('status', 'tersedia')
-        ->orderBy('name')
-        ->get();
+        $supirs = Supir::where('status', 'tersedia')
+            ->orderBy('name')
+            ->get();
 
-    // Permintaan AJAX untuk modal detail mobil customer
-    if ($request->ajax() || $request->wantsJson()) {
+        $view = ($request->ajax() || $request->wantsJson())
+            ? 'customer.partials.mobil-detail-modal'
+            : 'customer.mobil-detail';
 
-        return view(
-            'customer.partials.mobil-detail-modal',
-            compact(
-                'mobil',
-                'cabangs',
-                'supirs'
-            )
-        );
+        return view($view, compact('mobil', 'cabangs', 'supirs'));
     }
 
-    return view(
-        'customer.mobil-detail',
-        compact(
-            'mobil',
-            'cabangs',
-            'supirs'
-        )
-    );
-}
-
-    /**
-     * Form edit
-     */
     public function edit(Mobil $mobil)
     {
         $brands = Brand::all();

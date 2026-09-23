@@ -203,19 +203,6 @@
             color: white;
         }
 
-        .btn-back {
-            border: 1px solid #dfe5e1;
-            background: white;
-            color: #374151;
-            border-radius: 13px;
-            padding: 13px 20px;
-            font-weight: 600;
-        }
-
-        .btn-back:hover {
-            background: #f5f7f6;
-        }
-
         .section-title {
             font-weight: 800;
             margin-bottom: 20px;
@@ -246,7 +233,6 @@
 
 <body>
 
-{{-- NAVBAR --}}
 <nav class="navbar">
     <div class="container py-3">
 
@@ -317,12 +303,10 @@
     </div>
 
 
-    {{-- DETAIL --}}
     <div class="detail-card">
 
         <div class="row g-0">
 
-            {{-- FOTO --}}
             <div class="col-lg-6 p-3 p-md-4">
 
                @if($mobil->image)
@@ -342,7 +326,6 @@
             </div>
 
 
-            {{-- INFORMASI --}}
             <div class="col-lg-6">
 
                 <div class="detail-content">
@@ -388,7 +371,6 @@
 </p>
 
 
-                    {{-- HARGA --}}
                     <div class="price-box">
 
                         <div class="price-label">
@@ -408,8 +390,7 @@
 
 
                    
-                   {{-- SPESIFIKASI --}}
-<div class="row g-3 mt-2">
+                   <div class="row g-3 mt-2">
 
     <div class="col-6">
 
@@ -579,7 +560,6 @@
 </div>
 
 
-                    {{-- BUTTON --}}
                    <div class="mt-4">
 
     @if($mobil->status === 'Tersedia')
@@ -651,7 +631,6 @@
     </div>
 
 
-    {{-- INFORMASI TAMBAHAN --}}
     <div class="row mt-5 g-4">
 
         <div class="col-lg-7">
@@ -867,14 +846,12 @@
             showCloseButton: true,
             focusConfirm: false,
             allowOutsideClick: false,
-            // stopKeydownPropagation: true,
 
           didOpen: function () {
 
     const popup = Swal.getPopup();
     const form = popup.querySelector('form');
 
-    // Aktifkan input, select, textarea, dan tombol
     const fields = popup.querySelectorAll(
         'input, select, textarea, button'
     );
@@ -885,21 +862,6 @@
         field.style.pointerEvents = 'auto';
     });
 
-    // Kode promo
-    const kodePromo = popup.querySelector(
-        'input[name="kode_promo"]'
-    );
-
-    if (kodePromo) {
-        kodePromo.removeAttribute('readonly');
-        kodePromo.removeAttribute('disabled');
-        kodePromo.disabled = false;
-        kodePromo.readOnly = false;
-        kodePromo.style.pointerEvents = 'auto';
-        kodePromo.style.cursor = 'text';
-    }
-
-    // Catatan
     const catatan = popup.querySelector(
         'textarea[name="catatan"]'
     );
@@ -913,7 +875,6 @@
         catatan.style.cursor = 'text';
     }
 
-    // Validasi tanggal
     const tanggalMulai = popup.querySelector(
         'input[name="tanggal_mulai"]'
     );
@@ -939,7 +900,6 @@
 
     }
 
-    // Submit form
     $(form).on('submit', function () {
 
         const tombol = form.querySelector(

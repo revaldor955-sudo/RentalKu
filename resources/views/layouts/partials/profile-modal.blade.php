@@ -1,7 +1,4 @@
-{{-- MODAL PROFIL BERSAMA --}}
-{{-- Dipakai admin, staff, dan customer via @include('layouts.partials.profile-modal'). --}}
-{{-- Syarat: Bootstrap CSS + JS bundle sudah dimuat halaman masing-masing. --}}
-{{-- Trigger: elemen apa pun dengan data-bs-toggle="modal" data-bs-target="#profileModal". --}}
+
 
 <style>
     .pm-avatar {

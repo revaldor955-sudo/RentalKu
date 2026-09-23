@@ -10,29 +10,6 @@
         background: #f8faf9;
         display: block;
     }
-
-
-.swal2-container {
-    z-index: 20000 !important;
-}
-
-#formSewaContainer {
-    pointer-events: auto !important;
-}
-
-#formSewaContainer form {
-    display: block !important;
-    pointer-events: auto !important;
-}
-
-#formSewaContainer input,
-#formSewaContainer textarea,
-#formSewaContainer select {
-    pointer-events: auto !important;
-    user-select: text !important;
-    -webkit-user-select: text !important;
-    opacity: 1 !important;
-}
     .mobil-modal .mm-content {
         padding: 28px;
     }
@@ -116,6 +93,7 @@
 }
 
 #formSewaContainer form {
+    display: block !important;
     pointer-events: auto !important;
 }
 
@@ -667,7 +645,6 @@
 
 <script>
 
-
 function openSewaPopup() {
     const template = document.getElementById('sewaFormTemplate');
     const form = template?.querySelector('#sewaForm');
@@ -681,7 +658,6 @@ function openSewaPopup() {
         return;
     }
 
-    // Buat tempat untuk mengembalikan form
     const placeholder = document.createElement('span');
     placeholder.style.display = 'none';
 
@@ -700,15 +676,12 @@ function openSewaPopup() {
         didOpen: () => {
             const container = document.getElementById('formSewaContainer');
 
-            // Pindahkan form ASLI ke SweetAlert
             container.appendChild(form);
 
-            // Pastikan form tampil dan bisa digunakan
             form.style.display = 'block';
             form.style.visibility = 'visible';
             form.style.pointerEvents = 'auto';
 
-            // Aktifkan seluruh input
             form.querySelectorAll('input, textarea, select').forEach(input => {
                 input.disabled = false;
                 input.readOnly = false;
@@ -717,7 +690,6 @@ function openSewaPopup() {
                 input.style.opacity = '1';
             });
 
-            // Pastikan kolom dapat diketik
             const kodePromo = form.querySelector('[name="kode_promo"]');
             const catatan = form.querySelector('[name="catatan"]');
 
@@ -730,7 +702,6 @@ function openSewaPopup() {
                 }
             });
 
-            // Validasi tanggal
             const mulai = form.querySelector('[name="tanggal_mulai"]');
             const selesai = form.querySelector('[name="tanggal_selesai"]');
 
@@ -746,7 +717,6 @@ function openSewaPopup() {
         },
 
         didClose: () => {
-            // Kembalikan form ke template semula
             if (placeholder.parentNode) {
                 placeholder.parentNode.insertBefore(form, placeholder.nextSibling);
                 form.style.display = '';

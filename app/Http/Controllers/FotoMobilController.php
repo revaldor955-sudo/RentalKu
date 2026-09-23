@@ -8,28 +8,19 @@ use Illuminate\Http\Request;
 
 class FotoMobilController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+        public function index()
     {
         $fotoMobils = FotoMobil::all();
         $mobils = Mobil::all();
         return view('foto_mobils.index', compact('fotoMobils', 'mobils'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+        public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+        public function store(Request $request)
     {
         $validated = $request->validate([
             'mobil_id' => 'required|exists:mobils,id',
@@ -52,26 +43,17 @@ class FotoMobilController extends Controller
             ->with('success', 'Foto mobil berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(FotoMobil $fotoMobil)
+        public function show(FotoMobil $fotoMobil)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(FotoMobil $fotoMobil)
+        public function edit(FotoMobil $fotoMobil)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, FotoMobil $fotoMobil)
+        public function update(Request $request, FotoMobil $fotoMobil)
     {
         $validated = $request->validate([
             'mobil_id' => 'required|exists:mobils,id',
@@ -95,10 +77,7 @@ class FotoMobilController extends Controller
             ->with('success', 'Foto mobil berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(FotoMobil $fotoMobil)
+        public function destroy(FotoMobil $fotoMobil)
     {
         $fotoMobil->delete();
 

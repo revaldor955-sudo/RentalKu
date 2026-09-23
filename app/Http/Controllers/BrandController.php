@@ -7,17 +7,11 @@ use Illuminate\Http\Request;
 
 class BrandController extends Controller
 {
-    /**
-     * Menampilkan semua brand
-     */
     public function index()
     {
         return view('brands.index');
     }
 
-    /**
-     * Server-side DataTables: daftar brand (search, sort, pagination)
-     */
     public function data(Request $request)
     {
         $query = Brand::query()->withCount('mobils');
@@ -73,9 +67,6 @@ class BrandController extends Controller
         ]);
     }
 
-    /**
-     * Detail brand untuk edit modal (AJAX)
-     */
     public function show(Brand $brand)
     {
         return response()->json([
@@ -87,9 +78,6 @@ class BrandController extends Controller
         ]);
     }
 
-    /**
-     * Menyimpan brand baru
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -107,16 +95,9 @@ class BrandController extends Controller
         ]);
 
         if ($request->hasFile('logo')) {
-
             $image = $request->file('logo');
-
             $imageName = time() . '_' . $image->getClientOriginalName();
-
-            $image->move(
-                public_path('images/brands'),
-                $imageName
-            );
-
+            $image->move(public_path('images/brands'), $imageName);
             $validated['logo'] = 'images/brands/' . $imageName;
         }
 
@@ -133,9 +114,6 @@ class BrandController extends Controller
             ->with('success', 'Brand berhasil ditambahkan.');
     }
 
-    /**
-     * Memperbarui brand
-     */
     public function update(Request $request, Brand $brand)
     {
         $validated = $request->validate([
@@ -153,24 +131,13 @@ class BrandController extends Controller
         ]);
 
         if ($request->hasFile('logo')) {
-
-            // Hapus logo lama
-            if (
-                $brand->logo &&
-                file_exists(public_path($brand->logo))
-            ) {
+            if ($brand->logo && file_exists(public_path($brand->logo))) {
                 unlink(public_path($brand->logo));
             }
 
             $image = $request->file('logo');
-
             $imageName = time() . '_' . $image->getClientOriginalName();
-
-            $image->move(
-                public_path('images/brands'),
-                $imageName
-            );
-
+            $image->move(public_path('images/brands'), $imageName);
             $validated['logo'] = 'images/brands/' . $imageName;
         }
 
@@ -187,9 +154,6 @@ class BrandController extends Controller
             ->with('success', 'Brand berhasil diperbarui.');
     }
 
-    /**
-     * Menghapus brand
-     */
     public function destroy(Request $request, Brand $brand)
     {
         // Cegah penghapusan jika masih digunakan mobil

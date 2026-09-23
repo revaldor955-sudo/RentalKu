@@ -113,16 +113,9 @@
 
 <body>
 
-
-    {{-- NAVBAR --}}
-
     @include('layouts.partials.admin-navbar')
 
-
     <div class="container py-5">
-
-
-        {{-- HEADER --}}
 
         <div class="mb-4">
 
@@ -143,9 +136,6 @@
 
         </div>
 
-
-        {{-- ALERT --}}
-
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show">
 
@@ -157,7 +147,6 @@
 
             </div>
         @endif
-
 
         @if ($errors->any())
 
@@ -174,9 +163,6 @@
             </div>
 
         @endif
-
-
-        {{-- TABLE --}}
 
         <div class="page-card">
 
@@ -229,7 +215,7 @@
                     </thead>
 
                     <tbody>
-                        {{-- Diisi oleh DataTables (server-side) --}}
+
                     </tbody>
 
                 </table>
@@ -240,8 +226,6 @@
 
     </div>
 
-
-    {{-- MODAL DETAIL PEMBAYARAN --}}
     <div class="modal fade" id="detailPembayaranModal" tabindex="-1" aria-labelledby="detailPembayaranModalLabel"
         aria-hidden="true">
 
@@ -263,7 +247,6 @@
 
                 <div class="modal-body p-4">
 
-                    {{-- LOADING --}}
                     <div id="pembayaranDetailLoading" class="text-center py-5">
                         <div class="spinner-border text-success" role="status"></div>
                         <p class="text-muted mt-3 mb-0">
@@ -271,7 +254,6 @@
                         </p>
                     </div>
 
-                    {{-- ERROR --}}
                     <div id="pembayaranDetailError" class="alert alert-danger d-none" role="alert">
                         <i class="bi bi-exclamation-triangle-fill me-2"></i>
                         <span id="pembayaranDetailErrorMessage">
@@ -279,7 +261,6 @@
                         </span>
                     </div>
 
-                    {{-- KONTEN --}}
                     <div id="pembayaranDetailContent" class="d-none">
 
                         <div class="row g-3">
@@ -342,7 +323,6 @@
         </div>
 
     </div>
-
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

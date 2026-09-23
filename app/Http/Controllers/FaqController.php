@@ -9,9 +9,7 @@ class FaqController extends Controller
 {
     public function index()
     {
-        $faqs = Faq::orderBy('urutan', 'asc')
-            ->orderBy('id', 'desc')
-            ->get();
+        $faqs = Faq::orderBy('urutan', 'asc')->orderBy('id', 'desc')->get();
 
         return view('faqs.index', compact('faqs'));
     }
@@ -35,9 +33,7 @@ class FaqController extends Controller
             'urutan' => $validated['urutan'] ?? 0,
         ]);
 
-        return redirect()
-            ->route('faqs.index')
-            ->with('success', 'FAQ berhasil ditambahkan.');
+        return redirect()->route('faqs.index')->with('success', 'FAQ berhasil ditambahkan.');
     }
 
     public function update(Request $request, Faq $faq)
@@ -59,17 +55,13 @@ class FaqController extends Controller
             'urutan' => $validated['urutan'] ?? 0,
         ]);
 
-        return redirect()
-            ->route('faqs.index')
-            ->with('success', 'FAQ berhasil diperbarui.');
+        return redirect()->route('faqs.index')->with('success', 'FAQ berhasil diperbarui.');
     }
 
     public function destroy(Faq $faq)
     {
         $faq->delete();
 
-        return redirect()
-            ->route('faqs.index')
-            ->with('success', 'FAQ berhasil dihapus.');
+        return redirect()->route('faqs.index')->with('success', 'FAQ berhasil dihapus.');
     }
 }

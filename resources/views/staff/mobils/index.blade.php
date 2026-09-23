@@ -27,20 +27,11 @@
 
     <style>
 
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            margin: 0;
             background: #f4f6f5;
             color: #17201c;
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
-
-        /* =========================
-           NAVBAR
-        ========================= */
 
         .topbar {
             height: 76px;
@@ -93,10 +84,6 @@
             border-color: #f1c7cb;
             color: #b02a37;
         }
-
-        /* =========================
-           PAGE
-        ========================= */
 
         .page-wrapper {
             max-width: 1450px;
@@ -191,10 +178,6 @@
             transform: translateY(-1px);
         }
 
-        /* =========================
-           OVERVIEW
-        ========================= */
-
         .overview-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -249,10 +232,6 @@
             margin-top: 2px;
         }
 
-        /* =========================
-           ALERT
-        ========================= */
-
         .custom-alert {
             border: none;
             border-radius: 14px;
@@ -260,10 +239,6 @@
             font-size: 13px;
             box-shadow: 0 5px 18px rgba(0,0,0,.03);
         }
-
-        /* =========================
-           MAIN CARD
-        ========================= */
 
         .fleet-card {
             background: white;
@@ -321,10 +296,6 @@
             color: #727c77;
         }
 
-        /* =========================
-           TABLE
-        ========================= */
-
         .table {
             margin: 0;
         }
@@ -357,10 +328,6 @@
         .table tbody tr:hover {
             background: #fbfdfc;
         }
-
-        /* =========================
-           CAR INFO
-        ========================= */
 
         .car-info {
             display: flex;
@@ -442,10 +409,6 @@
             white-space: nowrap;
         }
 
-        /* =========================
-           STATUS
-        ========================= */
-
         .status-pill {
             display: inline-flex;
             align-items: center;
@@ -490,10 +453,6 @@
             background: #b02a37;
         }
 
-        /* =========================
-           ACTION
-        ========================= */
-
         .action-wrap {
             display: flex;
             justify-content: center;
@@ -533,10 +492,6 @@
             border-color: #f0c8cc;
         }
 
-        /* =========================
-           EMPTY
-        ========================= */
-
         .empty-state {
             padding: 75px 20px;
             text-align: center;
@@ -565,10 +520,6 @@
             color: #929b96;
             font-size: 12px;
         }
-
-        /* =========================
-           MODAL
-        ========================= */
 
         .modal-content {
             border: none;
@@ -684,10 +635,6 @@
             background: #edf0ee;
             flex: 1;
         }
-
-        /* =========================
-           RESPONSIVE
-        ========================= */
 
         @media(max-width: 1000px) {
 
@@ -819,8 +766,6 @@
 
     </div>
 
-
-    {{-- HEADER --}}
 
     <div class="hero-title">
 

@@ -28,15 +28,6 @@ class DashboardController extends Controller
 
         $mobils = Mobil::latest()->take(5)->get();
 
-        return view('staff.dashboard', compact(
-            'totalMobils',
-            'mobilTersedia',
-            'mobilDisewa',
-            'mobilMaintenance',
-            'totalUsers',
-            'totalRental',
-            'totalPembayaran',
-            'mobils'
-        ));
+        return view('staff.dashboard', compact('totalMobils', 'mobilTersedia', 'mobilDisewa', 'mobilMaintenance', 'totalUsers', 'totalRental', 'totalPembayaran', 'mobils'));
     }
 }

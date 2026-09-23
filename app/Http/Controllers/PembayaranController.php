@@ -18,9 +18,6 @@ class PembayaranController extends Controller
         return view('admin.pembayaran.index');
     }
 
-    /**
-     * Server-side DataTables: daftar pembayaran (search, sort, pagination)
-     */
     public function data(Request $request)
     {
         $query = Pembayaran::query()
@@ -97,9 +94,6 @@ class PembayaranController extends Controller
         ]);
     }
 
-    /**
-     * Detail pembayaran untuk modal popup (AJAX)
-     */
     public function detail(Pembayaran $pembayaran)
     {
         $pembayaran->load([
@@ -126,9 +120,6 @@ class PembayaranController extends Controller
         ]);
     }
 
-    /**
-     * FORM PEMBAYARAN CUSTOMER
-     */
     public function create(Rental $rental)
     {
         if ($rental->user_id != Auth::id()) {
@@ -149,9 +140,6 @@ class PembayaranController extends Controller
         ));
     }
 
-    /**
-     * SIMPAN PEMBAYARAN CUSTOMER
-     */
     public function store(Request $request, Rental $rental)
     {
         if ($rental->user_id != Auth::id()) {
@@ -192,9 +180,6 @@ class PembayaranController extends Controller
             ->with('success', 'Bukti pembayaran berhasil dikirim.');
     }
 
-    /**
-     * UPDATE STATUS PEMBAYARAN ADMIN
-     */
     public function updateStatus(Request $request, Pembayaran $pembayaran)
     {
         $validated = $request->validate([

@@ -7,9 +7,6 @@ use Illuminate\Http\Request;
 
 class BannerController extends Controller
 {
-    /**
-     * Server-side DataTables: daftar banner (search, sort, pagination)
-     */
     public function data(Request $request)
     {
         $query = Banner::query();
@@ -68,25 +65,16 @@ class BannerController extends Controller
         ]);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return view('banners.index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -116,25 +104,16 @@ class BannerController extends Controller
             ->with('success', 'Banner berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Banner $banner)
     {
         return response()->json($banner);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Banner $banner)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Banner $banner)
     {
         $validated = $request->validate([
@@ -164,9 +143,6 @@ class BannerController extends Controller
             ->with('success', 'Banner berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Banner $banner)
     {
         $banner->delete();

@@ -16,7 +16,6 @@
                         Checkout RentalKu
                     </h3>
 
-                    {{-- INFORMASI MOBIL --}}
                     <div class="d-flex align-items-center gap-3 mb-4">
 
                         @if($mobil->image)
@@ -42,7 +41,6 @@
 
                     </div>
 
-                    {{-- FORM KONFIRMASI --}}
                     <form
                         action="{{ route('rentals.checkout.confirm', $mobil->id) }}"
                         method="POST"
@@ -50,7 +48,6 @@
 
                         @csrf
 
-                        {{-- DETAIL RENTAL --}}
                         <h5 class="fw-bold mb-3">
                             Detail Rental
                         </h5>
@@ -97,7 +94,6 @@
 
                         <hr>
 
-                        {{-- INPUT PROMO --}}
                         <div
                             class="p-3 rounded-3 mb-4"
                             style="background: #f0fff6; border: 1px solid #d5f5e3;"
@@ -128,7 +124,6 @@
 
                         </div>
 
-                        {{-- INFORMASI DISKON --}}
                         @if(isset($diskon) && $diskon > 0)
 
                             <div class="d-flex justify-content-between mb-2 text-success">
@@ -141,7 +136,6 @@
 
                         @endif
 
-                        {{-- TOTAL --}}
                         <div class="d-flex justify-content-between align-items-center mb-4">
 
                             <strong class="fs-5">

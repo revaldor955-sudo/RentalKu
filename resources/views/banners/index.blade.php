@@ -166,7 +166,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- Diisi oleh DataTables (server-side) --}}
+
                     </tbody>
                 </table>
             </div>
@@ -174,8 +174,6 @@
 
     </div>
 
-
-    {{-- MODAL TAMBAH --}}
     <div class="modal fade" id="tambahBannerModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
@@ -234,8 +232,6 @@
         </div>
     </div>
 
-
-    {{-- MODAL EDIT --}}
     <div class="modal fade" id="editBannerModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
@@ -293,7 +289,6 @@
             </div>
         </div>
     </div>
-
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>

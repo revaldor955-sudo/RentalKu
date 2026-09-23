@@ -14,9 +14,6 @@ class KuponController extends Controller
         return view('kupons.index', compact('kupons'));
     }
 
-    /**
-     * Server-side DataTables: daftar promo (search, sort, pagination)
-     */
     public function data(Request $request)
     {
         $query = Kupon::query();

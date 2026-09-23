@@ -21,9 +21,6 @@ class PemeriksaanKendaraanController extends Controller
         return view('pemeriksaan_kendaraan.index', compact('rentals', 'kerusakanList'));
     }
 
-    /**
-     * Server-side DataTables: daftar pemeriksaan kendaraan
-     */
     public function data(Request $request)
     {
         $query = PemeriksaanMobil::query()
@@ -115,9 +112,6 @@ class PemeriksaanKendaraanController extends Controller
         ]);
     }
 
-    /**
-     * Simpan pemeriksaan baru
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -158,9 +152,6 @@ class PemeriksaanKendaraanController extends Controller
         ]);
     }
 
-    /**
-     * Update pemeriksaan
-     */
     public function update(Request $request, PemeriksaanMobil $pemeriksaan)
     {
         $validated = $request->validate([

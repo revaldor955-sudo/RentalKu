@@ -172,7 +172,6 @@
 
 <body>
 
-{{-- NAVBAR --}}
 <nav class="navbar">
 
     <div class="container py-3">
@@ -219,10 +218,8 @@
 
 </nav>
 
-
 <div class="container">
 
-    {{-- HEADER --}}
     <div class="page-header">
 
         <div class="d-flex justify-content-between align-items-center">
@@ -259,8 +256,6 @@
 
     </div>
 
-
-    {{-- ERROR --}}
     @if($errors->any())
 
         <div class="alert alert-danger alert-dismissible fade show mt-4">
@@ -292,8 +287,6 @@
 
     @endif
 
-
-    {{-- FORM --}}
     <div class="form-card">
 
         <form action="{{ route('staff.mobils.update', $mobil->id) }}"
@@ -306,7 +299,6 @@
 
             <div class="p-4 p-md-5">
 
-                {{-- INFORMASI DASAR --}}
                 <div class="section-title">
 
                     <i class="bi bi-car-front me-2"></i>
@@ -315,10 +307,8 @@
 
                 </div>
 
-
                 <div class="row g-4">
 
-                    {{-- BRAND --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -353,8 +343,6 @@
 
                     </div>
 
-
-                    {{-- TIPE --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -389,8 +377,6 @@
 
                     </div>
 
-
-                    {{-- NAMA --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -411,8 +397,6 @@
 
                     </div>
 
-
-                    {{-- PLAT --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -433,8 +417,6 @@
 
                     </div>
 
-
-                    {{-- TAHUN --}}
                     <div class="col-md-4">
 
                         <label class="form-label">
@@ -456,8 +438,6 @@
 
                     </div>
 
-
-                    {{-- TRANSMISI --}}
                     <div class="col-md-4">
 
                         <label class="form-label">
@@ -491,8 +471,6 @@
 
                     </div>
 
-
-                    {{-- KAPASITAS --}}
                     <div class="col-md-4">
 
                         <label class="form-label">
@@ -521,8 +499,6 @@
 
                     </div>
 
-
-                    {{-- WARNA --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -543,8 +519,6 @@
 
                     </div>
 
-
-                    {{-- CABANG --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -581,8 +555,6 @@
 
                 </div>
 
-
-                {{-- HARGA --}}
                 <div class="section-title mt-5">
 
                     <i class="bi bi-cash-stack me-2"></i>
@@ -591,10 +563,8 @@
 
                 </div>
 
-
                 <div class="row g-4">
 
-                    {{-- HARGA --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -623,8 +593,6 @@
 
                     </div>
 
-
-                    {{-- DEPOSIT --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -653,8 +621,6 @@
 
                     </div>
 
-
-                    {{-- STATUS --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -691,8 +657,6 @@
 
                 </div>
 
-
-                {{-- FOTO --}}
                 <div class="section-title mt-5">
 
                     <i class="bi bi-image me-2"></i>
@@ -700,7 +664,6 @@
                     Foto Mobil
 
                 </div>
-
 
                 <div class="row g-4">
 
@@ -728,7 +691,6 @@
                         @enderror
 
                     </div>
-
 
                     <div class="col-md-6">
 
@@ -760,8 +722,6 @@
 
                 </div>
 
-
-                {{-- FASILITAS --}}
                 <div class="section-title mt-5">
 
                     <i class="bi bi-check2-square me-2"></i>
@@ -769,7 +729,6 @@
                     Fasilitas Mobil
 
                 </div>
-
 
                 <div class="row g-3">
 
@@ -818,8 +777,6 @@
 
                 </div>
 
-
-                {{-- DESKRIPSI --}}
                 <div class="section-title mt-5">
 
                     <i class="bi bi-card-text me-2"></i>
@@ -827,7 +784,6 @@
                     Deskripsi
 
                 </div>
-
 
                 <div>
 
@@ -848,8 +804,6 @@
 
                 </div>
 
-
-                {{-- BUTTON --}}
                 <div class="d-flex justify-content-end gap-2 mt-5">
 
                     <a href="{{ route('staff.mobils.index') }}"
@@ -880,9 +834,7 @@
 
 </div>
 
-
 @include('layouts.partials.admin-footer', ['pageTitle' => 'Staff Dashboard • Edit Data Mobil'])
-
 
 <script>
 
@@ -900,7 +852,6 @@ $('#image').on('change', function(event) {
 });
 
 </script>
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

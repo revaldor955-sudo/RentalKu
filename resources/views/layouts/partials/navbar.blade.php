@@ -1,15 +1,11 @@
 <nav class="rk-navbar" id="rkNavbar">
 
     <div class="container rk-navbar-inner">
-
-        {{-- LOGO --}}
         <a class="rk-logo" href="{{ url('/') }}">
             Rental<span>ku</span><b>.</b>
         </a>
 
-        {{-- DESKTOP MENU --}}
         <div class="rk-desktop-menu">
-
             <a href="{{ url('/') }}" class="rk-nav-link">
                 <span>01</span>
                 Beranda
@@ -34,26 +30,15 @@
                 <span>05</span>
                 FAQ
             </a>
-            
 
             <a href="{{ url('/#kontak') }}" class="rk-nav-link">
                 <span>06</span>
                 Kontak
             </a>
-
-              {{-- <a href="{{ url('/#cabang') }}" class="rk-nav-link">
-                <span>06</span>
-                Cabang
-            </a> --}}
-
-
-
         </div>
 
 
-        {{-- DESKTOP AUTH --}}
         <div class="rk-navbar-actions">
-
             @auth
 
                 <div class="rk-user">
@@ -93,7 +78,6 @@
         </div>
 
 
-        {{-- MOBILE BUTTON --}}
         <button
             type="button"
             class="rk-menu-button"
@@ -108,9 +92,7 @@
     </div>
 
 
-    {{-- MOBILE MENU --}}
     <div class="rk-mobile-menu" id="rkMobileMenu">
-
         <div class="rk-mobile-menu-inner">
 
             <div class="rk-mobile-menu-label">

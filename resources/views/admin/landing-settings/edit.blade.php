@@ -6,7 +6,6 @@
 
 <div class="container-fluid py-4">
 
-    {{-- HEADER --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h3 class="fw-bold mb-1">
@@ -20,7 +19,6 @@
         </div>
     </div>
 
-    {{-- SUCCESS --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show">
             <i class="bi bi-check-circle me-2"></i>
@@ -32,7 +30,6 @@
         </div>
     @endif
 
-    {{-- ERROR --}}
     @if($errors->any())
         <div class="alert alert-danger">
             <strong>Terjadi kesalahan:</strong>
@@ -50,11 +47,6 @@
 
         @csrf
         @method('PUT')
-
-
-        {{-- ========================================================= --}}
-        {{-- HERO SECTION --}}
-        {{-- ========================================================= --}}
 
         <div class="card border-0 shadow-sm rounded-4 mb-4">
 
@@ -110,12 +102,6 @@
             </div>
         </div>
 
-
-
-        {{-- ========================================================= --}}
-        {{-- ABOUT SECTION --}}
-        {{-- ========================================================= --}}
-
         <div class="card border-0 shadow-sm rounded-4 mb-4">
 
             <div class="card-header bg-success text-white rounded-top-4 py-3">
@@ -139,7 +125,6 @@
                            placeholder="Solusi Rental Mobil untuk Setiap Perjalanan">
                 </div>
 
-
                 <div>
                     <label class="form-label fw-semibold">
                         About Description
@@ -153,12 +138,6 @@
 
             </div>
         </div>
-
-
-
-        {{-- ========================================================= --}}
-        {{-- BRAND SECTION --}}
-        {{-- ========================================================= --}}
 
         <div class="card border-0 shadow-sm rounded-4 mb-4">
 
@@ -183,7 +162,6 @@
                            placeholder="Pilihan Brand Mobil">
                 </div>
 
-
                 <div>
                     <label class="form-label fw-semibold">
                         Brand Description
@@ -197,12 +175,6 @@
 
             </div>
         </div>
-
-
-
-        {{-- ========================================================= --}}
-        {{-- PROMO SECTION --}}
-        {{-- ========================================================= --}}
 
         <div class="card border-0 shadow-sm rounded-4 mb-4">
 
@@ -227,7 +199,6 @@
                            placeholder="Promo RentalKu">
                 </div>
 
-
                 <div>
                     <label class="form-label fw-semibold">
                         Promo Description
@@ -241,12 +212,6 @@
 
             </div>
         </div>
-
-
-
-        {{-- ========================================================= --}}
-        {{-- FEATURE SECTION --}}
-        {{-- ========================================================= --}}
 
         <div class="card border-0 shadow-sm rounded-4 mb-4">
 
@@ -271,7 +236,6 @@
                            placeholder="Kenapa Memilih RentalKu?">
                 </div>
 
-
                 <div>
                     <label class="form-label fw-semibold">
                         Feature Description
@@ -285,12 +249,6 @@
 
             </div>
         </div>
-
-
-
-        {{-- ========================================================= --}}
-        {{-- STEPS SECTION --}}
-        {{-- ========================================================= --}}
 
         <div class="card border-0 shadow-sm rounded-4 mb-4">
 
@@ -315,7 +273,6 @@
                            placeholder="Cara Mudah Rental Mobil">
                 </div>
 
-
                 <div>
                     <label class="form-label fw-semibold">
                         Steps Description
@@ -329,12 +286,6 @@
 
             </div>
         </div>
-
-
-
-        {{-- ========================================================= --}}
-        {{-- TESTIMONIAL SECTION --}}
-        {{-- ========================================================= --}}
 
         <div class="card border-0 shadow-sm rounded-4 mb-4">
 
@@ -359,7 +310,6 @@
                            placeholder="Apa Kata Pelanggan Kami?">
                 </div>
 
-
                 <div>
                     <label class="form-label fw-semibold">
                         Testimonial Description
@@ -373,12 +323,6 @@
 
             </div>
         </div>
-
-
-
-        {{-- ========================================================= --}}
-        {{-- FAQ SECTION --}}
-        {{-- ========================================================= --}}
 
         <div class="card border-0 shadow-sm rounded-4 mb-4">
 
@@ -403,7 +347,6 @@
                            placeholder="Pertanyaan yang Sering Diajukan">
                 </div>
 
-
                 <div>
                     <label class="form-label fw-semibold">
                         FAQ Description
@@ -418,12 +361,6 @@
             </div>
         </div>
 
-
-
-        {{-- ========================================================= --}}
-        {{-- BUTTON --}}
-        {{-- ========================================================= --}}
-
         <div class="d-flex justify-content-end gap-2 mb-4">
 
             <a href="{{ url('/') }}"
@@ -434,7 +371,6 @@
                 Lihat Landing Page
 
             </a>
-
 
             <button type="submit"
                     class="btn btn-success rounded-pill px-4">

@@ -11,10 +11,7 @@ class LandingSetting extends Model
         'value',
     ];
 
-    public static function getValue(
-        string $key,
-        ?string $default = null
-    ): ?string {
+    public static function getValue(string $key, ?string $default = null): ?string {
         return static::where('key', $key)->value('value') ?? $default;
     }
 }

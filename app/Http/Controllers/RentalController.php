@@ -86,20 +86,9 @@ class RentalController extends Controller
             $validated['tanggal_selesai']
         );
 
-        $jumlahHari = $tanggalMulai->diffInDays(
-            $tanggalSelesai
-        );
+        $jumlahHari = $tanggalMulai->diffInDays($tanggalSelesai);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Mengecek jadwal rental mobil
-        |--------------------------------------------------------------------------
-        */
-
-        $rentalBertabrakan = Rental::where(
-            'mobil_id',
-            $mobil->id
-        )
+        $rentalBertabrakan = Rental::where('mobil_id', $mobil->id)
             ->whereIn('status', [
                 'Menunggu',
                 'Disetujui',

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 
@@ -29,12 +28,7 @@
             --rk-border: #e9eeeb;
         }
 
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            margin: 0;
             background: var(--rk-bg);
             font-family: 'Plus Jakarta Sans', sans-serif;
             color: #26352e;
@@ -390,7 +384,6 @@
 
     <main class="page-wrapper">
 
-        {{-- HEADER --}}
         <div class="page-header">
 
             <div>
@@ -416,7 +409,6 @@
         </div>
 
 
-        {{-- ALERT SUCCESS --}}
         @if (session('success'))
 
             <div class="alert alert-success alert-dismissible fade show mb-4"
@@ -436,7 +428,6 @@
         @endif
 
 
-        {{-- ALERT ERROR --}}
         @if ($errors->any())
 
             <div class="alert alert-danger alert-dismissible fade show mb-4"
@@ -467,7 +458,6 @@
         @endif
 
 
-        {{-- STATISTIC --}}
         <div class="row g-4 mb-4">
 
             <div class="col-md-4">
@@ -536,7 +526,6 @@
         </div>
 
 
-        {{-- TABLE --}}
         <div class="content-card">
 
             <div class="card-heading">
@@ -659,8 +648,6 @@
 
                                         <div class="action-group">
 
-                                            {{-- EDIT --}}
-
                                             <button type="button"
                                                 class="btn-action btn-edit"
                                                 data-bs-toggle="modal"
@@ -671,8 +658,6 @@
 
                                             </button>
 
-
-                                            {{-- DELETE --}}
 
                                             <button type="button"
                                                 class="btn-action btn-delete"
@@ -690,8 +675,6 @@
 
                                 </tr>
 
-
-                                {{-- MODAL EDIT --}}
 
                                 <div class="modal fade"
                                     id="modalEdit{{ $faq->id }}"
@@ -805,8 +788,6 @@
 
                                 </div>
 
-
-                                {{-- MODAL HAPUS --}}
 
                                 <div class="modal fade"
                                     id="modalHapus{{ $faq->id }}"
@@ -958,8 +939,6 @@
 
     </main>
 
-
-    {{-- MODAL TAMBAH --}}
 
     <div class="modal fade"
         id="modalTambah"

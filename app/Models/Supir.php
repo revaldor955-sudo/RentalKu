@@ -6,9 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Supir extends Model
 {
-    protected $table = 'supirs';
-
-    protected $fillable = [
+        protected $fillable = [
         'name',
         'phone',
         'image',

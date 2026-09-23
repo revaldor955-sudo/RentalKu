@@ -7,24 +7,20 @@
 
     <title>Management Mobil - RentalKu</title>
 
-    {{-- BOOTSTRAP --}}
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet">
 
-    {{-- BOOTSTRAP ICON --}}
     <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    {{-- FONT --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
-    {{-- DATATABLE --}}
     <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/css/dataTables.bootstrap5.min.css">
@@ -41,22 +37,13 @@
             --white: #ffffff;
         }
 
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            margin: 0;
             background:
                 radial-gradient(circle at 10% 0%, rgba(25, 135, 84, .06), transparent 25%),
                 var(--background);
             font-family: 'Plus Jakarta Sans', sans-serif;
             color: var(--dark);
         }
-
-        /* =========================
-           NAVBAR
-        ========================== */
 
         .navbar {
             background: rgba(255, 255, 255, .92);
@@ -75,19 +62,11 @@
             color: var(--primary);
         }
 
-        /* =========================
-           MAIN
-        ========================== */
-
         .main-container {
             max-width: 1440px;
             margin: auto;
             padding: 30px 20px 70px;
         }
-
-        /* =========================
-           HERO
-        ========================== */
 
         .hero {
             position: relative;
@@ -167,10 +146,6 @@
             transform: rotate(-4deg);
         }
 
-        /* =========================
-           ALERT
-        ========================== */
-
         .custom-alert {
             margin-top: 22px;
             padding: 15px 18px;
@@ -193,10 +168,6 @@
             color: #b02a37;
             border-color: #f3c8cd;
         }
-
-        /* =========================
-           STATISTICS
-        ========================== */
 
         .stats {
             margin-top: 24px;
@@ -262,10 +233,6 @@
             font-size: 11px;
         }
 
-        /* =========================
-           SECTION HEADER
-        ========================== */
-
         .section-header {
             margin-top: 42px;
             margin-bottom: 20px;
@@ -287,10 +254,6 @@
             color: var(--muted);
             font-size: 13px;
         }
-
-        /* =========================
-           BUTTON
-        ========================== */
 
         .btn-primary-custom {
             border: none;
@@ -323,10 +286,6 @@
         .btn-dashboard:hover {
             background: #f8faf9;
         }
-
-        /* =========================
-           FILTER BAR
-        ========================== */
 
         .filter-card {
             background: white;
@@ -369,10 +328,6 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .10);
         }
-
-        /* =========================
-           TABLE
-        ========================== */
 
         .table-card {
             background: white;
@@ -433,10 +388,6 @@
         #mobils-table thead .dt-column-order {
             display: none !important;
         }
-
-        /* =========================
-           CAR
-        ========================== */
 
         .car-wrapper {
             display: flex;
@@ -505,10 +456,6 @@
             color: #68736c;
         }
 
-        /* =========================
-           STATUS
-        ========================== */
-
         .badge-status {
             display: inline-flex;
             align-items: center;
@@ -542,10 +489,6 @@
             background: #ffe7ea;
             color: #c23645;
         }
-
-        /* =========================
-           ACTION
-        ========================== */
 
         .action-group {
             display: flex;
@@ -587,10 +530,6 @@
             border-color: #f3c8cd;
         }
 
-        /* =========================
-           DATATABLE
-        ========================== */
-
         .dt-container {
             padding: 0 20px 18px;
         }
@@ -618,10 +557,6 @@
             background: var(--primary) !important;
             color: white !important;
         }
-
-        /* =========================
-           MODAL
-        ========================== */
 
         .modal-content {
             border: none;
@@ -675,10 +610,6 @@
             min-height: 105px;
         }
 
-        /* =========================
-           FORM SECTION
-        ========================== */
-
         .form-section {
             padding: 17px;
             background: #fafcfb;
@@ -707,10 +638,6 @@
             background: var(--primary-soft);
             color: var(--primary);
         }
-
-        /* =========================
-           FACILITIES
-        ========================== */
 
         .facility-box {
             padding: 13px;
@@ -743,10 +670,6 @@
             accent-color: var(--primary);
         }
 
-        /* =========================
-           PHOTO PREVIEW
-        ========================== */
-
         .photo-preview-box {
             display: flex;
             align-items: center;
@@ -764,10 +687,6 @@
             border-radius: 11px;
         }
 
-        /* =========================
-           FOOTER
-        ========================== */
-
         footer {
             margin-top: 30px;
             padding: 28px 20px;
@@ -783,10 +702,6 @@
         .footer-brand span {
             color: var(--primary);
         }
-
-        /* =========================
-           RESPONSIVE
-        ========================== */
 
         @media (max-width: 768px) {
 
@@ -842,9 +757,6 @@
 
     <main class="main-container">
 
-        {{-- ================================
-             HERO
-        ================================= --}}
         <section class="hero">
 
             <div class="hero-content">
@@ -871,9 +783,6 @@
         </section>
 
 
-        {{-- ================================
-             ALERT SUCCESS
-        ================================= --}}
         @if(session('success'))
 
             <div class="custom-alert success">
@@ -884,9 +793,6 @@
         @endif
 
 
-        {{-- ================================
-             ALERT ERROR
-        ================================= --}}
         @if($errors->any())
 
             <div class="custom-alert error">
@@ -911,9 +817,6 @@
         @endif
 
 
-        {{-- ================================
-             STATISTIK
-        ================================= --}}
         <div class="row g-3 stats">
 
             {{-- TOTAL --}}
@@ -1054,9 +957,6 @@
         </div>
 
 
-        {{-- ================================
-             SECTION HEADER
-        ================================= --}}
         <div class="section-header">
 
             <div>
@@ -1096,9 +996,6 @@
         </div>
 
 
-        {{-- ================================
-             TABLE
-        ================================= --}}
         <div class="table-card">
 
             <div class="table-card-header">
@@ -1192,9 +1089,6 @@
     </main>
 
 
-    {{-- ======================================================
-         MODAL TAMBAH MOBIL
-    ======================================================= --}}
     <div class="modal fade"
          id="tambahMobilModal"
          tabindex="-1"
@@ -1692,9 +1586,6 @@
     </div>
 
 
-    {{-- ======================================================
-         MODAL EDIT MOBIL
-    ======================================================= --}}
     <div class="modal fade"
          id="editMobilModal"
          tabindex="-1"
@@ -2218,10 +2109,6 @@
     </footer>
 
 
-    {{-- =========================
-         JS
-    ========================== --}}
-
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
@@ -2237,10 +2124,6 @@
 
         const CSRF_TOKEN = '{{ csrf_token() }}';
 
-
-        /* =====================================================
-           STATUS BADGE
-        ====================================================== */
 
         function statusBadge(status) {
 
@@ -2259,10 +2142,6 @@
             `;
         }
 
-
-        /* =====================================================
-           FOTO MOBIL
-        ====================================================== */
 
         function mobilPhoto(image) {
 
@@ -2289,10 +2168,6 @@
             `;
         }
 
-
-        /* =====================================================
-           AKSI
-        ====================================================== */
 
         function mobilActions(data) {
 
@@ -2324,10 +2199,6 @@
         }
 
 
-        /* =====================================================
-           DATATABLE
-        ====================================================== */
-
         $(document).ready(function() {
 
             $('#mobils-table').DataTable({
@@ -2337,8 +2208,7 @@
                 serverSide: true,
 
                 ajax: {
-                    url: '{{ route('mobils.data') }}',
-                    type: 'GET'
+                    url: '{{ route('mobils.data') }}'
                 },
 
                 columns: [
@@ -2364,8 +2234,6 @@
 
                     {
                         data: null,
-                        orderable: true,
-                        searchable: true,
 
                         render: function(data) {
 
@@ -2490,11 +2358,7 @@
                     {
                         data: 'status',
 
-                        render: function(data) {
-
-                            return statusBadge(data);
-
-                        }
+                        render: statusBadge
                     },
 
 
@@ -2504,11 +2368,7 @@
                         searchable: false,
                         width: '100px',
 
-                        render: function(data) {
-
-                            return mobilActions(data);
-
-                        }
+                        render: mobilActions
                     }
 
                 ],
@@ -2517,9 +2377,6 @@
                 order: [
                     [1, 'asc']
                 ],
-
-
-                pageLength: 10,
 
 
                 lengthMenu: [
@@ -2562,10 +2419,6 @@
         });
 
 
-        /* =====================================================
-           DELETE
-        ====================================================== */
-
         function deleteMobil(id, name) {
 
             Swal.fire({
@@ -2587,8 +2440,6 @@
                 cancelButtonText: 'Batal',
 
                 reverseButtons: true,
-
-                buttonsStyling: true,
 
             }).then(function(result) {
 
@@ -2688,10 +2539,6 @@
         }
 
 
-        /* =====================================================
-           EDIT MOBIL
-        ====================================================== */
-
         function editMobil(id) {
 
             const table =
@@ -2720,8 +2567,6 @@
             }
 
 
-            /* ACTION FORM */
-
             $('#formEditMobil').attr(
 
                 'action',
@@ -2731,8 +2576,6 @@
 
             );
 
-
-            /* FIELD */
 
             $('#editBrandId').val(data.brand_id);
 
@@ -2773,8 +2616,6 @@
                 .val(data.description);
 
 
-            /* FASILITAS */
-
             $('#editMobilModal .edit-fasilitas-checkbox')
                 .prop('checked', false);
 
@@ -2808,8 +2649,6 @@
             }
 
 
-            /* FOTO */
-
             if (data.image) {
 
                 $('#editFotoPreview')
@@ -2840,8 +2679,6 @@
             $('#editImage').val('');
 
 
-            /* SHOW MODAL */
-
             const modal =
                 bootstrap.Modal
                     .getOrCreateInstance(
@@ -2855,10 +2692,6 @@
 
         }
 
-
-        /* =====================================================
-           UPDATE MOBIL
-        ====================================================== */
 
         $('#formEditMobil').on(
             'submit',
@@ -3011,10 +2844,6 @@
         );
 
 
-        /* =====================================================
-           PREVIEW FOTO EDIT
-        ====================================================== */
-
         $('#editImage').on(
             'change',
             function() {
@@ -3053,10 +2882,6 @@
         );
 
 
-        /* =====================================================
-           PREVIEW FOTO TAMBAH
-        ====================================================== */
-
         $('#tambahMobilModal input[name="image"]')
             .on('change', function() {
 
@@ -3072,11 +2897,6 @@
 
                 reader.onload =
                     function(e) {
-
-                        /*
-                         * Preview sederhana menggunakan
-                         * SweetAlert.
-                         */
 
                         Swal.fire({
 
@@ -3096,10 +2916,6 @@
 
             });
 
-
-        /* =====================================================
-           AUTO CLOSE ALERT
-        ====================================================== */
 
         setTimeout(function() {
 

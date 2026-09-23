@@ -43,23 +43,14 @@ class SupirController extends Controller
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-
-            $imageName = time() . '_' . uniqid() . '.' .
-                $image->getClientOriginalExtension();
-
-            $image->move(
-                public_path('images/supirs'),
-                $imageName
-            );
-
+            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/supirs'), $imageName);
             $validated['image'] = 'images/supirs/' . $imageName;
         }
 
         Supir::create($validated);
 
-        return redirect()
-            ->route('supirs.index')
-            ->with('success', 'Supir berhasil ditambahkan.');
+        return redirect()->route('supirs.index')->with('success', 'Supir berhasil ditambahkan.');
     }
 
     public function show(Supir $supir)

@@ -6,7 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
 <title>Management Fasilitas - RentalKu</title>
 
 <link
@@ -127,8 +126,6 @@
 
 <div class="container py-5">
 
-{{-- HEADER --}}
-
 <div class="d-flex justify-content-between align-items-center mb-4">
 
     <div>
@@ -165,15 +162,9 @@
 
 </div>
 
-
-{{-- SUCCESS --}}
-
 @if(session('success'))
     <span id="flashSuccess" class="d-none">{{ session('success') }}</span>
 @endif
-
-
-{{-- ERROR --}}
 
 @if($errors->any())
 
@@ -197,10 +188,7 @@
 
 @endif
 
-
 <div class="row g-4">
-
-    {{-- DAFTAR FASILITAS --}}
 
     <div class="col-lg-12">
 
@@ -251,7 +239,7 @@
                     </thead>
 
                     <tbody>
-                        {{-- Diisi oleh DataTables (server-side) --}}
+
                     </tbody>
 
                 </table>
@@ -263,9 +251,6 @@
     </div>
 
 </div>
-
-
-{{-- MODAL TAMBAH --}}
 
 <div
     class="modal fade"
@@ -344,9 +329,6 @@
     </div>
 
 </div>
-
-
-{{-- MODAL EDIT --}}
 
 <div
     class="modal fade"

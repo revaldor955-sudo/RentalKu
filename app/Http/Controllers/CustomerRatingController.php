@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class CustomerRatingController extends Controller
 {
-    /**
-     * Menampilkan halaman rating.
-     */
     public function create($rental)
     {
         $rental = Rental::findOrFail($rental);
@@ -24,27 +21,15 @@ class CustomerRatingController extends Controller
             abort(403, 'Rental belum selesai.');
         }
 
-        $sudahMemberiRating = Rating::where(
-            'booking_id',
-            $rental->id
-        )->exists();
+        $sudahMemberiRating = Rating::where('booking_id', $rental->id)->exists();
 
         if ($sudahMemberiRating) {
-            return redirect()
-                ->route('customer.dashboard')
-                ->with('error', 'Rental ini sudah memiliki rating.');
+            return redirect()->route('customer.dashboard')->with('error', 'Rental ini sudah memiliki rating.');
         }
 
-        return view(
-            'customer.ratings.create',
-            compact('rental')
-        );
+        return view('customer.ratings.create', compact('rental'));
     }
 
-
-    /**
-     * Menyimpan rating.
-     */
     public function store(Request $request, $rental)
     {
         $rental = Rental::findOrFail($rental);
@@ -57,30 +42,15 @@ class CustomerRatingController extends Controller
             abort(403, 'Rental belum selesai.');
         }
 
-        $sudahMemberiRating = Rating::where(
-            'booking_id',
-            $rental->id
-        )->exists();
+        $sudahMemberiRating = Rating::where('booking_id', $rental->id)->exists();
 
         if ($sudahMemberiRating) {
-            return redirect()
-                ->route('customer.dashboard')
-                ->with('error', 'Rental ini sudah memiliki rating.');
+            return redirect()->route('customer.dashboard')->with('error', 'Rental ini sudah memiliki rating.');
         }
 
         $validated = $request->validate([
-            'rating' => [
-                'required',
-                'integer',
-                'min:1',
-                'max:5',
-            ],
-
-            'komentar' => [
-                'required',
-                'string',
-                'max:1000',
-            ],
+            'rating' => 'required|integer|min:1|max:5',
+            'komentar' => 'required|string|max:1000',
         ]);
 
         $rating = new Rating();
@@ -93,8 +63,6 @@ class CustomerRatingController extends Controller
 
         $rating->save();
 
-        return redirect()
-            ->route('customer.dashboard')
-            ->with('success', 'Rating berhasil dikirim.');
+        return redirect()->route('customer.dashboard')->with('success', 'Rating berhasil dikirim.');
     }
 }

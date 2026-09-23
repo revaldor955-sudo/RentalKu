@@ -194,14 +194,12 @@
     </div>
 </nav>
 
-
 <div class="container">
 
     <div class="payment-wrapper">
 
         <div class="payment-card">
 
-            {{-- HEADER --}}
             <div class="payment-header">
 
                 <h2>
@@ -215,10 +213,8 @@
 
             </div>
 
-
             <div class="payment-body">
 
-                {{-- ERROR --}}
                 @if($errors->any())
 
                     <div class="alert alert-danger">
@@ -241,8 +237,6 @@
 
                 @endif
 
-
-                {{-- INFORMASI RENTAL --}}
                 <div class="rental-info">
 
                     <h5>
@@ -264,7 +258,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <div class="info-label">
@@ -276,7 +269,6 @@
                             </div>
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -290,7 +282,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <div class="info-label">
@@ -303,7 +294,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <div class="info-label">
@@ -315,7 +305,6 @@
                             </div>
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -330,7 +319,6 @@
                         </div>
 
                     </div>
-
 
                     <div class="total-box">
 
@@ -356,8 +344,6 @@
 
                 </div>
 
-
-                {{-- FORM PEMBAYARAN --}}
                 <form
                     action="{{ route('pembayaran.store', $rental->id) }}"
                     method="POST"
@@ -366,8 +352,6 @@
 
                     @csrf
 
-
-                    {{-- METODE PEMBAYARAN --}}
                     <div class="mb-4">
 
                         <label class="form-label">
@@ -410,8 +394,6 @@
 
                     </div>
 
-
-                    {{-- DETAIL METODE --}}
                     @if($metodePembayarans->count())
 
                         <div class="mb-4" id="metodeDetail">
@@ -457,8 +439,6 @@
 
                     @endif
 
-
-                    {{-- TANGGAL BAYAR --}}
                     <div class="mb-4">
 
                         <label class="form-label">
@@ -483,8 +463,6 @@
 
                     </div>
 
-
-                    {{-- BUKTI PEMBAYARAN --}}
                     <div class="mb-4">
 
                         <label class="form-label">
@@ -512,7 +490,6 @@
 
                         @enderror
 
-
                         <img
                             id="preview"
                             class="preview-image"
@@ -521,8 +498,6 @@
 
                     </div>
 
-
-                    {{-- INFO --}}
                     <div class="alert alert-warning">
 
                         <i class="bi bi-info-circle me-2"></i>
@@ -537,8 +512,6 @@
 
                     </div>
 
-
-                    {{-- BUTTON --}}
                     <div class="d-flex justify-content-between gap-2 mt-4">
 
                         <a
@@ -548,7 +521,6 @@
                             <i class="bi bi-arrow-left me-1"></i>
                             Kembali
                         </a>
-
 
                         <button
                             type="submit"
@@ -572,7 +544,6 @@
     </div>
 
 </div>
-
 
 <script>
 

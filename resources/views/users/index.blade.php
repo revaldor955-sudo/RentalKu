@@ -159,13 +159,10 @@
 
 <body>
 
-    {{-- NAVBAR --}}
     @include('layouts.partials.admin-navbar')
-
 
     <div class="container py-5">
 
-        {{-- HEADER --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
 
             <div>
@@ -194,7 +191,6 @@
 
         </div>
 
-
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show">
 
@@ -206,7 +202,6 @@
 
             </div>
         @endif
-
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show">
@@ -220,8 +215,6 @@
             </div>
         @endif
 
-
-        {{-- VALIDATION ERROR --}}
         @if ($errors->any())
 
             <div class="alert alert-danger">
@@ -242,8 +235,6 @@
 
         @endif
 
-
-        {{-- TABLE --}}
         <div class="page-card">
 
             <div class="table-responsive">
@@ -287,7 +278,7 @@
                     </thead>
 
                     <tbody>
-                        {{-- Diisi oleh DataTables (server-side) --}}
+
                     </tbody>
 
                 </table>
@@ -298,8 +289,6 @@
 
     </div>
 
-
-    {{-- MODAL EDIT (reusabel, diisi via AJAX) --}}
     <div class="modal fade" id="editUserModal" tabindex="-1">
 
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -351,7 +340,6 @@
 
                                 </div>
 
-
                                 <div class="col-md-6">
 
                                     <label class="form-label">
@@ -361,7 +349,6 @@
                                     <input type="email" name="email" id="edit-email" class="form-control" required>
 
                                 </div>
-
 
                                 <div class="col-md-6">
 
@@ -381,7 +368,6 @@
 
                                 </div>
 
-
                                 <div class="col-md-6">
 
                                     <label class="form-label">
@@ -393,7 +379,6 @@
 
                                 </div>
 
-
                                 <div class="col-md-6">
 
                                     <label class="form-label">
@@ -403,7 +388,6 @@
                                     <input type="text" name="phone" id="edit-phone" class="form-control">
 
                                 </div>
-
 
                                 <div class="col-md-6">
 
@@ -415,7 +399,6 @@
                                         accept=".jpg,.jpeg,.png">
 
                                 </div>
-
 
                                 <div class="col-12">
 
@@ -432,7 +415,6 @@
                         </div>
 
                     </div>
-
 
                     <div class="modal-footer">
 
@@ -455,7 +437,6 @@
         </div>
 
     </div>
-
 
     <div class="modal fade" id="detailUserModal" tabindex="-1" aria-labelledby="detailUserModalLabel"
         aria-hidden="true">
@@ -554,7 +535,6 @@
 
                 </div>
 
-
                 <form id="tambahUserForm" action="{{ route('users.store') }}" method="POST"
                     enctype="multipart/form-data">
 
@@ -575,7 +555,6 @@
 
                             </div>
 
-
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -586,7 +565,6 @@
                                     placeholder="contoh@email.com" required>
 
                             </div>
-
 
                             <div class="col-md-6">
 
@@ -610,7 +588,6 @@
 
                             </div>
 
-
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -622,7 +599,6 @@
 
                             </div>
 
-
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -633,7 +609,6 @@
                                     placeholder="08xxxxxxxxxx">
 
                             </div>
-
 
                             <div class="col-md-6">
 
@@ -649,7 +624,6 @@
 
                             </div>
 
-
                             <div class="col-12">
 
                                 <label class="form-label">
@@ -663,7 +637,6 @@
                         </div>
 
                     </div>
-
 
                     <div class="modal-footer">
 
@@ -686,7 +659,6 @@
         </div>
 
     </div>
-
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

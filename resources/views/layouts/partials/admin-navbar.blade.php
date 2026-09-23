@@ -62,8 +62,6 @@
 
         <div class="d-flex justify-content-between align-items-center w-100">
 
-            {{-- LOGO --}}
-
             <a href="{{ route('admin.dashboard') }}"
                 class="text-decoration-none brand">
 
@@ -71,8 +69,6 @@
 
             </a>
 
-
-            {{-- MENU --}}
 
             <div class="d-flex gap-2 align-items-center">
 
@@ -95,8 +91,6 @@
 
                 </a>
 
-
-                {{-- PROFIL --}}
 
                 <a href="#"
                     class="user-box d-none d-md-flex text-decoration-none text-dark"
@@ -122,7 +116,5 @@
     </div>
 </nav>
 
-
-{{-- MODAL PROFIL --}}
 
 @include('layouts.partials.profile-modal')

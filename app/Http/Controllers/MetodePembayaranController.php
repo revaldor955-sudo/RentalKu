@@ -7,27 +7,18 @@ use Illuminate\Http\Request;
 
 class MetodePembayaranController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+        public function index()
     {
         $metodePembayarans = MetodePembayaran::all();
         return view('metode_pembayarans.index', compact('metodePembayarans'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+        public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+        public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -43,26 +34,17 @@ class MetodePembayaranController extends Controller
             ->with('success', 'Metode pembayaran berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(MetodePembayaran $metodePembayaran)
+        public function show(MetodePembayaran $metodePembayaran)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(MetodePembayaran $metodePembayaran)
+        public function edit(MetodePembayaran $metodePembayaran)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, MetodePembayaran $metodePembayaran)
+        public function update(Request $request, MetodePembayaran $metodePembayaran)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -78,10 +60,7 @@ class MetodePembayaranController extends Controller
             ->with('success', 'Metode pembayaran berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(MetodePembayaran $metodePembayaran)
+        public function destroy(MetodePembayaran $metodePembayaran)
     {
         $metodePembayaran->delete();
 

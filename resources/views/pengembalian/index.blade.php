@@ -79,7 +79,6 @@
 
     @include('layouts.partials.admin-navbar')
 
-
     <div class="container py-4">
 
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -102,7 +101,6 @@
             </a>
 
         </div>
-
 
         <div class="card-custom">
 
@@ -149,7 +147,7 @@
                         </thead>
 
                         <tbody>
-                            {{-- Diisi oleh DataTables (server-side) --}}
+
                         </tbody>
 
                     </table>
@@ -161,7 +159,6 @@
         </div>
 
     </div>
-
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

@@ -37,10 +37,6 @@
 
     <style>
 
-        /* =========================================================
-           ROOT
-        ========================================================= */
-
         :root {
             --rk-green: #16834b;
             --rk-green-dark: #0f663a;
@@ -63,20 +59,11 @@
         }
 
 
-        /* =========================================================
-           RESET
-        ========================================================= */
-
-        * {
-            box-sizing: border-box;
-        }
-
         html {
             scroll-behavior: smooth;
         }
 
         body {
-            margin: 0;
             background: var(--rk-cream);
             color: var(--rk-dark);
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -92,10 +79,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-
-        /* =========================================================
-           PAGE BACKGROUND DECORATION
-        ========================================================= */
 
         .rk-page-decoration {
             position: fixed;
@@ -118,10 +101,6 @@
             left: -150px;
         }
 
-
-        /* =========================================================
-           NAVBAR
-        ========================================================= */
 
         .rk-navbar {
             position: sticky;
@@ -176,10 +155,6 @@
             color: var(--rk-green);
         }
 
-
-        /* =========================================================
-           USER PROFILE CHIP
-        ========================================================= */
 
         .rk-profile-trigger {
             display: flex;
@@ -245,18 +220,10 @@
         }
 
 
-        /* =========================================================
-           MAIN
-        ========================================================= */
-
         .rk-main {
             padding: 34px 0 70px;
         }
 
-
-        /* =========================================================
-           WELCOME HEADER
-        ========================================================= */
 
         .rk-welcome-row {
             margin-bottom: 25px;
@@ -307,10 +274,6 @@
         }
 
 
-        /* =========================================================
-           QUICK ACTION
-        ========================================================= */
-
         .rk-quick-action {
             display: inline-flex;
             align-items: center;
@@ -338,10 +301,6 @@
             font-size: 16px;
         }
 
-
-        /* =========================================================
-           BENTO HERO
-        ========================================================= */
 
         .rk-bento-hero {
             display: grid;
@@ -518,10 +477,6 @@
         }
 
 
-        /* =========================================================
-           HERO CAR IMAGE
-        ========================================================= */
-
         .rk-hero-car {
             position: absolute;
 
@@ -548,10 +503,6 @@
                 scale(1.02);
         }
 
-
-        /* =========================================================
-           SIDE BENTO
-        ========================================================= */
 
         .rk-side-stack {
             display: grid;
@@ -626,10 +577,6 @@
             background: rgba(22,131,75,.06);
         }
 
-
-        /* =========================================================
-           STATS
-        ========================================================= */
 
         .rk-stat-grid {
             display: grid;
@@ -706,10 +653,6 @@
         }
 
 
-        /* =========================================================
-           SECTION HEADER
-        ========================================================= */
-
         .rk-section {
             margin-bottom: 75px;
         }
@@ -753,10 +696,6 @@
             margin: 7px 0 0;
         }
 
-
-        /* =========================================================
-           RENTAL CARDS
-        ========================================================= */
 
         .rk-rental-list {
             display: grid;
@@ -884,10 +823,6 @@
         }
 
 
-        /* =========================================================
-           PAYMENT BUTTONS / ALERT
-        ========================================================= */
-
         .rk-payment-button {
             display: flex;
             align-items: center;
@@ -988,10 +923,6 @@
         }
 
 
-        /* =========================================================
-           EMPTY STATE
-        ========================================================= */
-
         .rk-empty {
             background: white;
 
@@ -1035,10 +966,6 @@
             margin: 0;
         }
 
-
-        /* =========================================================
-           CAR GRID
-        ========================================================= */
 
         .rk-car-grid {
             display: grid;
@@ -1255,10 +1182,6 @@
         }
 
 
-        /* =========================================================
-           INFORMATION SECTION
-        ========================================================= */
-
         .rk-info-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -1333,10 +1256,6 @@
             max-width: 260px;
         }
 
-
-        /* =========================================================
-           FOOTER
-        ========================================================= */
 
         .rk-footer {
             background: var(--rk-dark);
@@ -1414,10 +1333,6 @@
         }
 
 
-        /* =========================================================
-           MODAL DETAIL
-        ========================================================= */
-
         #mobilDetailModal .modal-content {
             border: none;
             border-radius: 25px !important;
@@ -1441,10 +1356,6 @@
         }
 
 
-        /* =========================================================
-           SWEETALERT
-        ========================================================= */
-
         .swal2-popup {
             border-radius: 22px !important;
             font-family: 'Plus Jakarta Sans', sans-serif !important;
@@ -1459,10 +1370,6 @@
             font-weight: 700 !important;
         }
 
-
-        /* =========================================================
-           RESPONSIVE TABLET
-        ========================================================= */
 
         @media (max-width: 991px) {
 
@@ -1510,10 +1417,6 @@
             }
         }
 
-
-        /* =========================================================
-           RESPONSIVE MOBILE
-        ========================================================= */
 
         @media (max-width: 767px) {
 
@@ -1634,16 +1537,8 @@
                 flex-direction: column;
             }
 
-            .rk-rental-details {
-                grid-template-columns: 1fr 1fr;
-            }
-
             .rk-detail-item {
                 padding: 0 10px;
-            }
-
-            .rk-detail-item:nth-child(3) {
-                padding-left: 0;
             }
 
             .rk-detail-item:nth-child(2),
@@ -1697,10 +1592,6 @@
         }
 
 
-        /* =========================================================
-           REDUCED MOTION
-        ========================================================= */
-
         @media (prefers-reduced-motion: reduce) {
 
             html {
@@ -1725,14 +1616,9 @@
 <body>
 
 
-    {{-- DECORATION BACKGROUND --}}
     <div class="rk-page-decoration rk-decoration-one"></div>
     <div class="rk-page-decoration rk-decoration-two"></div>
 
-
-    {{-- =========================================================
-         NAVBAR CUSTOMER
-    ========================================================== --}}
 
     <nav class="rk-navbar">
 
@@ -1791,18 +1677,10 @@
 
 
 
-    {{-- =========================================================
-         MAIN
-    ========================================================== --}}
-
     <main class="rk-main">
 
         <div class="container">
 
-
-            {{-- =================================================
-                 WELCOME
-            ================================================== --}}
 
             <div class="row align-items-end rk-welcome-row">
 
@@ -1853,14 +1731,8 @@
 
 
 
-            {{-- =================================================
-                 BENTO HERO
-            ================================================== --}}
-
             <div class="rk-bento-hero">
 
-
-                {{-- HERO UTAMA --}}
 
                 <div class="rk-hero-main">
 
@@ -1924,8 +1796,6 @@
                     </div>
 
 
-                    {{-- FOTO MOBIL --}}
-
                     <img
                         src="https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg"
                         class="rk-hero-car"
@@ -1935,8 +1805,6 @@
                 </div>
 
 
-
-                {{-- SIDE BENTO --}}
 
                 <div class="rk-side-stack">
 
@@ -1992,14 +1860,8 @@
 
 
 
-            {{-- =================================================
-                 STATS
-            ================================================== --}}
-
             <div class="rk-stat-grid">
 
-
-                {{-- MOBIL --}}
 
                 <div class="rk-stat-card">
 
@@ -2024,8 +1886,6 @@
                 </div>
 
 
-                {{-- RENTAL --}}
-
                 <div class="rk-stat-card">
 
                     <div class="rk-stat-icon yellow">
@@ -2048,8 +1908,6 @@
 
                 </div>
 
-
-                {{-- TRANSAKSI --}}
 
                 <div class="rk-stat-card">
 
@@ -2076,10 +1934,6 @@
             </div>
 
 
-
-            {{-- =================================================
-                 RENTAL SAYA
-            ================================================== --}}
 
             <section class="rk-section">
 
@@ -2116,8 +1970,6 @@
                             <div class="rk-rental-card">
 
 
-                                {{-- HEADER RENTAL --}}
-
                                 <div class="rk-rental-top">
 
                                     <div>
@@ -2136,8 +1988,6 @@
 
                                     </div>
 
-
-                                    {{-- STATUS --}}
 
                                     @if($rental->status === 'Menunggu')
 
@@ -2195,8 +2045,6 @@
                                 </div>
 
 
-
-                                {{-- DETAIL RENTAL --}}
 
                                 <div class="rk-rental-details">
 
@@ -2265,10 +2113,6 @@
                                 </div>
 
 
-
-                                {{-- =================================================
-                                     PEMBAYARAN DAN RATING
-                                ================================================== --}}
 
                                 @if ($rental->status === 'Menunggu')
 
@@ -2387,8 +2231,6 @@
 
                                 @endif
 
-                                {{-- TOMBOL ULASAN UNTUK RENTAL SELESAI --}}
-
                             </div>
 
                         @endforeach
@@ -2415,10 +2257,6 @@
             </section>
 
 
-
-            {{-- =================================================
-                 MOBIL
-            ================================================== --}}
 
             <section
                 class="rk-section"
@@ -2461,8 +2299,6 @@
                         >
 
 
-                            {{-- FOTO --}}
-
                             <div class="rk-car-image-wrap">
 
 
@@ -2485,8 +2321,6 @@
                                 @endif
 
 
-
-                                {{-- STATUS --}}
 
                                 @if($mobil->status == 'Tersedia')
 
@@ -2532,8 +2366,6 @@
                             </div>
 
 
-
-                            {{-- CONTENT --}}
 
                             <div class="rk-car-body">
 
@@ -2639,10 +2471,6 @@
             </section>
 
 
-
-            {{-- =================================================
-                 INFORMASI
-            ================================================== --}}
 
             <section
                 class="rk-section"
@@ -2759,10 +2587,6 @@
 
 
 
-    {{-- =========================================================
-         FOOTER
-    ========================================================== --}}
-
     <footer class="rk-footer">
 
         <div class="container">
@@ -2846,10 +2670,6 @@
 
 
 
-    {{-- =========================================================
-         MODAL DETAIL MOBIL
-    ========================================================== --}}
-
     <div
         class="modal fade"
         id="mobilDetailModal"
@@ -2899,33 +2719,21 @@
 
 
 
-    {{-- =========================================================
-         MODAL PROFILE
-    ========================================================== --}}
-
     @include('layouts.partials.profile-modal')
 
 
-
-    {{-- BOOTSTRAP --}}
 
     <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     ></script>
 
 
-  {{-- JQUERY --}}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-{{-- SWEETALERT --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
   <script>
-    /* =========================================================
-       DETAIL MOBIL VIA AJAX
-    ========================================================= */
-
     var $mobilDetailModalBody = $('#mobilDetailModalBody');
 
     function openMobilDetail(mobilId) {
@@ -2994,10 +2802,6 @@
     }
 
 
-    /* =========================================================
-       KLIK TOMBOL SEWA
-    ========================================================= */
-
     $(document).on('click', '.rk-rent-small', function(event) {
 
         event.preventDefault();
@@ -3020,11 +2824,6 @@
         openMobilDetail(mobilId);
 
     });
-/* =========================================================
-   POPUP FORM SEWA MOBIL
-========================================================= */
-
-
 window.openSewaPopup = function () {
 
     var template = document.getElementById('sewaFormTemplate');

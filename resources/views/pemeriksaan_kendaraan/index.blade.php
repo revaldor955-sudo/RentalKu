@@ -49,7 +49,6 @@
             white-space: nowrap;
         }
 
-        /* Sembunyikan ikon sort di semua kolom */
         #pemeriksaan-table thead .dt-column-order {
             display: none !important;
         }
@@ -81,11 +80,6 @@
             border-radius: 20px;
         }
 
-        .btn-action {
-            border-radius: 9px;
-            font-size: 12px;
-            font-weight: 600;
-        }
     </style>
 </head>
 
@@ -165,17 +159,17 @@
                                     Tanggal
                                 </th>
 
-                              <th>
-    Kerusakan
-</th>
+                                <th>
+                                    Kerusakan
+                                </th>
 
-<th>
-    Foto Bukti
-</th>
+                                <th>
+                                    Foto Bukti
+                                </th>
 
-<th class="text-end pe-4">
-    Aksi
-</th>
+                                <th class="text-end pe-4">
+                                    Aksi
+                                </th>
 
                             </tr>
 
@@ -196,7 +190,6 @@
     </div>
 
 
-    {{-- MODAL TAMBAH/EDIT --}}
     <div class="modal fade" id="pemeriksaanModal" tabindex="-1" aria-labelledby="pemeriksaanModalLabel" aria-hidden="true">
 
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -420,7 +413,6 @@
 
     <script>
         const CSRF_TOKEN = '{{ csrf_token() }}';
-        const KERUSAKAN_MAP = @json($kerusakanList->mapWithKeys(fn ($k) => [$k->id => $k->jenis_kerusakan]));
 
         function resetForm() {
             $('#formPemeriksaan')[0].reset();
@@ -503,7 +495,6 @@
             });
         }
 
-        // Aktifkan input keterangan saat checkbox dicentang
         $(document).on('change', '.kerusakan-check', function() {
             $(this).closest('.form-check').find('.kerusakan-keterangan')
                 .prop('disabled', !this.checked);
@@ -516,7 +507,6 @@
             const url = id ?
                 "{{ route('pemeriksaan-kendaraan.update', '__ID__') }}".replace('__ID__', id) :
                 "{{ route('pemeriksaan-kendaraan.store') }}";
-            const method = id ? 'PUT' : 'POST';
 
             const formData = new FormData(this);
             if (id) formData.append('_method', 'PUT');
@@ -562,7 +552,6 @@
                
 ajax: {
     url: "{{ route('pemeriksaan-kendaraan.data') }}",
-    type: 'GET',
     dataType: 'json',
     headers: {
         'Accept': 'application/json',
@@ -606,32 +595,26 @@ columns: [
         },
     },
 
-    // Pelanggan
-    {
-        data: null,
-        orderable: true,
-        searchable: false,
-        render: function(data) {
-            return '<div class="fw-bold">' + (data.user_name || '-') + '</div>' +
+        {
+            data: null,
+            searchable: false,
+            render: function(data) {
+                return '<div class="fw-bold">' + (data.user_name || '-') + '</div>' +
                 '<small class="text-muted">' + (data.user_email || '-') + '</small>';
         },
     },
 
-    // Mobil
-    {
-        data: null,
-        orderable: true,
-        searchable: false,
-        render: function(data) {
-            return '<div class="fw-bold">' + (data.mobil_name || '-') + '</div>' +
+        {
+            data: null,
+            searchable: false,
+            render: function(data) {
+                return '<div class="fw-bold">' + (data.mobil_name || '-') + '</div>' +
                 '<small class="text-muted">' + (data.mobil_plate || '-') + '</small>';
         },
     },
 
-    // Jenis
-    {
-        data: 'jenis',
-        orderable: true,
+        {
+            data: 'jenis',
         searchable: false,
         render: function(data) {
             return '<span class="badge-jenis">' +
@@ -640,10 +623,8 @@ columns: [
         },
     },
 
-    // Kondisi
-    {
-        data: 'kondisi',
-        orderable: true,
+        {
+            data: 'kondisi',
         searchable: false,
         render: function(data) {
             return '<span class="status status-' + data + '">' +
@@ -652,16 +633,13 @@ columns: [
         },
     },
 
-    // Tanggal
-    {
-        data: 'tanggal',
-        orderable: true,
+        {
+            data: 'tanggal',
         searchable: false,
     },
 
-    // Kerusakan
-    {
-        data: 'kerusakan',
+        {
+            data: 'kerusakan',
         orderable: false,
         searchable: false,
         render: function(data) {
@@ -675,9 +653,8 @@ columns: [
         },
     },
 
-    // Foto Bukti
-    {
-        data: 'foto_bukti',
+        {
+            data: 'foto_bukti',
         orderable: false,
         searchable: false,
         render: function(data) {
@@ -701,12 +678,11 @@ columns: [
         },
     },
 
-    // Aksi
-    {
-        data: null,
-        orderable: false,
-        searchable: false,
-        className: 'text-end pe-4',
+        {
+            data: null,
+            orderable: false,
+            searchable: false,
+            className: 'text-end pe-4',
         width: '140px',
         render: function(data) {
             return '<div class="d-flex justify-content-end gap-2">' +
@@ -735,7 +711,6 @@ columns: [
                     info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
                     infoEmpty: 'Tidak ada data',
                     infoFiltered: '(difilter dari _MAX_ total data)',
-                    infoPostFix: '',
                     loadingRecords: 'Memuat...',
                     zeroRecords: 'Tidak ditemukan data yang cocok',
                     emptyTable: 'Belum ada pemeriksaan',

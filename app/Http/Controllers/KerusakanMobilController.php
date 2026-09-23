@@ -7,27 +7,18 @@ use Illuminate\Http\Request;
 
 class KerusakanMobilController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+        public function index()
     {
         $kerusakanMobils = KerusakanMobil::all();
         return view('kerusakan_mobils.index', compact('kerusakanMobils'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+        public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+        public function store(Request $request)
     {
         $validated = $request->validate([
             'jenis_kerusakan' => 'required|in:Mesin,Ban,Body,Interior,Rem,Kelistrikan,AC,Transmisi,Suspensi,Kaca,Lainnya',
@@ -42,26 +33,17 @@ class KerusakanMobilController extends Controller
             ->with('success', 'Kerusakan mobil berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(KerusakanMobil $kerusakanMobil)
+        public function show(KerusakanMobil $kerusakanMobil)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(KerusakanMobil $kerusakanMobil)
+        public function edit(KerusakanMobil $kerusakanMobil)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, KerusakanMobil $kerusakanMobil)
+        public function update(Request $request, KerusakanMobil $kerusakanMobil)
     {
         $validated = $request->validate([
             'jenis_kerusakan' => 'required|in:Mesin,Ban,Body,Interior,Rem,Kelistrikan,AC,Transmisi,Suspensi,Kaca,Lainnya',
@@ -76,10 +58,7 @@ class KerusakanMobilController extends Controller
             ->with('success', 'Kerusakan mobil berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(KerusakanMobil $kerusakanMobil)
+        public function destroy(KerusakanMobil $kerusakanMobil)
     {
         $kerusakanMobil->delete();
 

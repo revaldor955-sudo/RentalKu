@@ -8,28 +8,19 @@ use Illuminate\Http\Request;
 
 class DokumenMobilController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+        public function index()
     {
         $dokumenMobils = DokumenMobil::all();
         $mobils = Mobil::all();
         return view('dokumen_mobils.index', compact('dokumenMobils', 'mobils'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+        public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+        public function store(Request $request)
     {
         $validated = $request->validate([
             'mobil_id' => 'required|exists:mobils,id',
@@ -59,26 +50,17 @@ class DokumenMobilController extends Controller
             ->with('success', 'Dokumen mobil berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(DokumenMobil $dokumenMobil)
+        public function show(DokumenMobil $dokumenMobil)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(DokumenMobil $dokumenMobil)
+        public function edit(DokumenMobil $dokumenMobil)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, DokumenMobil $dokumenMobil)
+        public function update(Request $request, DokumenMobil $dokumenMobil)
     {
         $validated = $request->validate([
             'mobil_id' => 'required|exists:mobils,id',
@@ -108,10 +90,7 @@ class DokumenMobilController extends Controller
             ->with('success', 'Dokumen mobil berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(DokumenMobil $dokumenMobil)
+        public function destroy(DokumenMobil $dokumenMobil)
     {
         $dokumenMobil->delete();
 

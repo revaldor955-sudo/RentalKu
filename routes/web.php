@@ -54,10 +54,8 @@ Route::resource('metode_pembayarans', MetodePembayaranController::class)
     ->except(['create', 'edit', 'show']);
 
 Route::middleware(['auth'])->group(function () {
-
     Route::resource('supirs', SupirController::class)
         ->except(['create', 'edit', 'show']);
-
 });
 
 Route::get('/kupons/data', [KuponController::class, 'data'])
@@ -102,12 +100,9 @@ Route::resource('banners', BannerController::class)
 
 Route::get('banners/data', [BannerController::class, 'data'])->name('banners.data');
 
-
 Route::middleware('adminstaff')->group(function () {
-
     Route::resource('faqs', FaqController::class)
         ->except(['create', 'edit', 'show']);
-
 });
 
 Route::get('/', [HomeController::class, 'index'])
@@ -167,17 +162,14 @@ Route::middleware('customer')->group(function () {
     Route::post('/customer/pembayaran/{rental}', [PembayaranController::class, 'store'])
         ->name('pembayaran.store');
 
-      // MENYIAPKAN CHECKOUT DARI FORM RENTAL
-Route::post('/customer/checkout/{mobil}', [RentalController::class, 'checkout'])
-    ->name('rentals.checkout');
+    Route::post('/customer/checkout/{mobil}', [RentalController::class, 'checkout'])
+        ->name('rentals.checkout');
 
-// MENAMPILKAN HALAMAN CHECKOUT
-Route::get('/customer/checkout/{mobil}', [RentalController::class, 'showCheckout'])
-    ->name('rentals.checkout.show');
+    Route::get('/customer/checkout/{mobil}', [RentalController::class, 'showCheckout'])
+        ->name('rentals.checkout.show');
 
-// KONFIRMASI DAN MENYIMPAN RENTAL
-Route::post('/customer/checkout/confirm/{mobil}', [RentalController::class, 'confirmCheckout'])
-    ->name('rentals.checkout.confirm');
+    Route::post('/customer/checkout/confirm/{mobil}', [RentalController::class, 'confirmCheckout'])
+        ->name('rentals.checkout.confirm');
 });
 
 Route::middleware('adminstaff')->group(function () {
@@ -238,36 +230,22 @@ Route::middleware('adminstaff')->group(function () {
 });
 
 Route::middleware('adminstaff')->group(function () {
-
     Route::get('/laporan', [LaporanController::class, 'index'])
         ->name('laporan.index');
 });
-// Route::get('/customer/ratings/create/{rental}', 
-//     [CustomerRatingController::class, 'create']
-// )->name('customer.ratings.create');
 
 Route::middleware(['auth', 'customer'])->group(function () {
+    Route::get('/customer/ratings/create/{rental}', [CustomerRatingController::class, 'create'])
+        ->name('customer.ratings.create');
 
-    Route::get(
-        '/customer/ratings/create/{rental}',
-        [CustomerRatingController::class, 'create']
-    )->name('customer.ratings.create');
-
-    Route::post(
-        '/customer/ratings/{rental}',
-        [CustomerRatingController::class, 'store']
-    )->name('customer.ratings.store');
-
+    Route::post('/customer/ratings/{rental}', [CustomerRatingController::class, 'store'])
+        ->name('customer.ratings.store');
 });
 
-Route::get('/admin/landing-settings', [
-    LandingSettingController::class,
-    'edit'
-])->name('admin.landing-settings.edit');
+Route::get('/admin/landing-settings', [LandingSettingController::class, 'edit'])
+    ->name('admin.landing-settings.edit');
 
-Route::put('/admin/landing-settings', [
-    LandingSettingController::class,
-    'update'
-])->name('admin.landing-settings.update');
+Route::put('/admin/landing-settings', [LandingSettingController::class, 'update'])
+    ->name('admin.landing-settings.update');
 
 require __DIR__.'/auth.php';
