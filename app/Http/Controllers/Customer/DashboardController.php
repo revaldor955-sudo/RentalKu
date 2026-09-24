@@ -43,15 +43,19 @@ class DashboardController extends Controller
 
         $metodePembayarans = MetodePembayaran::orderBy('name')->get();
 
-        $rentals = Rental::with(['mobil', 'pembayaran', 'dendas', 'cabangAmbil', 'cabangKembali'])
+        $rentals = Rental::with(['mobil', 'pembayaran', 'dendas', 'cabangAmbil', 'cabangKembali', 'rating'])
             ->where('user_id', $userId)
             ->latest()
             ->get();
 
+        // Tab: Aktivitas (Menunggu/Disetujui) vs Riwayat (Selesai/Ditolak).
+        $rentalsAktif = $rentals->whereIn('status', ['Menunggu', 'Disetujui']);
+        $rentalsRiwayat = $rentals->whereIn('status', ['Selesai', 'Ditolak']);
+
         // Grid aktivitas ala landing: tampil sebagian + tombol muat lagi.
         $jumlahRental = max(4, (int) request()->input('jumlah_rental', 4));
         $totalRentals = $rentals->count();
-        $rentalsTampil = $rentals->take($jumlahRental);
+        $rentalsTampil = $rentalsAktif->take($jumlahRental);
 
         // Hasil verifikasi klaim yang belum dibaca customer.
         $klaimUpdates = Kompensasi::with('mobil')
@@ -68,6 +72,8 @@ class DashboardController extends Controller
         return view('customer.dashboard', compact(
             'mobils',
             'rentals',
+            'rentalsAktif',
+            'rentalsRiwayat',
             'mobilTersediaCount',
             'rentalCount',
             'totalTransaksi',

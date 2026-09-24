@@ -20,18 +20,20 @@
 
                                 <div class="hero-badge">
                                     <i class="bi bi-patch-check-fill"></i>
-                                    Rental mobil mudah & terpercaya
+                                    {{ $landingSettings['hero_badge'] ?? 'Rental mobil mudah & terpercaya' }}
                                 </div>
 
                                 <h1>
-                                    Perjalanan lebih mudah
-                                    dengan <span>Rentalku.</span>
+                                    @if(!empty($landingSettings['hero_title']))
+                                        {{ $landingSettings['hero_title'] }}
+                                    @else
+                                        Perjalanan lebih mudah
+                                        dengan <span>Rentalku.</span>
+                                    @endif
                                 </h1>
 
                                 <p>
-                                    Temukan mobil yang sesuai kebutuhanmu.
-                                    Pilih kendaraan, tentukan tanggal rental,
-                                    dan lakukan rental dengan mudah secara online.
+                                    {{ $landingSettings['hero_description'] ?? 'Temukan mobil yang sesuai kebutuhanmu. Pilih kendaraan, tentukan tanggal rental, dan lakukan rental dengan mudah secara online.' }}
                                 </p>
 
                                 <div class="hero-buttons">
@@ -666,8 +668,14 @@
                         </div>
 
                         <h2 class="section-title">
-                            Pertanyaan yang sering ditanyakan
+                            {{ $landingSettings['faq_title'] ?? 'Pertanyaan yang sering ditanyakan' }}
                         </h2>
+
+                        @if(!empty($landingSettings['faq_description']))
+                        <p class="text-secondary mt-3">
+                            {{ $landingSettings['faq_description'] }}
+                        </p>
+                        @endif
 
                     </div>
 
@@ -680,13 +688,13 @@
                                 <h2 class="accordion-header">
 
                                     <button class="accordion-button {{ $key !== 0 ? 'collapsed' : '' }}" type="button"
-                                        data-bs-toggle="collapse" data-bs-target="#faq{{ $faq->id_faq }}">
+                                        data-bs-toggle="collapse" data-bs-target="#faq{{ $faq->id }}">
                                         {{ $faq->pertanyaan }}
                                     </button>
 
                                 </h2>
 
-                                <div id="faq{{ $faq->id_faq }}"
+                                <div id="faq{{ $faq->id }}"
                                     class="accordion-collapse collapse {{ $key === 0 ? 'show' : '' }}"
                                     data-bs-parent="#faqAccordion">
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cabang;
+use App\Models\LandingSetting;
 use App\Models\Mobil;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -86,7 +87,13 @@ class HomeController extends Controller
             ->limit(6)
             ->get();
 
+        $landingSettings = LandingSetting::pluck('value', 'key')->toArray();
+        $selectedFaqIds = json_decode($landingSettings['selected_faq_ids'] ?? 'null', true);
+
         $faqs = DB::table('faqs')
+            ->when(! empty($selectedFaqIds), function ($query) use ($selectedFaqIds) {
+                $query->whereIn('id', array_values(array_unique($selectedFaqIds)));
+            })
             ->orderBy('urutan')
             ->get();
 
@@ -102,7 +109,8 @@ class HomeController extends Controller
             'selesai',
             'punyaFilter',
             'jumlah',
-            'totalTersedia'
+            'totalTersedia',
+            'landingSettings'
         ));
     }
 
