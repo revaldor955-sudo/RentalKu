@@ -213,18 +213,6 @@
         color: #198754;
     }
 
-    .nav-link.active::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 3px;
-        height: 24px;
-        background: #198754;
-        border-radius: 0 3px 3px 0;
-    }
-
     .nav-icon {
         width: 20px;
         height: 20px;
@@ -697,7 +685,15 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('admin.landing-settings.edit') }}"
+                        <a href="{{ route('admin.ratings.index') }}"
+                           class="nav-link {{ request()->routeIs('admin.ratings*') ? 'active' : '' }}"
+                           aria-current="{{ request()->routeIs('admin.ratings*') ? 'page' : 'false' }}">
+                            <i class="bi bi-star-fill nav-icon" aria-hidden="true"></i>
+                            <span class="nav-text">Ulasan Pelanggan</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.landing-settings.index') }}"
                            class="nav-link {{ request()->routeIs('admin.landing-settings*') ? 'active' : '' }}"
                            aria-current="{{ request()->routeIs('admin.landing-settings*') ? 'page' : 'false' }}">
                             <i class="bi bi-sliders nav-icon" aria-hidden="true"></i>

@@ -286,8 +286,13 @@
                         <div class="col-md-6">
                             <div class="border rounded-3 p-3 h-100">
                                 <small class="text-muted fw-bold text-uppercase">Mobil</small>
-                                <h6 class="fw-bold mb-1" id="rd-mobil">-</h6>
-                                <small class="text-muted" id="rd-plat">-</small>
+                                <div class="d-flex align-items-center gap-3 mt-2">
+                                    <img id="rd-mobil-img" src="" alt="Mobil" class="rounded-3" style="width: 80px; height: 60px; object-fit: cover; display: none;">
+                                    <div>
+                                        <h6 class="fw-bold mb-1" id="rd-mobil">-</h6>
+                                        <small class="text-muted" id="rd-plat">-</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -591,6 +596,11 @@
                     $('#rd-email').text(data.email);
                     $('#rd-mobil').text(data.mobil);
                     $('#rd-plat').text(data.plat);
+                    if (data.mobil_image) {
+                        $('#rd-mobil-img').attr('src', data.mobil_image).show();
+                    } else {
+                        $('#rd-mobil-img').hide();
+                    }
                     $('#rd-tanggal').text(data.tanggal_mulai + ' s/d ' + data.tanggal_selesai);
                     $('#rd-jumlah-hari').text(data.jumlah_hari + ' hari');
                     $('#rd-cabang-ambil').text(data.cabang_ambil);

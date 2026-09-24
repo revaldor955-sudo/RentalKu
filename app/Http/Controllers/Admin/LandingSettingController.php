@@ -5,14 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\LandingSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LandingSettingController extends Controller
 {
-    public function edit()
+    public function index()
     {
         $settings = LandingSetting::pluck('value', 'key')->toArray();
+        $faqs = DB::table('faqs')->orderBy('urutan')->get();
 
-        return view('admin.landing-settings.edit', compact('settings'));
+        return view('admin.landing-settings.index', compact('settings', 'faqs'));
     }
 
     public function update(Request $request)
@@ -45,17 +47,29 @@ class LandingSettingController extends Controller
 
             'faq_title' => 'nullable|string|max:255',
             'faq_description' => 'nullable|string',
+            'selected_faq_ids' => 'nullable|array',
+            'selected_faq_ids.*' => 'exists:faqs,id',
         ]);
 
         foreach ($validated as $key => $value) {
+            if ($key === 'selected_faq_ids') {
+                $value = json_encode($value);
+            }
             LandingSetting::updateOrCreate(
                 ['key' => $key],
                 ['value' => $value]
             );
         }
 
+        if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pengaturan Landing Page berhasil diperbarui.',
+            ]);
+        }
+
         return redirect()
-            ->route('admin.landing-settings.edit')
+            ->route('admin.landing-settings.index')
             ->with('success', 'Pengaturan Landing Page berhasil diperbarui.');
     }
 }

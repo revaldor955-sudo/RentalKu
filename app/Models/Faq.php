@@ -12,5 +12,6 @@ class Faq extends Model
         'pertanyaan',
         'jawaban',
         'urutan',
+        'is_active',
     ];
 }
