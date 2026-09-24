@@ -21,7 +21,7 @@ class CustomerRatingController extends Controller
             abort(403, 'Rental belum selesai.');
         }
 
-        $sudahMemberiRating = Rating::where('booking_id', $rental->id)->exists();
+        $sudahMemberiRating = Rating::where('rental_id', $rental->id)->exists();
 
         if ($sudahMemberiRating) {
             return redirect()->route('customer.dashboard')->with('error', 'Rental ini sudah memiliki rating.');
@@ -42,7 +42,7 @@ class CustomerRatingController extends Controller
             abort(403, 'Rental belum selesai.');
         }
 
-        $sudahMemberiRating = Rating::where('booking_id', $rental->id)->exists();
+        $sudahMemberiRating = Rating::where('rental_id', $rental->id)->exists();
 
         if ($sudahMemberiRating) {
             return redirect()->route('customer.dashboard')->with('error', 'Rental ini sudah memiliki rating.');
@@ -55,7 +55,7 @@ class CustomerRatingController extends Controller
 
         $rating = new Rating();
 
-        $rating->booking_id = $rental->id;
+        $rating->rental_id = $rental->id;
         $rating->customer_id = Auth::id();
         $rating->staff_id = null;
         $rating->rating = $validated['rating'];
