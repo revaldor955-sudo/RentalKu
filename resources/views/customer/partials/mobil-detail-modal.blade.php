@@ -492,6 +492,45 @@
 
             <div class="col-12">
 
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Pilih Supir (Opsional)</label>
+                    <select name="supir_id" class="form-select" id="supirSelectModal">
+                        <option value="">Tanpa Supir (Lepas Kunci)</option>
+                        @foreach($supirs as $supir)
+                            <option value="{{ $supir->id }}" 
+                                data-cabang-id="{{ $supir->cabang_id }}"
+                                data-name="{{ $supir->name }}" 
+                                data-phone="{{ $supir->phone }}" 
+                                data-tarif="{{ number_format($supir->tarif_perhari, 0, ',', '.') }}"
+                                data-image="{{ $supir->image ?? 'https://ui-avatars.com/api/?name='.urlencode($supir->name) }}">
+                                {{ $supir->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Profile Supir Card (selalu tampil, data di-update via JS di dashboard) -->
+                <div id="supirProfileCardModal" class="card mb-3 shadow-sm border-primary">
+                    <div class="card-body p-3">
+                        <div class="d-flex align-items-center">
+                            <img id="supirImgModal" src="https://ui-avatars.com/api/?name=Pilih+Supir" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0 fw-bold text-primary" id="supirNameModal">Silakan pilih supir</h6>
+                                <div class="small text-muted mb-1">
+                                    <i class="bi bi-telephone me-1"></i> <span id="supirPhoneModal">-</span>
+                                </div>
+                                <div class="fw-bold text-success" id="supirTarifModalContainer">
+                                    + <span id="supirTarifModal">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-12">
+
                 <label class="form-label fw-semibold">
                     Catatan
                 </label>

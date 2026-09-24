@@ -789,6 +789,83 @@
 
             <div class="col-12">
 
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Pilih Supir (Opsional)</label>
+                    <select name="supir_id" class="form-select" id="supirSelect" onchange="updateSupirProfile(this)">
+                        <option value="">Tanpa Supir (Lepas Kunci)</option>
+                        @foreach($supirs as $supir)
+                            <option value="{{ $supir->id }}" 
+                                    data-cabang-id="{{ $supir->cabang_id }}"
+                                    data-name="{{ $supir->name }}" 
+                                    data-phone="{{ $supir->phone }}" 
+                                    data-tarif="{{ number_format($supir->tarif_perhari, 0, ',', '.') }}"
+                                    data-image="{{ $supir->image ?? 'https://ui-avatars.com/api/?name='.urlencode($supir->name) }}">
+                                {{ $supir->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Profile Supir Card (Hidden by default) -->
+                <div id="supirProfileCard" class="card mb-3 shadow-sm border-primary animate__animated animate__fadeIn" style="display: none;">
+                    <div class="card-body p-3">
+                        <div class="d-flex align-items-center">
+                            <img id="supirImg" src="" class="rounded-circle me-3" style="width: 70px; height: 70px; object-fit: cover; border: 2px solid var(--bs-primary);">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 fw-bold text-primary" id="supirName"></h6>
+                                <div class="small text-muted mb-2">
+                                    <i class="bi bi-telephone me-1"></i> <span id="supirPhone"></span>
+                                </div>
+                                <div class="badge bg-light text-primary border border-primary">
+                                    Tarif: Rp <span id="supirTarif"></span> /hari
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function updateSupirProfile(select) {
+                        const card = document.getElementById('supirProfileCard');
+                        const opt = select.options[select.selectedIndex];
+                        
+                        if (select.value === "") {
+                            card.style.display = 'none';
+                        } else {
+                            document.getElementById('supirName').innerText = opt.dataset.name;
+                            document.getElementById('supirPhone').innerText = opt.dataset.phone;
+                            document.getElementById('supirTarif').innerText = opt.dataset.tarif;
+                            document.getElementById('supirImg').src = opt.dataset.image;
+                            card.style.display = 'block';
+                        }
+                        updateSewaButton();
+                    }
+
+                    function updateSewaButton() {
+                        const tglMulai = document.querySelector('input[name="tanggal_mulai"]').value;
+                        const tglSelesai = document.querySelector('input[name="tanggal_selesai"]').value;
+                        const btn = document.querySelector('button[type="submit"]');
+                        
+                        // Disable if dates empty
+                        btn.disabled = !(tglMulai && tglSelesai);
+                    }
+
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const dateInputs = document.querySelectorAll('input[name="tanggal_mulai"], input[name="tanggal_selesai"]');
+                        dateInputs.forEach(i => i.addEventListener('change', updateSewaButton));
+                        updateSewaButton();
+                    });
+                </script>
+
+                <div class="form-text mt-2">
+                   <i class="bi bi-info-circle me-1"></i>
+                   Pilih supir jika Anda membutuhkan bantuan pengemudi.
+                </div>
+
+            </div>
+
+            <div class="col-12">
+
                 <label class="form-label fw-semibold">
                     Catatan
                 </label>
@@ -948,6 +1025,24 @@
         if (!form) return;
         var kembali = form.querySelector('select[name="cabang_kembali_id"]');
         if (kembali && !kembali.value) kembali.value = el.value;
+
+        // Filter supir berdasarkan cabang ambil yang dipilih
+        var cabangId = el.value;
+        var supirSelect = form.querySelector('select[name="supir_id"]');
+        if (supirSelect) {
+            Array.from(supirSelect.options).forEach(function(opt) {
+                if (opt.value === "") return;
+                opt.hidden = (opt.dataset.cabangId !== cabangId);
+            });
+
+            // Reset pilihan supir jika tidak sesuai cabang
+            if (supirSelect.value !== "" && supirSelect.options[supirSelect.selectedIndex].dataset.cabangId !== cabangId) {
+                supirSelect.value = "";
+                var card = document.getElementById('supirProfileCard');
+                if (card) card.style.display = 'none';
+                updateSewaButton();
+            }
+        }
     });
 
     // #33: hapus catatan inline saat tanggal diubah / submit diulang.
