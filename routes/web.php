@@ -18,6 +18,7 @@ use App\Http\Controllers\ServisMobilController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\MetodePembayaranController;
 use App\Http\Controllers\Admin\LandingSettingController;
+use App\Http\Controllers\Admin\RatingController as AdminRatingController;
 use App\Http\Controllers\CustomerRatingController;
 use App\Http\Controllers\MobilController;
 use App\Http\Controllers\PembayaranController;
@@ -309,11 +310,20 @@ Route::middleware(['auth', 'customer'])->group(function () {
 });
 
 Route::middleware('admin')->group(function () {
-    Route::get('/admin/landing-settings', [LandingSettingController::class, 'edit'])
-        ->name('admin.landing-settings.edit');
+    Route::get('/admin/landing-settings', [LandingSettingController::class, 'index'])
+        ->name('admin.landing-settings.index');
 
     Route::put('/admin/landing-settings', [LandingSettingController::class, 'update'])
         ->name('admin.landing-settings.update');
+
+    Route::get('/admin/ratings', [AdminRatingController::class, 'index'])
+        ->name('admin.ratings.index');
+
+    Route::get('/admin/ratings/data', [AdminRatingController::class, 'data'])
+        ->name('admin.ratings.data');
+
+    Route::delete('/admin/ratings/{rating}', [AdminRatingController::class, 'destroy'])
+        ->name('admin.ratings.destroy');
 });
 
 require __DIR__.'/auth.php';

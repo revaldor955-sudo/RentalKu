@@ -177,9 +177,26 @@ class RentalController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Perhitungan harga
+        | Validasi stok mobil per tipe
         |--------------------------------------------------------------------------
         */
+
+        $totalMobilSameType = Mobil::where('tipe_mobil_id', $validated['tipe_mobil_id'] ?? $mobil->tipe_mobil_id)->count();
+
+        $rentalsSameTypeConflict = Rental::where('tipe_mobil_id', $validated['tipe_mobil_id'] ?? $mobil->tipe_mobil_id)
+            ->whereIn('status', ['Menunggu', 'Disetujui', 'Berjalan'])
+            ->where(function ($query) use ($tanggalMulai, $tanggalSelesai) {
+                $query->whereDate('tanggal_mulai', '<', $tanggalSelesai)
+                    ->whereDate('tanggal_selesai', '>', $tanggalMulai);
+            })
+            ->count();
+
+        if ($rentalsSameTypeConflict >= $totalMobilSameType) {
+            return $this->errorResponse(
+                $request,
+                'Semua mobil tipe "' . ($validated['tipe_mobil_id'] ?? $mobil->tipe_mobil->name ?? $mobil->name) . '" sedang disewa.'
+            );
+        }
 
         $hargaPerhari = (float) $mobil->harga_perhari;
 
@@ -513,11 +530,37 @@ $checkoutUrl = route(
     ['mobil' => $mobil->id]
 );
         if ($isAjax) {
+            $supirData = null;
+            if ($supir) {
+                $supirData = [
+                    'id' => $supir->id,
+                    'nama' => $supir->nama,
+                    'tarif_perhari' => $supir->tarif_perhari,
+                ];
+            }
+
+            $html = view('customer.partials.checkout-summary', [
+                'mobil' => $mobil,
+                'supir' => $supir,
+                'jumlahHari' => $jumlahHari,
+                'subtotalMobil' => $subtotalMobil,
+                'subtotalSupir' => $subtotalSupir,
+                'deposit' => $deposit,
+                'diskon' => $diskon,
+                'totalHarga' => $totalHarga,
+                'checkout' => [
+                    'tanggal_mulai' => $validated['tanggal_mulai'],
+                    'tanggal_selesai' => $validated['tanggal_selesai'],
+                    'supir_id' => $validated['supir_id'] ?? null,
+                    'kode_promo' => $validated['kode_promo'] ?? '',
+                    'catatan' => $validated['catatan'] ?? '',
+                ],
+            ])->render();
+
             return response()->json([
                 'success' => true,
-                'message' =>
-                    'Data checkout berhasil disiapkan.',
-                'redirect' => $checkoutUrl,
+                'message' => 'Data checkout berhasil disiapkan.',
+                'html' => $html,
             ]);
         }
 
@@ -892,6 +935,11 @@ public function confirmCheckout(
 
             'catatan' =>
                 $rental->catatan ?? '-',
+
+            'mobil_image' =>
+                $rental->mobil && $rental->mobil->image
+                    ? asset($rental->mobil->image)
+                    : null,
 
             'pembayaran' =>
                 $rental->pembayaran,
