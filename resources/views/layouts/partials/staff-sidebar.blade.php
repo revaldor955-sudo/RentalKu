@@ -1,4 +1,3 @@
-{{-- STAFF SIDEBAR --}}
 {{-- shadcn/ui style: collapsible, accessible, keyboard navigable --}}
 {{-- Usage: @include('layouts.partials.staff-sidebar') --}}
 
@@ -687,7 +686,6 @@
     let isCollapsed = false;
     let isMobile = window.innerWidth < MOBILE_BREAKPOINT;
 
-    // Initialize from localStorage (desktop only)
     function init() {
         if (!isMobile) {
             const saved = localStorage.getItem(STORAGE_KEY);

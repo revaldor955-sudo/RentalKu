@@ -575,7 +575,6 @@
 
 <body>
 
-
 <nav class="navbar navbar-expand-lg sticky-top">
 
     <div class="container py-3">
@@ -634,7 +633,6 @@
 
 </nav>
 
-
 <div class="container">
 
     @if (session('success'))
@@ -644,7 +642,6 @@
     @if (session('error'))
         <span id="flashError" class="d-none">{{ session('error') }}</span>
     @endif
-
 
 <section class="hero">
 
@@ -705,7 +702,6 @@
 
         </div>
 
-
         <div class="col-lg-6 mt-5 mt-lg-0">
 
             <div class="hero-photo-wrapper">
@@ -736,13 +732,11 @@
 
 </div>
 
-
         </div>
 
     </div>
 
 </section>
-
 
 <div class="row g-3 stats">
 
@@ -774,7 +768,6 @@
 
     </div>
 
-
     <div class="col-md-4">
 
         <div class="stat-card">
@@ -802,7 +795,6 @@
         </div>
 
     </div>
-
 
     <div class="col-md-4">
 
@@ -833,7 +825,6 @@
     </div>
 
 </div>
-
 
 @if(($klaimUpdates ?? collect())->count())
 
@@ -868,7 +859,6 @@
     </div>
 
 @endif
-
 
 <section class="section">
     <section id="rental-saya" class="section pt-4">
@@ -1033,7 +1023,6 @@
         </div>
     </form>
 
-
     <div class="row g-4" id="mobilGrid">
 
         @forelse($mobils as $index => $mobil)
@@ -1078,7 +1067,6 @@
     @endif
 
 </div>
-
 
                     <div class="car-body">
 
@@ -1141,7 +1129,6 @@
 
             </div>
 
-
         @empty
 
             <div class="col-12">
@@ -1172,7 +1159,6 @@
 
 </section>
 
-
 <section id="informasi" class="py-5">
 
     <div class="row g-4">
@@ -1200,7 +1186,6 @@
 
         </div>
 
-
         <div class="col-md-4">
 
             <div class="stat-card h-100">
@@ -1223,7 +1208,6 @@
             </div>
 
         </div>
-
 
         <div class="col-md-4">
 
@@ -1254,7 +1238,6 @@
 
 </div>
 
-
 <footer>
 
     <div class="container py-5">
@@ -1273,7 +1256,6 @@
                 </p>
 
             </div>
-
 
             <div class="col-md-6 text-md-end">
 
@@ -1296,7 +1278,6 @@
 
 </footer>
 
-
 <div class="d-lg-none fixed-bottom bg-white border-top p-2">
     <div class="d-flex gap-2">
         <a href="#mobil" class="btn btn-success flex-grow-1">
@@ -1309,7 +1290,6 @@
         </a>
     </div>
 </div>
-
 
 {{-- MODAL DETAIL MOBIL (diisi via AJAX, tanpa reload halaman) --}}
 <div
@@ -1332,7 +1312,6 @@
     </div>
 
 </div>
-
 
 {{-- MODAL LIHAT BUKTI FOTO (denda) --}}
 <div
@@ -1366,7 +1345,6 @@
         bootstrap.Modal.getOrCreateInstance(document.getElementById('buktiModal')).show();
     }
 </script>
-
 
 {{-- MODAL PEMBAYARAN (diisi via data-attribute tombol, submit AJAX tanpa pindah halaman) --}}
 <style>
@@ -1605,7 +1583,6 @@
     </div>
 
 </div>
-
 
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -2124,7 +2101,6 @@
     })();
 
 </script>
-
 
 </body>
 </html>

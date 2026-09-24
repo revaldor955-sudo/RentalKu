@@ -141,9 +141,7 @@ class KuponController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('kupons.index')
-            ->with('success', 'Promo berhasil ditambahkan.');
+        return redirect()->route('kupons.index')->with('success', 'Promo berhasil ditambahkan.');
     }
 
     public function update(Request $request, Kupon $kupon)
@@ -166,9 +164,7 @@ class KuponController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('kupons.index')
-            ->with('success', 'Promo berhasil diperbarui.');
+        return redirect()->route('kupons.index')->with('success', 'Promo berhasil diperbarui.');
     }
 
     public function destroy(Request $request, Kupon $kupon)
@@ -181,8 +177,6 @@ class KuponController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('kupons.index')
-            ->with('success', 'Promo berhasil dihapus.');
+        return redirect()->route('kupons.index')->with('success', 'Promo berhasil dihapus.');
     }
 }

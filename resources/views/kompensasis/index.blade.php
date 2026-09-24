@@ -145,11 +145,9 @@
         </div>
     </div>
 
-
     @if(session('success'))
         <span id="flashSuccess" class="d-none">{{ session('success') }}</span>
     @endif
-
 
     @if($errors->any())
         <div class="alert alert-danger mb-4">
@@ -161,7 +159,6 @@
             </ul>
         </div>
     @endif
-
 
     <div class="row g-4">
         <div class="col-lg-12">
@@ -187,7 +184,6 @@
             </div>
         </div>
     </div>
-
 
     <div class="modal fade" id="detailKompensasiModal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">

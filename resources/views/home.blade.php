@@ -173,7 +173,6 @@
 
     </section>
 
-
     <section class="search-box">
 
         <div class="container">
@@ -249,7 +248,6 @@
 
     </section>
 
-
     <section class="section" id="mobil">
 
         <div class="container">
@@ -282,7 +280,6 @@
                 </p>
 
             </div>
-
 
             <div class="row g-3 justify-content-center">
 
@@ -317,7 +314,6 @@
 
     </section>
 
-
     <section class="section" id="tentang">
 
         <div class="container">
@@ -347,7 +343,6 @@
 
                 </div>
 
-
                 <div class="col-lg-7">
 
                     <div class="row g-4">
@@ -373,7 +368,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <div class="feature-card">
@@ -395,7 +389,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <div class="feature-card">
@@ -416,7 +409,6 @@
                             </div>
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -449,7 +441,6 @@
 
     </section>
 
-
     <section class="section section-light" id="cara-rental">
 
         <div class="container">
@@ -470,7 +461,6 @@
                 </p>
 
             </div>
-
 
             <div class="row g-5">
 
@@ -495,7 +485,6 @@
 
                 </div>
 
-
                 <div class="col-md-6 col-lg-3">
 
                     <div class="step-card">
@@ -517,7 +506,6 @@
 
                 </div>
 
-
                 <div class="col-md-6 col-lg-3">
 
                     <div class="step-card">
@@ -538,7 +526,6 @@
                     </div>
 
                 </div>
-
 
                 <div class="col-md-6 col-lg-3">
 
@@ -567,9 +554,6 @@
 
     </section>
 
-
-
-
     @if ($ratings->count())
 
         <section class="section section-light">
@@ -587,7 +571,6 @@
                     </h2>
 
                 </div>
-
 
                 <div class="row g-4">
 
@@ -608,11 +591,9 @@
 
                                 </div>
 
-
                                 <div class="rating-text">
                                     "{{ $rating->ulasan ?? 'Pelayanan sangat baik.' }}"
                                 </div>
-
 
                                 <div class="user-info">
 
@@ -623,7 +604,6 @@
                                             <i class="bi bi-person"></i>
                                         </div>
                                     @endif
-
 
                                     <div>
 
@@ -652,7 +632,6 @@
 
     @endif
 
-
     <section class="section faq" id="faq">
 
         <div class="container">
@@ -678,7 +657,6 @@
                         @endif
 
                     </div>
-
 
                     <div class="accordion" id="faqAccordion">
 
@@ -723,7 +701,6 @@
 
     </section>
 
-
     <section class="section">
 
         <div class="container">
@@ -761,7 +738,6 @@
         </div>
 
     </section>
-
 
     <script>
         $(function () {

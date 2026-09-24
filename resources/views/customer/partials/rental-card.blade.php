@@ -53,7 +53,6 @@
 
         </div>
 
-
         <div class="row g-3 mb-3">
 
             <div class="col-6">
@@ -105,7 +104,6 @@
             </div>
 
         </div>
-
 
         <div class="mt-auto">
 

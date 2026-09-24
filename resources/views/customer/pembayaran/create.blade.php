@@ -194,7 +194,6 @@
     </div>
 </nav>
 
-
 <div class="container">
 
     <div class="payment-wrapper">
@@ -213,7 +212,6 @@
                 </p>
 
             </div>
-
 
             <div class="payment-body">
 
@@ -239,7 +237,6 @@
 
                 @endif
 
-
                 <div class="rental-info">
 
                     <h5>
@@ -261,7 +258,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <div class="info-label">
@@ -273,7 +269,6 @@
                             </div>
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -287,7 +282,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <div class="info-label">
@@ -300,7 +294,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <div class="info-label">
@@ -312,7 +305,6 @@
                             </div>
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -327,7 +319,6 @@
                         </div>
 
                     </div>
-
 
                     <div class="total-box">
 
@@ -353,7 +344,6 @@
 
                 </div>
 
-
                 <form
                     action="{{ route('pembayaran.store', $rental->id) }}"
                     method="POST"
@@ -361,7 +351,6 @@
                 >
 
                     @csrf
-
 
                     <div class="mb-4">
 
@@ -404,7 +393,6 @@
                         @enderror
 
                     </div>
-
 
                     @if($metodePembayarans->count())
 
@@ -464,7 +452,6 @@
 
                     @endif
 
-
                     <div class="mb-4">
 
                         <label class="form-label">
@@ -488,7 +475,6 @@
                         @enderror
 
                     </div>
-
 
                     <div class="mb-4">
 
@@ -517,7 +503,6 @@
 
                         @enderror
 
-
                         <img
                             id="preview"
                             class="preview-image"
@@ -525,7 +510,6 @@
                         >
 
                     </div>
-
 
                     <div class="alert alert-warning">
 
@@ -541,7 +525,6 @@
 
                     </div>
 
-
                     <div class="d-flex justify-content-between gap-2 mt-4">
 
                         <a
@@ -551,7 +534,6 @@
                             <i class="bi bi-arrow-left me-1"></i>
                             Kembali
                         </a>
-
 
                         <button
                             type="submit"
@@ -575,7 +557,6 @@
     </div>
 
 </div>
-
 
 <script>
 

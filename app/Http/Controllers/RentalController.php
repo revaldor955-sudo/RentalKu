@@ -26,9 +26,7 @@ class RentalController extends Controller
                 ], 401);
             }
 
-            return redirect()
-                ->route('login')
-                ->with('error', 'Silakan login terlebih dahulu.');
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
         }
 
         if ($mobil->status !== 'Tersedia') {
@@ -329,12 +327,7 @@ class RentalController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('customer.dashboard')
-            ->with(
-                'success',
-                'Pengajuan sewa mobil berhasil dibuat.'
-            );
+        return redirect()->route('customer.dashboard')->with('success', 'Pengajuan sewa mobil berhasil dibuat.');
     }
 
     /**
@@ -588,15 +581,11 @@ public function showCheckout(Mobil $mobil)
     $checkout = session('checkout_rental');
 
 if (!$checkout) {
-    return redirect()
-        ->route('customer.dashboard')
-        ->with('error', 'Data checkout tidak ditemukan. Silakan ulangi proses booking.');
+    return redirect()->route('customer.dashboard')->with('error', 'Data checkout tidak ditemukan. Silakan ulangi proses booking.');
 }
 
     if ((int) ($checkout['mobil_id'] ?? 0) !== (int) $mobil->id) {
-        return redirect()
-            ->route('home')
-            ->with('error', 'Data checkout tidak sesuai dengan mobil.');
+        return redirect()->route('home')->with('error', 'Data checkout tidak sesuai dengan mobil.');
     }
 
     $supir = null;

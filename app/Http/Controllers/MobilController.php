@@ -227,15 +227,10 @@ class MobilController extends Controller
 
         // Jika Staff
         if ($request->is('staff/mobils')) {
-            return redirect()
-                ->route('staff.mobils.index')
-                ->with('success', 'Mobil berhasil ditambahkan.');
+            return redirect()->route('staff.mobils.index')->with('success', 'Mobil berhasil ditambahkan.');
         }
 
-        // Jika Admin
-        return redirect()
-            ->route('mobils.index')
-            ->with('success', 'Mobil berhasil ditambahkan.');
+        return redirect()->route('mobils.index')->with('success', 'Mobil berhasil ditambahkan.');
     }
 
     /**
@@ -327,10 +322,8 @@ class MobilController extends Controller
             $validated['image'] = 'images/mobils/'.$imageName;
         }
 
-        // Update data mobil
         $mobil->update($validated);
 
-        // Update fasilitas
         $mobil->fasilitas()->sync(
             $request->input('fasilitas', [])
         );
@@ -343,9 +336,7 @@ class MobilController extends Controller
         }
 
         // Selalu kembali ke data mobil STAFF
-        return redirect()
-            ->route('staff.mobils.index')
-            ->with('success', 'Mobil berhasil diperbarui.');
+        return redirect()->route('staff.mobils.index')->with('success', 'Mobil berhasil diperbarui.');
     }
 
     /**
@@ -364,13 +355,9 @@ class MobilController extends Controller
 
         // Redirect sesuai asal halaman (admin vs staff)
         if ($request->routeIs('staff.mobils.destroy')) {
-            return redirect()
-                ->route('staff.mobils.index')
-                ->with('success', 'Mobil berhasil dihapus.');
+            return redirect()->route('staff.mobils.index')->with('success', 'Mobil berhasil dihapus.');
         }
 
-        return redirect()
-            ->route('mobils.index')
-            ->with('success', 'Mobil berhasil dihapus.');
+        return redirect()->route('mobils.index')->with('success', 'Mobil berhasil dihapus.');
     }
 }

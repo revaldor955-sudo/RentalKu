@@ -1,4 +1,3 @@
-{{-- MODAL PROFIL BERSAMA --}}
 {{-- Dipakai admin, staff, dan customer via @include('layouts.partials.profile-modal'). --}}
 {{-- Syarat: Bootstrap CSS + JS bundle sudah dimuat halaman masing-masing. --}}
 {{-- Style header dibawa sendiri agar rapi di halaman mana pun (termasuk via admin/staff-navbar). --}}

@@ -282,7 +282,6 @@
     </div>
 </nav>
 
-
 <div class="container py-4">
 
     {{-- KEMBALI: customer → dashboard, guest → beranda (dashboard dilindungi auth) --}}
@@ -308,12 +307,10 @@
 
     </div>
 
-
     <div class="detail-card">
 
         <div class="row g-0">
 
-            {{-- FOTO --}}
             <div class="col-lg-6 p-3 p-md-4">
 
                @if($mobil->image)
@@ -331,7 +328,6 @@
 @endif
 
             </div>
-
 
             <div class="col-lg-6">
 
@@ -359,20 +355,17 @@
 
 @endif
 
-
                     <h1 class="car-title">
 
                     {{ $mobil->name }}
 
                     </h1>
 
-
                    <p class="car-subtitle">
     <i class="bi bi-car-front me-1"></i>
 
     {{ $mobil->tipeMobil->name ?? '-' }}
 </p>
-
 
                     <div class="price-box">
 
@@ -391,8 +384,6 @@
 
                     </div>
 
-
-                   
 <div class="row g-3 mt-2">
 
     <div class="col-6">
@@ -415,7 +406,6 @@
 
     </div>
 
-
     <div class="col-6">
 
         <div class="spec-card">
@@ -435,7 +425,6 @@
         </div>
 
     </div>
-
 
     <div class="col-6">
 
@@ -457,7 +446,6 @@
 
     </div>
 
-
     <div class="col-6">
 
         <div class="spec-card">
@@ -478,7 +466,6 @@
 
     </div>
 
-
     <div class="col-6">
 
         <div class="spec-card">
@@ -498,7 +485,6 @@
         </div>
 
     </div>
-
 
     <div class="col-6">
 
@@ -562,7 +548,6 @@
 
 </div>
 
-
                    <div class="mt-4">
 
     @if($mobil->status === 'Tersedia')
@@ -612,7 +597,6 @@
 
 </div>
 
-
                     <div class="text-center mt-3">
 
                         <small class="text-muted">
@@ -633,7 +617,6 @@
 
     </div>
 
-
     <div class="row mt-5 g-4">
 
         <div class="col-lg-7">
@@ -653,7 +636,6 @@
             </div>
 
         </div>
-
 
         <div class="col-lg-5">
 

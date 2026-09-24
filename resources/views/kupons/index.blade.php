@@ -189,11 +189,9 @@
 
     </div>
 
-
     @if(session('success'))
         <span id="flashSuccess" class="d-none">{{ session('success') }}</span>
     @endif
-
 
     @if($errors->any())
         <div class="alert alert-danger mb-4">
@@ -208,7 +206,6 @@
 
         </div>
     @endif
-
 
     <div class="page-card">
 
@@ -242,7 +239,6 @@
     </div>
 
 </div>
-
 
 <div
     class="modal fade"
@@ -284,7 +280,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label fw-bold">
@@ -313,7 +308,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label fw-bold">
@@ -330,7 +324,6 @@
                             >
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -349,7 +342,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label fw-bold">
@@ -367,7 +359,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label fw-bold">
@@ -382,7 +373,6 @@
                             >
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -430,7 +420,6 @@
     </div>
 
 </div>
-
 
 <div
     class="modal fade"
@@ -613,7 +602,6 @@
     </div>
 
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
 

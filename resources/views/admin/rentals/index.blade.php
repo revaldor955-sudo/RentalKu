@@ -109,15 +109,11 @@
 
 <body>
 
-{{-- Sidebar Layout --}}
 @include('layouts.partials.sidebar')
-
 <script>
-    // Inject navbar into sidebar layout
     document.addEventListener('DOMContentLoaded', function() {
         const mainContent = document.getElementById('mainContent');
         const pageContent = mainContent?.querySelector('.page-content');
-
         if (mainContent && pageContent) {
             const navbar = document.querySelector('header.topbar');
             if (navbar) {
@@ -127,12 +123,9 @@
     });
 </script>
 
-{{-- Page Content --}}
 <div class="page-content">
-
 <div class="container-fluid px-4">
 
-    {{-- HEADER --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
 
         <div>
@@ -147,8 +140,6 @@
 
     </div>
 
-
-    {{-- ALERT SUCCESS --}}
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show mb-4">
 
@@ -162,8 +153,6 @@
         </div>
     @endif
 
-
-    {{-- ALERT ERROR --}}
     @if (session('error'))
         <div class="alert alert-danger alert-dismissible fade show mb-4">
 
@@ -177,8 +166,6 @@
         </div>
     @endif
 
-
-    {{-- TABLE --}}
     <div class="card-custom">
 
         <div class="card-body p-0">
@@ -241,8 +228,6 @@
 
 </div>
 
-
-{{-- MODAL DETAIL RENTAL --}}
 <div class="modal fade" id="detailRentalModal" tabindex="-1" aria-labelledby="detailRentalModalLabel"
     aria-hidden="true">
 
@@ -254,7 +239,6 @@
 
             <div class="modal-body p-4">
 
-                {{-- LOADING --}}
                 <div id="rentalDetailLoading" class="text-center py-5">
                     <div class="spinner-border text-success" role="status"></div>
                     <p class="text-muted mt-3 mb-0">
@@ -262,7 +246,6 @@
                     </p>
                 </div>
 
-                {{-- ERROR --}}
                 <div id="rentalDetailError" class="alert alert-danger d-none" role="alert">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i>
                     <span id="rentalDetailErrorMessage">
@@ -270,7 +253,6 @@
                     </span>
                 </div>
 
-                {{-- KONTEN --}}
                 <div id="rentalDetailContent" class="d-none">
 
                     <div class="row g-3">

@@ -141,7 +141,6 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Track active tab in URL hash
     document.querySelectorAll('[data-bs-toggle="pill"]').forEach(btn => {
         btn.addEventListener('shown.bs.tab', e => {
             const pane = document.querySelector(e.target.getAttribute('data-bs-target'));
@@ -149,14 +148,11 @@
             history.replaceState(null, '', '#' + pane.id);
         });
     });
-
-    // Restore active tab from URL hash on load
     const hash = window.location.hash;
     if (hash) {
         const trigger = document.querySelector(`[data-bs-target="${hash}"]`);
         if (trigger) new bootstrap.Tab(trigger).show();
     }
-
     const form = document.getElementById('landingSettingsForm');
     const btn = document.getElementById('btnSave');
 

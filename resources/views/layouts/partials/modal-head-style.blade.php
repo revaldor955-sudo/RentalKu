@@ -1,4 +1,3 @@
-{{-- STYLE HEADER MODAL BERSAMA --}}
 {{-- Dipakai semua halaman via @include('layouts.partials.modal-head-style') di dalam <head>. --}}
 {{-- Pasangan markup: @include('layouts.partials.modal-head', ['title' => ..., 'icon' => ..., 'subtitle' => ..., 'titleId' => ...]). --}}
 <style>

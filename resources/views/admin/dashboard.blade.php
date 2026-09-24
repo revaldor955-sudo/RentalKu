@@ -201,15 +201,11 @@
 
 <body>
 
-{{-- Sidebar Layout --}}
 @include('layouts.partials.sidebar')
-
 <script>
-    // Inject navbar into sidebar layout
     document.addEventListener('DOMContentLoaded', function() {
         const mainContent = document.getElementById('mainContent');
         const pageContent = mainContent?.querySelector('.page-content');
-
         if (mainContent && pageContent) {
             const navbar = document.querySelector('header.topbar');
             if (navbar) {
@@ -219,9 +215,7 @@
     });
 </script>
 
-{{-- Page Content --}}
 <div class="page-content">
-
 
 <div class="container-fluid px-4">
 
@@ -275,7 +269,6 @@
 
 <div class="row g-4 mb-4">
 
-    {{-- USERS --}}
     <div class="col-md-6 col-xl-3">
         <div class="stat-card">
             <div class="d-flex justify-content-between">
@@ -293,8 +286,6 @@
             </div>
         </div>
     </div>
-
-    {{-- MOBIL --}}
     <div class="col-md-6 col-xl-3">
         <div class="stat-card">
             <div class="d-flex justify-content-between">
@@ -312,8 +303,6 @@
             </div>
         </div>
     </div>
-
-    {{-- TERSEDIA --}}
     <div class="col-md-6 col-xl-3">
         <div class="stat-card">
             <div class="d-flex justify-content-between">
@@ -331,8 +320,6 @@
             </div>
         </div>
     </div>
-
-    {{-- CABANG --}}
     <div class="col-md-6 col-xl-3">
         <div class="stat-card">
             <div class="d-flex justify-content-between">
@@ -350,7 +337,6 @@
             </div>
         </div>
     </div>
-
 </div>
 
 
@@ -751,7 +737,6 @@
 
 </div>
 
-{{-- Footer --}}
 <footer class="bg-white border-top py-4 mt-auto">
     <div class="container-fluid px-4 text-center">
         <div class="fw-bold">
@@ -762,7 +747,6 @@
         </small>
     </div>
 </footer>
-
 </div>
 
 {{-- Chart Laporan (animasi sekali saat pertama terlihat) --}}
