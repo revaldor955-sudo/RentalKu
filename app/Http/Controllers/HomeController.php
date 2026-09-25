@@ -97,6 +97,10 @@ class HomeController extends Controller
             ->orderBy('urutan')
             ->get();
 
+        $totalPuas = DB::table('rentals')->where('status', 'selesai')->count() + 1200;
+        $ratingRata = round(DB::table('ratings')->avg('rating'), 1);
+        $totalMobil = DB::table('mobils')->count();
+
         return view('home', compact(
             'banners',
             'mobils',
@@ -110,7 +114,10 @@ class HomeController extends Controller
             'punyaFilter',
             'jumlah',
             'totalTersedia',
-            'landingSettings'
+            'landingSettings',
+            'totalPuas',
+            'ratingRata',
+            'totalMobil'
         ));
     }
 

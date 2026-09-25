@@ -362,22 +362,22 @@
     <section class="py-5" style="background-color: var(--primary); color: white;">
         <div class="container">
             <div class="row text-center g-4">
-                <div class="col-6 col-md-3">
-                    <h2 class="fw-bold display-5 mb-1" data-count="{{ $totalTersedia ?? 50 }}">50+</h2>
-                    <p class="mb-0 opacity-75">Mobil Tersedia</p>
-                </div>
-                <div class="col-6 col-md-3">
-                    <h2 class="fw-bold display-5 mb-1">1,200+</h2>
-                    <p class="mb-0 opacity-75">Pelanggan Puas</p>
-                </div>
-                <div class="col-6 col-md-3">
-                    <h2 class="fw-bold display-5 mb-1">24/7</h2>
-                    <p class="mb-0 opacity-75">Layanan Support</p>
-                </div>
-                <div class="col-6 col-md-3">
-                    <h2 class="fw-bold display-5 mb-1">4.9</h2>
-                    <p class="mb-0 opacity-75">Rating Rata-rata</p>
-                </div>
+            <div class="col-6 col-md-3">
+                <h2 class="fw-bold display-5 mb-1">{{ $totalMobil }}+</h2>
+                <p class="mb-0 opacity-75">Mobil Tersedia</p>
+            </div>
+            <div class="col-6 col-md-3">
+                <h2 class="fw-bold display-5 mb-1">{{ $totalPuas }}+</h2>
+                <p class="mb-0 opacity-75">Pelanggan Puas</p>
+            </div>
+            <div class="col-6 col-md-3">
+                <h2 class="fw-bold display-5 mb-1">24/7</h2>
+                <p class="mb-0 opacity-75">Layanan Support</p>
+            </div>
+            <div class="col-6 col-md-3">
+                <h2 class="fw-bold display-5 mb-1">{{ $ratingRata ?: '4.9' }}</h2>
+                <p class="mb-0 opacity-75">Rating Rata-rata</p>
+            </div>
             </div>
         </div>
     </section>
