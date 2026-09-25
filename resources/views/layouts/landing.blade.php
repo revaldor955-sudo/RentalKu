@@ -654,7 +654,6 @@
             border: none !important;
             outline: none !important;
             box-shadow: none !important;
-            transform: translateY(-2px);
         }
 
         .nav-btn-ghost::after {
@@ -699,42 +698,6 @@
         .navbar-nav .nav-link:hover::after {
             width: 60%;
             left: 20%;
-        }
-
-        /* Tombol kembali — pill rounded, no background tint */
-        .nav-btn-back {
-            border: none !important;
-            outline: none !important;
-            box-shadow: none !important;
-            color: var(--dark) !important;
-            background: transparent !important;
-            border-radius: 999px !important;
-            transition: all 0.2s ease !important;
-            position: relative;
-        }
-        .nav-btn-back:hover,
-        .nav-btn-back:focus {
-            color: var(--primary) !important;
-            background: transparent !important;
-            border: none !important;
-            outline: none !important;
-            box-shadow: none !important;
-            transform: translateY(-2px);
-        }
-        .nav-btn-back::after {
-            content: '';
-            position: absolute;
-            width: 60%;
-            height: 2px;
-            bottom: 2px;
-            left: 20%;
-            background-color: var(--primary);
-            transition: width 0.2s ease, left 0.2s ease;
-        }
-        .nav-btn-back:hover::after,
-        .nav-btn-back:focus::after {
-            width: 80%;
-            left: 10%;
         }
 
     </style>
