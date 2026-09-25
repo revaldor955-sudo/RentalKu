@@ -388,12 +388,12 @@
             <div class="row align-items-center justify-content-center g-3">
                 <div class="col-auto text-center">
                     <span class="badge rounded-pill px-3 py-2" style="background-color: var(--primary); font-size: 0.85rem;">
-                        🔥 PROMO SPESIAL
+                        {{ $landingSettings['promo_title'] ?? '🔥 PROMO SPESIAL' }}
                     </span>
                 </div>
                 <div class="col-auto text-center d-none d-md-block">
                     <span class="fw-semibold" style="color: var(--primary-dark);">
-                        Diskon hingga 20% untuk rental mingguan — Berakhir dalam:
+                        {{ $landingSettings['promo_description'] ?? 'Diskon hingga 20% untuk rental mingguan — Berakhir dalam:' }}
                     </span>
                 </div>
                 <div class="col-auto">
