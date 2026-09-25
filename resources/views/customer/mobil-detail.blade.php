@@ -215,6 +215,40 @@
         }
 
         /* Tombol kembali — pill rounded, no background tint */
+        .nav-btn-ghost {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            color: #374151 !important;
+            background: transparent !important;
+            border-radius: 10px !important;
+            transition: all 0.2s ease !important;
+            position: relative;
+        }
+        .nav-btn-ghost:hover,
+        .nav-btn-ghost:focus {
+            background: rgba(44, 102, 110, 0.1) !important;
+            color: #2c666e !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        .nav-btn-ghost::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 2px;
+            left: 50%;
+            background-color: #2c666e;
+            transition: width 0.2s ease, left 0.2s ease;
+        }
+        .nav-btn-ghost:hover::after,
+        .nav-btn-ghost:focus::after {
+            width: 60%;
+            left: 20%;
+        }
+
         .nav-btn-back {
             border: none !important;
             outline: none !important;
@@ -306,12 +340,13 @@
 
                 @else
 
-                    <a href="{{ route('login') }}" class="btn btn-light border rounded-3 px-3 fw-semibold">
-                        <i class="bi bi-box-arrow-in-right me-1"></i>
+                    <a href="{{ route('login') }}" class="btn px-3 py-2 fw-semibold d-flex align-items-center gap-2 nav-btn-ghost">
+                        <i class="bi bi-box-arrow-in-right"></i>
                         Masuk
                     </a>
 
-                    <a href="{{ route('register') }}" class="btn btn-rent">
+                    <a href="{{ route('register') }}" class="btn px-3 py-2 fw-semibold d-flex align-items-center gap-2 nav-btn-ghost">
+                        <i class="bi bi-person-plus"></i>
                         Daftar
                     </a>
 
