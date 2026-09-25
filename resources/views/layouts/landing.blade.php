@@ -635,6 +635,71 @@
             --bs-success: #2C666E;
             --bs-success-rgb: 44, 102, 110;
         }
+        /* Ghost button & Nav-link hover effects */
+        .nav-btn-ghost {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            color: var(--dark) !important;
+            background: transparent !important;
+            border-radius: 10px !important;
+            transition: all 0.2s ease !important;
+            position: relative;
+        }
+
+        .nav-btn-ghost:hover,
+        .nav-btn-ghost:focus {
+            background: rgba(44, 102, 110, 0.1) !important;
+            color: var(--primary) !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .nav-btn-ghost::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 2px;
+            left: 50%;
+            background-color: var(--primary);
+            transition: width 0.2s ease, left 0.2s ease;
+        }
+
+        .nav-btn-ghost:hover::after,
+        .nav-btn-ghost:focus::after {
+            width: 60%;
+            left: 20%;
+        }
+
+        .navbar-nav .nav-link {
+            transition: color 0.2s ease, background 0.2s ease !important;
+            position: relative;
+            border-radius: 10px !important;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--primary) !important;
+            background: rgba(44, 102, 110, 0.1) !important;
+        }
+
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 2px;
+            left: 50%;
+            background-color: var(--primary);
+            transition: width 0.2s ease, left 0.2s ease;
+        }
+
+        .navbar-nav .nav-link:hover::after {
+            width: 60%;
+            left: 20%;
+        }
+
     </style>
 
     @stack('styles')
@@ -645,11 +710,13 @@
     <div style="height: 76px;"></div>
     @include('layouts.partials.navbar')
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     @yield('content')
 
     @include('layouts.partials.footer')
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         const navbar = document.getElementById('mainNavbar');
@@ -658,15 +725,16 @@
         function updateNavbar() {
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
+            // Cuma muncul pas mentok atas (<= 60px), selain itu (scroll bawah/atas) tetep ilang
             if (scrollTop <= 60) {
                 navbar.style.transform = 'translateY(0)';
             } else {
                 navbar.style.transform = 'translateY(-100%)';
             }
+
             ticking = false;
         }
 
-        // Initial check saat page load
         document.addEventListener('DOMContentLoaded', updateNavbar);
 
         window.addEventListener('scroll', function() {

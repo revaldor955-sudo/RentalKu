@@ -352,15 +352,22 @@
 
                     @if($mobil->status === 'Tersedia')
 
-                        <button
-                            type="button"
-                            class="btn btn-rental w-100 d-flex align-items-center justify-content-center"
-                            onclick="openSewaPopup()">
-
-                            <i class="bi bi-calendar-check me-2"></i>
-                            Sewa Sekarang
-
-                        </button>
+                        @auth
+                            <button
+                                type="button"
+                                class="btn btn-rental w-100 d-flex align-items-center justify-content-center"
+                                onclick="openSewaPopup()">
+                                <i class="bi bi-calendar-check me-2"></i>
+                                Sewa Sekarang
+                            </button>
+                        @else
+                            <a
+                                href="{{ route('login') }}"
+                                class="btn btn-rental w-100 d-flex align-items-center justify-content-center text-decoration-none">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                Masuk untuk Sewa
+                            </a>
+                        @endauth
 
                     @else
 
@@ -377,6 +384,13 @@
 
                     @endif
 
+                </div>
+
+                <div class="text-center mt-3 pt-3 border-top">
+                    <a href="{{ route('mobils.show', $mobil->id) }}" class="text-decoration-none fw-semibold" style="color: #198754;">
+                        <i class="bi bi-box-arrow-up-right me-1"></i>
+                        Lihat Detail Lengkap
+                    </a>
                 </div>
 
             </div>
