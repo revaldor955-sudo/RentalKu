@@ -9,7 +9,7 @@
             <div class="carousel-inner">
 
                 {{-- Slide default --}}
-                <div class="carousel-item active hero-slide" style="background-image: url('{{ asset('images/banners/hero-jalan-palem.jpg') }}')">
+                <div class="carousel-item active hero-slide" style="background-image: url('{{ asset('images/banners/hero-jalan-palem.jpg') }}');" onerror="this.style.backgroundImage='url(data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1200 600%22%3E%3Crect fill=%22%23E8F0F1%22 width=%221200%22 height=%22600%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%232C666E%22%3EBanner tidak tersedia%3C/text%3E%3C/svg%3E)'">
                     <div class="d-flex align-items-center justify-content-center h-100">
                         <div class="hero-content">
                             <div class="hero-badge">
@@ -43,7 +43,7 @@
 
                 {{-- Slide dari database --}}
                 @foreach ($banners as $banner)
-                    <div class="carousel-item hero-slide" style="background-image: url('{{ asset($banner->gambar) }}')">
+                    <div class="carousel-item hero-slide" style="background-image: url('{{ asset($banner->gambar) }}');" onerror="this.style.backgroundImage='url(data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1200 600%22%3E%3Crect fill=%22%23E8F0F1%22 width=%221200%22 height=%22600%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%232C666E%22%3E{{ htmlspecialchars($banner->judul) }}%3C/text%3E%3C/svg%3E)'">
                         <div class="d-flex align-items-center justify-content-center h-100">
                             <div class="hero-content">
                                 <div class="hero-badge">
@@ -358,7 +358,61 @@
 
     </section>
 
-    <section class="section section-light" id="cara-rental">
+    {{-- Statistik / Counter Section --}}
+    <section class="py-5" style="background-color: var(--primary); color: white;">
+        <div class="container">
+            <div class="row text-center g-4">
+                <div class="col-6 col-md-3">
+                    <h2 class="fw-bold display-5 mb-1" data-count="{{ $totalTersedia ?? 50 }}">50+</h2>
+                    <p class="mb-0 opacity-75">Mobil Tersedia</p>
+                </div>
+                <div class="col-6 col-md-3">
+                    <h2 class="fw-bold display-5 mb-1">1,200+</h2>
+                    <p class="mb-0 opacity-75">Pelanggan Puas</p>
+                </div>
+                <div class="col-6 col-md-3">
+                    <h2 class="fw-bold display-5 mb-1">24/7</h2>
+                    <p class="mb-0 opacity-75">Layanan Support</p>
+                </div>
+                <div class="col-6 col-md-3">
+                    <h2 class="fw-bold display-5 mb-1">4.9</h2>
+                    <p class="mb-0 opacity-75">Rating Rata-rata</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- Promo Urgency Banner --}}
+    <section class="py-3" style="background: linear-gradient(135deg, #E8F0F1 0%, #F0EDEE 100%);">
+        <div class="container">
+            <div class="row align-items-center justify-content-center g-3">
+                <div class="col-auto text-center">
+                    <span class="badge rounded-pill px-3 py-2" style="background-color: var(--primary); font-size: 0.85rem;">
+                        🔥 PROMO SPESIAL
+                    </span>
+                </div>
+                <div class="col-auto text-center d-none d-md-block">
+                    <span class="fw-semibold" style="color: var(--primary-dark);">
+                        Diskon hingga 20% untuk rental mingguan — Berakhir dalam:
+                    </span>
+                </div>
+                <div class="col-auto">
+                    <div id="countdownTimer" class="d-flex gap-2 fw-bold" style="color: var(--primary-dark); font-size: 1rem;">
+                        <span class="bg-white rounded px-2 py-1 shadow-sm"><span id="cdHours">23</span>j</span>
+                        <span class="bg-white rounded px-2 py-1 shadow-sm"><span id="cdMinutes">59</span>m</span>
+                        <span class="bg-white rounded px-2 py-1 shadow-sm"><span id="cdSeconds">59</span>d</span>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <a href="#mobil" class="btn btn-sm fw-bold" style="background-color: var(--primary); color: white; border-radius: 20px;">
+                        Klaim Sekarang →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="cara-rental">
 
         <div class="container">
 
@@ -658,6 +712,31 @@
 
     <script>
         $(function () {
+            // Countdown promo urgency
+            function startCountdown() {
+                var end = new Date();
+                end.setHours(23, 59, 59, 999);
+
+                function pad(n) {
+                    return n < 10 ? '0' + n : n;
+                }
+
+                function tick() {
+                    var diff = end - new Date();
+                    if (diff <= 0) diff = 0;
+                    var h = Math.floor(diff / (1000 * 60 * 60));
+                    var m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    var s = Math.floor((diff % (1000 * 60)) / 1000);
+                    $('#cdHours').text(pad(h));
+                    $('#cdMinutes').text(pad(m));
+                    $('#cdSeconds').text(pad(s));
+                }
+
+                tick();
+                setInterval(tick, 1000);
+            }
+            startCountdown();
+
             var $form = $('.search-card form');
             if (!$form.length) return;
 
