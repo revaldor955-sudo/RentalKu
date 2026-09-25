@@ -64,12 +64,46 @@
 </div>
 
 
+<style>
+    .car-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+        border: 1px solid #edf0ee;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #fff;
+        position: relative;
+    }
+    .car-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+    }
+    .car-card:hover .car-title {
+        color: var(--primary, #2c666e);
+    }
+    .car-card:hover .btn-rent {
+        background: var(--primary, #2c666e) !important;
+        color: #fff !important;
+    }
+    .car-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        transition: transform 0.25s ease;
+    }
+    .car-card:hover .car-image {
+        transform: scale(1.04);
+    }
+</style>
+
 <div class="row g-4">
 
     @forelse($mobils as $mobil)
         <div class="col-md-6 col-lg-4">
 
-            <div class="car-card">
+            <div class="car-card" 
+                 data-mobil-id="{{ $mobil->id }}"
+                 role="button"
+                 style="cursor: pointer;">
 
                 @if ($mobil->fotoMobils->isNotEmpty())
                     <img src="{{ $mobil->fotoMobils->first()->url }}" class="car-image"
@@ -125,9 +159,13 @@
 
                         </div>
 
-                        <a href="{{ route('mobils.show', $mobil->id) }}" class="btn btn-rent">
+                        <button
+                            type="button"
+                            class="btn btn-rent"
+                            data-mobil-id="{{ $mobil->id }}"
+                            style="pointer-events: none;">
                             Detail
-                        </a>
+                        </button>
 
                     </div>
 

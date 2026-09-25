@@ -214,6 +214,46 @@
             margin-bottom: 20px;
         }
 
+        /* Tombol kembali — pill rounded, no background tint */
+        .nav-btn-back {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            color: #374151 !important;
+            background: transparent !important;
+            border-radius: 999px !important;
+            transition: all 0.2s ease !important;
+            position: relative;
+            display: inline-flex !important;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px !important;
+        }
+        .nav-btn-back:hover,
+        .nav-btn-back:focus {
+            color: #374151 !important;
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        .nav-btn-back::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: #2c666e;
+            transition: width 0.2s ease, left 0.2s ease;
+            border-radius: 1px;
+        }
+        .nav-btn-back:hover::after,
+        .nav-btn-back:focus::after {
+            width: 100%;
+            left: 0;
+        }
+
         @media (max-width: 768px) {
 
             .car-photo {
@@ -296,11 +336,10 @@
 
             </a>
         @else
-            <a href="{{ url('/') }}" class="btn btn-outline-secondary">
-
-                <i class="bi bi-arrow-left me-2"></i>
-
+            <a href="{{ url('/') }}" class="btn px-3 py-2 fw-semibold d-flex align-items-center gap-2 nav-btn-back">
+                <i class="bi bi-arrow-left"></i>
                 Kembali ke Beranda
+            </a>
 
             </a>
         @endauth

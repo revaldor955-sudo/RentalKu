@@ -840,6 +840,127 @@
                 cari(window.location.href, false, false);
             });
         });
+
+        // Modal detail mobil — card + button trigger
+        $(document).on('click', '.car-card[data-mobil-id], button[data-mobil-id]', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var mobilId = $(this).data('mobil-id');
+            var modalEl = document.getElementById('mobilDetailModal');
+            var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            var $body = $('#mobilDetailModal .modal-body');
+
+            $body.html('<div class="text-center py-5"><div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+            modal.show();
+
+            $.ajax({
+                url: '/mobils/' + mobilId,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                method: 'GET'
+            })
+            .done(function (html) {
+                $body.html(html);
+            })
+            .fail(function () {
+                $body.html('<div class="alert alert-danger m-3"><i class="bi bi-exclamation-circle me-2"></i>Gagal memuat detail mobil.</div>');
+            });
+        });
+
+        // Popup form sewa (SweetAlert) — untuk user yang login
+        @auth
+        window.openSewaPopup = function() {
+            var $template = $('#sewaFormTemplate');
+            if (!$template.length) return;
+
+            if ($('.mobil-modal .mm-badge-available').length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Mobil sedang tidak tersedia.',
+                });
+                return;
+            }
+
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('mobilDetailModal')).hide();
+
+            var $carTitle = $('.mobil-modal .mm-title');
+
+            Swal.fire({
+                title: $carTitle.length ? $carTitle.text().trim() : 'Sewa Mobil',
+                html: $template.html(),
+                width: 600,
+                showConfirmButton: false,
+                didOpen: function() {
+                    var $form = $('#swal2-html-container form#sewaForm');
+                    if (!$form.length) $form = $('#swal2-html-container form').first();
+                    if (!$form.length) return;
+
+                    $form.on('submit', function(event) {
+                        event.preventDefault();
+                        var formData = new FormData($form[0]);
+                        Swal.showLoading();
+
+                        $.ajax({
+                            url: $form.attr('action'),
+                            method: 'POST',
+                            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                            data: formData,
+                            processData: false,
+                            contentType: false
+                        })
+                        .done(function(data, textStatus, xhr) {
+                            Swal.hideLoading();
+                            if (xhr.status !== 200) {
+                                var firstError = data.errors ? Object.values(data.errors).flat()[0] : (data.message || 'Terjadi kesalahan.');
+                                Swal.fire({ icon: 'error', title: 'Gagal', text: firstError });
+                                return;
+                            }
+                            Swal.fire({ icon: 'success', title: 'Berhasil!', text: data.message || 'Pengajuan sewa berhasil.', confirmButtonText: 'OK' })
+                                .then(function() { window.location.href = '{{ route('customer.dashboard') }}'; });
+                        })
+                        .fail(function() {
+                            Swal.hideLoading();
+                            Swal.fire({ icon: 'error', title: 'Gagal', text: 'Koneksi bermasalah. Silakan coba lagi.' });
+                        });
+                    });
+
+                    // Supir profile card toggle
+                    var supirSelect = document.querySelector('#supirSelectModal');
+                    if (supirSelect) {
+                        supirSelect.addEventListener('change', function() {
+                            var card = document.querySelector('#supirProfileCardModal');
+                            var opt = this.options[this.selectedIndex];
+                            if (!card) return;
+                            if (this.value === '') {
+                                card.style.display = 'none';
+                            } else {
+                                document.querySelector('#supirNameModal').innerText = opt.dataset.name;
+                                document.querySelector('#supirPhoneModal').innerText = opt.dataset.phone;
+                                document.querySelector('#supirTarifModal').innerText = opt.dataset.tarif;
+                                document.querySelector('#supirImgModal').src = opt.dataset.image;
+                                card.style.display = 'block';
+                            }
+                        });
+                    }
+                }
+            });
+        };
+        @endauth
     </script>
+
+    {{-- Modal Detail Mobil --}}
+    <div class="modal fade" id="mobilDetailModal" tabindex="-1" aria-labelledby="mobilDetailLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title" id="mobilDetailLabel">Detail Mobil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+                    <!-- Content loaded via AJAX -->
+                </div>
+            </div>
+        </div>
+    </div>
 
 @endsection
