@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg sticky-top">
+<nav class="navbar navbar-expand-lg fixed-top shadow-sm" id="mainNavbar" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); transition: transform 0.15s ease-out; transform: translateY(-100%);">
 
     <div class="container">
 

@@ -1,3 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Work+Sans:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* RentalKu brand colors from image analysis */
+:root {
+    --color-primary: #2C666E;
+    --color-background: #F0EDEE;
+    --color-foreground: #1F2937;
+}
+
+body {
+    font-family: 'Work Sans', sans-serif;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+}

@@ -5,172 +5,89 @@
 @section('content')
 
     <section class="hero">
+        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+            <div class="carousel-inner">
 
-        <div class="container">
+                {{-- Slide default --}}
+                <div class="carousel-item active hero-slide" style="background-image: url('{{ asset('images/banners/hero-jalan-palem.jpg') }}')">
+                    <div class="d-flex align-items-center justify-content-center h-100">
+                        <div class="hero-content">
+                            <div class="hero-badge">
+                                <i class="bi bi-patch-check-fill"></i>
+                                {{ $landingSettings['hero_badge'] ?? 'Rental mobil mudah & terpercaya' }}
+                            </div>
+                            <h1>
+                                @if(!empty($landingSettings['hero_title']))
+                                    {{ $landingSettings['hero_title'] }}
+                                @else
+                                    Perjalanan lebih mudah
+                                    dengan <span>Rentalku.</span>
+                                @endif
+                            </h1>
+                            <p>
+                                {{ $landingSettings['hero_description'] ?? 'Temukan mobil yang sesuai kebutuhanmu. Pilih kendaraan, tentukan tanggal rental, dan lakukan rental dengan mudah secara online.' }}
+                            </p>
+                            <div class="hero-buttons">
+                                <a href="#mobil" class="btn btn-hero btn-hero-primary">
+                                    <i class="bi bi-car-front me-2"></i>
+                                    Lihat Mobil
+                                </a>
+                                <a href="#cara-rental" class="btn btn-hero btn-hero-outline">
+                                    Cara Rental
+                                    <i class="bi bi-arrow-right ms-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            @if ($banners->count())
-
-                <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
-
-                    <div class="carousel-inner">
-
-                        <div class="carousel-item active">
-
+                {{-- Slide dari database --}}
+                @foreach ($banners as $banner)
+                    <div class="carousel-item hero-slide" style="background-image: url('{{ asset($banner->gambar) }}')">
+                        <div class="d-flex align-items-center justify-content-center h-100">
                             <div class="hero-content">
-
                                 <div class="hero-badge">
-                                    <i class="bi bi-patch-check-fill"></i>
-                                    {{ $landingSettings['hero_badge'] ?? 'Rental mobil mudah & terpercaya' }}
+                                    <i class="bi bi-megaphone-fill"></i>
+                                    Promo Spesial
                                 </div>
-
-                                <h1>
-                                    @if(!empty($landingSettings['hero_title']))
-                                        {{ $landingSettings['hero_title'] }}
-                                    @else
-                                        Perjalanan lebih mudah
-                                        dengan <span>Rentalku.</span>
-                                    @endif
-                                </h1>
-
-                                <p>
-                                    {{ $landingSettings['hero_description'] ?? 'Temukan mobil yang sesuai kebutuhanmu. Pilih kendaraan, tentukan tanggal rental, dan lakukan rental dengan mudah secara online.' }}
-                                </p>
-
+                                <h1>{{ $banner->judul }}</h1>
+                                <p>{{ $banner->description }}</p>
                                 <div class="hero-buttons">
-
-                                    <a href="#mobil" class="btn btn-hero btn-hero-primary">
+                                    @if ($banner->link)
+                                        <a href="{{ $banner->link }}" class="btn btn-hero btn-hero-primary"
+                                           @if (str_starts_with($banner->link, 'http')) target="_blank" rel="noopener" @endif>
+                                            Selengkapnya
+                                            <i class="bi bi-arrow-right ms-2"></i>
+                                        </a>
+                                    @endif
+                                    <a href="#mobil" class="btn btn-hero btn-hero-outline">
                                         <i class="bi bi-car-front me-2"></i>
                                         Lihat Mobil
                                     </a>
-
-                                    <a href="#cara-rental" class="btn btn-hero btn-hero-outline">
-                                        Cara Rental
-                                        <i class="bi bi-arrow-right ms-2"></i>
-                                    </a>
-
                                 </div>
-
                             </div>
-
                         </div>
-
-                        @foreach ($banners as $banner)
-
-                            <div class="carousel-item hero-slide"
-                                style="background-image: url('{{ asset($banner->gambar) }}');">
-
-                                <div class="hero-content">
-
-                                    <div class="hero-badge">
-                                        <i class="bi bi-megaphone-fill"></i>
-                                        Promo Spesial
-                                    </div>
-
-                                    <h1>
-                                        {{ $banner->judul }}
-                                    </h1>
-
-                                    <p>
-                                        {{ $banner->description }}
-                                    </p>
-
-                                    <div class="hero-buttons">
-
-                                        @if ($banner->link)
-
-                                            <a href="{{ $banner->link }}"
-                                                class="btn btn-hero btn-hero-primary"
-                                                @if (str_starts_with($banner->link, 'http')) target="_blank" rel="noopener" @endif>
-
-                                                Selengkapnya
-                                                <i class="bi bi-arrow-right ms-2"></i>
-
-                                            </a>
-
-                                        @endif
-
-                                        <a href="#mobil" class="btn btn-hero btn-hero-outline">
-                                            <i class="bi bi-car-front me-2"></i>
-                                            Lihat Mobil
-                                        </a>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        @endforeach
-
                     </div>
+                @endforeach
 
-                    <div class="carousel-indicators">
+            </div>
 
-                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0"
-                            class="active" aria-current="true" aria-label="Slide 1"></button>
+            {{-- Indikator --}}
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                @foreach ($banners as $i => $banner)
+                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $i + 1 }}" aria-label="Banner: {{ $banner->judul }}"></button>
+                @endforeach
+            </div>
 
-                        @foreach ($banners as $i => $banner)
-
-                            <button type="button" data-bs-target="#heroCarousel"
-                                data-bs-slide-to="{{ $i + 1 }}"
-                                aria-label="Banner: {{ $banner->judul }}"></button>
-
-                        @endforeach
-
-                    </div>
-
-                    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel"
-                        data-bs-slide="prev" aria-label="Slide sebelumnya">
-                        <span class="carousel-control-prev-icon"></span>
-                    </button>
-
-                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel"
-                        data-bs-slide="next" aria-label="Slide berikutnya">
-                        <span class="carousel-control-next-icon"></span>
-                    </button>
-
-                </div>
-
-            @else
-
-                <div class="hero-content">
-
-                    <div class="hero-badge">
-                        <i class="bi bi-patch-check-fill"></i>
-                        Rental mobil mudah & terpercaya
-                    </div>
-
-                    <h1>
-                        Perjalanan lebih mudah
-                        dengan <span>Rentalku.</span>
-                    </h1>
-
-                    <p>
-                        Temukan mobil yang sesuai kebutuhanmu.
-                        Pilih kendaraan, tentukan tanggal rental,
-                        dan lakukan rental dengan mudah secara online.
-                    </p>
-
-                    <div class="hero-buttons">
-
-                        <a href="#mobil" class="btn btn-hero btn-hero-primary">
-                            <i class="bi bi-car-front me-2"></i>
-                            Lihat Mobil
-                        </a>
-
-                        <a href="#cara-rental" class="btn btn-hero btn-hero-outline">
-                            Cara Rental
-                            <i class="bi bi-arrow-right ms-2"></i>
-                        </a>
-
-                    </div>
-
-                </div>
-
-            @endif
-
+            {{-- Navigasi --}}
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Slide sebelumnya">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Slide berikutnya">
+                <span class="carousel-control-next-icon"></span>
+            </button>
         </div>
-
     </section>
 
     <section class="search-box">

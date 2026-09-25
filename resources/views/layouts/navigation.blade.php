@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}" class="text-xl font-extrabold tracking-tight text-gray-900">
-                        Rental<span class="text-brand">ku</span>.
+                        Rental<span class="text-primary">ku</span>.
                     </a>
                 </div>
 
