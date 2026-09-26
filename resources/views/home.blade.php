@@ -676,6 +676,132 @@
 
     </section>
 
+    <section class="section faq" id="sk">
+
+        <div class="container">
+
+            <div class="row justify-content-center">
+
+                <div class="col-lg-8">
+
+                    <div class="text-center mb-5">
+
+                        <div class="text-success fw-bold mb-2">
+                            SYARAT & KETENTUAN
+                        </div>
+
+                        <h2 class="section-title">
+                            Kebijakan Penggunaan Layanan
+                        </h2>
+
+                        <p class="section-subtitle mx-auto">
+                            Silakan baca dengan seksama sebelum menggunakan layanan Rentalku.
+                        </p>
+
+                    </div>
+
+                    <div class="accordion" id="skAccordion">
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#sk1">
+                                    Syarat Umum Rental
+                                </button>
+                            </h2>
+                            <div id="sk1" class="accordion-collapse collapse show" data-bs-parent="#skAccordion">
+                                <div class="accordion-body text-secondary">
+                                    <ul>
+                                        <li>Penyewa harus berusia minimal 21 tahun dengan SIM yang masih berlaku.</li>
+                                        <li>Penyewa bertanggung jawab penuh terhadap kendaraan selama masa rental.</li>
+                                        <li>Pembayaran dapat dilakukan melalui transfer bank, kartu kredit, atau e-wallet.</li>
+                                        <li>Deposit awal diperlukan sebagai jaminan untuk keamanan kendaraan.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sk2">
+                                    Tanggung Jawab Penyewa
+                                </button>
+                            </h2>
+                            <div id="sk2" class="accordion-collapse collapse" data-bs-parent="#skAccordion">
+                                <div class="accordion-body text-secondary">
+                                    <ul>
+                                        <li>Penyewa wajib memeriksa kondisi kendaraan sebelum memulai rental.</li>
+                                        <li>Dilarang menggunakan kendaraan untuk aktivitas ilegal atau berbahaya.</li>
+                                        <li>Penyewa menanggung biaya perbaikan jika terjadi kerusakan akibat kelalaian.</li>
+                                        <li>Kendaraan harus dikembalikan dalam kondisi bersih dan sesuai waktu perjanjian.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sk3">
+                                    Kebijakan Pembatalan & Pengembalian
+                                </button>
+                            </h2>
+                            <div id="sk3" class="accordion-collapse collapse" data-bs-parent="#skAccordion">
+                                <div class="accordion-body text-secondary">
+                                    <ul>
+                                        <li>Pembatalan lebih dari 48 jam sebelum tanggal rental: refund 100%.</li>
+                                        <li>Pembatalan 24-48 jam: refund 50%.</li>
+                                        <li>Pembatalan kurang dari 24 jam: tidak ada refund.</li>
+                                        <li>Keterlambatan pengembalian akan dikenakan denda Rp 200.000 per jam.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sk4">
+                                    Asuransi & Ganti Rugi
+                                </button>
+                            </h2>
+                            <div id="sk4" class="accordion-collapse collapse" data-bs-parent="#skAccordion">
+                                <div class="accordion-body text-secondary">
+                                    <ul>
+                                        <li>Semua kendaraan dilindungi asuransi dasar. Asuransi tambahan dapat ditambahkan dengan biaya terpisah.</li>
+                                        <li>Kerusakan akibat kelalaian penyewa menjadi tanggung jawab penyewa (sesuai estimasi bengkel resmi).</li>
+                                        <li>Kehilangan atau pencurian kendaraan: penyewa bertanggung jawab penuh.</li>
+                                        <li>Kerusakan ringan yang sudah tercakup dalam asuransi akan ditanggung Rentalku.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sk5">
+                                    Kebijakan Privasi & Data
+                                </button>
+                            </h2>
+                            <div id="sk5" class="accordion-collapse collapse" data-bs-parent="#skAccordion">
+                                <div class="accordion-body text-secondary">
+                                    <ul>
+                                        <li>Data pribadi penyewa dijaga keamanannya sesuai standar industri.</li>
+                                        <li>Rentalku tidak membagikan data pribadi kepada pihak ketiga tanpa persetujuan.</li>
+                                        <li>Data transaksi disimpan untuk keperluan administrasi dan audit.</li>
+                                        <li>Penyewa berhak mengajukan penghapusan data sesuai peraturan perlindungan data yang berlaku.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
     <style>
         #kontak {
             background-color: #f8f9fa;

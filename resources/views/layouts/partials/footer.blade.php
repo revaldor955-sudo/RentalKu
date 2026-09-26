@@ -38,6 +38,7 @@
                     <a href="{{ url('/#mobil') }}">Mobil</a>
                     <a href="{{ url('/#tentang') }}">Tentang Kami</a>
                     <a href="{{ url('/#faq') }}">FAQ</a>
+                    <a href="{{ url('/#sk') }}">S&K</a>
 
                 </div>
 
