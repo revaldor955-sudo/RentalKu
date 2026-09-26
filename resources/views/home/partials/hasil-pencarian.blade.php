@@ -221,7 +221,7 @@
 
         @if ($mobils->count() < $totalTersedia)
 
-            <a href="{{ route('home', ['jumlah' => $jumlah + 6]) }}" class="btn btn-outline-dark px-4 py-2" data-search-link>
+            <a href="{{ route('home', ['jumlah' => $jumlah + 6]) }}" class="btn btn-link text-dark text-decoration-none fw-semibold" data-search-link>
                 Tampilkan Lebih Banyak
                 <small class="text-secondary ms-1">({{ $totalTersedia - $mobils->count() }} lainnya)</small>
                 <i class="bi bi-chevron-down ms-1"></i>
@@ -231,8 +231,8 @@
 
         @if ($jumlah > 6)
 
-            <a href="{{ route('home') }}" class="btn btn-outline-secondary px-4 py-2" data-search-link data-search-top>
-                Tampilkan Lebih Sedikit
+            <a href="{{ route('home') }}" class="btn btn-link text-secondary text-decoration-none fw-semibold" data-search-link data-search-top>
+                Sembunyikan
                 <i class="bi bi-chevron-up ms-1"></i>
             </a>
 
