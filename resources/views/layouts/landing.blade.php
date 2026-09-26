@@ -9,6 +9,16 @@
 
     <meta name="description" content="Rentalku menyediakan layanan rental mobil mudah, aman dan terpercaya.">
 
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="@yield('title', 'Rentalku - Rental Mobil Terpercaya')">
+    <meta property="og:description" content="Rentalku menyediakan layanan rental mobil mudah, aman dan terpercaya.">
+    <meta property="og:image" content="{{ asset('images/og-image.jpg') }}">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -566,7 +576,7 @@
         footer {
             background: #111827;
             color: white;
-            padding: 65px 0 25px;
+            padding: 40px 0 20px;
         }
 
         footer .brand {

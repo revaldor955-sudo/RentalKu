@@ -5,6 +5,7 @@ use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CabangController;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboardController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DendaController;
 use App\Http\Controllers\DokumenMobilController;
 use App\Http\Controllers\FaqController;
@@ -157,6 +158,9 @@ Route::resource('faqs', FaqController::class)
 Route::get('/', [HomeController::class, 'index'])
     ->middleware('guest')
     ->name('home');
+
+Route::post('/contact', [ContactController::class, 'store'])
+    ->name('contact.store');
 
 Route::get('/dashboard', function () {
     return match (Auth::user()->roles_id) {

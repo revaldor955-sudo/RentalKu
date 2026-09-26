@@ -126,23 +126,23 @@
 
                         <div class="col-lg-3">
 
-                            <div class="search-label">
+                            <div class="search-label" id="tanggal-mulai-label">
                                 Tanggal Mulai
                             </div>
 
                             <input type="date" name="tanggal_mulai" value="{{ $mulai?->toDateString() }}"
-                                min="{{ now()->toDateString() }}" class="form-control search-input">
+                                min="{{ now()->toDateString() }}" id="tanggal_mulai" aria-labelledby="tanggal-mulai-label" class="form-control search-input">
 
                         </div>
 
                         <div class="col-lg-3">
 
-                            <div class="search-label">
+                            <div class="search-label" id="tanggal-selesai-label">
                                 Tanggal Selesai
                             </div>
 
                             <input type="date" name="tanggal_selesai" value="{{ $selesai?->toDateString() }}"
-                                min="{{ now()->toDateString() }}" class="form-control search-input">
+                                min="{{ now()->toDateString() }}" id="tanggal_selesai" aria-labelledby="tanggal-selesai-label" class="form-control search-input">
 
                         </div>
 
@@ -527,7 +527,7 @@
 
     @if ($ratings->count())
 
-        <section class="section section-light">
+        <section class="section section-light" id="testimoni">
 
             <div class="container">
 
@@ -540,6 +540,10 @@
                     <h2 class="section-title">
                         Apa kata pelanggan?
                     </h2>
+
+                    <p class="section-subtitle mx-auto">
+                        Ribuan pelanggan telah mempercayakan perjalanan mereka kepada Rentalku.
+                    </p>
 
                 </div>
 
@@ -569,7 +573,7 @@
                                 <div class="user-info">
 
                                     @if ($rating->foto_user)
-                                        <img src="{{ asset('storage/' . $rating->foto_user) }}" class="user-avatar">
+                                        <img src="{{ asset('storage/' . $rating->foto_user) }}" class="user-avatar" alt="{{ $rating->nama }}" loading="lazy">
                                     @else
                                         <div class="user-avatar d-flex align-items-center justify-content-center">
                                             <i class="bi bi-person"></i>
@@ -672,7 +676,163 @@
 
     </section>
 
-    <section class="section">
+    <style>
+        #kontak {
+            background-color: #f8f9fa;
+            padding: 80px 0;
+            border-top: 1px solid #eef2f0;
+            border-bottom: 1px solid #eef2f0;
+        }
+        .contact-form {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .cta-banner {
+            margin-top: 40px;
+        }
+        .cta {
+            margin-bottom: 40px;
+        }
+    </style>
+
+    {{-- Contact Form Section --}}
+    <section class="section" id="kontak">
+
+        <div class="container">
+
+            <div class="row justify-content-center">
+
+                <div class="col-lg-8">
+
+                    <div class="text-center mb-5">
+
+                        <div class="text-success fw-bold mb-2">
+                            HUBUNGI KAMI
+                        </div>
+
+                        <h2 class="section-title">
+                            Ada pertanyaan?
+                        </h2>
+
+                        <p class="section-subtitle mx-auto">
+                            Kami siap membantu Anda. Hubungi tim Rentalku atau isi form di bawah.
+                        </p>
+
+                    </div>
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <div class="contact-info">
+
+                                <div class="contact-item mb-4">
+
+                                    <div class="contact-icon">
+                                        <i class="bi bi-telephone"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <h5>Telepon</h5>
+
+                                        <p class="text-muted">+62 812-3456-7890</p>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="contact-item mb-4">
+
+                                    <div class="contact-icon">
+                                        <i class="bi bi-envelope"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <h5>Email</h5>
+
+                                        <p class="text-muted">info@rentalku.com</p>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="contact-item">
+
+                                    <div class="contact-icon">
+                                        <i class="bi bi-geo-alt"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <h5>Lokasi</h5>
+
+                                        <p class="text-muted">Pontianak, Kalimantan Barat</p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <form id="contactForm" action="{{ route('contact.store') ?? '#' }}" method="POST" class="contact-form">
+
+                                @csrf
+
+                                <div class="mb-3">
+
+                                    <label for="contact_name" class="form-label">Nama Lengkap</label>
+
+                                    <input type="text" class="form-control" id="contact_name" name="nama" placeholder="Nama Anda" required>
+
+                                </div>
+
+                                <div class="mb-3">
+
+                                    <label for="contact_email" class="form-label">Email</label>
+
+                                    <input type="email" class="form-control" id="contact_email" name="email" placeholder="Email Anda" required>
+
+                                </div>
+
+                                <div class="mb-3">
+
+                                    <label for="contact_subject" class="form-label">Subjek</label>
+
+                                    <input type="text" class="form-control" id="contact_subject" name="subjek" placeholder="Subjek pesan" required>
+
+                                </div>
+
+                                <div class="mb-3">
+
+                                    <label for="contact_message" class="form-label">Pesan</label>
+
+                                    <textarea class="form-control" id="contact_message" name="pesan" rows="4" placeholder="Tuliskan pesan Anda..." required></textarea>
+
+                                </div>
+
+                                <button type="submit" class="btn btn-rent w-100">Kirim Pesan</button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
 
         <div class="container">
 

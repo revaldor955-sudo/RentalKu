@@ -107,12 +107,12 @@
 
                 @if ($mobil->fotoMobils->isNotEmpty())
                     <img src="{{ $mobil->fotoMobils->first()->url }}" class="car-image"
-                        alt="{{ $mobil->name }}">
+                        alt="{{ $mobil->name }}" loading="lazy">
                 @elseif($mobil->image)
-                    <img src="{{ asset($mobil->image) }}" class="car-image" alt="{{ $mobil->name }}">
+                    <img src="{{ asset($mobil->image) }}" class="car-image" alt="{{ $mobil->name }}" loading="lazy">
                 @else
                     <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=900&q=80"
-                        class="car-image" alt="{{ $mobil->name }}">
+                        class="car-image" alt="{{ $mobil->name }}" loading="lazy">
                 @endif
 
 

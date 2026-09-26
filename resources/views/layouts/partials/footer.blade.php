@@ -1,8 +1,8 @@
-<footer id="kontak">
+<footer id="footer-section">
 
     <div class="container">
 
-        <div class="row g-5">
+        <div class="row g-3">
 
             <div class="col-lg-5">
 
@@ -35,9 +35,9 @@
                 <div class="d-flex flex-column gap-2">
 
                     <a href="{{ url('/') }}">Beranda</a>
-                    <a href="#mobil">Mobil</a>
-                    <a href="#tentang">Tentang Kami</a>
-                    <a href="#faq">FAQ</a>
+                    <a href="{{ url('/#mobil') }}">Mobil</a>
+                    <a href="{{ url('/#tentang') }}">Tentang Kami</a>
+                    <a href="{{ url('/#faq') }}">FAQ</a>
 
                 </div>
 
@@ -51,9 +51,9 @@
 
                 <div class="d-flex flex-column gap-2">
 
-                    <a href="#mobil">Rental Mobil</a>
-                    <a href="#cara-rental">Dengan Supir</a>
-                    <a href="#cara-rental">Tanpa Supir</a>
+                    <a href="{{ url('/#mobil') }}">Rental Mobil</a>
+                    <a href="{{ url('/#cara-rental') }}">Dengan Supir</a>
+                    <a href="{{ url('/#cara-rental') }}">Tanpa Supir</a>
 
                 </div>
 
@@ -88,7 +88,7 @@
 
         </div>
 
-        <hr class="border-secondary my-5">
+        <hr class="border-secondary my-3">
 
         <div class="text-center">
 
