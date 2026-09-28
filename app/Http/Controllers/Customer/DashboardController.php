@@ -12,6 +12,18 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
+    public function riwayat()
+    {
+        $userId = auth()->id();
+        $rentals = Rental::with(['mobil', 'pembayaran', 'dendas', 'cabangAmbil', 'cabangKembali', 'rating'])
+            ->where('user_id', $userId)
+            ->whereIn('status', ['Selesai', 'Ditolak'])
+            ->latest()
+            ->get();
+
+        return view('customer.riwayat', compact('rentals'));
+    }
+
     public function index()
     {
         $userId = auth()->id();

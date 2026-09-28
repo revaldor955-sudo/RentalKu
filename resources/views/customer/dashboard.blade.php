@@ -66,6 +66,58 @@
             font-size: 16px;
         }
 
+        .user-box.dropdown-toggle {
+            transition: none;
+        }
+
+        .user-box.dropdown-toggle:hover {
+            transform: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+        }
+
+        .dropdown-menu {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.2s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            font-size: 14px;
+            padding: 10px 16px;
+            color: #1f2937;
+            transition: all 0.15s ease;
+        }
+
+        .dropdown-item:hover,
+        .dropdown-item:focus {
+            background: #f5f7f6;
+            color: #198754;
+        }
+
+        .dropdown-item.text-danger:hover,
+        .dropdown-item.text-danger:focus {
+            background: #fee;
+            color: #dc3545;
+        }
+
+        .dropdown-divider {
+            margin: 6px 0;
+            opacity: 0.5;
+        }
+
         .hero {
             position: relative;
             overflow: hidden;
@@ -547,7 +599,7 @@
             }
         }
 
-        .rental-masonry-item {
+        .rental-card {
             margin-bottom: 1.5rem;
         }
 
@@ -558,7 +610,7 @@
                 column-gap: 1.5rem;
             }
 
-            .rental-masonry-item {
+            .rental-card {
                 break-inside: avoid;
             }
 
@@ -575,63 +627,8 @@
 
 <body>
 
-<nav class="navbar navbar-expand-lg sticky-top">
-
-    <div class="container py-3">
-
-        <a href="{{ url('/') }}" class="text-decoration-none brand">
-            Rental<span>ku</span>.
-        </a>
-
-        <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#customerNav" aria-controls="customerNav" aria-expanded="false" aria-label="Menu navigasi">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="customerNav">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-2">
-                <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="#mobil">Cari Mobil</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="#rental-saya">Rental Saya</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="{{ route('customer.kompensasi.index') }}">Kompensasi</a>
-                </li>
-                <li class="nav-item d-lg-none">
-                    <form action="{{ route('logout') }}" method="POST" class="m-0">
-                        @csrf
-                        <button type="submit" class="btn btn-outline-danger btn-sm w-100">
-                            <i class="bi bi-box-arrow-right me-1"></i>
-                            Logout
-                        </button>
-                    </form>
-                </li>
-            </ul>
-        </div>
-
-        <div class="d-flex align-items-center gap-3 ms-2">
-
-            <div class="user-box d-none d-md-flex"
-                 data-bs-toggle="modal"
-                 data-bs-target="#profileModal"
-                 style="cursor: pointer;">
-
-                <div class="user-icon">
-                    <i class="bi bi-person"></i>
-                </div>
-
-                <span>
-                    {{ Auth::user()->name }}
-                </span>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</nav>
+<div style="height: 76px;"></div>
+@include('layouts.partials.customer-nav')
 
 <div class="container">
 
@@ -879,25 +876,7 @@
 
     </div>
 
-    <ul class="nav nav-pills mb-3 gap-2" id="rentalTab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="aktif-tab" data-bs-toggle="pill" data-bs-target="#aktif" type="button" role="tab" aria-controls="aktif" aria-selected="true">
-                <i class="bi bi-lightning-charge me-1"></i>
-                Aktivitas
-                <span class="badge bg-success ms-1">{{ $rentalsAktif->count() }}</span>
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="riwayat-tab" data-bs-toggle="pill" data-bs-target="#riwayat" type="button" role="tab" aria-controls="riwayat" aria-selected="false">
-                <i class="bi bi-clock-history me-1"></i>
-                Riwayat
-                <span class="badge bg-secondary ms-1">{{ $rentalsRiwayat->count() }}</span>
-            </button>
-        </li>
-    </ul>
 
-    <div class="tab-content" id="rentalTabContent">
-        <div class="tab-pane fade show active" id="aktif" role="tabpanel" aria-labelledby="aktif-tab">
             @if($rentalsAktif->count())
                 <div class="rental-masonry">
                     @foreach($rentalsAktif as $rental)
@@ -929,45 +908,8 @@
                     <p class="text-muted mt-2 mb-0">Tidak ada aktivitas rental saat ini.</p>
                 </div>
             @endif
-        </div>
 
-        <div class="tab-pane fade" id="riwayat" role="tabpanel" aria-labelledby="riwayat-tab">
-            @if($rentalsRiwayat->count())
-                <div class="rental-masonry">
-                    @foreach($rentalsRiwayat as $rental)
-                        @include('customer.partials.rental-card', ['rental' => $rental, 'tab' => 'riwayat'])
-                    @endforeach
-                </div>
-            @else
-                <div class="text-center py-5">
-                    <i class="bi bi-clock-history fs-1 text-muted"></i>
-                    <p class="text-muted mt-2 mb-0">Belum ada riwayat rental.</p>
-                </div>
-            @endif
-        </div>
-    </div>
 
-    @if(!$rentalsAktif->count() && !$rentalsRiwayat->count())
-
-        <div class="empty-card">
-
-            <div class="empty-icon">
-
-                <i class="bi bi-calendar-x"></i>
-
-            </div>
-
-            <h5 class="fw-bold mt-4">
-                Belum Ada Rental
-            </h5>
-
-            <p class="text-muted mb-0">
-                Rental yang kamu lakukan akan muncul di sini.
-            </p>
-
-        </div>
-
-    @endif
 
 </section>
 

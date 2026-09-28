@@ -206,6 +206,10 @@ Route::middleware('staff')->group(function () {
 Route::get('/customer/dashboard', [CustomerDashboardController::class, 'index'])
     ->middleware('customer')
     ->name('customer.dashboard');
+
+Route::get('/customer/riwayat', [CustomerDashboardController::class, 'riwayat'])
+    ->middleware('customer')
+    ->name('customer.riwayat');
 Route::middleware('customer')->group(function () {
     Route::get('/customer/mobils/search', [CustomerDashboardController::class, 'search'])
         ->name('customer.mobils.search');
