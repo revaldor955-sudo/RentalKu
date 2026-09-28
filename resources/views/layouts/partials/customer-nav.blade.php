@@ -1,5 +1,12 @@
 <nav class="navbar navbar-expand-lg fixed-top shadow-sm" id="customerNavbar" style="background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0, 0, 0, .05); transition: transform 0.2s ease-out; padding: 16px 0;">
 
+    <style>
+        /* Sembunyikan caretez Bootstrap pada tombol profil customer */
+        .user-box.no-caret.dropdown-toggle::after {
+            display: none;
+        }
+    </style>
+
     <div class="container">
 
         <a href="{{ route('customer.dashboard') }}" class="navbar-brand">
@@ -25,14 +32,18 @@
 
             <div class="d-flex align-items-center gap-3">
                 <div class="dropdown">
-                    <button class="user-box dropdown-toggle d-flex align-items-center gap-2 border-0 bg-transparent p-0 cursor-pointer" 
-                            id="profileDropdown" 
-                            data-bs-toggle="dropdown" 
+                    <button class="user-box dropdown-toggle d-flex align-items-center gap-2 border-0 bg-transparent p-0 cursor-pointer no-caret"
+                            id="profileDropdown"
+                            data-bs-toggle="dropdown"
                             aria-expanded="false">
-                        <div class="user-icon d-flex align-items-center justify-content-center rounded-circle text-white fw-bold" style="width:38px; height:38px; background: var(--primary, #2C666E);">
-                            <i class="bi bi-person fs-5"></i>
+                        <div class="user-avatar user-icon d-flex align-items-center justify-content-center rounded-circle text-white fw-bold overflow-hidden" style="width:38px; height:38px; background: var(--primary, #2C666E);">
+                            @if(Auth::user()->photo)
+                                <img src="{{ asset(Auth::user()->photo) }}" alt="Avatar" style="width:100%; height:100%; object-fit:cover;">
+                            @else
+                                <i class="bi bi-person fs-5"></i>
+                            @endif
                         </div>
-                        <span class="fw-semibold" style="color: var(--dark, #111827);">
+                        <span class="user-name fw-semibold" style="color: var(--dark, #111827);">
                             {{ Auth::user()->name }}
                         </span>
                     </button>
@@ -45,6 +56,12 @@
                                 <i class="bi bi-envelope me-2"></i>
                                 {{ Auth::user()->email }}
                             </div>
+                        </li>
+                        <li>
+                            <button class="dropdown-item rounded-2 py-2 d-flex align-items-center" type="button" data-bs-toggle="modal" data-bs-target="#profileModal" data-mode="edit">
+                                <i class="bi bi-person-badge me-3 text-secondary"></i>
+                                Edit Profile
+                            </button>
                         </li>
 @unless(request()->routeIs('customer.riwayat'))
                         <li>
