@@ -74,13 +74,13 @@
         }
 
         .user-box.dropdown-toggle {
-            transition: all 0.2s ease;
+            transition: none;
         }
 
         .user-box.dropdown-toggle:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(25, 135, 84, 0.15);
-            background: #f0f8f4 !important;
+            transform: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
         }
 
         .dropdown-menu {
