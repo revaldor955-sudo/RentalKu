@@ -46,6 +46,7 @@
                                 {{ Auth::user()->email }}
                             </div>
                         </li>
+@unless(request()->routeIs('customer.riwayat'))
                         <li>
                             <a class="dropdown-item rounded-2 py-2" href="{{ route('customer.riwayat') }}">
                                 <i class="bi bi-clock-history me-3 text-primary"></i>
@@ -53,6 +54,7 @@
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
+@endunless
                         <li>
                             <form action="{{ route('logout') }}" method="POST" class="m-0">
                                 @csrf
