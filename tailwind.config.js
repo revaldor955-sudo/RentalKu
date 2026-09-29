@@ -12,7 +12,7 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Outfit', 'Work Sans', ...defaultTheme.fontFamily.sans],
+                sans: ['Montserrat', 'Plus Jakarta Sans', ...defaultTheme.fontFamily.sans],
             },
 
             colors: {
