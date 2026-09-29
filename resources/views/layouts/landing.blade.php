@@ -300,8 +300,8 @@
         }
 
         .car-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 18px 40px rgba(0, 0, 0, .09);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .05);
         }
 
         .car-image {
@@ -356,7 +356,8 @@
 
         .brand-card:hover {
             border-color: var(--primary);
-            transform: translateY(-4px);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .05);
         }
 
         .brand-logo {

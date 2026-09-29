@@ -343,8 +343,8 @@
         }
 
         .car-card:hover {
-            transform: translateY(-7px);
-            box-shadow: 0 18px 40px rgba(0,0,0,.10);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,.05);
         }
 
         .car-photo-wrapper {
