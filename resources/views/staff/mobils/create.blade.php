@@ -170,9 +170,7 @@
 
 @include('layouts.partials.staff-sidebar')
 
-{{-- Page Content (dipindah ke #mainContent oleh staff-sidebar) --}}
 <div class="page-content">
-
 <div class="container">
 
 

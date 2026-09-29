@@ -66,6 +66,58 @@
             font-size: 16px;
         }
 
+        .user-box.dropdown-toggle {
+            transition: none;
+        }
+
+        .user-box.dropdown-toggle:hover {
+            transform: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+        }
+
+        .dropdown-menu {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.2s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            font-size: 14px;
+            padding: 10px 16px;
+            color: #1f2937;
+            transition: all 0.15s ease;
+        }
+
+        .dropdown-item:hover,
+        .dropdown-item:focus {
+            background: #f5f7f6;
+            color: #198754;
+        }
+
+        .dropdown-item.text-danger:hover,
+        .dropdown-item.text-danger:focus {
+            background: #fee;
+            color: #dc3545;
+        }
+
+        .dropdown-divider {
+            margin: 6px 0;
+            opacity: 0.5;
+        }
+
         .hero {
             position: relative;
             overflow: hidden;
@@ -547,7 +599,7 @@
             }
         }
 
-        .rental-masonry-item {
+        .rental-card {
             margin-bottom: 1.5rem;
         }
 
@@ -558,7 +610,7 @@
                 column-gap: 1.5rem;
             }
 
-            .rental-masonry-item {
+            .rental-card {
                 break-inside: avoid;
             }
 
@@ -575,65 +627,8 @@
 
 <body>
 
-
-<nav class="navbar navbar-expand-lg sticky-top">
-
-    <div class="container py-3">
-
-        <a href="{{ url('/') }}" class="text-decoration-none brand">
-            Rental<span>ku</span>.
-        </a>
-
-        <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#customerNav" aria-controls="customerNav" aria-expanded="false" aria-label="Menu navigasi">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="customerNav">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-2">
-                <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="#mobil">Cari Mobil</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="#rental-saya">Rental Saya</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="{{ route('customer.kompensasi.index') }}">Kompensasi</a>
-                </li>
-                <li class="nav-item d-lg-none">
-                    <form action="{{ route('logout') }}" method="POST" class="m-0">
-                        @csrf
-                        <button type="submit" class="btn btn-outline-danger btn-sm w-100">
-                            <i class="bi bi-box-arrow-right me-1"></i>
-                            Logout
-                        </button>
-                    </form>
-                </li>
-            </ul>
-        </div>
-
-        <div class="d-flex align-items-center gap-3 ms-2">
-
-            <div class="user-box d-none d-md-flex"
-                 data-bs-toggle="modal"
-                 data-bs-target="#profileModal"
-                 style="cursor: pointer;">
-
-                <div class="user-icon">
-                    <i class="bi bi-person"></i>
-                </div>
-
-                <span>
-                    {{ Auth::user()->name }}
-                </span>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</nav>
-
+<div style="height: 76px;"></div>
+@include('layouts.partials.customer-nav')
 
 <div class="container">
 
@@ -644,7 +639,6 @@
     @if (session('error'))
         <span id="flashError" class="d-none">{{ session('error') }}</span>
     @endif
-
 
 <section class="hero">
 
@@ -705,7 +699,6 @@
 
         </div>
 
-
         <div class="col-lg-6 mt-5 mt-lg-0">
 
             <div class="hero-photo-wrapper">
@@ -736,13 +729,11 @@
 
 </div>
 
-
         </div>
 
     </div>
 
 </section>
-
 
 <div class="row g-3 stats">
 
@@ -774,7 +765,6 @@
 
     </div>
 
-
     <div class="col-md-4">
 
         <div class="stat-card">
@@ -802,7 +792,6 @@
         </div>
 
     </div>
-
 
     <div class="col-md-4">
 
@@ -833,7 +822,6 @@
     </div>
 
 </div>
-
 
 @if(($klaimUpdates ?? collect())->count())
 
@@ -869,7 +857,6 @@
 
 @endif
 
-
 <section class="section">
     <section id="rental-saya" class="section pt-4">
 
@@ -889,328 +876,40 @@
 
     </div>
 
-    @if($rentals->count())
 
-        <div class="rental-masonry">
-
-            @foreach(($rentalsTampil ?? $rentals) as $rental)
-
-                <div class="rental-masonry-item">
-
-                    <div class="stat-card d-flex flex-column h-100">
-
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-
-                            <div>
-
-                                <h5 class="fw-bold mb-1">
-                                    {{ $rental->mobil->name ?? 'Mobil' }}
-                                </h5>
-
-                                <small class="text-muted">
-                                    Rental #{{ $rental->id }}
-                                </small>
-
-                            </div>
-@if($rental->status === 'Menunggu')
-
-                                <span class="badge bg-warning text-dark">
-                                    Menunggu
-
-                                </span>
-
-                            @elseif($rental->status === 'Disetujui')
-
-                                <span class="badge bg-success">
-                                    Disetujui
-
-                                </span>
-
-                            @elseif($rental->status === 'Selesai')
-
-                                <span class="badge bg-secondary">
-                                    Selesai
-
-                                </span>
-
-                            @elseif($rental->status === 'Ditolak')
-
-                                <span class="badge bg-danger">
-                                    Ditolak
-
-                                </span>
-
-                            @else
-
-                                <span class="badge bg-dark">
-                                    {{ $rental->status }}
-                                </span>
-
-                            @endif
-
-                        </div>
-
-
-                        <div class="row g-3 mb-3">
-
-                            <div class="col-6">
-
-                                <small class="text-muted d-block">
-                                    Tanggal Mulai
-                                </small>
-
-                                <strong>
-                                    {{ $rental->tanggal_mulai->format('d/m/Y') }}
-                                </strong>
-
-                            </div>
-
-                            <div class="col-6">
-
-                                <small class="text-muted d-block">
-                                    Tanggal Selesai
-                                </small>
-
-                                <strong>
-                                    {{ $rental->tanggal_selesai->format('d/m/Y') }}
-                                </strong>
-
-                            </div>
-
-                            <div class="col-6">
-
-                                <small class="text-muted d-block">
-                                    Jumlah Hari
-                                </small>
-
-                                <strong>
-                                    {{ $rental->jumlah_hari }} Hari
-                                </strong>
-
-                            </div>
-
-                            <div class="col-6">
-
-                                <small class="text-muted d-block">
-                                    Total Harga
-                                </small>
-
-                                <strong class="text-success">
-                                    Rp {{ number_format($rental->total_harga, 0, ',', '.') }}
-                                </strong>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="mt-auto">
-
-@if($rental->status === 'Disetujui')
-
-    @if(!$rental->pembayaran)
-
-        <button
-            type="button"
-            class="btn btn-success w-100 btn-bayar"
-            data-action="{{ route('pembayaran.store', $rental->id) }}"
-            data-title="Bayar Sekarang"
-            data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
-            data-rental="{{ $rental->id }}"
-            data-cabang="{{ $rental->cabang_ambil_id }}"
-            data-total="{{ $rental->total_harga }}"
-        >
-            <i class="bi bi-credit-card me-1"></i>
-            Bayar Sekarang
-        </button>
-
-    @elseif($rental->pembayaran->status === 'Menunggu')
-
-        <div class="alert alert-info mb-0">
-            <i class="bi bi-clock-history me-1"></i>
-            Bukti pembayaran sudah dikirim dan sedang
-            menunggu verifikasi tim kami.
-        </div>
-
-   @elseif($rental->pembayaran->status === 'Disetujui')
-
-    <div class="alert alert-success mb-0">
-        <i class="bi bi-check-circle-fill me-1"></i>
-        Pembayaran sudah diverifikasi tim kami.
-    </div>
-
-    @elseif($rental->pembayaran->status === 'Ditolak')
-
-        <button
-            type="button"
-            class="btn btn-danger w-100 btn-bayar"
-            data-action="{{ route('pembayaran.store', $rental->id) }}"
-            data-title="Upload Ulang Pembayaran"
-            data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
-            data-rental="{{ $rental->id }}"
-            data-cabang="{{ $rental->cabang_ambil_id }}"
-            data-total="{{ $rental->total_harga }}"
-        >
-            <i class="bi bi-arrow-repeat me-1"></i>
-            Upload Ulang Pembayaran
-        </button>
-
-    @endif
-
-@elseif($rental->status === 'Menunggu')
-
-    <div class="alert alert-warning mb-0">
-        <i class="bi bi-hourglass-split me-1"></i>
-        Menunggu persetujuan tim kami sebelum melakukan pembayaran.
-    </div>
-
-@elseif($rental->status === 'Ditolak')
-
-    <div class="alert alert-danger mb-0">
-        <i class="bi bi-x-circle me-1"></i>
-        Pengajuan rental ditolak.
-    </div>
-
-@elseif($rental->status === 'Selesai')
-
-    <div class="alert alert-secondary mb-0">
-        <i class="bi bi-check2-circle me-1"></i>
-        Rental telah selesai.
-                <a href="{{ route('customer.kompensasi.index', ['baru' => 1, 'rental' => $rental->id]) }}" class="btn btn-outline-success btn-sm ms-2">
-            <i class="bi bi-megaphone me-1"></i>
-            Ajukan Kompensasi
-        </a>
-    </div>
-
-@endif
-
-                        @if($rental->dendas && $rental->dendas->count())
-                                <div class="mt-3">
-                                    <h6 class="fw-bold mb-2">
-                                        <i class="bi bi-exclamation-triangle me-1"></i>
-                                        Denda Rental Ini
-                                    </h6>
-                                    @foreach($rental->dendas as $d)
-                                        <div class="border rounded p-3 mb-2">
-                                            <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
-                                                <strong>{{ $d->jenis ?? 'Denda' }}</strong>
-                                                @if($d->status === 'lunas')
-                                                    <span class="badge bg-success">Lunas</span>
-                                                @elseif($d->status === 'menunggu verifikasi')
-                                                    <span class="badge bg-info text-dark">Menunggu Verifikasi</span>
-                                                @else
-                                                    <span class="badge bg-warning text-dark">Belum Bayar</span>
-                                                @endif
-                                            </div>
-                                            <div class="text-success fw-bold mb-1">
-                                                Rp {{ number_format($d->nominal ?? 0, 0, ',', '.') }}
-                                            </div>
-                                            @isset($d->syarat_dan_ketentuan)
-                                                @if($d->syarat_dan_ketentuan)
-                                                    <small class="text-muted d-block mb-1">{{ $d->syarat_dan_ketentuan }}</small>
-                                                @endif
-                                            @endisset
-                                            @isset($d->foto_bukti)
-                                                @if($d->foto_bukti)
-                                                    <small class="text-muted d-block">Bukti staff:</small>
-                                                    <img src="{{ asset($d->foto_bukti) }}" alt="Bukti denda (klik untuk memperbesar)" title="Klik untuk memperbesar" data-src="{{ asset($d->foto_bukti) }}" onclick="openBuktiModal(this)" class="img-fluid rounded mb-1" style="max-height: 120px; cursor: zoom-in;">
-                                                @endif
-                                            @endisset
-                                            @isset($d->bukti_bayar)
-                                                @if($d->bukti_bayar)
-                                                    <small class="text-muted d-block">Bukti bayar kamu:</small>
-                                                    <img src="{{ asset($d->bukti_bayar) }}" alt="Bukti bayar denda (klik untuk memperbesar)" title="Klik untuk memperbesar" data-src="{{ asset($d->bukti_bayar) }}" onclick="openBuktiModal(this)" class="img-fluid rounded mb-1" style="max-height: 120px; cursor: zoom-in;">
-                                                @endif
-                                            @endisset
-                                            @isset($d->tanggal_bayar)
-                                                @if($d->tanggal_bayar)
-                                                    <small class="text-muted d-block mb-1">Tanggal bayar: {{ \Carbon\Carbon::parse($d->tanggal_bayar)->format('d/m/Y') }}</small>
-                                                @endif
-                                            @endisset
-                                            @if(($d->status ?? 'belum bayar') === 'belum bayar')
-                                                <form method="POST" action="{{ route('customer.dendas.bayar', $d->id) }}" enctype="multipart/form-data" class="mt-2">
-                                                    @csrf
-                                                    <div class="row g-2">
-                                                        <div class="col-12">
-                                                            <label class="form-label small mb-1">Bukti Bayar</label>
-                                                            <input type="file" name="bukti_bayar" class="form-control form-control-sm" accept="image/*" required>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <label class="form-label small mb-1">Tanggal Bayar</label>
-                                                            <input type="date" name="tanggal_bayar" class="form-control form-control-sm" required>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <button type="submit" class="btn btn-warning btn-sm w-100">
-                                                                <i class="bi bi-cash-coin me-1"></i>
-                                                                Bayar Denda
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            @endif
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endif
-
-                        </div>
-
-                    </div>
+            @if($rentalsAktif->count())
+                <div class="rental-masonry">
+                    @foreach($rentalsAktif as $rental)
+                        @include('customer.partials.rental-card', ['rental' => $rental])
+                    @endforeach
 
                 </div>
 
-            @endforeach
+                @if($rentalsAktif->count() > $jumlahRental)
+                    <div class="text-center mt-4 d-flex flex-wrap gap-2 justify-content-center">
+                        <a href="{{ route('customer.dashboard', array_merge(request()->only(['q', 'cabang', 'transmisi']), ['jumlah_rental' => $jumlahRental + 4])) }}" class="btn btn-outline-success px-4 py-2">
+                            Tampilkan Lebih Banyak
+                            <small class="text-muted ms-1">({{ $rentalsAktif->count() - $rentalsTampil->count() }} lainnya)</small>
+                            <i class="bi bi-chevron-down ms-1"></i>
+                        </a>
 
-        </div>
-
-        @if(($totalRentals ?? $rentals->count()) > ($jumlahRental ?? 4) || ($jumlahRental ?? 4) > 4)
-
-            <div class="text-center mt-4 d-flex flex-wrap gap-2 justify-content-center">
-
-                @if(($rentalsTampil ?? $rentals)->count() < ($totalRentals ?? $rentals->count()))
-
-                    <a href="{{ route('customer.dashboard', array_merge(request()->only(['q', 'cabang', 'transmisi']), ['jumlah_rental' => ($jumlahRental ?? 4) + 4])) }}" class="btn btn-outline-success px-4 py-2">
-                        Tampilkan Lebih Banyak
-                        <small class="text-muted ms-1">({{ ($totalRentals ?? $rentals->count()) - ($rentalsTampil ?? $rentals)->count() }} lainnya)</small>
-                        <i class="bi bi-chevron-down ms-1"></i>
-                    </a>
-
+                        @if($jumlahRental > 4)
+                            <a href="{{ route('customer.dashboard', request()->only(['q', 'cabang', 'transmisi'])) }}" class="btn btn-outline-secondary px-4 py-2">
+                                Tampilkan Lebih Sedikit
+                                <i class="bi bi-chevron-up ms-1"></i>
+                            </a>
+                        @endif
+                    </div>
                 @endif
 
-                @if(($jumlahRental ?? 4) > 4)
+            @else
+                <div class="text-center py-5">
+                    <i class="bi bi-lightning-charge fs-1 text-muted"></i>
+                    <p class="text-muted mt-2 mb-0">Tidak ada aktivitas rental saat ini.</p>
+                </div>
+            @endif
 
-                    <a href="{{ route('customer.dashboard', request()->only(['q', 'cabang', 'transmisi'])) }}" class="btn btn-outline-secondary px-4 py-2">
-                        Tampilkan Lebih Sedikit
-                        <i class="bi bi-chevron-up ms-1"></i>
-                    </a>
 
-                @endif
-
-            </div>
-
-        @endif
-
-    @else
-
-        <div class="empty-card">
-
-            <div class="empty-icon">
-
-                <i class="bi bi-calendar-x"></i>
-
-            </div>
-
-            <h5 class="fw-bold mt-4">
-                Belum Ada Rental
-            </h5>
-
-            <p class="text-muted mb-0">
-                Rental yang kamu lakukan akan muncul di sini.
-            </p>
-
-        </div>
-
-    @endif
 
 </section>
 
@@ -1266,7 +965,6 @@
         </div>
     </form>
 
-
     <div class="row g-4" id="mobilGrid">
 
         @forelse($mobils as $index => $mobil)
@@ -1311,7 +1009,6 @@
     @endif
 
 </div>
-
 
                     <div class="car-body">
 
@@ -1374,7 +1071,6 @@
 
             </div>
 
-
         @empty
 
             <div class="col-12">
@@ -1405,7 +1101,6 @@
 
 </section>
 
-
 <section id="informasi" class="py-5">
 
     <div class="row g-4">
@@ -1433,7 +1128,6 @@
 
         </div>
 
-
         <div class="col-md-4">
 
             <div class="stat-card h-100">
@@ -1456,7 +1150,6 @@
             </div>
 
         </div>
-
 
         <div class="col-md-4">
 
@@ -1487,7 +1180,6 @@
 
 </div>
 
-
 <footer>
 
     <div class="container py-5">
@@ -1506,7 +1198,6 @@
                 </p>
 
             </div>
-
 
             <div class="col-md-6 text-md-end">
 
@@ -1529,7 +1220,6 @@
 
 </footer>
 
-
 <div class="d-lg-none fixed-bottom bg-white border-top p-2">
     <div class="d-flex gap-2">
         <a href="#mobil" class="btn btn-success flex-grow-1">
@@ -1543,7 +1233,6 @@
     </div>
 </div>
 
-
 {{-- MODAL DETAIL MOBIL (diisi via AJAX, tanpa reload halaman) --}}
 <div
     class="modal fade"
@@ -1552,7 +1241,7 @@
     aria-labelledby="mobilDetailModalLabel"
     aria-hidden="true">
 
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
 
         <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
 
@@ -1565,7 +1254,6 @@
     </div>
 
 </div>
-
 
 {{-- MODAL LIHAT BUKTI FOTO (denda) --}}
 <div
@@ -1599,7 +1287,6 @@
         bootstrap.Modal.getOrCreateInstance(document.getElementById('buktiModal')).show();
     }
 </script>
-
 
 {{-- MODAL PEMBAYARAN (diisi via data-attribute tombol, submit AJAX tanpa pindah halaman) --}}
 <style>
@@ -1839,7 +1526,6 @@
 
 </div>
 
-
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -1929,61 +1615,146 @@
             width: 600,
             showConfirmButton: false,
             didOpen: function() {
-                var $form = $('#swal2-html-container form');
-                if (!$form.length) return;
-
-                $form.on('submit', function(event) {
-                    event.preventDefault();
-
-                    var formData = new FormData($form[0]);
-
-                    Swal.showLoading();
-
-                    $.ajax({
-                        url: $form.attr('action'),
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        data: formData,
-                        processData: false,
-                        contentType: false
-                    })
-                    .done(function(data, textStatus, xhr) {
-                        Swal.hideLoading();
-
-                        if (xhr.status !== 200) {
-                            var firstError = data.errors
-                                ? Object.values(data.errors).flat()[0]
-                                : (data.message || 'Terjadi kesalahan.');
-
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Gagal',
-                                text: firstError,
-                            });
-                            return;
-                        }
-
-                        Swal.fire({
-                            title: 'Berhasil!',
-                            html: '<div class="swal-check"><svg width="72" height="72" viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" fill="none" stroke="#198754" stroke-width="2.5"/><path fill="none" stroke="#198754" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" d="M14 27l8 8 16-16"/></svg><p>' + escHtml(data.message || 'Pengajuan sewa mobil berhasil dibuat.') + '</p></div>',
-                            confirmButtonText: 'OK',
-                        }).then(function() {
-                            window.location.reload();
-                        });
-                    })
-                    .fail(function() {
-                        Swal.hideLoading();
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: 'Terjadi kesalahan. Silakan coba lagi.',
-                        });
-                    });
-                });
+                initSewaForm();
             }
+        });
+    }
+
+    function updateSewaButtonSwal($swal) {
+        var form = $swal.find('form#sewaForm')[0] || $swal.find('form')[0];
+        if (!form) return;
+        var tglMulai = form.querySelector('input[name="tanggal_mulai"]');
+        var tglSelesai = form.querySelector('input[name="tanggal_selesai"]');
+        var btn = form.querySelector('button[type="submit"]');
+        if (!tglMulai || !tglSelesai || !btn) return;
+        btn.disabled = !(tglMulai.value && tglSelesai.value);
+    }
+
+    function initSewaForm() {
+        var $form = $('#swal2-html-container form#sewaForm');
+        if (!$form.length) {
+            $form = $('#swal2-html-container form').first();
+        }
+        if (!$form.length) return;
+
+        var $swal = $('#swal2-html-container');
+
+        // Re-bind supir dropdown onchange after Swal inject
+        var supirSelect = $swal.find('#supirSelectModal')[0];
+        if (supirSelect) {
+            supirSelect.addEventListener('change', function() {
+                const card = $swal.find('#supirProfileCardModal')[0];
+                const opt = this.options[this.selectedIndex];
+                
+                if (this.value === "") {
+                    $swal.find('#supirNameModal')[0].innerText = 'Silakan pilih supir';
+                    $swal.find('#supirPhoneModal')[0].innerText = '-';
+                    $swal.find('#supirTarifModal')[0].innerText = '0';
+                    $swal.find('#supirImgModal')[0].src = 'https://ui-avatars.com/api/?name=Pilih+Supir';
+                } else {
+                    $swal.find('#supirNameModal')[0].innerText = opt.dataset.name;
+                    $swal.find('#supirPhoneModal')[0].innerText = opt.dataset.phone;
+                    $swal.find('#supirTarifModal')[0].innerText = opt.dataset.tarif.replace('Rp ', '').replace('/hari', '');
+                    $swal.find('#supirImgModal')[0].src = opt.dataset.image;
+                }
+                card.style.display = 'block';
+                updateSewaButtonSwal($swal);
+            });
+        }
+
+        // Filter supir berdasarkan cabang ambil yang dipilih
+        var cabangAmbil = $swal.find('select[name="cabang_ambil_id"]')[0];
+        if (cabangAmbil && supirSelect) {
+            cabangAmbil.addEventListener('change', function() {
+                const cabangId = this.value;
+
+                // Sembunyikan option supir dari cabang lain
+                Array.from(supirSelect.options).forEach(function(opt) {
+                    if (opt.value === "") return;
+                    opt.hidden = (String(opt.dataset.cabangId) !== String(cabangId));
+                });
+
+                // Reset pilihan jika supir terpilih bukan dari cabang ini
+                if (supirSelect.value !== "" && supirSelect.options[supirSelect.selectedIndex].dataset.cabangId !== cabangId) {
+                    supirSelect.value = "";
+                    supirSelect.dispatchEvent(new Event('change'));
+                }
+            });
+
+            // Trigger awal supaya filter langsung jalan saat popup dibuka
+            cabangAmbil.dispatchEvent(new Event('change'));
+        }
+
+        // Bind date inputs supaya tombol Ajukan Sewa enable/disable
+        var dateInputs = $swal.find('input[name="tanggal_mulai"], input[name="tanggal_selesai"]');
+        dateInputs.on('change', function() {
+            updateSewaButtonSwal($swal);
+        });
+        updateSewaButtonSwal($swal);
+
+        $form.off('submit').on('submit', function(event) {
+            event.preventDefault();
+
+            var formData = new FormData($form[0]);
+
+            Swal.showLoading();
+
+            $.ajax({
+                url: $form.attr('action').replace('/rental/', '/checkout/'),
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                data: formData,
+                processData: false,
+                contentType: false
+            })
+            .done(function(data, textStatus, xhr) {
+                Swal.hideLoading();
+
+                if (!data.success) {
+                    var firstError = data.errors
+                        ? Object.values(data.errors).flat()[0]
+                        : (data.message || 'Terjadi kesalahan.');
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: firstError,
+                    });
+                    return;
+                }
+
+                if (data.html) {
+                    $('#swal2-html-container').html(data.html);
+                    $('#cs-kode-promo').on('keypress', function(e) {
+                        if (e.which === 13) {
+                            e.preventDefault();
+                            applyPromo();
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Respon checkout tidak valid.',
+                    });
+                }
+            })
+            .fail(function(xhr) {
+                Swal.hideLoading();
+                var data = xhr.responseJSON || {};
+                var firstError = data.errors
+                    ? Object.values(data.errors).flat()[0]
+                    : (data.message || 'Terjadi kesalahan. Silakan coba lagi.');
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: firstError,
+                });
+            });
         });
     }
 
@@ -2272,7 +2043,6 @@
     })();
 
 </script>
-
 
 </body>
 </html>

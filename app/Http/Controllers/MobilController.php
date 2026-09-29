@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\Cabang;
 use App\Models\Fasilitas;
 use App\Models\Mobil;
+use App\Models\Supir;
 use App\Models\TipeMobil;
 use Illuminate\Http\Request;
 
@@ -226,15 +227,10 @@ class MobilController extends Controller
 
         // Jika Staff
         if ($request->is('staff/mobils')) {
-            return redirect()
-                ->route('staff.mobils.index')
-                ->with('success', 'Mobil berhasil ditambahkan.');
+            return redirect()->route('staff.mobils.index')->with('success', 'Mobil berhasil ditambahkan.');
         }
 
-        // Jika Admin
-        return redirect()
-            ->route('mobils.index')
-            ->with('success', 'Mobil berhasil ditambahkan.');
+        return redirect()->route('mobils.index')->with('success', 'Mobil berhasil ditambahkan.');
     }
 
     /**
@@ -250,14 +246,15 @@ class MobilController extends Controller
         ])->findOrFail($id);
 
         $cabangs = Cabang::orderBy('name')->get();
+        $supirs = Supir::where('status', 'tersedia')->orderBy('name')->get();
 
         // Permintaan AJAX (modal detail mobil di dashboard customer):
         // kembalikan partial view agar tidak reload seluruh halaman.
         if ($request->ajax() || $request->wantsJson()) {
-            return view('customer.partials.mobil-detail-modal', compact('mobil', 'cabangs'));
+            return view('customer.partials.mobil-detail-modal', compact('mobil', 'cabangs', 'supirs'));
         }
 
-        return view('customer.mobil-detail', compact('mobil', 'cabangs'));
+        return view('customer.mobil-detail', compact('mobil', 'cabangs', 'supirs'));
     }
 
     /**
@@ -325,10 +322,8 @@ class MobilController extends Controller
             $validated['image'] = 'images/mobils/'.$imageName;
         }
 
-        // Update data mobil
         $mobil->update($validated);
 
-        // Update fasilitas
         $mobil->fasilitas()->sync(
             $request->input('fasilitas', [])
         );
@@ -341,9 +336,7 @@ class MobilController extends Controller
         }
 
         // Selalu kembali ke data mobil STAFF
-        return redirect()
-            ->route('staff.mobils.index')
-            ->with('success', 'Mobil berhasil diperbarui.');
+        return redirect()->route('staff.mobils.index')->with('success', 'Mobil berhasil diperbarui.');
     }
 
     /**
@@ -362,13 +355,9 @@ class MobilController extends Controller
 
         // Redirect sesuai asal halaman (admin vs staff)
         if ($request->routeIs('staff.mobils.destroy')) {
-            return redirect()
-                ->route('staff.mobils.index')
-                ->with('success', 'Mobil berhasil dihapus.');
+            return redirect()->route('staff.mobils.index')->with('success', 'Mobil berhasil dihapus.');
         }
 
-        return redirect()
-            ->route('mobils.index')
-            ->with('success', 'Mobil berhasil dihapus.');
+        return redirect()->route('mobils.index')->with('success', 'Mobil berhasil dihapus.');
     }
 }

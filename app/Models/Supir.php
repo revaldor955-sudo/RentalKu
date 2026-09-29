@@ -6,15 +6,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class Supir extends Model
 {
-    protected $table = 'supirs';
 
     protected $fillable = [
         'name',
         'phone',
-        'image',
         'tarif_perhari',
         'status',
+        'image',
+        'cabang_id',
     ];
+
+    public function cabang()
+    {
+        return $this->belongsTo(Cabang::class);
+    }
 
     public function rental()
     {

@@ -124,9 +124,7 @@ class RoleController extends Controller
                 ], 422);
             }
 
-            return redirect()
-                ->route('roles.index')
-                ->with('error', 'Nama role tidak dapat diganti karena masih dipakai user.');
+            return redirect()->route('roles.index')->with('error', 'Nama role tidak dapat diganti karena masih dipakai user.');
         }
 
         $role->update($validated);
@@ -151,9 +149,7 @@ class RoleController extends Controller
                 ], 422);
             }
 
-            return redirect()
-                ->route('roles.index')
-                ->with('error', 'Role tidak dapat dihapus karena masih dipakai user.');
+            return redirect()->route('roles.index')->with('error', 'Role tidak dapat dihapus karena masih dipakai user.');
         }
 
         $role->delete();

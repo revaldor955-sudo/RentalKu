@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Rental extends Model
 {
-    protected $table = 'rentals';
 
     protected $fillable = [
         'user_id',
@@ -66,5 +65,17 @@ class Rental extends Model
     public function kompensasis()
     {
         return $this->hasMany(Kompensasi::class, 'rental_id');
+    }
+
+    public function rating()
+    {
+        return $this->hasOne(Rating::class, 'rental_id');
+    }
+
+    public function supirs()
+    {
+        return $this->belongsToMany(Supir::class, 'rental_supir', 'rental_id', 'supir_id')
+            ->withPivot('tarif_perhari', 'sub_total')
+            ->withTimestamps();
     }
 }

@@ -12,10 +12,12 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Outfit', 'Work Sans', ...defaultTheme.fontFamily.sans],
             },
 
             colors: {
+                primary: '#2C666E',
+                background: '#F0EDEE',
                 brand: {
                     DEFAULT: '#198754',
                     dark: '#146c43',

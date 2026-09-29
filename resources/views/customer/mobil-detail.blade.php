@@ -214,6 +214,80 @@
             margin-bottom: 20px;
         }
 
+        /* Tombol kembali — pill rounded, no background tint */
+        .nav-btn-ghost {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            color: #374151 !important;
+            background: transparent !important;
+            border-radius: 10px !important;
+            transition: all 0.2s ease !important;
+            position: relative;
+        }
+        .nav-btn-ghost:hover,
+        .nav-btn-ghost:focus {
+            background: rgba(44, 102, 110, 0.1) !important;
+            color: #2c666e !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        .nav-btn-ghost::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 2px;
+            left: 50%;
+            background-color: #2c666e;
+            transition: width 0.2s ease, left 0.2s ease;
+        }
+        .nav-btn-ghost:hover::after,
+        .nav-btn-ghost:focus::after {
+            width: 60%;
+            left: 20%;
+        }
+
+        .nav-btn-back {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            color: #374151 !important;
+            background: transparent !important;
+            border-radius: 999px !important;
+            transition: all 0.2s ease !important;
+            position: relative;
+            display: inline-flex !important;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px !important;
+        }
+        .nav-btn-back:hover,
+        .nav-btn-back:focus {
+            color: #374151 !important;
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        .nav-btn-back::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: #2c666e;
+            transition: width 0.2s ease, left 0.2s ease;
+            border-radius: 1px;
+        }
+        .nav-btn-back:hover::after,
+        .nav-btn-back:focus::after {
+            width: 100%;
+            left: 0;
+        }
+
         @media (max-width: 768px) {
 
             .car-photo {
@@ -266,12 +340,13 @@
 
                 @else
 
-                    <a href="{{ route('login') }}" class="btn btn-light border rounded-3 px-3 fw-semibold">
-                        <i class="bi bi-box-arrow-in-right me-1"></i>
+                    <a href="{{ route('login') }}" class="btn px-3 py-2 fw-semibold d-flex align-items-center gap-2 nav-btn-ghost">
+                        <i class="bi bi-box-arrow-in-right"></i>
                         Masuk
                     </a>
 
-                    <a href="{{ route('register') }}" class="btn btn-rent">
+                    <a href="{{ route('register') }}" class="btn px-3 py-2 fw-semibold d-flex align-items-center gap-2 nav-btn-ghost">
+                        <i class="bi bi-person-plus"></i>
                         Daftar
                     </a>
 
@@ -281,7 +356,6 @@
 
     </div>
 </nav>
-
 
 <div class="container py-4">
 
@@ -297,23 +371,20 @@
 
             </a>
         @else
-            <a href="{{ url('/') }}" class="btn btn-outline-secondary">
-
-                <i class="bi bi-arrow-left me-2"></i>
-
+            <a href="{{ url('/') }}" class="btn px-3 py-2 fw-semibold d-flex align-items-center gap-2 nav-btn-back">
+                <i class="bi bi-arrow-left"></i>
                 Kembali ke Beranda
+            </a>
 
             </a>
         @endauth
 
     </div>
 
-
     <div class="detail-card">
 
         <div class="row g-0">
 
-            {{-- FOTO --}}
             <div class="col-lg-6 p-3 p-md-4">
 
                @if($mobil->image)
@@ -331,7 +402,6 @@
 @endif
 
             </div>
-
 
             <div class="col-lg-6">
 
@@ -359,20 +429,17 @@
 
 @endif
 
-
                     <h1 class="car-title">
 
                     {{ $mobil->name }}
 
                     </h1>
 
-
                    <p class="car-subtitle">
     <i class="bi bi-car-front me-1"></i>
 
     {{ $mobil->tipeMobil->name ?? '-' }}
 </p>
-
 
                     <div class="price-box">
 
@@ -391,8 +458,6 @@
 
                     </div>
 
-
-                   
 <div class="row g-3 mt-2">
 
     <div class="col-6">
@@ -415,7 +480,6 @@
 
     </div>
 
-
     <div class="col-6">
 
         <div class="spec-card">
@@ -435,7 +499,6 @@
         </div>
 
     </div>
-
 
     <div class="col-6">
 
@@ -457,7 +520,6 @@
 
     </div>
 
-
     <div class="col-6">
 
         <div class="spec-card">
@@ -478,7 +540,6 @@
 
     </div>
 
-
     <div class="col-6">
 
         <div class="spec-card">
@@ -498,7 +559,6 @@
         </div>
 
     </div>
-
 
     <div class="col-6">
 
@@ -562,7 +622,6 @@
 
 </div>
 
-
                    <div class="mt-4">
 
     @if($mobil->status === 'Tersedia')
@@ -612,7 +671,6 @@
 
 </div>
 
-
                     <div class="text-center mt-3">
 
                         <small class="text-muted">
@@ -633,7 +691,6 @@
 
     </div>
 
-
     <div class="row mt-5 g-4">
 
         <div class="col-lg-7">
@@ -653,7 +710,6 @@
             </div>
 
         </div>
-
 
         <div class="col-lg-5">
 
@@ -784,6 +840,83 @@
                     min="{{ date('Y-m-d', strtotime('+1 day')) }}"
                     value="{{ old('tanggal_selesai', date('Y-m-d', strtotime('+1 day'))) }}"
                     required>
+
+            </div>
+
+            <div class="col-12">
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Pilih Supir (Opsional)</label>
+                    <select name="supir_id" class="form-select" id="supirSelect" onchange="updateSupirProfile(this)">
+                        <option value="">Tanpa Supir (Lepas Kunci)</option>
+                        @foreach($supirs as $supir)
+                            <option value="{{ $supir->id }}" 
+                                    data-cabang-id="{{ $supir->cabang_id }}"
+                                    data-name="{{ $supir->name }}" 
+                                    data-phone="{{ $supir->phone }}" 
+                                    data-tarif="{{ number_format($supir->tarif_perhari, 0, ',', '.') }}"
+                                    data-image="{{ $supir->image ?? 'https://ui-avatars.com/api/?name='.urlencode($supir->name) }}">
+                                {{ $supir->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Profile Supir Card (Hidden by default) -->
+                <div id="supirProfileCard" class="card mb-3 shadow-sm border-primary animate__animated animate__fadeIn" style="display: none;">
+                    <div class="card-body p-3">
+                        <div class="d-flex align-items-center">
+                            <img id="supirImg" src="" class="rounded-circle me-3" style="width: 70px; height: 70px; object-fit: cover; border: 2px solid var(--bs-primary);">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 fw-bold text-primary" id="supirName"></h6>
+                                <div class="small text-muted mb-2">
+                                    <i class="bi bi-telephone me-1"></i> <span id="supirPhone"></span>
+                                </div>
+                                <div class="badge bg-light text-primary border border-primary">
+                                    Tarif: Rp <span id="supirTarif"></span> /hari
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function updateSupirProfile(select) {
+                        const card = document.getElementById('supirProfileCard');
+                        const opt = select.options[select.selectedIndex];
+                        
+                        if (select.value === "") {
+                            card.style.display = 'none';
+                        } else {
+                            document.getElementById('supirName').innerText = opt.dataset.name;
+                            document.getElementById('supirPhone').innerText = opt.dataset.phone;
+                            document.getElementById('supirTarif').innerText = opt.dataset.tarif;
+                            document.getElementById('supirImg').src = opt.dataset.image;
+                            card.style.display = 'block';
+                        }
+                        updateSewaButton();
+                    }
+
+                    function updateSewaButton() {
+                        const tglMulai = document.querySelector('input[name="tanggal_mulai"]').value;
+                        const tglSelesai = document.querySelector('input[name="tanggal_selesai"]').value;
+                        const btn = document.querySelector('button[type="submit"]');
+                        
+                        // Disable if dates empty
+                        btn.disabled = !(tglMulai && tglSelesai);
+                    }
+
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const dateInputs = document.querySelectorAll('input[name="tanggal_mulai"], input[name="tanggal_selesai"]');
+                        dateInputs.forEach(i => i.addEventListener('change', updateSewaButton));
+                        updateSewaButton();
+                    });
+                </script>
+
+                <div class="form-text mt-2">
+                   <i class="bi bi-info-circle me-1"></i>
+                   Pilih supir jika Anda membutuhkan bantuan pengemudi.
+                </div>
 
             </div>
 
@@ -948,6 +1081,24 @@
         if (!form) return;
         var kembali = form.querySelector('select[name="cabang_kembali_id"]');
         if (kembali && !kembali.value) kembali.value = el.value;
+
+        // Filter supir berdasarkan cabang ambil yang dipilih
+        var cabangId = el.value;
+        var supirSelect = form.querySelector('select[name="supir_id"]');
+        if (supirSelect) {
+            Array.from(supirSelect.options).forEach(function(opt) {
+                if (opt.value === "") return;
+                opt.hidden = (opt.dataset.cabangId !== cabangId);
+            });
+
+            // Reset pilihan supir jika tidak sesuai cabang
+            if (supirSelect.value !== "" && supirSelect.options[supirSelect.selectedIndex].dataset.cabangId !== cabangId) {
+                supirSelect.value = "";
+                var card = document.getElementById('supirProfileCard');
+                if (card) card.style.display = 'none';
+                updateSewaButton();
+            }
+        }
     });
 
     // #33: hapus catatan inline saat tanggal diubah / submit diulang.

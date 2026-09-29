@@ -288,7 +288,6 @@
 
     </div>
 
-
     @if(session('success'))
 
         <div class="alert alert-success mb-4">
@@ -297,7 +296,6 @@
         </div>
 
     @endif
-
 
     @if($errors->any())
 
@@ -319,7 +317,6 @@
         </div>
 
     @endif
-
 
     <div class="row g-4 mb-4">
 
@@ -351,7 +348,6 @@
 
         </div>
 
-
         <div class="col-md-6 col-xl-3">
 
             <div class="stat-card">
@@ -380,7 +376,6 @@
 
         </div>
 
-
         <div class="col-md-6 col-xl-3">
 
             <div class="stat-card">
@@ -408,7 +403,6 @@
             </div>
 
         </div>
-
 
         <div class="col-md-6 col-xl-3">
 
@@ -439,7 +433,6 @@
         </div>
 
     </div>
-
 
     <div class="mt-4">
 
@@ -473,7 +466,6 @@
             </div>
 
         </div>
-
 
         <div class="table-card">
 
@@ -541,7 +533,6 @@
 
     </div>
 
-
     <div class="modal fade" id="fotoMobilModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -602,7 +593,6 @@
 
                             </div>
 
-
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -629,7 +619,6 @@
                                 </select>
 
                             </div>
-
 
                             <div class="col-md-4">
 
@@ -658,7 +647,6 @@
 
                             </div>
 
-
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -674,7 +662,6 @@
                                     required>
 
                             </div>
-
 
                             <div class="col-md-6">
 
@@ -692,7 +679,6 @@
 
                             </div>
 
-
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -708,7 +694,6 @@
                                     required>
 
                             </div>
-
 
                             <div class="col-md-4">
 
@@ -736,7 +721,6 @@
 
                             </div>
 
-
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -751,7 +735,6 @@
                                     value="{{ old('kapasitas') }}">
 
                             </div>
-
 
                             <div class="col-md-4">
 
@@ -768,7 +751,6 @@
                                     required>
 
                             </div>
-
 
                             <div class="col-md-4">
 
@@ -795,7 +777,6 @@
 
                             </div>
 
-
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -821,7 +802,6 @@
 
                             </div>
 
-
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -839,7 +819,6 @@
                                 </small>
 
                             </div>
-
 
                             <div class="col-md-6">
 
@@ -865,7 +844,6 @@
 
                             </div>
 
-
                             <div class="col-12">
 
                                 <label class="form-label">
@@ -879,7 +857,6 @@
                                     placeholder="Masukkan deskripsi mobil...">{{ old('description') }}</textarea>
 
                             </div>
-
 
                             <div class="col-12">
 
@@ -953,7 +930,6 @@
 
     </div>
 
-
     <div class="modal fade"
          id="editMobilModal"
          tabindex="-1"
@@ -1007,7 +983,6 @@
 
                             </div>
 
-
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -1036,7 +1011,6 @@
                                 </select>
 
                             </div>
-
 
                             <div class="col-md-4">
 
@@ -1067,7 +1041,6 @@
 
                             </div>
 
-
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -1083,7 +1056,6 @@
                                     required>
 
                             </div>
-
 
                             <div class="col-md-6">
 
@@ -1101,7 +1073,6 @@
 
                             </div>
 
-
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -1117,7 +1088,6 @@
                                     required>
 
                             </div>
-
 
                             <div class="col-md-4">
 
@@ -1146,7 +1116,6 @@
 
                             </div>
 
-
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -1163,7 +1132,6 @@
 
                             </div>
 
-
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -1179,7 +1147,6 @@
                                     required>
 
                             </div>
-
 
                             <div class="col-md-4">
 
@@ -1206,7 +1173,6 @@
 
                             </div>
 
-
                             <div class="col-md-4">
 
                                 <label class="form-label">
@@ -1231,7 +1197,6 @@
                                 </div>
 
                             </div>
-
 
                             <div class="col-md-6">
 
@@ -1258,7 +1223,6 @@
                                 </small>
 
                             </div>
-
 
                             <div class="col-md-6">
 
@@ -1287,7 +1251,6 @@
 
                             </div>
 
-
                             <div class="col-12">
 
                                 <label class="form-label">
@@ -1302,7 +1265,6 @@
                                     placeholder="Masukkan deskripsi mobil..."></textarea>
 
                             </div>
-
 
                             <div class="col-12">
 

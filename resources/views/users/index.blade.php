@@ -190,16 +190,13 @@
 
     </div>
 
-
     @if (session('success'))
         <span id="flashSuccess" class="d-none">{{ session('success') }}</span>
     @endif
 
-
     @if (session('error'))
         <span id="flashError" class="d-none">{{ session('error') }}</span>
     @endif
-
 
     @if ($errors->any())
 
@@ -220,7 +217,6 @@
         </div>
 
     @endif
-
 
     <div class="page-card">
 
@@ -275,7 +271,6 @@
 
 </div>
 
-
 <div class="modal fade" id="editUserModal" tabindex="-1">
 
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -318,7 +313,6 @@
 
                             </div>
 
-
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -328,7 +322,6 @@
                                 <input type="email" name="email" id="edit-email" class="form-control" required>
 
                             </div>
-
 
                             <div class="col-md-6">
 
@@ -348,7 +341,6 @@
 
                             </div>
 
-
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -360,7 +352,6 @@
 
                             </div>
 
-
                             <div class="col-md-6">
 
                                 <label class="form-label">
@@ -370,7 +361,6 @@
                                 <input type="text" name="phone" id="edit-phone" class="form-control">
 
                             </div>
-
 
                             <div class="col-md-6">
 
@@ -382,7 +372,6 @@
                                     accept=".jpg,.jpeg,.png">
 
                             </div>
-
 
                             <div class="col-12">
 
@@ -399,7 +388,6 @@
                     </div>
 
                 </div>
-
 
                 <div class="modal-footer">
 
@@ -422,7 +410,6 @@
     </div>
 
 </div>
-
 
 <div class="modal fade" id="detailUserModal" tabindex="-1" aria-labelledby="detailUserModalLabel"
     aria-hidden="true">
@@ -513,7 +500,6 @@
 
             @include('layouts.partials.modal-head', ['title' => 'Tambah Pengguna', 'icon' => 'bi-person-plus-fill'])
 
-
             <form id="tambahUserForm" action="{{ route('users.store') }}" method="POST"
                 enctype="multipart/form-data">
 
@@ -534,7 +520,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label">
@@ -545,7 +530,6 @@
                                 placeholder="contoh@email.com" required>
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -569,7 +553,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label">
@@ -581,7 +564,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label">
@@ -592,7 +574,6 @@
                                 placeholder="08xxxxxxxxxx">
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -608,7 +589,6 @@
 
                         </div>
 
-
                         <div class="col-12">
 
                             <label class="form-label">
@@ -622,7 +602,6 @@
                     </div>
 
                 </div>
-
 
                 <div class="modal-footer">
 

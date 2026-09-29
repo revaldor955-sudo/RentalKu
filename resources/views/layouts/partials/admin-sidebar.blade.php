@@ -213,18 +213,6 @@
         color: #198754;
     }
 
-    .nav-link.active::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 3px;
-        height: 24px;
-        background: #198754;
-        border-radius: 0 3px 3px 0;
-    }
-
     .nav-icon {
         width: 20px;
         height: 20px;
@@ -348,6 +336,11 @@
         color: #9ca3af;
         flex-shrink: 0;
         transition: transform var(--sidebar-transition);
+    }
+
+    /* Hide caretez Bootstrap, pakai chevron custom */
+    .user-menu.dropdown-toggle::after {
+        display: none;
     }
 
     .admin-sidebar.collapsed .user-menu .chevron {
@@ -696,27 +689,67 @@
                             <span class="nav-text">Metode Pembayaran</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.ratings.index') }}"
+                           class="nav-link {{ request()->routeIs('admin.ratings*') ? 'active' : '' }}"
+                           aria-current="{{ request()->routeIs('admin.ratings*') ? 'page' : 'false' }}">
+                            <i class="bi bi-star-fill nav-icon" aria-hidden="true"></i>
+                            <span class="nav-text">Ulasan Pelanggan</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.landing-settings.index') }}"
+                           class="nav-link {{ request()->routeIs('admin.landing-settings*') ? 'active' : '' }}"
+                           aria-current="{{ request()->routeIs('admin.landing-settings*') ? 'page' : 'false' }}">
+                            <i class="bi bi-sliders nav-icon" aria-hidden="true"></i>
+                            <span class="nav-text">Landing Settings</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </nav>
 
         <footer class="sidebar-footer">
-            <button
-               type="button"
-               class="user-menu"
-               data-bs-toggle="modal"
-               data-bs-target="#profileModal"
-               aria-label="Profil pengguna"
-            >
-                <div class="user-avatar" aria-hidden="true">
-                    <i class="bi bi-person-fill"></i>
-                </div>
-                <div class="user-info">
-                    <span class="user-name">{{ Auth::user()->name }}</span>
-                    <span class="user-role">{{ Auth::user()->role->name ?? 'Admin' }}</span>
-                </div>
-                <i class="bi bi-chevron-right chevron" aria-hidden="true"></i>
-            </button>
+            <div class="dropdown w-100">
+                <button
+                   type="button"
+                   class="user-menu w-100 text-start dropdown-toggle bg-transparent border-0 d-flex align-items-center"
+                   data-bs-toggle="dropdown"
+                   aria-expanded="false"
+                   aria-label="Menu pengguna"
+                >
+                    <div class="user-avatar" aria-hidden="true">
+                        @if(Auth::user()->photo)
+                            <img src="{{ asset(Auth::user()->photo) }}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+                        @else
+                            <i class="bi bi-person-fill"></i>
+                        @endif
+                    </div>
+                    <div class="user-info flex-grow-1">
+                        <span class="user-name">{{ Auth::user()->name }}</span>
+                        <span class="user-role">{{ Auth::user()->role->name ?? 'Admin' }}</span>
+                    </div>
+                    <i class="bi bi-chevron-up chevron ms-auto" aria-hidden="true" style="font-size: 12px; color: #64748b;"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-start shadow border-0 mb-2 p-2 w-100" style="border-radius: 12px; bottom: 100%; top: auto;">
+                    <li>
+                        <button class="dropdown-item rounded-2 py-2 d-flex align-items-center" type="button" data-bs-toggle="modal" data-bs-target="#profileModal" data-mode="edit">
+                            <i class="bi bi-person-badge me-3 text-secondary"></i>
+                            Edit Profile
+                        </button>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form action="{{ route('logout') }}" method="POST" class="m-0">
+                            @csrf
+                            <button type="submit" class="dropdown-item text-danger rounded-2 py-2 d-flex align-items-center">
+                                <i class="bi bi-box-arrow-right me-3"></i>
+                                Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </footer>
     </aside>
 

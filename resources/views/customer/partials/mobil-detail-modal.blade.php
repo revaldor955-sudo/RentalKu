@@ -352,15 +352,22 @@
 
                     @if($mobil->status === 'Tersedia')
 
-                        <button
-                            type="button"
-                            class="btn btn-rental w-100 d-flex align-items-center justify-content-center"
-                            onclick="openSewaPopup()">
-
-                            <i class="bi bi-calendar-check me-2"></i>
-                            Sewa Sekarang
-
-                        </button>
+                        @auth
+                            <button
+                                type="button"
+                                class="btn btn-rental w-100 d-flex align-items-center justify-content-center"
+                                onclick="openSewaPopup()">
+                                <i class="bi bi-calendar-check me-2"></i>
+                                Sewa Sekarang
+                            </button>
+                        @else
+                            <a
+                                href="{{ route('login') }}"
+                                class="btn btn-rental w-100 d-flex align-items-center justify-content-center text-decoration-none">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                Masuk untuk Sewa
+                            </a>
+                        @endauth
 
                     @else
 
@@ -379,6 +386,13 @@
 
                 </div>
 
+                <div class="text-center mt-3 pt-3 border-top">
+                    <a href="{{ route('mobils.show', $mobil->id) }}" class="text-decoration-none fw-semibold" style="color: #198754;">
+                        <i class="bi bi-box-arrow-up-right me-1"></i>
+                        Lihat Detail Lengkap
+                    </a>
+                </div>
+
             </div>
 
         </div>
@@ -386,7 +400,6 @@
     </div>
 
 </div>
-
 
 {{-- FORM SEWA (server-rendered, di-inject ke SweetAlert saat klik "Sewa Sekarang") --}}
 <div id="sewaFormTemplate" class="d-none">
@@ -487,6 +500,45 @@
                     min="{{ date('Y-m-d', strtotime('+1 day')) }}"
                     value="{{ old('tanggal_selesai', date('Y-m-d', strtotime('+1 day'))) }}"
                     required>
+
+            </div>
+
+            <div class="col-12">
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Pilih Supir (Opsional)</label>
+                    <select name="supir_id" class="form-select" id="supirSelectModal">
+                        <option value="">Tanpa Supir (Lepas Kunci)</option>
+                        @foreach($supirs as $supir)
+                            <option value="{{ $supir->id }}" 
+                                data-cabang-id="{{ $supir->cabang_id }}"
+                                data-name="{{ $supir->name }}" 
+                                data-phone="{{ $supir->phone }}" 
+                                data-tarif="{{ number_format($supir->tarif_perhari, 0, ',', '.') }}"
+                                data-image="{{ $supir->image ?? 'https://ui-avatars.com/api/?name='.urlencode($supir->name) }}">
+                                {{ $supir->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Profile Supir Card (selalu tampil, data di-update via JS di dashboard) -->
+                <div id="supirProfileCardModal" class="card mb-3 shadow-sm border-primary">
+                    <div class="card-body p-3">
+                        <div class="d-flex align-items-center">
+                            <img id="supirImgModal" src="https://ui-avatars.com/api/?name=Pilih+Supir" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0 fw-bold text-primary" id="supirNameModal">Silakan pilih supir</h6>
+                                <div class="small text-muted mb-1">
+                                    <i class="bi bi-telephone me-1"></i> <span id="supirPhoneModal">-</span>
+                                </div>
+                                <div class="fw-bold text-success" id="supirTarifModalContainer">
+                                    + <span id="supirTarifModal">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
 

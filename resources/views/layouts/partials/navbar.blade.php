@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg sticky-top">
+<nav class="navbar navbar-expand-lg fixed-top shadow-sm" id="mainNavbar" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); transition: transform 0.2s ease-out;">
 
     <div class="container">
 
@@ -76,15 +76,17 @@
 
         <a
             href="{{ route('login') }}"
-            class="btn btn-light border rounded-3 px-3 fw-semibold"
+            class="btn px-3 py-2 fw-semibold d-flex align-items-center gap-2 nav-btn-ghost"
         >
+            <i class="bi bi-box-arrow-in-right"></i>
             Masuk
         </a>
 
         <a
             href="{{ route('register') }}"
-            class="btn btn-rent"
+            class="btn px-3 py-2 fw-semibold d-flex align-items-center gap-2 nav-btn-ghost"
         >
+            <i class="bi bi-person-plus"></i>
             Daftar
         </a>
 

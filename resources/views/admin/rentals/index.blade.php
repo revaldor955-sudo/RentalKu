@@ -109,15 +109,11 @@
 
 <body>
 
-{{-- Sidebar Layout --}}
 @include('layouts.partials.sidebar')
-
 <script>
-    // Inject navbar into sidebar layout
     document.addEventListener('DOMContentLoaded', function() {
         const mainContent = document.getElementById('mainContent');
         const pageContent = mainContent?.querySelector('.page-content');
-
         if (mainContent && pageContent) {
             const navbar = document.querySelector('header.topbar');
             if (navbar) {
@@ -127,12 +123,9 @@
     });
 </script>
 
-{{-- Page Content --}}
 <div class="page-content">
-
 <div class="container-fluid px-4">
 
-    {{-- HEADER --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
 
         <div>
@@ -147,8 +140,6 @@
 
     </div>
 
-
-    {{-- ALERT SUCCESS --}}
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show mb-4">
 
@@ -162,8 +153,6 @@
         </div>
     @endif
 
-
-    {{-- ALERT ERROR --}}
     @if (session('error'))
         <div class="alert alert-danger alert-dismissible fade show mb-4">
 
@@ -177,8 +166,6 @@
         </div>
     @endif
 
-
-    {{-- TABLE --}}
     <div class="card-custom">
 
         <div class="card-body p-0">
@@ -241,8 +228,6 @@
 
 </div>
 
-
-{{-- MODAL DETAIL RENTAL --}}
 <div class="modal fade" id="detailRentalModal" tabindex="-1" aria-labelledby="detailRentalModalLabel"
     aria-hidden="true">
 
@@ -254,7 +239,6 @@
 
             <div class="modal-body p-4">
 
-                {{-- LOADING --}}
                 <div id="rentalDetailLoading" class="text-center py-5">
                     <div class="spinner-border text-success" role="status"></div>
                     <p class="text-muted mt-3 mb-0">
@@ -262,7 +246,6 @@
                     </p>
                 </div>
 
-                {{-- ERROR --}}
                 <div id="rentalDetailError" class="alert alert-danger d-none" role="alert">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i>
                     <span id="rentalDetailErrorMessage">
@@ -270,7 +253,6 @@
                     </span>
                 </div>
 
-                {{-- KONTEN --}}
                 <div id="rentalDetailContent" class="d-none">
 
                     <div class="row g-3">
@@ -286,8 +268,13 @@
                         <div class="col-md-6">
                             <div class="border rounded-3 p-3 h-100">
                                 <small class="text-muted fw-bold text-uppercase">Mobil</small>
-                                <h6 class="fw-bold mb-1" id="rd-mobil">-</h6>
-                                <small class="text-muted" id="rd-plat">-</small>
+                                <div class="d-flex align-items-center gap-3 mt-2">
+                                    <img id="rd-mobil-img" src="" alt="Mobil" class="rounded-3" style="width: 80px; height: 60px; object-fit: cover; display: none;">
+                                    <div>
+                                        <h6 class="fw-bold mb-1" id="rd-mobil">-</h6>
+                                        <small class="text-muted" id="rd-plat">-</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -591,6 +578,11 @@
                     $('#rd-email').text(data.email);
                     $('#rd-mobil').text(data.mobil);
                     $('#rd-plat').text(data.plat);
+                    if (data.mobil_image) {
+                        $('#rd-mobil-img').attr('src', data.mobil_image).show();
+                    } else {
+                        $('#rd-mobil-img').hide();
+                    }
                     $('#rd-tanggal').text(data.tanggal_mulai + ' s/d ' + data.tanggal_selesai);
                     $('#rd-jumlah-hari').text(data.jumlah_hari + ' hari');
                     $('#rd-cabang-ambil').text(data.cabang_ambil);

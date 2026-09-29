@@ -192,11 +192,9 @@
 
     </div>
 
-
     @if(session('success'))
         <span id="flashSuccess" class="d-none">{{ session('success') }}</span>
     @endif
-
 
     @if($errors->any())
 
@@ -219,7 +217,6 @@
         </div>
 
     @endif
-
 
     <div class="row g-4">
 
@@ -300,7 +297,6 @@
         </div>
 
     </div>
-
 
     <div
         class="modal fade"
@@ -414,7 +410,6 @@
         </div>
 
     </div>
-
 
     <div
         class="modal fade"

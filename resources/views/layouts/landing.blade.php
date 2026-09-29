@@ -9,6 +9,16 @@
 
     <meta name="description" content="Rentalku menyediakan layanan rental mobil mudah, aman dan terpercaya.">
 
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="@yield('title', 'Rentalku - Rental Mobil Terpercaya')">
+    <meta property="og:description" content="Rentalku menyediakan layanan rental mobil mudah, aman dan terpercaya.">
+    <meta property="og:image" content="{{ asset('images/og-image.jpg') }}">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -19,11 +29,11 @@
 
     <style>
         :root {
-            --primary: #16a34a;
-            --primary-dark: #15803d;
+            --primary: #2C666E;
+            --primary-dark: #1F4F54;
             --dark: #111827;
             --muted: #6b7280;
-            --light: #f6f8f7;
+            --light: #F0EDEE;
             --border: #e5e7eb;
         }
 
@@ -100,130 +110,109 @@
         }
 
         .hero {
-            /* Tinggi tetap (bukan ikut ukuran natural gambar) agar rantai
-               height:100% container->carousel->slide resolve dan gambar
-               ter-crop rapi oleh cover; overflow:hidden membuang sisa crop. */
-            height: 680px;
+            height: 550px;
             overflow: hidden;
-            background:
-                linear-gradient(90deg,
-                    rgba(10, 20, 15, .92) 0%,
-                    rgba(10, 20, 15, .75) 42%,
-                    rgba(10, 20, 15, .15) 100%),
-                url('{{ asset('images/banners/hero-jalan-palem.jpg') }}') center/cover;
-            display: flex;
-            align-items: stretch;
-            padding: 0;
             position: relative;
+            border-radius: 0 0 40px 40px;
         }
 
-        .hero .container,
-        #heroCarousel,
-        #heroCarousel .carousel-inner {
+        .hero .carousel,
+        .hero .carousel-inner,
+        .hero .carousel-item {
             height: 100%;
         }
 
-        /* Carousel adalah flex item dalam .container (flex-row) tanpa konten
-           in-flow -> menyusut ke 0px; paksa selebar container agar
-           left: calc(50% - 50vw) pada slide menghasilkan posisi full-bleed. */
-        #heroCarousel {
-            width: 100%;
+        .hero-slide {
+            background-size: cover;
+            background-position: center;
+            position: relative;
         }
 
-        /* Tamp tanpa carousel (banner kosong): konten tetap vertikal center */
-        .hero > .container {
-            display: flex;
-            align-items: center;
-        }
-
-        #heroCarousel .carousel-inner {
-            overflow: visible;
+        .hero-slide::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(44, 102, 110, .88) 0%, rgba(17, 24, 39, .55) 100%);
         }
 
         .hero-content {
             color: white;
-            max-width: 700px;
-        }
-
-        #heroCarousel .hero-content {
+            text-align: center;
+            width: 100%;
+            padding: 0 20px;
             position: relative;
             z-index: 2;
-        }
-
-        /* Slide banner: gambarnya jadi latar penuh, dioverlay gradasi agar teks terbaca */
-        #heroCarousel .hero-slide {
-            background-size: cover;
-            background-position: center;
-        }
-
-        #heroCarousel .hero-slide::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg,
-                rgba(10, 20, 15, .92) 0%,
-                rgba(10, 20, 15, .75) 42%,
-                rgba(10, 20, 15, .15) 100%);
-        }
-
-        /* Item memenuhi seluruh hero agar latar slide full-bleed.
-           Non-aktif tetap display: none dari Bootstrap. */
-        #heroCarousel .carousel-item {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: calc(50% - 50vw);
-            width: 100vw;
-        }
-
-        /* Flex juga berlaku saat transisi (.carousel-item-next/.-prev)
-           agar konten slide masuk/keluar tidak melompat dari atas ke tengah. */
-        #heroCarousel .carousel-item.active,
-        #heroCarousel .carousel-item-next,
-        #heroCarousel .carousel-item-prev {
-            display: flex;
-            align-items: center;
-            padding-block: 95px;
-            /* Ikut garis kiri/kanan .container walau item selebar viewport */
-            padding-inline: max(12px, calc(50vw - 648px));
         }
 
         .hero-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(255, 255, 255, .12);
-            border: 1px solid rgba(255, 255, 255, .2);
-            padding: 8px 14px;
+            background: rgba(255, 255, 255, .15);
+            border: 1px solid rgba(255, 255, 255, .25);
+            padding: 8px 16px;
             border-radius: 50px;
-            margin-bottom: 25px;
-            font-size: 14px;
-            backdrop-filter: blur(10px);
+
+        /* Loading Skeleton */
+        .search-skeleton {
+            opacity: 0.7;
+        }
+        .skeleton-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .skeleton-img {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(90deg, #F0EDEE 25%, #E8F0F1 50%, #F0EDEE 75%);
+            background-size: 400% 100%;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            animation: shimmer 1.5s infinite linear;
+        }
+        .skeleton-line {
+            background: linear-gradient(90deg, #F0EDEE 25%, #E8F0F1 50%, #F0EDEE 75%);
+            background-size: 400% 100%;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            animation: shimmer 1.5s infinite linear;
+        }
+        .skeleton-line-lg { width: 90%; }
+        .skeleton-line-md { width: 70%; }
+        .skeleton-line-sm { width: 50%; }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+            margin-bottom: 18px;
+            font-size: 13px;
+            backdrop-filter: blur(8px);
         }
 
         .hero h1 {
-            font-size: clamp(42px, 6vw, 72px);
-            font-weight: 800;
-            line-height: 1.08;
-            letter-spacing: -2px;
+            font-size: clamp(32px, 5vw, 56px);
+            font-weight: 700;
+            margin-bottom: 14px;
         }
 
         .hero h1 span {
-            color: #4ade80;
+            color: #7FB7BC;
         }
 
         .hero p {
-            font-size: 18px;
-            color: rgba(255, 255, 255, .78);
-            max-width: 590px;
-            margin-top: 20px;
-            line-height: 1.7;
+            font-size: 16px;
+            opacity: .9;
+            margin: 0 auto 26px;
+            max-width: 560px;
         }
 
         .hero-buttons {
-            margin-top: 30px;
+            justify-content: center;
             display: flex;
-            gap: 13px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
@@ -396,7 +385,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #dcfce7;
+            background: #E8F0F1;
             color: var(--primary);
             border-radius: 14px;
             font-size: 25px;
@@ -465,50 +454,48 @@
             max-width: 700px;
         }
 
-        /* z-index di atas .hero-content agar panah kiri bisa diklik */
-        #heroCarousel .carousel-control-prev,
-        #heroCarousel .carousel-control-next {
+        /* Carousel kontrol */
+        .hero .carousel-control-prev,
+        .hero .carousel-control-next {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, .15);
+            border-radius: 50%;
+            backdrop-filter: blur(8px);
             top: 50%;
-            bottom: auto;
-            width: 42px;
-            height: 42px;
-            background: transparent;
-            opacity: .85;
-            z-index: 3;
-        }
-
-        #heroCarousel .carousel-control-prev {
-            left: -26px;
-        }
-
-        #heroCarousel .carousel-control-next {
-            right: -26px;
-        }
-
-        @media (max-width: 1400px) {
-
-            #heroCarousel .carousel-control-prev {
-                left: 10px;
-            }
-
-            #heroCarousel .carousel-control-next {
-                right: 10px;
-            }
-
-        }
-
-        #heroCarousel .carousel-control-prev:hover,
-        #heroCarousel .carousel-control-next:hover {
+            transform: translateY(-50%);
             opacity: 1;
+            z-index: 3;
+            border: 1px solid rgba(255, 255, 255, .2);
         }
 
-        /* Indikator slide: dot putih; slide aktif memanjang jadi pill */
-        #heroCarousel .carousel-indicators {
+        .hero .carousel-control-prev {
+            left: 20px;
+        }
+
+        .hero .carousel-control-next {
+            right: 20px;
+        }
+
+        .hero .carousel-control-prev:hover,
+        .hero .carousel-control-next:hover {
+            background: rgba(255, 255, 255, .3);
+        }
+
+        .hero .carousel-control-prev-icon,
+        .hero .carousel-control-next-icon {
+            filter: invert(1);
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Indikator */
+        .hero .carousel-indicators {
             z-index: 3;
             margin-bottom: 26px;
         }
 
-        #heroCarousel .carousel-indicators [data-bs-target] {
+        .hero .carousel-indicators [data-bs-target] {
             width: 9px;
             height: 9px;
             border: none;
@@ -518,7 +505,7 @@
             transition: width .25s ease-out, background-color .25s ease-out;
         }
 
-        #heroCarousel .carousel-indicators .active {
+        .hero .carousel-indicators .active {
             width: 28px;
             background: white;
         }
@@ -570,7 +557,7 @@
 
         .faq .accordion-button:not(.collapsed) {
             color: var(--primary);
-            background: #f0fdf4;
+            background: #E8F0F1;
             box-shadow: none;
         }
 
@@ -589,7 +576,7 @@
         footer {
             background: #111827;
             color: white;
-            padding: 65px 0 25px;
+            padding: 40px 0 20px;
         }
 
         footer .brand {
@@ -598,7 +585,7 @@
         }
 
         footer .brand span {
-            color: #4ade80;
+            color: #7FB7BC;
         }
 
         footer p,
@@ -618,11 +605,20 @@
         @media(max-width: 768px) {
 
             .hero {
-                height: 600px;
+                height: 500px;
             }
 
             .hero h1 {
-                letter-spacing: -1px;
+                font-size: 28px;
+            }
+
+            .hero p {
+                font-size: 14px;
+            }
+
+            .hero .carousel-control-prev,
+            .hero .carousel-control-next {
+                display: none;
             }
 
             .search-box {
@@ -643,6 +639,77 @@
             }
 
         }
+
+        /* Override Bootstrap success (green) to teal */
+        :root {
+            --bs-success: #2C666E;
+            --bs-success-rgb: 44, 102, 110;
+        }
+        /* Ghost button & Nav-link hover effects */
+        .nav-btn-ghost {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            color: var(--dark) !important;
+            background: transparent !important;
+            border-radius: 10px !important;
+            transition: all 0.2s ease !important;
+            position: relative;
+        }
+
+        .nav-btn-ghost:hover,
+        .nav-btn-ghost:focus {
+            background: rgba(44, 102, 110, 0.1) !important;
+            color: var(--primary) !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .nav-btn-ghost::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 2px;
+            left: 50%;
+            background-color: var(--primary);
+            transition: width 0.2s ease, left 0.2s ease;
+        }
+
+        .nav-btn-ghost:hover::after,
+        .nav-btn-ghost:focus::after {
+            width: 60%;
+            left: 20%;
+        }
+
+        .navbar-nav .nav-link {
+            transition: color 0.2s ease, background 0.2s ease !important;
+            position: relative;
+            border-radius: 10px !important;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--primary) !important;
+            background: rgba(44, 102, 110, 0.1) !important;
+        }
+
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 2px;
+            left: 50%;
+            background-color: var(--primary);
+            transition: width 0.2s ease, left 0.2s ease;
+        }
+
+        .navbar-nav .nav-link:hover::after {
+            width: 60%;
+            left: 20%;
+        }
+
     </style>
 
     @stack('styles')
@@ -650,13 +717,43 @@
 
 <body>
 
+    <div style="height: 76px;"></div>
     @include('layouts.partials.navbar')
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @yield('content')
 
     @include('layouts.partials.footer')
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const navbar = document.getElementById('mainNavbar');
+        let ticking = false;
+
+        function updateNavbar() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            // Cuma muncul pas mentok atas (<= 60px), selain itu (scroll bawah/atas) tetep ilang
+            if (scrollTop <= 60) {
+                navbar.style.transform = 'translateY(0)';
+            } else {
+                navbar.style.transform = 'translateY(-100%)';
+            }
+
+            ticking = false;
+        }
+
+        document.addEventListener('DOMContentLoaded', updateNavbar);
+
+        window.addEventListener('scroll', function() {
+            if (!ticking) {
+                window.requestAnimationFrame(updateNavbar);
+                ticking = true;
+            }
+        }, { passive: true });
+    </script>
 
     @stack('scripts')
 

@@ -128,9 +128,7 @@ class BrandController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('brands.index')
-            ->with('success', 'Brand berhasil ditambahkan.');
+        return redirect()->route('brands.index')->with('success', 'Brand berhasil ditambahkan.');
     }
 
     /**
@@ -182,9 +180,7 @@ class BrandController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('brands.index')
-            ->with('success', 'Brand berhasil diperbarui.');
+        return redirect()->route('brands.index')->with('success', 'Brand berhasil diperbarui.');
     }
 
     /**
@@ -200,10 +196,8 @@ class BrandController extends Controller
                 ], 422);
             }
 
-            return redirect()
-                ->route('brands.index')
-                ->with('error', 'Brand tidak dapat dihapus karena masih digunakan oleh mobil.');
-        }
+            return redirect()->route('brands.index')->with('error', 'Brand tidak dapat dihapus karena masih digunakan oleh mobil.');
+            }
 
         if (
             $brand->logo &&
@@ -220,8 +214,6 @@ class BrandController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('brands.index')
-            ->with('success', 'Brand berhasil dihapus.');
+        return redirect()->route('brands.index')->with('success', 'Brand berhasil dihapus.');
     }
 }

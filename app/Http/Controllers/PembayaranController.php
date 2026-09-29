@@ -159,9 +159,7 @@ class PembayaranController extends Controller
         }
 
         if ($rental->status !== 'Disetujui') {
-            return redirect()
-                ->route('customer.dashboard')
-                ->with('error', 'Rental belum disetujui.');
+            return redirect()->route('customer.dashboard')->with('error', 'Rental belum disetujui.');
         }
 
         $metodePembayarans = $this->metodeUntukCabang($rental->cabang_ambil_id);
@@ -230,9 +228,7 @@ class PembayaranController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('customer.dashboard')
-            ->with('success', 'Bukti pembayaran berhasil dikirim.');
+        return redirect()->route('customer.dashboard')->with('success', 'Bukti pembayaran berhasil dikirim.');
     }
 
     public function updateStatus(Request $request, Pembayaran $pembayaran)

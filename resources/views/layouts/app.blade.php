@@ -16,8 +16,8 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="antialiased">
-        <div class="min-h-screen bg-brand-lighter">
+    <body class="antialiased min-h-screen bg-background">
+        <div class="min-h-screen bg-background">
             @include('layouts.navigation')
 
             <!-- Page Heading -->

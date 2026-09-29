@@ -152,7 +152,6 @@
 
 <div class="container-fluid px-4">
 
-
     <div class="mb-4">
 
         <div class="d-flex justify-content-between align-items-center mb-1">
@@ -178,7 +177,6 @@
 
     </div>
 
-
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show mb-4">
 
@@ -190,7 +188,6 @@
 
         </div>
     @endif
-
 
     @if ($errors->any())
 
@@ -207,7 +204,6 @@
         </div>
 
     @endif
-
 
     <div class="page-card">
 
@@ -269,7 +265,6 @@
     </div>
 
 </div>
-
 
 <div
     class="modal fade"
@@ -395,7 +390,6 @@
     </div>
 
 </div>
-
 
 <div
     class="modal fade"

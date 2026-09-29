@@ -159,7 +159,6 @@
         </small>
     </div>
 
-
     <div class="mb-4 no-print">
 
         <div class="d-flex justify-content-between align-items-center mb-1">
@@ -174,7 +173,6 @@
         </p>
 
     </div>
-
 
     {{-- Filter periode --}}
     <form method="GET" action="{{ route('laporan.index') }}" class="page-card p-4 mb-4 no-print">
@@ -216,7 +214,6 @@
 
     </form>
 
-
     {{-- Kartu ringkasan --}}
     <div class="row g-3 mb-4">
         <div class="col-md-3 col-6">
@@ -257,7 +254,6 @@
 
     </div>
 
-
     {{-- grafik + breakdown metode --}}
     <div class="row g-3 mb-4">
             <div class="col-lg-8">
@@ -291,7 +287,6 @@
                 </div>
             </div>
         </div>
-
 
         @php
             // Gabungkan 3 sumber jadi satu aliran kas, urut tanggal.
@@ -417,7 +412,6 @@
             </div>
         @endif
 
-
         {{-- Tombol cetak --}}
         @if ($arus->isNotEmpty())
             <div class="text-center mt-4 no-print">
@@ -429,7 +423,6 @@
 
             </div>
         @endif
-
 
 </div>
 

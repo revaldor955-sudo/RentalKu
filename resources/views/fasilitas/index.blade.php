@@ -6,7 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
     <title>Management Fasilitas - RentalKu</title>
 
     <link
@@ -179,11 +178,9 @@
 
 </div>
 
-
 @if(session('success'))
     <span id="flashSuccess" class="d-none">{{ session('success') }}</span>
 @endif
-
 
 @if($errors->any())
 
@@ -206,7 +203,6 @@
     </div>
 
 @endif
-
 
 <div class="row g-4">
 
@@ -271,7 +267,6 @@
 
 </div>
 
-
 <div
     class="modal fade"
     id="tambahFasilitasModal"
@@ -335,7 +330,6 @@
     </div>
 
 </div>
-
 
 <div
     class="modal fade"

@@ -167,7 +167,6 @@
 
     </div>
 
-
     <div class="card-custom">
 
         <div class="card-body p-0">
@@ -228,7 +227,6 @@
     </div>
 
 </div>
-
 
 <div class="modal fade" id="pemeriksaanModal" tabindex="-1" aria-labelledby="pemeriksaanModalLabel" aria-hidden="true">
 

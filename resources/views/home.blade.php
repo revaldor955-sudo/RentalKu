@@ -5,172 +5,90 @@
 @section('content')
 
     <section class="hero">
+        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+            <div class="carousel-inner">
 
-        <div class="container">
-
-            @if ($banners->count())
-
-                <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
-
-                    <div class="carousel-inner">
-
-                        <div class="carousel-item active">
-
-                            <div class="hero-content">
-
-                                <div class="hero-badge">
-                                    <i class="bi bi-patch-check-fill"></i>
-                                    Rental mobil mudah & terpercaya
-                                </div>
-
-                                <h1>
+                {{-- Slide default --}}
+                <div class="carousel-item active hero-slide" style="background-image: url('{{ asset('images/banners/hero-jalan-palem.jpg') }}');" onerror="this.style.backgroundImage='url(data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1200 600%22%3E%3Crect fill=%22%23E8F0F1%22 width=%221200%22 height=%22600%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%232C666E%22%3EBanner tidak tersedia%3C/text%3E%3C/svg%3E)'">
+                    <div class="d-flex align-items-center justify-content-center h-100">
+                        <div class="hero-content">
+                            <div class="hero-badge">
+                                <i class="bi bi-patch-check-fill"></i>
+                                {{ $landingSettings['hero_badge'] ?? 'Rental mobil mudah & terpercaya' }}
+                            </div>
+                            <h1>
+                                @if(!empty($landingSettings['hero_title']))
+                                    {{ $landingSettings['hero_title'] }}
+                                @else
                                     Perjalanan lebih mudah
                                     dengan <span>Rentalku.</span>
-                                </h1>
+                                @endif
+                            </h1>
+                            <p>
+                                {{ $landingSettings['hero_description'] ?? 'Temukan mobil yang sesuai kebutuhanmu. Pilih kendaraan, tentukan tanggal rental, dan lakukan rental dengan mudah secara online.' }}
+                            </p>
+                            <div class="hero-buttons">
+                                <a href="#mobil" class="btn btn-hero btn-hero-primary">
+                                    <i class="bi bi-car-front me-2"></i>
+                                    Lihat Mobil
+                                </a>
+                                <a href="#cara-rental" class="btn btn-hero btn-hero-outline">
+                                    Cara Rental
+                                    <i class="bi bi-arrow-right ms-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                                <p>
-                                    Temukan mobil yang sesuai kebutuhanmu.
-                                    Pilih kendaraan, tentukan tanggal rental,
-                                    dan lakukan rental dengan mudah secara online.
-                                </p>
-
+                {{-- Slide dari database --}}
+                @foreach ($banners as $banner)
+                    <div class="carousel-item hero-slide" style="background-image: url('{{ asset($banner->gambar) }}');" onerror="this.style.backgroundImage='url(data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1200 600%22%3E%3Crect fill=%22%23E8F0F1%22 width=%221200%22 height=%22600%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%232C666E%22%3E{{ htmlspecialchars($banner->judul) }}%3C/text%3E%3C/svg%3E)'">
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <div class="hero-content">
+                                <div class="hero-badge">
+                                    <i class="bi bi-megaphone-fill"></i>
+                                    Promo Spesial
+                                </div>
+                                <h1>{{ $banner->judul }}</h1>
+                                <p>{{ $banner->description }}</p>
                                 <div class="hero-buttons">
-
-                                    <a href="#mobil" class="btn btn-hero btn-hero-primary">
+                                    @if ($banner->link)
+                                        <a href="{{ $banner->link }}" class="btn btn-hero btn-hero-primary"
+                                           @if (str_starts_with($banner->link, 'http')) target="_blank" rel="noopener" @endif>
+                                            Selengkapnya
+                                            <i class="bi bi-arrow-right ms-2"></i>
+                                        </a>
+                                    @endif
+                                    <a href="#mobil" class="btn btn-hero btn-hero-outline">
                                         <i class="bi bi-car-front me-2"></i>
                                         Lihat Mobil
                                     </a>
-
-                                    <a href="#cara-rental" class="btn btn-hero btn-hero-outline">
-                                        Cara Rental
-                                        <i class="bi bi-arrow-right ms-2"></i>
-                                    </a>
-
                                 </div>
-
                             </div>
-
                         </div>
-
-                        @foreach ($banners as $banner)
-
-                            <div class="carousel-item hero-slide"
-                                style="background-image: url('{{ asset($banner->gambar) }}');">
-
-                                <div class="hero-content">
-
-                                    <div class="hero-badge">
-                                        <i class="bi bi-megaphone-fill"></i>
-                                        Promo Spesial
-                                    </div>
-
-                                    <h1>
-                                        {{ $banner->judul }}
-                                    </h1>
-
-                                    <p>
-                                        {{ $banner->description }}
-                                    </p>
-
-                                    <div class="hero-buttons">
-
-                                        @if ($banner->link)
-
-                                            <a href="{{ $banner->link }}"
-                                                class="btn btn-hero btn-hero-primary"
-                                                @if (str_starts_with($banner->link, 'http')) target="_blank" rel="noopener" @endif>
-
-                                                Selengkapnya
-                                                <i class="bi bi-arrow-right ms-2"></i>
-
-                                            </a>
-
-                                        @endif
-
-                                        <a href="#mobil" class="btn btn-hero btn-hero-outline">
-                                            <i class="bi bi-car-front me-2"></i>
-                                            Lihat Mobil
-                                        </a>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        @endforeach
-
                     </div>
+                @endforeach
 
-                    <div class="carousel-indicators">
+            </div>
 
-                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0"
-                            class="active" aria-current="true" aria-label="Slide 1"></button>
+            {{-- Indikator --}}
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                @foreach ($banners as $i => $banner)
+                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $i + 1 }}" aria-label="Banner: {{ $banner->judul }}"></button>
+                @endforeach
+            </div>
 
-                        @foreach ($banners as $i => $banner)
-
-                            <button type="button" data-bs-target="#heroCarousel"
-                                data-bs-slide-to="{{ $i + 1 }}"
-                                aria-label="Banner: {{ $banner->judul }}"></button>
-
-                        @endforeach
-
-                    </div>
-
-                    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel"
-                        data-bs-slide="prev" aria-label="Slide sebelumnya">
-                        <span class="carousel-control-prev-icon"></span>
-                    </button>
-
-                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel"
-                        data-bs-slide="next" aria-label="Slide berikutnya">
-                        <span class="carousel-control-next-icon"></span>
-                    </button>
-
-                </div>
-
-            @else
-
-                <div class="hero-content">
-
-                    <div class="hero-badge">
-                        <i class="bi bi-patch-check-fill"></i>
-                        Rental mobil mudah & terpercaya
-                    </div>
-
-                    <h1>
-                        Perjalanan lebih mudah
-                        dengan <span>Rentalku.</span>
-                    </h1>
-
-                    <p>
-                        Temukan mobil yang sesuai kebutuhanmu.
-                        Pilih kendaraan, tentukan tanggal rental,
-                        dan lakukan rental dengan mudah secara online.
-                    </p>
-
-                    <div class="hero-buttons">
-
-                        <a href="#mobil" class="btn btn-hero btn-hero-primary">
-                            <i class="bi bi-car-front me-2"></i>
-                            Lihat Mobil
-                        </a>
-
-                        <a href="#cara-rental" class="btn btn-hero btn-hero-outline">
-                            Cara Rental
-                            <i class="bi bi-arrow-right ms-2"></i>
-                        </a>
-
-                    </div>
-
-                </div>
-
-            @endif
-
+            {{-- Navigasi --}}
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Slide sebelumnya">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Slide berikutnya">
+                <span class="carousel-control-next-icon"></span>
+            </button>
         </div>
-
     </section>
-
 
     <section class="search-box">
 
@@ -208,23 +126,23 @@
 
                         <div class="col-lg-3">
 
-                            <div class="search-label">
+                            <div class="search-label" id="tanggal-mulai-label">
                                 Tanggal Mulai
                             </div>
 
                             <input type="date" name="tanggal_mulai" value="{{ $mulai?->toDateString() }}"
-                                min="{{ now()->toDateString() }}" class="form-control search-input">
+                                min="{{ now()->toDateString() }}" id="tanggal_mulai" aria-labelledby="tanggal-mulai-label" class="form-control search-input">
 
                         </div>
 
                         <div class="col-lg-3">
 
-                            <div class="search-label">
+                            <div class="search-label" id="tanggal-selesai-label">
                                 Tanggal Selesai
                             </div>
 
                             <input type="date" name="tanggal_selesai" value="{{ $selesai?->toDateString() }}"
-                                min="{{ now()->toDateString() }}" class="form-control search-input">
+                                min="{{ now()->toDateString() }}" id="tanggal_selesai" aria-labelledby="tanggal-selesai-label" class="form-control search-input">
 
                         </div>
 
@@ -246,7 +164,6 @@
         </div>
 
     </section>
-
 
     <section class="section" id="mobil">
 
@@ -281,7 +198,6 @@
 
             </div>
 
-
             <div class="row g-3 justify-content-center">
 
                 @forelse($brands as $brand)
@@ -315,7 +231,6 @@
 
     </section>
 
-
     <section class="section" id="tentang">
 
         <div class="container">
@@ -345,7 +260,6 @@
 
                 </div>
 
-
                 <div class="col-lg-7">
 
                     <div class="row g-4">
@@ -371,7 +285,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <div class="feature-card">
@@ -393,7 +306,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <div class="feature-card">
@@ -414,7 +326,6 @@
                             </div>
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -447,8 +358,61 @@
 
     </section>
 
+    {{-- Statistik / Counter Section --}}
+    <section class="py-5" style="background-color: var(--primary); color: white;">
+        <div class="container">
+            <div class="row text-center g-4">
+            <div class="col-6 col-md-3">
+                <h2 class="fw-bold display-5 mb-1">{{ $totalMobil }}+</h2>
+                <p class="mb-0 opacity-75">Mobil Tersedia</p>
+            </div>
+            <div class="col-6 col-md-3">
+                <h2 class="fw-bold display-5 mb-1">{{ $totalPuas }}+</h2>
+                <p class="mb-0 opacity-75">Pelanggan Puas</p>
+            </div>
+            <div class="col-6 col-md-3">
+                <h2 class="fw-bold display-5 mb-1">24/7</h2>
+                <p class="mb-0 opacity-75">Layanan Support</p>
+            </div>
+            <div class="col-6 col-md-3">
+                <h2 class="fw-bold display-5 mb-1">{{ $ratingRata ?: '4.9' }}</h2>
+                <p class="mb-0 opacity-75">Rating Rata-rata</p>
+            </div>
+            </div>
+        </div>
+    </section>
 
-    <section class="section section-light" id="cara-rental">
+    {{-- Promo Urgency Banner --}}
+    <section class="py-3" style="background: linear-gradient(135deg, #E8F0F1 0%, #F0EDEE 100%);">
+        <div class="container">
+            <div class="row align-items-center justify-content-center g-3">
+                <div class="col-auto text-center">
+                    <span class="badge rounded-pill px-3 py-2" style="background-color: var(--primary); font-size: 0.85rem;">
+                        {{ $landingSettings['promo_title'] ?? '🔥 PROMO SPESIAL' }}
+                    </span>
+                </div>
+                <div class="col-auto text-center d-none d-md-block">
+                    <span class="fw-semibold" style="color: var(--primary-dark);">
+                        {{ $landingSettings['promo_description'] ?? 'Diskon hingga 20% untuk rental mingguan — Berakhir dalam:' }}
+                    </span>
+                </div>
+                <div class="col-auto">
+                    <div id="countdownTimer" class="d-flex gap-2 fw-bold" style="color: var(--primary-dark); font-size: 1rem;">
+                        <span class="bg-white rounded px-2 py-1 shadow-sm"><span id="cdHours">23</span>j</span>
+                        <span class="bg-white rounded px-2 py-1 shadow-sm"><span id="cdMinutes">59</span>m</span>
+                        <span class="bg-white rounded px-2 py-1 shadow-sm"><span id="cdSeconds">59</span>d</span>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <a href="#mobil" class="btn btn-sm fw-bold" style="background-color: var(--primary); color: white; border-radius: 20px;">
+                        Klaim Sekarang →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="cara-rental">
 
         <div class="container">
 
@@ -468,7 +432,6 @@
                 </p>
 
             </div>
-
 
             <div class="row g-5">
 
@@ -493,7 +456,6 @@
 
                 </div>
 
-
                 <div class="col-md-6 col-lg-3">
 
                     <div class="step-card">
@@ -515,7 +477,6 @@
 
                 </div>
 
-
                 <div class="col-md-6 col-lg-3">
 
                     <div class="step-card">
@@ -536,7 +497,6 @@
                     </div>
 
                 </div>
-
 
                 <div class="col-md-6 col-lg-3">
 
@@ -565,12 +525,9 @@
 
     </section>
 
-
-
-
     @if ($ratings->count())
 
-        <section class="section section-light">
+        <section class="section section-light" id="testimoni">
 
             <div class="container">
 
@@ -584,8 +541,11 @@
                         Apa kata pelanggan?
                     </h2>
 
-                </div>
+                    <p class="section-subtitle mx-auto">
+                        Ribuan pelanggan telah mempercayakan perjalanan mereka kepada Rentalku.
+                    </p>
 
+                </div>
 
                 <div class="row g-4">
 
@@ -606,22 +566,19 @@
 
                                 </div>
 
-
                                 <div class="rating-text">
                                     "{{ $rating->ulasan ?? 'Pelayanan sangat baik.' }}"
                                 </div>
 
-
                                 <div class="user-info">
 
                                     @if ($rating->foto_user)
-                                        <img src="{{ asset('storage/' . $rating->foto_user) }}" class="user-avatar">
+                                        <img src="{{ asset('storage/' . $rating->foto_user) }}" class="user-avatar" alt="{{ $rating->nama }}" loading="lazy">
                                     @else
                                         <div class="user-avatar d-flex align-items-center justify-content-center">
                                             <i class="bi bi-person"></i>
                                         </div>
                                     @endif
-
 
                                     <div>
 
@@ -650,7 +607,6 @@
 
     @endif
 
-
     <section class="section faq" id="faq">
 
         <div class="container">
@@ -666,11 +622,16 @@
                         </div>
 
                         <h2 class="section-title">
-                            Pertanyaan yang sering ditanyakan
+                            {{ $landingSettings['faq_title'] ?? 'Pertanyaan yang sering ditanyakan' }}
                         </h2>
 
-                    </div>
+                        @if(!empty($landingSettings['faq_description']))
+                        <p class="text-secondary mt-3">
+                            {{ $landingSettings['faq_description'] }}
+                        </p>
+                        @endif
 
+                    </div>
 
                     <div class="accordion" id="faqAccordion">
 
@@ -680,13 +641,13 @@
                                 <h2 class="accordion-header">
 
                                     <button class="accordion-button {{ $key !== 0 ? 'collapsed' : '' }}" type="button"
-                                        data-bs-toggle="collapse" data-bs-target="#faq{{ $faq->id_faq }}">
+                                        data-bs-toggle="collapse" data-bs-target="#faq{{ $faq->id }}">
                                         {{ $faq->pertanyaan }}
                                     </button>
 
                                 </h2>
 
-                                <div id="faq{{ $faq->id_faq }}"
+                                <div id="faq{{ $faq->id }}"
                                     class="accordion-collapse collapse {{ $key === 0 ? 'show' : '' }}"
                                     data-bs-parent="#faqAccordion">
 
@@ -715,8 +676,289 @@
 
     </section>
 
+    <section class="section faq" id="sk">
 
-    <section class="section">
+        <div class="container">
+
+            <div class="row justify-content-center">
+
+                <div class="col-lg-8">
+
+                    <div class="text-center mb-5">
+
+                        <div class="text-success fw-bold mb-2">
+                            SYARAT & KETENTUAN
+                        </div>
+
+                        <h2 class="section-title">
+                            Kebijakan Penggunaan Layanan
+                        </h2>
+
+                        <p class="section-subtitle mx-auto">
+                            Silakan baca dengan seksama sebelum menggunakan layanan Rentalku.
+                        </p>
+
+                    </div>
+
+                    <div class="accordion" id="skAccordion">
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#sk1">
+                                    Syarat Umum Rental
+                                </button>
+                            </h2>
+                            <div id="sk1" class="accordion-collapse collapse show" data-bs-parent="#skAccordion">
+                                <div class="accordion-body text-secondary">
+                                    <ul>
+                                        <li>Penyewa harus berusia minimal 21 tahun dengan SIM yang masih berlaku.</li>
+                                        <li>Penyewa bertanggung jawab penuh terhadap kendaraan selama masa rental.</li>
+                                        <li>Pembayaran dapat dilakukan melalui transfer bank, kartu kredit, atau e-wallet.</li>
+                                        <li>Deposit awal diperlukan sebagai jaminan untuk keamanan kendaraan.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sk2">
+                                    Tanggung Jawab Penyewa
+                                </button>
+                            </h2>
+                            <div id="sk2" class="accordion-collapse collapse" data-bs-parent="#skAccordion">
+                                <div class="accordion-body text-secondary">
+                                    <ul>
+                                        <li>Penyewa wajib memeriksa kondisi kendaraan sebelum memulai rental.</li>
+                                        <li>Dilarang menggunakan kendaraan untuk aktivitas ilegal atau berbahaya.</li>
+                                        <li>Penyewa menanggung biaya perbaikan jika terjadi kerusakan akibat kelalaian.</li>
+                                        <li>Kendaraan harus dikembalikan dalam kondisi bersih dan sesuai waktu perjanjian.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sk3">
+                                    Kebijakan Pembatalan & Pengembalian
+                                </button>
+                            </h2>
+                            <div id="sk3" class="accordion-collapse collapse" data-bs-parent="#skAccordion">
+                                <div class="accordion-body text-secondary">
+                                    <ul>
+                                        <li>Pembatalan lebih dari 48 jam sebelum tanggal rental: refund 100%.</li>
+                                        <li>Pembatalan 24-48 jam: refund 50%.</li>
+                                        <li>Pembatalan kurang dari 24 jam: tidak ada refund.</li>
+                                        <li>Keterlambatan pengembalian akan dikenakan denda Rp 200.000 per jam.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sk4">
+                                    Asuransi & Ganti Rugi
+                                </button>
+                            </h2>
+                            <div id="sk4" class="accordion-collapse collapse" data-bs-parent="#skAccordion">
+                                <div class="accordion-body text-secondary">
+                                    <ul>
+                                        <li>Semua kendaraan dilindungi asuransi dasar. Asuransi tambahan dapat ditambahkan dengan biaya terpisah.</li>
+                                        <li>Kerusakan akibat kelalaian penyewa menjadi tanggung jawab penyewa (sesuai estimasi bengkel resmi).</li>
+                                        <li>Kehilangan atau pencurian kendaraan: penyewa bertanggung jawab penuh.</li>
+                                        <li>Kerusakan ringan yang sudah tercakup dalam asuransi akan ditanggung Rentalku.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sk5">
+                                    Kebijakan Privasi & Data
+                                </button>
+                            </h2>
+                            <div id="sk5" class="accordion-collapse collapse" data-bs-parent="#skAccordion">
+                                <div class="accordion-body text-secondary">
+                                    <ul>
+                                        <li>Data pribadi penyewa dijaga keamanannya sesuai standar industri.</li>
+                                        <li>Rentalku tidak membagikan data pribadi kepada pihak ketiga tanpa persetujuan.</li>
+                                        <li>Data transaksi disimpan untuk keperluan administrasi dan audit.</li>
+                                        <li>Penyewa berhak mengajukan penghapusan data sesuai peraturan perlindungan data yang berlaku.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <style>
+        #kontak {
+            background-color: #f8f9fa;
+            padding: 80px 0;
+            border-top: 1px solid #eef2f0;
+            border-bottom: 1px solid #eef2f0;
+        }
+        .contact-form {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .cta-banner {
+            margin-top: 40px;
+        }
+        .cta {
+            margin-bottom: 40px;
+        }
+    </style>
+
+    {{-- Contact Form Section --}}
+    <section class="section" id="kontak">
+
+        <div class="container">
+
+            <div class="row justify-content-center">
+
+                <div class="col-lg-8">
+
+                    <div class="text-center mb-5">
+
+                        <div class="text-success fw-bold mb-2">
+                            HUBUNGI KAMI
+                        </div>
+
+                        <h2 class="section-title">
+                            Ada pertanyaan?
+                        </h2>
+
+                        <p class="section-subtitle mx-auto">
+                            Kami siap membantu Anda. Hubungi tim Rentalku atau isi form di bawah.
+                        </p>
+
+                    </div>
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <div class="contact-info">
+
+                                <div class="contact-item mb-4">
+
+                                    <div class="contact-icon">
+                                        <i class="bi bi-telephone"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <h5>Telepon</h5>
+
+                                        <p class="text-muted">+62 812-3456-7890</p>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="contact-item mb-4">
+
+                                    <div class="contact-icon">
+                                        <i class="bi bi-envelope"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <h5>Email</h5>
+
+                                        <p class="text-muted">info@rentalku.com</p>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="contact-item">
+
+                                    <div class="contact-icon">
+                                        <i class="bi bi-geo-alt"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <h5>Lokasi</h5>
+
+                                        <p class="text-muted">Pontianak, Kalimantan Barat</p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <form id="contactForm" action="{{ route('contact.store') ?? '#' }}" method="POST" class="contact-form">
+
+                                @csrf
+
+                                <div class="mb-3">
+
+                                    <label for="contact_name" class="form-label">Nama Lengkap</label>
+
+                                    <input type="text" class="form-control" id="contact_name" name="nama" placeholder="Nama Anda" required>
+
+                                </div>
+
+                                <div class="mb-3">
+
+                                    <label for="contact_email" class="form-label">Email</label>
+
+                                    <input type="email" class="form-control" id="contact_email" name="email" placeholder="Email Anda" required>
+
+                                </div>
+
+                                <div class="mb-3">
+
+                                    <label for="contact_subject" class="form-label">Subjek</label>
+
+                                    <input type="text" class="form-control" id="contact_subject" name="subjek" placeholder="Subjek pesan" required>
+
+                                </div>
+
+                                <div class="mb-3">
+
+                                    <label for="contact_message" class="form-label">Pesan</label>
+
+                                    <textarea class="form-control" id="contact_message" name="pesan" rows="4" placeholder="Tuliskan pesan Anda..." required></textarea>
+
+                                </div>
+
+                                <button type="submit" class="btn btn-rent w-100">Kirim Pesan</button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
 
         <div class="container">
 
@@ -754,9 +996,33 @@
 
     </section>
 
-
     <script>
         $(function () {
+            // Countdown promo urgency
+            function startCountdown() {
+                var end = new Date();
+                end.setHours(23, 59, 59, 999);
+
+                function pad(n) {
+                    return n < 10 ? '0' + n : n;
+                }
+
+                function tick() {
+                    var diff = end - new Date();
+                    if (diff <= 0) diff = 0;
+                    var h = Math.floor(diff / (1000 * 60 * 60));
+                    var m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    var s = Math.floor((diff % (1000 * 60)) / 1000);
+                    $('#cdHours').text(pad(h));
+                    $('#cdMinutes').text(pad(m));
+                    $('#cdSeconds').text(pad(s));
+                }
+
+                tick();
+                setInterval(tick, 1000);
+            }
+            startCountdown();
+
             var $form = $('.search-card form');
             if (!$form.length) return;
 
@@ -860,6 +1126,127 @@
                 cari(window.location.href, false, false);
             });
         });
+
+        // Modal detail mobil — card + button trigger
+        $(document).on('click', '.car-card[data-mobil-id], button[data-mobil-id]', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var mobilId = $(this).data('mobil-id');
+            var modalEl = document.getElementById('mobilDetailModal');
+            var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            var $body = $('#mobilDetailModal .modal-body');
+
+            $body.html('<div class="text-center py-5"><div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+            modal.show();
+
+            $.ajax({
+                url: '/mobils/' + mobilId,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                method: 'GET'
+            })
+            .done(function (html) {
+                $body.html(html);
+            })
+            .fail(function () {
+                $body.html('<div class="alert alert-danger m-3"><i class="bi bi-exclamation-circle me-2"></i>Gagal memuat detail mobil.</div>');
+            });
+        });
+
+        // Popup form sewa (SweetAlert) — untuk user yang login
+        @auth
+        window.openSewaPopup = function() {
+            var $template = $('#sewaFormTemplate');
+            if (!$template.length) return;
+
+            if ($('.mobil-modal .mm-badge-available').length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Mobil sedang tidak tersedia.',
+                });
+                return;
+            }
+
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('mobilDetailModal')).hide();
+
+            var $carTitle = $('.mobil-modal .mm-title');
+
+            Swal.fire({
+                title: $carTitle.length ? $carTitle.text().trim() : 'Sewa Mobil',
+                html: $template.html(),
+                width: 600,
+                showConfirmButton: false,
+                didOpen: function() {
+                    var $form = $('#swal2-html-container form#sewaForm');
+                    if (!$form.length) $form = $('#swal2-html-container form').first();
+                    if (!$form.length) return;
+
+                    $form.on('submit', function(event) {
+                        event.preventDefault();
+                        var formData = new FormData($form[0]);
+                        Swal.showLoading();
+
+                        $.ajax({
+                            url: $form.attr('action'),
+                            method: 'POST',
+                            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                            data: formData,
+                            processData: false,
+                            contentType: false
+                        })
+                        .done(function(data, textStatus, xhr) {
+                            Swal.hideLoading();
+                            if (xhr.status !== 200) {
+                                var firstError = data.errors ? Object.values(data.errors).flat()[0] : (data.message || 'Terjadi kesalahan.');
+                                Swal.fire({ icon: 'error', title: 'Gagal', text: firstError });
+                                return;
+                            }
+                            Swal.fire({ icon: 'success', title: 'Berhasil!', text: data.message || 'Pengajuan sewa berhasil.', confirmButtonText: 'OK' })
+                                .then(function() { window.location.href = '{{ route('customer.dashboard') }}'; });
+                        })
+                        .fail(function() {
+                            Swal.hideLoading();
+                            Swal.fire({ icon: 'error', title: 'Gagal', text: 'Koneksi bermasalah. Silakan coba lagi.' });
+                        });
+                    });
+
+                    // Supir profile card toggle
+                    var supirSelect = document.querySelector('#supirSelectModal');
+                    if (supirSelect) {
+                        supirSelect.addEventListener('change', function() {
+                            var card = document.querySelector('#supirProfileCardModal');
+                            var opt = this.options[this.selectedIndex];
+                            if (!card) return;
+                            if (this.value === '') {
+                                card.style.display = 'none';
+                            } else {
+                                document.querySelector('#supirNameModal').innerText = opt.dataset.name;
+                                document.querySelector('#supirPhoneModal').innerText = opt.dataset.phone;
+                                document.querySelector('#supirTarifModal').innerText = opt.dataset.tarif;
+                                document.querySelector('#supirImgModal').src = opt.dataset.image;
+                                card.style.display = 'block';
+                            }
+                        });
+                    }
+                }
+            });
+        };
+        @endauth
     </script>
+
+    {{-- Modal Detail Mobil --}}
+    <div class="modal fade" id="mobilDetailModal" tabindex="-1" aria-labelledby="mobilDetailLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title" id="mobilDetailLabel">Detail Mobil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+                    <!-- Content loaded via AJAX -->
+                </div>
+            </div>
+        </div>
+    </div>
 
 @endsection

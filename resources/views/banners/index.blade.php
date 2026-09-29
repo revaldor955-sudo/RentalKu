@@ -266,7 +266,6 @@
     </div>
 </div>
 
-
 <div class="modal fade" id="editBannerModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -320,7 +319,6 @@
         </div>
     </div>
 </div>
-
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>

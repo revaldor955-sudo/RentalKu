@@ -133,9 +133,7 @@
 
 @include('layouts.partials.staff-sidebar')
 
-{{-- Page Content (dipindah ke #mainContent oleh staff-sidebar) --}}
 <div class="page-content">
-
 <div class="container-fluid px-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -162,13 +160,11 @@
 
     </div>
 
-
     @if(session('success'))
 
         <span id="flashSuccess" class="d-none">{{ session('success') }}</span>
 
     @endif
-
 
     @if($errors->any())
 
@@ -187,7 +183,6 @@
         </div>
 
     @endif
-
 
     <div class="page-card">
 
@@ -376,7 +371,6 @@
 
 </div>
 
-
 <div
     class="modal fade"
     id="tambahMobilModal"
@@ -417,7 +411,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label fw-semibold">
@@ -433,7 +426,6 @@
                             >
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -463,7 +455,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label fw-semibold">
@@ -491,7 +482,6 @@
                             </select>
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -521,7 +511,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label fw-semibold">
@@ -537,7 +526,6 @@
                             >
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -567,7 +555,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label fw-semibold">
@@ -583,7 +570,6 @@
                             >
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -601,7 +587,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label fw-semibold">
@@ -618,7 +603,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label fw-semibold">
@@ -634,7 +618,6 @@
                             >
 
                         </div>
-
 
                         <div class="col-md-6">
 
@@ -664,7 +647,6 @@
 
                         </div>
 
-
                         <div class="col-md-6">
 
                             <label class="form-label fw-semibold">
@@ -679,7 +661,6 @@
                             >
 
                         </div>
-
 
                         <div class="col-12">
 
@@ -727,7 +708,6 @@
     </div>
 
 </div>
-
 
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
