@@ -669,6 +669,16 @@
                             Edit Profile
                         </button>
                     </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form action="{{ route('logout') }}" method="POST" class="m-0">
+                            @csrf
+                            <button type="submit" class="dropdown-item text-danger rounded-2 py-2 d-flex align-items-center">
+                                <i class="bi bi-box-arrow-right me-3"></i>
+                                Logout
+                            </button>
+                        </form>
+                    </li>
                 </ul>
             </div>
         </footer>
