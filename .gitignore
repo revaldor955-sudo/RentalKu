@@ -32,4 +32,5 @@ Thumbs.db
 /.graphify_python
 /graphify-out
 AGENTS.md
+DESIGN.md
 *.png

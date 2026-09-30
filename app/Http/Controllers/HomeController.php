@@ -52,7 +52,7 @@ class HomeController extends Controller
 
         // AJAX: kembalikan partial hasil saja, query section lain dilewati.
         if ($request->ajax() || $request->wantsJson()) {
-            return view('home.partials.hasil-pencarian', compact(
+            return view('home.partials.daftar-mobil', compact(
                 'mobils',
                 'punyaFilter',
                 'cabangAktif',

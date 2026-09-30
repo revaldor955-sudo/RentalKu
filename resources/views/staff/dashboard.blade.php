@@ -79,8 +79,8 @@
         }
 
         .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(0,0,0,.06);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,.05);
         }
 
         .stat-icon {
@@ -119,8 +119,8 @@
         }
 
         .menu-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,.07);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,.05);
             border-color: #198754;
         }
 
