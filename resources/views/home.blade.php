@@ -169,8 +169,8 @@
 
         <div class="container">
 
-            <div id="hasil-pencarian">
-                @include('home.partials.hasil-pencarian')
+            <div id="daftar-mobil">
+                @include('home.partials.daftar-mobil')
             </div>
 
         </div>
@@ -1031,7 +1031,7 @@
             var $selesai = $(form.elements.tanggal_selesai);
             var $cabangEl = $(form.elements.cabang);
             var $tombol = $form.find('button[type="submit"]');
-            var $kontainer = $('#hasil-pencarian');
+            var $kontainer = $('#daftar-mobil');
 
             function sinkronMin() {
                 $selesai.attr('min', $mulai.val() || '');
@@ -1116,7 +1116,7 @@
                 cari(form.action + '?' + query, true, false);
             });
 
-            $(document).on('click', '#hasil-pencarian [data-search-link]', function (e) {
+            $(document).on('click', '#daftar-mobil [data-search-link]', function (e) {
                 e.preventDefault();
                 var $link = $(this);
                 cari($link.attr('href'), true, $link.attr('data-search-top') !== undefined);
