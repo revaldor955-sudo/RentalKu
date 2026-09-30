@@ -181,7 +181,9 @@ class RentalController extends Controller
 
         $totalMobilSameType = Mobil::where('tipe_mobil_id', $validated['tipe_mobil_id'] ?? $mobil->tipe_mobil_id)->count();
 
-        $rentalsSameTypeConflict = Rental::where('tipe_mobil_id', $validated['tipe_mobil_id'] ?? $mobil->tipe_mobil_id)
+        $rentalsSameTypeConflict = Rental::whereHas('mobil', function ($q) use ($validated, $mobil) {
+            $q->where('tipe_mobil_id', $validated['tipe_mobil_id'] ?? $mobil->tipe_mobil_id);
+        })
             ->whereIn('status', ['Menunggu', 'Disetujui', 'Berjalan'])
             ->where(function ($query) use ($tanggalMulai, $tanggalSelesai) {
                 $query->whereDate('tanggal_mulai', '<', $tanggalSelesai)
