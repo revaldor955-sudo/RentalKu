@@ -752,55 +752,81 @@
 
                             </div>
 
-                            <div class="col-md-4">
+                         <div class="col-md-4">
 
-                                <label class="form-label">
-                                    Harga Per Hari
-                                </label>
+    <label class="form-label">
+        Harga Per Hari
+    </label>
 
-                                <div class="input-group">
+    <div class="input-group">
 
-                                    <span class="input-group-text">
-                                        Rp
-                                    </span>
+        <span class="input-group-text">
+            Rp
+        </span>
 
-                                    <input
-                                        type="number"
-                                        name="harga_perhari"
-                                        class="form-control"
-                                        placeholder="300000"
-                                        value="{{ old('harga_perhari') }}"
-                                        min="0"
-                                        required>
+        <input
+            type="text"
+            id="hargaPerhariDisplay"
+            class="form-control rupiah-input"
+            placeholder="600.000"
+            autocomplete="off"
+            inputmode="numeric"
+            required
+        >
 
-                                </div>
+    </div>
 
-                            </div>
+    {{-- Nilai asli yang dikirim ke Laravel --}}
+    <input
+        type="hidden"
+        name="harga_perhari"
+        id="hargaPerhari"
+        value="{{ old('harga_perhari') }}"
+    >
 
-                            <div class="col-md-4">
+    <small class="text-muted">
+        Contoh: 600.000
+    </small>
 
-                                <label class="form-label">
-                                    Deposit
-                                </label>
+</div>
 
-                                <div class="input-group">
+                           <div class="col-md-4">
 
-                                    <span class="input-group-text">
-                                        Rp
-                                    </span>
+    <label class="form-label">
+        Deposit
+    </label>
 
-                                    <input
-                                        type="number"
-                                        name="deposit"
-                                        class="form-control"
-                                        placeholder="500000"
-                                        value="{{ old('deposit') }}"
-                                        min="0"
-                                        required>
+    <div class="input-group">
 
-                                </div>
+        <span class="input-group-text">
+            Rp
+        </span>
 
-                            </div>
+        <input
+            type="text"
+            id="depositDisplay"
+            class="form-control rupiah-input"
+            placeholder="500.000"
+            autocomplete="off"
+            inputmode="numeric"
+            required
+        >
+
+    </div>
+
+    {{-- Nilai asli yang dikirim ke Laravel --}}
+    <input
+        type="hidden"
+        name="deposit"
+        id="deposit"
+        value="{{ old('deposit') }}"
+    >
+
+    <small class="text-muted">
+        Contoh: 500.000
+    </small>
+
+</div> 
 
                             <div class="col-md-6">
 
@@ -1544,6 +1570,90 @@
             });
         });
     }
+
+
+
+    /* ============================================================
+   FORMAT RUPIAH
+   600000   -> 600.000
+   1500000  -> 1.500.000
+   25000000 -> 25.000.000
+============================================================ */
+
+function formatRupiah(angka) {
+
+    if (angka === null || angka === undefined) {
+        return '';
+    }
+
+    angka = String(angka).replace(/\D/g, '');
+
+    if (angka === '') {
+        return '';
+    }
+
+    return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+
+/* ============================================================
+   TAMBAH MOBIL - HARGA PER HARI
+============================================================ */
+
+$(document).on('input', '#hargaPerhariDisplay', function () {
+
+    let angka = this.value.replace(/\D/g, '');
+
+    $('#hargaPerhari').val(angka);
+
+    this.value = formatRupiah(angka);
+
+});
+
+
+/* ============================================================
+   TAMBAH MOBIL - DEPOSIT
+============================================================ */
+
+$(document).on('input', '#depositDisplay', function () {
+
+    let angka = this.value.replace(/\D/g, '');
+
+    $('#deposit').val(angka);
+
+    this.value = formatRupiah(angka);
+
+});
+
+
+/* ============================================================
+   EDIT MOBIL - HARGA PER HARI
+============================================================ */
+
+$(document).on('input', '#editHargaPerhariDisplay', function () {
+
+    let angka = this.value.replace(/\D/g, '');
+
+    $('#editHargaPerhari').val(angka);
+
+    this.value = formatRupiah(angka);
+
+});
+
+
+/* ============================================================
+   EDIT MOBIL - DEPOSIT
+============================================================ */
+
+$(document).on('input', '#editDepositDisplay', function () {
+
+    let angka = this.value.replace(/\D/g, '');
+
+    $('#editDeposit').val(angka);
+
+    this.value = formatRupiah(angka);
+
+});
 
     function editMobil(id) {
         const data = $('#mobils-table').DataTable().rows().data().toArray()
