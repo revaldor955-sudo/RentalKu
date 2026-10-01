@@ -76,17 +76,19 @@ class HomeController extends Controller
             ->orderBy('name')
             ->get();
 
-        $ratings = DB::table('ratings')
-            ->join('users', 'ratings.customer_id', '=', 'users.id')
-            ->select(
-                'ratings.*',
-                'users.name',
-                'users.photo as foto_user'
-            )
-            ->latest('ratings.id')
-            ->limit(6)
-            ->get();
-
+$ratings = DB::table('ratings')
+    ->join('users', 'ratings.customer_id', '=', 'users.id')
+    ->join('rentals', 'ratings.rental_id', '=', 'rentals.id')
+    ->join('mobils', 'rentals.mobil_id', '=', 'mobils.id')
+    ->select(
+        'ratings.*',
+        'users.name as nama',
+        'users.photo as foto_user',
+        'mobils.name as nama_mobil'
+    )
+    ->latest('ratings.id')
+    ->limit(6)
+    ->get();
         $landingSettings = LandingSetting::pluck('value', 'key')->toArray();
         $selectedFaqIds = json_decode($landingSettings['selected_faq_ids'] ?? 'null', true);
 

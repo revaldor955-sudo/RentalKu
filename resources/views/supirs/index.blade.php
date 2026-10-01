@@ -329,7 +329,26 @@
                             class="form-control"
                             placeholder="Contoh: Budi Santoso"
                             required>
+<label class="form-label fw-semibold mt-3">
+    Cabang <span class="text-danger">*</span>
+</label>
 
+<select
+    name="cabang_id"
+    class="form-select"
+    required>
+
+    <option value="">
+        -- Pilih Cabang --
+    </option>
+
+    @foreach($cabangs as $cabang)
+        <option value="{{ $cabang->id }}">
+            {{ $cabang->name }}
+        </option>
+    @endforeach
+
+</select>
                         <label class="form-label fw-semibold mt-3">
                             Nomor HP
                         </label>
@@ -445,6 +464,28 @@
                             placeholder="Contoh: Budi Santoso"
                             required>
 
+                            <label class="form-label fw-semibold mt-3">
+    Cabang <span class="text-danger">*</span>
+</label>
+
+<select
+    name="cabang_id"
+    id="editCabangSupir"
+    class="form-select"
+    required>
+
+    <option value="">
+        -- Pilih Cabang --
+    </option>
+
+    @foreach($cabangs as $cabang)
+        <option value="{{ $cabang->id }}">
+            {{ $cabang->name }}
+        </option>
+    @endforeach
+
+</select>
+
                         <label class="form-label fw-semibold mt-3">
                             Nomor HP
                         </label>
@@ -494,6 +535,8 @@
                                 required>
                         </div>
 
+
+                        
                         <label class="form-label fw-semibold mt-3">
                             Status
                         </label>
@@ -740,10 +783,11 @@
             return;
         }
 
-        $('#editNamaSupir').val(data.name);
-        $('#editPhoneSupir').val(data.phone);
-        $('#editTarifPerhariSupir').val(data.tarif_perhari);
-        $('#editStatusSupir').val(data.status);
+      $('#editNamaSupir').val(data.name);
+$('#editCabangSupir').val(data.cabang_id);
+$('#editPhoneSupir').val(data.phone);
+$('#editTarifPerhariSupir').val(data.tarif_perhari);
+$('#editStatusSupir').val(data.status);
 
         if (data.image) {
             $('#editFotoPreview').attr('src', PHOTO_URL.replace('__PHOTO__', data.image)).show();

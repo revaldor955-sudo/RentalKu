@@ -86,7 +86,9 @@
         #kupons-table thead .dt-column-order {
             display: none !important;
         }
-
+.rupiah-input {
+    font-weight: 600;
+}
         .code {
             background: #e9f7ef;
             color: #198754;
@@ -342,23 +344,41 @@
 
                         </div>
 
-                        <div class="col-md-6">
+                      <div class="col-md-6">
 
-                            <label class="form-label fw-bold">
-                                Minimal Pembelian
-                            </label>
+    <label class="form-label fw-bold">
+        Minimal Pembelian
+    </label>
 
-                            <input
-                                type="number"
-                                name="minimal_pembelian"
-                                class="form-control"
-                                placeholder="Contoh: 100000"
-                                min="0"
-                                required
-                            >
+    <div class="input-group">
 
-                        </div>
+        <span class="input-group-text">
+            Rp
+        </span>
 
+        <input
+            type="text"
+            id="editMinimalPembelianDisplay"
+            class="form-control rupiah-input"
+            placeholder="100.000"
+            inputmode="numeric"
+            autocomplete="off"
+            required
+        >
+
+        <input
+            type="hidden"
+            name="minimal_pembelian"
+            id="editMinimalPembelian"
+        >
+
+    </div>
+
+    <small class="text-muted">
+        Contoh: Rp 100.000
+    </small>
+
+</div>
                         <div class="col-md-6">
 
                             <label class="form-label fw-bold">
@@ -528,20 +548,41 @@
                             >
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">
-                                Minimal Pembelian
-                            </label>
+                     <div class="col-md-6">
 
-                            <input
-                                type="number"
-                                name="minimal_pembelian"
-                                id="editMinimalPembelian"
-                                class="form-control"
-                                min="0"
-                                required
-                            >
-                        </div>
+    <label class="form-label fw-bold">
+        Minimal Pembelian
+    </label>
+
+    <div class="input-group">
+
+        <span class="input-group-text">
+            Rp
+        </span>
+
+        <input
+            type="text"
+            id="editMinimalPembelianDisplay"
+            class="form-control rupiah-input"
+            placeholder="100.000"
+            inputmode="numeric"
+            autocomplete="off"
+            required
+        >
+
+        <input
+            type="hidden"
+            name="minimal_pembelian"
+            id="editMinimalPembelian"
+        >
+
+    </div>
+
+    <small class="text-muted">
+        Contoh: Rp 100.000
+    </small>
+
+</div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-bold">
@@ -938,6 +979,57 @@
             }
         });
     });
+
+    /* ============================================================
+   FORMAT RUPIAH
+   Tampilan : 100.000
+   Database : 100000
+============================================================ */
+
+function formatRupiah(angka) {
+
+    angka = String(angka || '').replace(/\D/g, '');
+
+    if (angka === '') {
+        return '';
+    }
+
+    return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+
+/* ============================================================
+   TAMBAH PROMO - MINIMAL PEMBELIAN
+============================================================ */
+
+$(document).on('input', '#minimal_pembelian_display', function() {
+
+    let angka = $(this).val().replace(/\D/g, '');
+
+    // Yang tampil
+    $(this).val(formatRupiah(angka));
+
+    // Yang dikirim ke Laravel
+    $('#minimal_pembelian').val(angka);
+
+});
+
+
+/* ============================================================
+   EDIT PROMO - MINIMAL PEMBELIAN
+============================================================ */
+
+$(document).on('input', '#editMinimalPembelianDisplay', function() {
+
+    let angka = $(this).val().replace(/\D/g, '');
+
+    // Yang tampil
+    $(this).val(formatRupiah(angka));
+
+    // Yang dikirim ke Laravel
+    $('#editMinimalPembelian').val(angka);
+
+});
 
 </script>
 
