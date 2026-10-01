@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+
+use App\Models\Cabang;
 use App\Models\Supir;
 use Illuminate\Http\Request;
 
 class SupirController extends Controller
 {
-    public function index()
-    {
-        return view('supirs.index');
-    }
+  public function index()
+{
+    $cabangs = Cabang::orderBy('name')->get();
+
+    return view('supirs.index', compact('cabangs'));
+}
 
     /**
      * Server-side DataTables: daftar supir (search, sort, pagination)
@@ -53,16 +57,17 @@ class SupirController extends Controller
 
         $supirs = $query->offset($start)->limit($length)->get();
 
-        $data = $supirs->map(function ($item) {
-            return [
-                'id' => $item->id,
-                'name' => $item->name,
-                'phone' => $item->phone,
-                'image' => $item->image,
-                'tarif_perhari' => $item->tarif_perhari,
-                'status' => $item->status,
-            ];
-        });
+      $data = $supirs->map(function ($item) {
+    return [
+        'id' => $item->id,
+        'name' => $item->name,
+        'cabang_id' => $item->cabang_id,
+        'phone' => $item->phone,
+        'image' => $item->image,
+        'tarif_perhari' => $item->tarif_perhari,
+        'status' => $item->status,
+    ];
+});
 
         return response()->json([
             'draw' => (int) $request->input('draw'),
@@ -80,6 +85,7 @@ class SupirController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'cabang_id' => 'required|exists:cabangs,id',
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'image' => 'nullable|mimes:jpeg,png,jpg,svg|max:2048',
@@ -128,6 +134,7 @@ class SupirController extends Controller
     public function update(Request $request, Supir $supir)
     {
         $validated = $request->validate([
+                'cabang_id' => 'required|exists:cabangs,id',
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'image' => 'nullable|mimes:jpeg,png,jpg,svg|max:2048',
