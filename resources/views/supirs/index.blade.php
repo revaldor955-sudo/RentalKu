@@ -323,18 +323,21 @@
                             Nama Supir
                         </label>
 
+
                         <input
                             type="text"
                             name="name"
                             class="form-control"
                             placeholder="Contoh: Budi Santoso"
                             required>
-<label class="form-label fw-semibold mt-3">
-    Cabang <span class="text-danger">*</span>
+
+                            <label class="form-label fw-semibold mt-3">
+    Cabang
 </label>
 
 <select
     name="cabang_id"
+    id="cabangIdSupir"
     class="form-select"
     required>
 
@@ -378,14 +381,15 @@
 
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
-                            <input
-                                type="number"
-                                name="tarif_perhari"
-                                class="form-control"
-                                placeholder="Contoh: 150000"
-                                min="0"
-                                step="0.01"
-                                required>
+                           <input
+    type="text"
+    name="tarif_perhari"
+    id="tarifPerhariSupir"
+    class="form-control rupiah-input"
+    placeholder="Contoh: 150.000"
+    inputmode="numeric"
+    autocomplete="off"
+    required>
                         </div>
 
                         <label class="form-label fw-semibold mt-3">
@@ -464,28 +468,6 @@
                             placeholder="Contoh: Budi Santoso"
                             required>
 
-                            <label class="form-label fw-semibold mt-3">
-    Cabang <span class="text-danger">*</span>
-</label>
-
-<select
-    name="cabang_id"
-    id="editCabangSupir"
-    class="form-select"
-    required>
-
-    <option value="">
-        -- Pilih Cabang --
-    </option>
-
-    @foreach($cabangs as $cabang)
-        <option value="{{ $cabang->id }}">
-            {{ $cabang->name }}
-        </option>
-    @endforeach
-
-</select>
-
                         <label class="form-label fw-semibold mt-3">
                             Nomor HP
                         </label>
@@ -524,19 +506,17 @@
 
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
-                            <input
-                                type="number"
-                                name="tarif_perhari"
-                                id="editTarifPerhariSupir"
-                                class="form-control"
-                                placeholder="Contoh: 150000"
-                                min="0"
-                                step="0.01"
-                                required>
+                          <input
+    type="text"
+    name="tarif_perhari"
+    id="editTarifPerhariSupir"
+    class="form-control rupiah-input"
+    placeholder="Contoh: 150.000"
+    inputmode="numeric"
+    autocomplete="off"
+    required>
                         </div>
 
-
-                        
                         <label class="form-label fw-semibold mt-3">
                             Status
                         </label>
@@ -593,13 +573,23 @@
 
 <script>
 
+    // ============================================================
+    // GLOBAL
+    // ============================================================
+
     var CSRF_TOKEN = '{{ csrf_token() }}';
 
     var PHOTO_URL = '{{ asset('__PHOTO__') }}';
 
+
+    // ============================================================
+    // FLASH SUCCESS
+    // ============================================================
+
     var $flashSuccess = $('#flashSuccess');
 
     if ($flashSuccess.length) {
+
         Swal.fire({
             icon: 'success',
             title: 'Berhasil',
@@ -607,9 +597,16 @@
             timer: 1800,
             showConfirmButton: false,
         });
+
     }
 
+
+    // ============================================================
+    // FORMAT STATUS
+    // ============================================================
+
     function statusBadge(status) {
+
         const map = {
             'tersedia': 'status-tersedia',
             'tidak tersedia': 'status-tidak-tersedia',
@@ -617,274 +614,829 @@
 
         const cls = map[status] || 'bg-secondary text-white';
 
-        return '<span class="badge-status ' + cls + '">' + status.charAt(0).toUpperCase() + status.slice(1) + '</span>';
+        const text = status
+            ? status.charAt(0).toUpperCase() + status.slice(1)
+            : '-';
+
+        return '<span class="badge-status ' + cls + '">' + text + '</span>';
     }
+
+
+    // ============================================================
+    // FOTO SUPIR
+    // ============================================================
 
     function supirPhoto(image) {
+
         if (image) {
-            return '<img src="' + PHOTO_URL.replace('__PHOTO__', image) +
+
+            return '<img src="' +
+                PHOTO_URL.replace('__PHOTO__', image) +
                 '" class="supir-photo" alt="Foto supir">';
+
         }
 
-        return '<div class="photo-placeholder"><i class="bi bi-person-fill"></i></div>';
+        return '<div class="photo-placeholder">' +
+            '<i class="bi bi-person-fill"></i>' +
+            '</div>';
     }
+
+
+    // ============================================================
+    // FORMAT RUPIAH
+    // ============================================================
+
+    function formatRupiahInput(value) {
+
+        let angka = String(value || '').replace(/\D/g, '');
+
+        if (!angka) {
+            return '';
+        }
+
+        return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+
+    // ============================================================
+    // AMBIL ANGKA ASLI
+    // 150.000 -> 150000
+    // ============================================================
+
+    function getRawRupiah(value) {
+
+        return String(value || '').replace(/\D/g, '');
+    }
+
+
+    // ============================================================
+    // FORMAT SAAT MENGETIK
+    // ============================================================
+
+    $(document).on('input', '.rupiah-input', function() {
+
+        const input = this;
+
+        const cursorPosition = input.selectionStart || 0;
+
+        const oldValue = input.value;
+
+        const angkaSebelum = oldValue
+            .substring(0, cursorPosition)
+            .replace(/\D/g, '')
+            .length;
+
+        input.value = formatRupiahInput(oldValue);
+
+        let newPosition = 0;
+        let angkaDitemukan = 0;
+
+        while (
+            newPosition < input.value.length &&
+            angkaDitemukan < angkaSebelum
+        ) {
+
+            if (/\d/.test(input.value[newPosition])) {
+                angkaDitemukan++;
+            }
+
+            newPosition++;
+        }
+
+        input.setSelectionRange(
+            newPosition,
+            newPosition
+        );
+
+    });
+
+
+    // ============================================================
+    // DATATABLE
+    // ============================================================
 
     $(document).ready(function() {
 
         $('#supirs-table').DataTable({
+
             processing: true,
+
             serverSide: true,
+
             ajax: {
                 url: '{{ route('supirs.data') }}',
                 type: 'GET',
             },
-            columns: [{
+
+            columns: [
+
+                // NO
+                {
                     data: null,
                     orderable: false,
                     searchable: false,
                     className: 'px-3',
                     width: '70px',
+
                     render: function(data, type, row, meta) {
-                        return meta.row + meta.settings._iDisplayStart + 1;
+
+                        return meta.row +
+                            meta.settings._iDisplayStart +
+                            1;
                     },
                 },
+
+
+                // NAMA
                 {
                     data: 'name',
                     orderable: true,
                     searchable: true,
+
                     render: function(data) {
+
                         return '<strong>' + data + '</strong>';
                     },
                 },
+
+
+                // TELEPON
                 {
                     data: 'phone',
                     orderable: true,
                     searchable: true,
                 },
+
+
+                // FOTO
                 {
                     data: 'image',
                     orderable: false,
                     searchable: false,
+
                     render: function(data) {
+
                         return supirPhoto(data);
                     },
                 },
+
+
+                // TARIF
                 {
                     data: 'tarif_perhari',
                     orderable: true,
                     searchable: false,
+
                     render: function(data) {
-                        return '<span class="fw-semibold">Rp ' +
-                            Number(data).toLocaleString('id-ID') + '</span>';
+
+                        const angka = Number(data) || 0;
+
+                        return '<span class="fw-semibold">' +
+                            'Rp ' +
+                            angka.toLocaleString('id-ID') +
+                            '</span>';
                     },
                 },
+
+
+                // STATUS
                 {
                     data: 'status',
                     orderable: true,
                     searchable: false,
+
                     render: function(data) {
+
                         return statusBadge(data);
                     },
                 },
+
+
+                // AKSI
                 {
                     data: 'id',
                     orderable: false,
                     searchable: false,
                     className: 'text-center',
                     width: '140px',
+
                     render: function(data, type, row) {
+
+                        const safeName = String(row.name || '')
+                            .replace(/'/g, "\\'");
+
                         return '<div class="d-flex justify-content-center gap-2">' +
-                            '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
-                            'title="Edit" onclick="editSupir(' + data + ')">' +
-                            '<i class="bi bi-pencil-square"></i></button>' +
-                            '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" ' +
-                            'title="Hapus" onclick="deleteSupir(' + data +
-                            ', \'' + row.name.replace(/'/g, "\\'") + '\')">' +
-                            '<i class="bi bi-trash"></i></button>' +
+
+                            '<button type="button" ' +
+                            'class="btn p-1 text-primary" ' +
+                            'style="border:none;background:none;" ' +
+                            'title="Edit" ' +
+                            'onclick="editSupir(' + data + ')">' +
+
+                            '<i class="bi bi-pencil-square"></i>' +
+
+                            '</button>' +
+
+                            '<button type="button" ' +
+                            'class="btn p-1 text-danger" ' +
+                            'style="border:none;background:none;" ' +
+                            'title="Hapus" ' +
+                            'onclick="deleteSupir(' +
+                            data +
+                            ', \'' +
+                            safeName +
+                            '\')">' +
+
+                            '<i class="bi bi-trash"></i>' +
+
+                            '</button>' +
+
                             '</div>';
                     },
                 },
+
             ],
+
             order: [
                 [1, 'asc']
             ],
+
             language: {
+
                 processing: 'Memproses...',
+
                 search: 'Cari:',
+
                 lengthMenu: 'Tampilkan _MENU_ data',
+
                 info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+
                 infoEmpty: 'Tidak ada data',
+
                 infoFiltered: '(difilter dari _MAX_ total data)',
+
                 loadingRecords: 'Memuat...',
+
                 zeroRecords: 'Tidak ditemukan data yang cocok',
+
                 emptyTable: 'Belum ada supir',
+
                 aria: {
                     sortAscending: ': aktifkan untuk urut naik',
                     sortDescending: ': aktifkan untuk urut turun',
                 },
+
             },
+
         });
 
     });
 
+
+    // ============================================================
+    // HAPUS SUPIR
+    // ============================================================
+
     function deleteSupir(id, name) {
+
         Swal.fire({
+
             title: 'Konfirmasi',
-            text: 'Apakah Anda yakin ingin menghapus supir "' + name + '"?',
+
+            text: 'Apakah Anda yakin ingin menghapus supir "' +
+                name +
+                '"?',
+
             icon: 'warning',
+
             showCancelButton: true,
+
             confirmButtonText: 'Ya, hapus',
+
             cancelButtonText: 'Batal',
+
         }).then(function(result) {
-            if (!result.isConfirmed) return;
+
+            if (!result.isConfirmed) {
+                return;
+            }
 
             $.ajax({
-                url: "{{ route('supirs.destroy', '__ID__') }}".replace('__ID__', id),
+
+                url: "{{ route('supirs.destroy', '__ID__') }}"
+                    .replace('__ID__', id),
+
                 method: 'DELETE',
+
                 headers: {
+
                     'X-CSRF-TOKEN': CSRF_TOKEN,
+
                     'Accept': 'application/json',
+
                     'X-Requested-With': 'XMLHttpRequest',
+
                 },
+
                 success: function(result) {
-                    $('#supirs-table').DataTable().ajax.reload();
+
+                    $('#supirs-table')
+                        .DataTable()
+                        .ajax
+                        .reload(null, false);
 
                     Swal.fire({
+
                         icon: 'success',
+
                         title: 'Berhasil',
-                        text: (result && result.message) ? result.message : 'Supir berhasil dihapus.',
+
+                        text: result.message ||
+                            'Supir berhasil dihapus.',
+
                         timer: 1500,
+
                         showConfirmButton: false,
+
                     });
+
                 },
+
                 error: function(xhr) {
-                    const result = xhr.responseJSON || {};
+
+                    const result =
+                        xhr.responseJSON || {};
+
                     Swal.fire({
+
                         icon: 'error',
+
                         title: 'Gagal',
+
                         text: result.message ||
                             'Terjadi kesalahan saat menghapus supir.',
+
                     });
+
                 }
+
             });
+
         });
+
     }
 
+
+    // ============================================================
+    // EDIT SUPIR
+    // ============================================================
+
     function editSupir(id) {
-        const data = $('#supirs-table').DataTable().rows().data().toArray()
-            .find(r => r.id == id);
+
+        const table =
+            $('#supirs-table').DataTable();
+
+        const data =
+            table.rows().data().toArray()
+            .find(function(row) {
+
+                return row.id == id;
+            });
+
 
         if (!data) {
+
             Swal.fire({
+
                 icon: 'error',
+
                 title: 'Gagal',
+
                 text: 'Data supir tidak ditemukan.',
+
             });
+
             return;
         }
 
-      $('#editNamaSupir').val(data.name);
-$('#editCabangSupir').val(data.cabang_id);
-$('#editPhoneSupir').val(data.phone);
-$('#editTarifPerhariSupir').val(data.tarif_perhari);
-$('#editStatusSupir').val(data.status);
+
+        $('#editNamaSupir')
+            .val(data.name);
+
+
+        $('#editPhoneSupir')
+            .val(data.phone);
+
+
+        // FORMAT TARIF SAAT EDIT
+        $('#editTarifPerhariSupir')
+            .val(
+                formatRupiahInput(
+                    data.tarif_perhari
+                )
+            );
+
+
+        $('#editStatusSupir')
+            .val(data.status);
+
 
         if (data.image) {
-            $('#editFotoPreview').attr('src', PHOTO_URL.replace('__PHOTO__', data.image)).show();
+
+            $('#editFotoPreview')
+                .attr(
+                    'src',
+                    PHOTO_URL.replace(
+                        '__PHOTO__',
+                        data.image
+                    )
+                )
+                .show();
+
         } else {
-            $('#editFotoPreview').hide();
+
+            $('#editFotoPreview')
+                .hide();
         }
 
-        $('#formEditSupir').attr('action',
-            "{{ route('supirs.update', '__ID__') }}".replace('__ID__', id));
 
-        bootstrap.Modal.getOrCreateInstance($('#editSupirModal')[0]).show();
+        // JIKA DATA CABANG TERSEDIA
+        if (data.cabang_id) {
+
+            $('#editCabangIdSupir')
+                .val(data.cabang_id);
+
+        }
+
+
+        $('#formEditSupir')
+            .attr(
+                'action',
+                "{{ route('supirs.update', '__ID__') }}"
+                    .replace('__ID__', id)
+            );
+
+
+        bootstrap.Modal
+            .getOrCreateInstance(
+                $('#editSupirModal')[0]
+            )
+            .show();
+
     }
 
-    $(document).on('submit', '#formTambahSupir', function(e) {
-        e.preventDefault();
 
-        const formData = new FormData(this);
+    // ============================================================
+    // TAMBAH SUPIR
+    // HANYA SATU HANDLER
+    // ============================================================
 
-        $.ajax({
-            url: $(this).attr('action'),
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            headers: {
-                'X-CSRF-TOKEN': CSRF_TOKEN,
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            success: function(result) {
-                bootstrap.Modal.getInstance($('#tambahSupirModal')[0]).hide();
-                $('#formTambahSupir')[0].reset();
-                $('#supirs-table').DataTable().ajax.reload();
+    $(document).on(
+        'submit',
+        '#formTambahSupir',
+        function(e) {
 
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: result.message || 'Supir berhasil ditambahkan.',
-                    timer: 1500,
-                    showConfirmButton: false,
-                });
-            },
-            error: function(xhr) {
-                const r = xhr.responseJSON || {};
-                const msg = r.errors ? Object.values(r.errors)[0][0] :
-                    (r.message || 'Terjadi kesalahan saat menambahkan supir.');
+            e.preventDefault();
+
+            const form = this;
+
+            const inputTarif =
+                $('#tarifPerhariSupir');
+
+
+            // Validasi cabang
+            const cabang =
+                $('#cabangIdSupir').val();
+
+            if (!cabang) {
 
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal',
-                    text: msg,
+
+                    icon: 'warning',
+
+                    title: 'Cabang belum dipilih',
+
+                    text: 'Silakan pilih cabang supir terlebih dahulu.',
+
                 });
+
+                return;
             }
-        });
-    });
 
-    $(document).on('submit', '#formEditSupir', function(e) {
-        e.preventDefault();
 
-        const formData = new FormData(this);
+            // Ambil angka asli
+            const tarif =
+                getRawRupiah(
+                    inputTarif.val()
+                );
 
-        $.ajax({
-            url: $(this).attr('action'),
-            method: 'PUT',
-            data: formData,
-            processData: false,
-            contentType: false,
-            headers: {
-                'X-CSRF-TOKEN': CSRF_TOKEN,
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            success: function(result) {
-                bootstrap.Modal.getInstance($('#editSupirModal')[0]).hide();
-                $('#supirs-table').DataTable().ajax.reload();
+
+            if (!tarif) {
 
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: result.message || 'Supir berhasil diperbarui.',
-                    timer: 1500,
-                    showConfirmButton: false,
-                });
-            },
-            error: function(xhr) {
-                const r = xhr.responseJSON || {};
-                const msg = r.errors ? Object.values(r.errors)[0][0] :
-                    (r.message || 'Terjadi kesalahan saat memperbarui supir.');
 
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal',
-                    text: msg,
+                    icon: 'warning',
+
+                    title: 'Tarif belum diisi',
+
+                    text: 'Silakan masukkan tarif per hari.',
+
                 });
+
+                return;
             }
-        });
-    });
+
+
+            // Ubah 150.000 -> 150000
+            inputTarif.val(tarif);
+
+
+            const formData =
+                new FormData(form);
+
+
+            $.ajax({
+
+                url: $(form).attr('action'),
+
+                method: 'POST',
+
+                data: formData,
+
+                processData: false,
+
+                contentType: false,
+
+                headers: {
+
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+
+                    'Accept': 'application/json',
+
+                    'X-Requested-With':
+                        'XMLHttpRequest',
+
+                },
+
+
+                success: function(result) {
+
+                    bootstrap.Modal
+                        .getInstance(
+                            $('#tambahSupirModal')[0]
+                        )
+                        .hide();
+
+
+                    form.reset();
+
+
+                    $('#tarifPerhariSupir')
+                        .val('');
+
+
+                    $('#cabangIdSupir')
+                        .val('');
+
+
+                    $('#supirs-table')
+                        .DataTable()
+                        .ajax
+                        .reload(null, false);
+
+
+                    Swal.fire({
+
+                        icon: 'success',
+
+                        title: 'Berhasil',
+
+                        text: result.message ||
+                            'Supir berhasil ditambahkan.',
+
+                        timer: 1500,
+
+                        showConfirmButton: false,
+
+                    });
+
+                },
+
+
+                error: function(xhr) {
+
+                    // Kembalikan format Rupiah
+                    inputTarif.val(
+                        formatRupiahInput(
+                            inputTarif.val()
+                        )
+                    );
+
+
+                    const r =
+                        xhr.responseJSON || {};
+
+
+                    let msg =
+                        'Terjadi kesalahan saat menambahkan supir.';
+
+
+                    if (r.errors) {
+
+                        const firstError =
+                            Object.values(
+                                r.errors
+                            )[0];
+
+                        if (firstError) {
+                            msg = firstError[0];
+                        }
+
+                    } else if (r.message) {
+
+                        msg = r.message;
+
+                    }
+
+
+                    Swal.fire({
+
+                        icon: 'error',
+
+                        title: 'Gagal',
+
+                        text: msg,
+
+                    });
+
+                }
+
+            });
+
+        }
+    );
+
+
+    // ============================================================
+    // EDIT SUPIR
+    // HANYA SATU HANDLER
+    // ============================================================
+
+    $(document).on(
+        'submit',
+        '#formEditSupir',
+        function(e) {
+
+            e.preventDefault();
+
+            const form = this;
+
+            const inputTarif =
+                $('#editTarifPerhariSupir');
+
+
+            const tarif =
+                getRawRupiah(
+                    inputTarif.val()
+                );
+
+
+            if (!tarif) {
+
+                Swal.fire({
+
+                    icon: 'warning',
+
+                    title: 'Tarif belum diisi',
+
+                    text: 'Silakan masukkan tarif per hari.',
+
+                });
+
+                return;
+            }
+
+
+            // 150.000 -> 150000
+            inputTarif.val(tarif);
+
+
+            const formData =
+                new FormData(form);
+
+
+            $.ajax({
+
+                url: $(form).attr('action'),
+
+                // Karena form sudah mempunyai:
+                // @method('PUT')
+                // gunakan POST
+                method: 'POST',
+
+                data: formData,
+
+                processData: false,
+
+                contentType: false,
+
+                headers: {
+
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+
+                    'Accept': 'application/json',
+
+                    'X-Requested-With':
+                        'XMLHttpRequest',
+
+                },
+
+
+                success: function(result) {
+
+                    bootstrap.Modal
+                        .getInstance(
+                            $('#editSupirModal')[0]
+                        )
+                        .hide();
+
+
+                    $('#supirs-table')
+                        .DataTable()
+                        .ajax
+                        .reload(null, false);
+
+
+                    Swal.fire({
+
+                        icon: 'success',
+
+                        title: 'Berhasil',
+
+                        text: result.message ||
+                            'Supir berhasil diperbarui.',
+
+                        timer: 1500,
+
+                        showConfirmButton: false,
+
+                    });
+
+                },
+
+
+                error: function(xhr) {
+
+                    // Kembalikan format Rupiah
+                    inputTarif.val(
+                        formatRupiahInput(
+                            inputTarif.val()
+                        )
+                    );
+
+
+                    const r =
+                        xhr.responseJSON || {};
+
+
+                    let msg =
+                        'Terjadi kesalahan saat memperbarui supir.';
+
+
+                    if (r.errors) {
+
+                        const firstError =
+                            Object.values(
+                                r.errors
+                            )[0];
+
+                        if (firstError) {
+                            msg = firstError[0];
+                        }
+
+                    } else if (r.message) {
+
+                        msg = r.message;
+
+                    }
+
+
+                    Swal.fire({
+
+                        icon: 'error',
+
+                        title: 'Gagal',
+
+                        text: msg,
+
+                    });
+
+                }
+
+            });
+
+        }
+    );
 
 </script>
 
