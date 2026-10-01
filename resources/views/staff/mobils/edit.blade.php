@@ -14,6 +14,25 @@
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
+    <script>
+        function formatRupiahInput(value) {
+            let angka = String(value || '').replace(/\D/g, '');
+            if (!angka) return '';
+            return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        function getRawRupiah(value) {
+            return String(value || '').replace(/\D/g, '');
+        }
+
+        $(document).on('input', '.rupiah-input', function() {
+            const input = this;
+            const rawValue = getRawRupiah(input.value);
+            input.value = formatRupiahInput(rawValue);
+            $('#' + $(input).attr('id').replace('_display', '')).val(rawValue);
+        });
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">

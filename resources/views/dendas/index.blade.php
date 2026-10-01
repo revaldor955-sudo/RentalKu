@@ -318,13 +318,19 @@
                     <div class="input-group">
                         <span class="input-group-text">Rp</span>
                         <input
-                            type="number"
-                            name="nominal"
-                            class="form-control"
-                            placeholder="Contoh: 50000"
-                            min="0"
-                            step="0.01"
+                            type="text"
+                            name="nominal_display"
+                            id="nominalDisplay"
+                            class="form-control rupiah-input"
+                            placeholder="50.000"
+                            inputmode="numeric"
+                            autocomplete="off"
+                            data-target="nominal"
                             required>
+                        <input
+                            type="hidden"
+                            name="nominal"
+                            id="nominal">
                     </div>
 
                     <label class="form-label fw-semibold mt-3">
@@ -443,14 +449,19 @@
                     <div class="input-group">
                         <span class="input-group-text">Rp</span>
                         <input
-                            type="number"
-                            name="nominal"
-                            id="editNominalDenda"
-                            class="form-control"
-                            placeholder="Contoh: 50000"
-                            min="0"
-                            step="0.01"
+                            type="text"
+                            name="nominal_display"
+                            id="editNominalDendaDisplay"
+                            class="form-control rupiah-input"
+                            placeholder="50.000"
+                            inputmode="numeric"
+                            autocomplete="off"
+                            data-target="editNominalDenda"
                             required>
+                        <input
+                            type="hidden"
+                            name="nominal"
+                            id="editNominalDenda">
                     </div>
 
                     <label class="form-label fw-semibold mt-3">
@@ -550,9 +561,26 @@
 <script>
     const CSRF_TOKEN = '{{ csrf_token() }}';
 
+    function formatRupiahInput(value) {
+        let angka = String(value || '').replace(/\D/g, '');
+        if (!angka) return '';
+        return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
     function formatRupiah(value) {
         return 'Rp ' + Number(value).toLocaleString('id-ID');
     }
+
+    function getRawRupiah(value) {
+        return String(value || '').replace(/\D/g, '');
+    }
+
+    $(document).on('input', '.rupiah-input', function() {
+        const input = this;
+        const rawValue = getRawRupiah(input.value);
+        input.value = formatRupiahInput(rawValue);
+        $('#' + $(input).data('target')).val(rawValue);
+    });
 
     function openFotoDenda(url) {
         $('#fotoDendaPreview').attr('src', url);
@@ -767,6 +795,7 @@
 
                         $('#editRentalIdDenda').val(data.rental_id);
                         $('#editJenisDenda').val(data.jenis);
+                        $('#editNominalDendaDisplay').val(formatRupiah(data.nominal));
                         $('#editNominalDenda').val(data.nominal);
                         $('#editStatusDenda').val(data.status);
                         $('#editSyaratDenda').val(data.syarat_dan_ketentuan);

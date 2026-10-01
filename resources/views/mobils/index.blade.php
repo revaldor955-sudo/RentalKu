@@ -771,6 +771,7 @@
             placeholder="600.000"
             autocomplete="off"
             inputmode="numeric"
+            data-target="hargaPerhari"
             required
         >
 
@@ -809,6 +810,7 @@
             placeholder="500.000"
             autocomplete="off"
             inputmode="numeric"
+            data-target="deposit"
             required
         >
 
@@ -1187,13 +1189,17 @@
                                     </span>
 
                                     <input
-                                        type="number"
-                                        name="harga_perhari"
-                                        id="editHargaPerhari"
-                                        class="form-control"
-                                        placeholder="300000"
-                                        min="0"
+                                        type="text"
+                                        id="editHargaPerhariDisplay"
+                                        class="form-control rupiah-input"
+                                        placeholder="300.000"
+                                        inputmode="numeric"
+                                        autocomplete="off"
+                                        data-target="editHargaPerhari"
                                         required>
+                                    <input type="hidden"
+                                           name="harga_perhari"
+                                           id="editHargaPerhari">
 
                                 </div>
 
@@ -1212,13 +1218,17 @@
                                     </span>
 
                                     <input
-                                        type="number"
-                                        name="deposit"
-                                        id="editDeposit"
-                                        class="form-control"
-                                        placeholder="500000"
-                                        min="0"
+                                        type="text"
+                                        id="editDepositDisplay"
+                                        class="form-control rupiah-input"
+                                        placeholder="500.000"
+                                        inputmode="numeric"
+                                        autocomplete="off"
+                                        data-target="editDeposit"
                                         required>
+                                    <input type="hidden"
+                                           name="deposit"
+                                           id="editDeposit">
 
                                 </div>
 
@@ -1784,6 +1794,24 @@ $(document).on('input', '#editDepositDisplay', function () {
                 });
             }
         });
+    });
+
+    function formatRupiahInput(value) {
+        let angka = String(value || '').replace(/\D/g, '');
+        if (!angka) return '';
+        return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function getRawRupiah(value) {
+        return String(value || '').replace(/\D/g, '');
+    }
+
+    $(document).on('input', '.rupiah-input', function() {
+        const input = this;
+        const rawValue = getRawRupiah(input.value);
+        input.value = formatRupiahInput(rawValue);
+        const target = $(input).data('target');
+        if (target) $('#' + target).val(rawValue);
     });
 
 </script>
