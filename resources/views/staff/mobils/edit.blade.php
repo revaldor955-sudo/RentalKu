@@ -145,6 +145,12 @@
             padding: 24px;
         }
 
+        /* FORMAT RUPIAH */
+        .rupiah-input {
+            font-weight: 500;
+            letter-spacing: .3px;
+        }
+
         @media (max-width: 1024px) {
             .page-content {
                 padding: 16px;
@@ -234,7 +240,8 @@
 
         <form action="{{ route('staff.mobils.update', $mobil->id) }}"
               method="POST"
-              enctype="multipart/form-data">
+              enctype="multipart/form-data"
+              id="editMobilForm">
 
             @csrf
 
@@ -508,6 +515,10 @@
                 </div>
 
 
+                {{-- =====================================================
+                     HARGA DAN STATUS
+                     ===================================================== --}}
+
                 <div class="section-title mt-5">
 
                     <i class="bi bi-cash-stack me-2"></i>
@@ -519,6 +530,7 @@
 
                 <div class="row g-4">
 
+                    {{-- HARGA PER HARI --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -531,13 +543,26 @@
                                 Rp
                             </span>
 
-                            <input type="number"
+                            {{-- INPUT YANG DITAMPILKAN KE USER --}}
+                            <input type="text"
+                                   id="harga_perhari_display"
+                                   value="{{ number_format((int) old('harga_perhari', $mobil->harga_perhari), 0, ',', '.') }}"
+                                   class="form-control rupiah-input @error('harga_perhari') is-invalid @enderror"
+                                   placeholder="350.000"
+                                   inputmode="numeric"
+                                   autocomplete="off">
+
+                            {{-- NILAI ASLI YANG DIKIRIM KE DATABASE --}}
+                            <input type="hidden"
                                    name="harga_perhari"
-                                   value="{{ old('harga_perhari', $mobil->harga_perhari) }}"
-                                   class="form-control @error('harga_perhari') is-invalid @enderror"
-                                   min="0">
+                                   id="harga_perhari"
+                                   value="{{ old('harga_perhari', $mobil->harga_perhari) }}">
 
                         </div>
+
+                        <small class="text-muted">
+                            Contoh: Rp 350.000
+                        </small>
 
                         @error('harga_perhari')
                             <div class="text-danger small mt-1">
@@ -548,6 +573,7 @@
                     </div>
 
 
+                    {{-- DEPOSIT --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -560,13 +586,26 @@
                                 Rp
                             </span>
 
-                            <input type="number"
+                            {{-- INPUT YANG DITAMPILKAN KE USER --}}
+                            <input type="text"
+                                   id="deposit_display"
+                                   value="{{ number_format((int) old('deposit', $mobil->deposit), 0, ',', '.') }}"
+                                   class="form-control rupiah-input @error('deposit') is-invalid @enderror"
+                                   placeholder="500.000"
+                                   inputmode="numeric"
+                                   autocomplete="off">
+
+                            {{-- NILAI ASLI YANG DIKIRIM KE DATABASE --}}
+                            <input type="hidden"
                                    name="deposit"
-                                   value="{{ old('deposit', $mobil->deposit) }}"
-                                   class="form-control @error('deposit') is-invalid @enderror"
-                                   min="0">
+                                   id="deposit"
+                                   value="{{ old('deposit', $mobil->deposit) }}">
 
                         </div>
+
+                        <small class="text-muted">
+                            Contoh: Rp 500.000
+                        </small>
 
                         @error('deposit')
                             <div class="text-danger small mt-1">
@@ -577,6 +616,7 @@
                     </div>
 
 
+                    {{-- STATUS --}}
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -613,6 +653,10 @@
 
                 </div>
 
+
+                {{-- =====================================================
+                     FOTO
+                     ===================================================== --}}
 
                 <div class="section-title mt-5">
 
@@ -682,6 +726,10 @@
                 </div>
 
 
+                {{-- =====================================================
+                     FASILITAS
+                     ===================================================== --}}
+
                 <div class="section-title mt-5">
 
                     <i class="bi bi-check2-square me-2"></i>
@@ -739,6 +787,10 @@
                 </div>
 
 
+                {{-- =====================================================
+                     DESKRIPSI
+                     ===================================================== --}}
+
                 <div class="section-title mt-5">
 
                     <i class="bi bi-card-text me-2"></i>
@@ -767,6 +819,10 @@
 
                 </div>
 
+
+                {{-- =====================================================
+                     BUTTON
+                     ===================================================== --}}
 
                 <div class="d-flex justify-content-end gap-2 mt-5">
 
@@ -806,18 +862,139 @@
 
 <script>
 
-$('#image').on('change', function(event) {
-    var file = event.target.files[0];
-    var $preview = $('#imagePreview');
+    /*
+    ============================================================
+    FORMAT RUPIAH
+    ============================================================
 
-    if (!file) return;
+    Contoh:
+    350000  -> 350.000
+    500000  -> 500.000
+    1250000 -> 1.250.000
 
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        $preview.html('<img src="' + e.target.result + '" alt="Preview Foto">');
-    };
-    reader.readAsDataURL(file);
-});
+    Yang tampil = format rupiah
+    Yang dikirim = angka asli tanpa titik
+    */
+
+
+    function formatRupiah(angka) {
+
+        if (angka === null || angka === undefined) {
+            return '';
+        }
+
+        // Hanya ambil angka
+        angka = String(angka).replace(/\D/g, '');
+
+        if (angka === '') {
+            return '';
+        }
+
+        return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+
+    function angkaAsli(angka) {
+
+        if (angka === null || angka === undefined) {
+            return '';
+        }
+
+        // Hapus semua titik
+        return String(angka).replace(/\./g, '').replace(/\D/g, '');
+    }
+
+
+    /*
+    ============================================================
+    HARGA PER HARI
+    ============================================================
+    */
+
+    const hargaDisplay = document.getElementById('harga_perhari_display');
+    const hargaHidden = document.getElementById('harga_perhari');
+
+    hargaDisplay.addEventListener('input', function () {
+
+        let angka = angkaAsli(this.value);
+
+        // Tampilkan format Rp dengan titik
+        this.value = formatRupiah(angka);
+
+        // Simpan angka asli untuk Laravel
+        hargaHidden.value = angka;
+
+    });
+
+
+    /*
+    ============================================================
+    DEPOSIT
+    ============================================================
+    */
+
+    const depositDisplay = document.getElementById('deposit_display');
+    const depositHidden = document.getElementById('deposit');
+
+    depositDisplay.addEventListener('input', function () {
+
+        let angka = angkaAsli(this.value);
+
+        // Tampilkan format Rp dengan titik
+        this.value = formatRupiah(angka);
+
+        // Simpan angka asli untuk Laravel
+        depositHidden.value = angka;
+
+    });
+
+
+    /*
+    ============================================================
+    SAAT FORM DIKIRIM
+    ============================================================
+    */
+
+    document.getElementById('editMobilForm').addEventListener('submit', function () {
+
+        // Pastikan nilai hidden sudah angka bersih
+        hargaHidden.value = angkaAsli(hargaDisplay.value);
+        depositHidden.value = angkaAsli(depositDisplay.value);
+
+    });
+
+
+    /*
+    ============================================================
+    PREVIEW FOTO
+    ============================================================
+    */
+
+    $('#image').on('change', function(event) {
+
+        var file = event.target.files[0];
+
+        var $preview = $('#imagePreview');
+
+        if (!file) {
+            return;
+        }
+
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+
+            $preview.html(
+                '<img src="' +
+                e.target.result +
+                '" alt="Preview Foto">'
+            );
+
+        };
+
+        reader.readAsDataURL(file);
+
+    });
 
 </script>
 
