@@ -237,21 +237,6 @@
 
 @include('layouts.partials.sidebar')
 
-<script>
-    // Inject navbar into sidebar layout
-    document.addEventListener('DOMContentLoaded', function() {
-        const mainContent = document.getElementById('mainContent');
-        const pageContent = mainContent?.querySelector('.page-content');
-
-        if (mainContent && pageContent) {
-            const navbar = document.querySelector('header.topbar');
-            if (navbar) {
-                mainContent.insertBefore(navbar, pageContent);
-            }
-        }
-    });
-</script>
-
 <div class="page-content">
 
 <div class="container-fluid px-4">
