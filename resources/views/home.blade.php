@@ -908,40 +908,118 @@
 
                         <div class="col-md-6">
 
-                            <form id="contactForm" action="{{ route('contact.store') ?? '#' }}" method="POST" class="contact-form">
+@if(session('success'))
 
+    <div class="alert alert-success alert-dismissible fade show mb-4">
+
+        <i class="bi bi-check-circle-fill me-2"></i>
+
+        {{ session('success') }}
+
+        <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert">
+        </button>
+
+    </div>
+
+@endif
+
+
+@if($errors->any())
+
+    <div class="alert alert-danger alert-dismissible fade show mb-4">
+
+        <strong>
+            Pesan belum dapat dikirim.
+        </strong>
+
+        <ul class="mb-0 mt-2">
+
+            @foreach($errors->all() as $error)
+
+                <li>{{ $error }}</li>
+
+            @endforeach
+
+        </ul>
+
+        <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert">
+        </button>
+
+    </div>
+
+@endif                            
+
+<form
+    id="contactForm"
+    action="{{ route('contact.store') }}"
+    method="POST"
+    class="contact-form"
+>
                                 @csrf
 
                                 <div class="mb-3">
 
                                     <label for="contact_name" class="form-label">Nama Lengkap</label>
 
-                                    <input type="text" class="form-control" id="contact_name" name="nama" placeholder="Nama Anda" required>
-
+<input
+    type="text"
+    class="form-control"
+    id="contact_name"
+    name="nama"
+    value="{{ old('nama') }}"
+    placeholder="Nama Anda"
+    required
+>
                                 </div>
 
                                 <div class="mb-3">
 
                                     <label for="contact_email" class="form-label">Email</label>
 
-                                    <input type="email" class="form-control" id="contact_email" name="email" placeholder="Email Anda" required>
-
+<input
+    type="email"
+    class="form-control"
+    id="contact_email"
+    name="email"
+    value="{{ old('email') }}"
+    placeholder="Email Anda"
+    required
+>
                                 </div>
 
                                 <div class="mb-3">
 
                                     <label for="contact_subject" class="form-label">Subjek</label>
 
-                                    <input type="text" class="form-control" id="contact_subject" name="subjek" placeholder="Subjek pesan" required>
-
+<input
+    type="text"
+    class="form-control"
+    id="contact_subject"
+    name="subjek"
+    value="{{ old('subjek') }}"
+    placeholder="Subjek pesan"
+    required
+>
                                 </div>
 
                                 <div class="mb-3">
 
                                     <label for="contact_message" class="form-label">Pesan</label>
 
-                                    <textarea class="form-control" id="contact_message" name="pesan" rows="4" placeholder="Tuliskan pesan Anda..." required></textarea>
-
+<textarea
+    class="form-control"
+    id="contact_message"
+    name="pesan"
+    rows="4"
+    placeholder="Tuliskan pesan Anda..."
+    required
+>{{ old('pesan') }}</textarea>
                                 </div>
 
                                 <button type="submit" class="btn btn-rent w-100">Kirim Pesan</button>

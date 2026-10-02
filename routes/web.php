@@ -384,6 +384,41 @@ Route::get('/', [HomeController::class, 'index'])
 Route::post('/contact', [ContactController::class, 'store'])
     ->name('contact.store');
 
+    /*
+|--------------------------------------------------------------------------
+| MANAGEMENT CONTACT / HUBUNGI KAMI
+|--------------------------------------------------------------------------
+| Admin saja
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('admin')->group(function () {
+
+    Route::get(
+        '/admin/contacts',
+        [ContactController::class, 'index']
+    )->name('contacts.index');
+
+
+    Route::get(
+        '/admin/contacts/{contact}',
+        [ContactController::class, 'show']
+    )->name('contacts.show');
+
+
+    Route::post(
+        '/admin/contacts/{contact}/reply',
+        [ContactController::class, 'reply']
+    )->name('contacts.reply');
+
+
+    Route::delete(
+        '/admin/contacts/{contact}',
+        [ContactController::class, 'destroy']
+    )->name('contacts.destroy');
+
+});
+
 
 /*
 |--------------------------------------------------------------------------
