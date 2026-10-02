@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* RentalKu brand colors from image analysis */
+:root {
+    --color-primary: #2C666E;
+    --color-background: #F0EDEE;
+    --color-foreground: #1F2937;
+}
+
+body {
+    font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+}
