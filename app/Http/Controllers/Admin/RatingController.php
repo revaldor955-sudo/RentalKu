@@ -10,7 +10,7 @@ class RatingController extends Controller
 {
     public function index()
     {
-        return view('admin.ratings.index');
+        return view('admin.ratings.index')->with('pageTitle', 'Customer Rating');
     }
 
     public function data(Request $request)

@@ -18,7 +18,7 @@ class PemeriksaanKendaraanController extends Controller
 
         $kerusakanList = KerusakanMobil::orderBy('jenis_kerusakan')->get();
 
-        return view('pemeriksaan_kendaraan.index', compact('rentals', 'kerusakanList'));
+        return view('pemeriksaan_kendaraan.index', compact('rentals', 'kerusakanList'))->with('pageTitle', 'Pemeriksaan Kendaraan');
     }
 
     /**

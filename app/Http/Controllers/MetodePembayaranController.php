@@ -12,7 +12,7 @@ class MetodePembayaranController extends Controller
     {
         $cabangs = Cabang::orderBy('name')->get();
 
-        return view('metode_pembayarans.index', compact('cabangs'));
+        return view('metode_pembayarans.index', compact('cabangs'))->with('pageTitle', 'Metode Pembayaran');
     }
 
     public function data(Request $request)

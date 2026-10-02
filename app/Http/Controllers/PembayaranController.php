@@ -12,7 +12,7 @@ class PembayaranController extends Controller
 {
     public function index()
     {
-        return view('admin.pembayaran.index');
+        return view('admin.pembayaran.index')->with('pageTitle', 'Pembayaran');
     }
 
     public function data(Request $request)

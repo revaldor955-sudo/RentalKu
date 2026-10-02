@@ -11,7 +11,7 @@ class DokumenMobilController extends Controller
     public function index()
     {
         $mobils = Mobil::all();
-        return view('dokumen_mobils.index', compact('mobils'));
+        return view('dokumen_mobils.index', compact('mobils'))->with('pageTitle', 'Dokumen Kendaraan');
     }
 
     /**

@@ -11,7 +11,7 @@ class FotoMobilController extends Controller
     public function index()
     {
         $mobils = Mobil::all();
-        return view('foto_mobils.index', compact('mobils'));
+        return view('foto_mobils.index', compact('mobils'))->with('pageTitle', 'Foto Kendaraan');
     }
 
     /**

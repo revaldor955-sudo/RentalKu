@@ -78,6 +78,6 @@ class DashboardController extends Controller
             'unpaidDendasCount',
             'claimedKompensasisCount',
             'latestRentals'
-        ));
+        ))->with('pageTitle', 'Dashboard');
     }
 }

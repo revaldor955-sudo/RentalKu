@@ -12,7 +12,7 @@ class BrandController extends Controller
      */
     public function index()
     {
-        return view('brands.index');
+        return view('brands.index')->with('pageTitle', 'Merek');
     }
 
     /**

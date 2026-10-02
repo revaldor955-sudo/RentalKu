@@ -13,7 +13,7 @@ class SupirController extends Controller
 {
     $cabangs = Cabang::orderBy('name')->get();
 
-    return view('supirs.index', compact('cabangs'));
+    return view('supirs.index', compact('cabangs'))->with('pageTitle', 'Supir');
 }
 
     /**

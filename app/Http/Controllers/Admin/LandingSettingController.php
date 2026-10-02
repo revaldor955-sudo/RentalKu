@@ -14,7 +14,7 @@ class LandingSettingController extends Controller
         $settings = LandingSetting::pluck('value', 'key')->toArray();
         $faqs = DB::table('faqs')->orderBy('urutan')->get();
 
-        return view('admin.landing-settings.index', compact('settings', 'faqs'));
+        return view('admin.landing-settings.index', compact('settings', 'faqs'))->with('pageTitle', 'Pengaturan Landing');
     }
 
     public function update(Request $request)

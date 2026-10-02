@@ -10,7 +10,7 @@ class KompensasiController extends Controller
 {
     public function index()
     {
-        return view('kompensasis.index');
+        return view('kompensasis.index')->with('pageTitle', 'Kompensasi');
     }
 
     public function data(Request $request)

@@ -2,6 +2,7 @@
 {{-- Usage: @include('layouts.partials.admin-sidebar') --}}
 
 <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
+<link rel="stylesheet" href="{{ asset('css/action-hover.css') }}">
 <style>
     .nav-badge { opacity: 1; } /* Specific admin override */
     .nav-link.active::before {
@@ -214,15 +215,6 @@
                 </ul>
             </div>
 
-            <li class="nav-item">
-    <a href="{{ route('contacts.index') }}"
-       class="nav-link {{ request()->routeIs('contacts*') ? 'active' : '' }}"
-       aria-current="{{ request()->routeIs('contacts*') ? 'page' : 'false' }}">
-        <i class="bi bi-envelope nav-icon" aria-hidden="true"></i>
-        <span class="nav-text">Hubungi Kami</span>
-    </a>
-</li>
-
             <div class="sidebar-section" data-section="reports">
                 <div class="section-label" data-section-label="reports">Laporan & Lainnya</div>
                 <ul class="nav-list" role="list">
@@ -232,6 +224,14 @@
                            aria-current="{{ request()->routeIs('laporan*') ? 'page' : 'false' }}">
                             <i class="bi bi-file-earmark-bar-graph nav-icon" aria-hidden="true"></i>
                             <span class="nav-text">Laporan</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('contacts.index') }}"
+                           class="nav-link {{ request()->routeIs('contacts*') ? 'active' : '' }}"
+                           aria-current="{{ request()->routeIs('contacts*') ? 'page' : 'false' }}">
+                            <i class="bi bi-envelope nav-icon" aria-hidden="true"></i>
+                            <span class="nav-text">Hubungi Kami</span>
                         </a>
                     </li>
                     <li class="nav-item">

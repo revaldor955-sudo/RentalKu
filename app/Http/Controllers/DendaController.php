@@ -13,7 +13,7 @@ class DendaController extends Controller
         $rentals = Rental::with('mobil', 'user')
             ->where('status', 'Selesai')
             ->get();
-        return view('dendas.index', compact('rentals'));
+        return view('dendas.index', compact('rentals'))->with('pageTitle', 'Denda');
     }
 
     /**

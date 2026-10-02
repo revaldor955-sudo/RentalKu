@@ -334,15 +334,15 @@ Route::middleware('adminstaff')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::resource(
-        'banners',
-        BannerController::class
-    )->except(['create', 'edit', 'show']);
-
     Route::get(
         'banners/data',
         [BannerController::class, 'data']
     )->name('banners.data');
+
+    Route::resource(
+        'banners',
+        BannerController::class
+    )->except(['create', 'edit']);
 
 
     /*
@@ -401,9 +401,21 @@ Route::middleware('admin')->group(function () {
 
 
     Route::get(
-        '/admin/contacts/{contact}',
-        [ContactController::class, 'show']
-    )->name('contacts.show');
+        '/admin/contacts/data',
+        [ContactController::class, 'data']
+    )->name('contacts.data');
+
+
+    Route::get(
+        '/admin/contacts/{contact}/detail',
+        [ContactController::class, 'detail']
+    )->name('contacts.detail');
+
+
+    Route::patch(
+        '/admin/contacts/{contact}/read',
+        [ContactController::class, 'markAsRead']
+    )->name('contacts.read');
 
 
     Route::post(

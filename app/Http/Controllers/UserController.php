@@ -14,7 +14,7 @@ class UserController extends Controller
     {
         $roles = Role::all();
 
-        return view('users.index', compact('roles'));
+        return view('users.index', compact('roles'))->with('pageTitle', 'Pengguna');
     }
 
     /**

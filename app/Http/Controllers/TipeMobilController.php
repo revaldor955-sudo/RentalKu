@@ -9,7 +9,7 @@ class TipeMobilController extends Controller
 {
     public function index()
     {
-        return view('tipe_mobils.index');
+        return view('tipe_mobils.index')->with('pageTitle', 'Tipe Kendaraan');
     }
 
     /**

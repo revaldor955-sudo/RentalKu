@@ -69,11 +69,92 @@ class ContactController extends Controller
 
 
     /**
+     * Server-side DataTables: daftar pesan masuk (search, sort, pagination)
+     */
+    public function data(Request $request)
+    {
+        $query = Contact::query();
+
+        $recordsTotal = $query->count();
+
+        $search = $request->input('search.value');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('subjek', 'like', "%{$search}%")
+                  ->orWhere('pesan', 'like', "%{$search}%")
+                  ->orWhere('status', 'like', "%{$search}%");
+            });
+        }
+
+        $statusFilter = $request->input('columns.4.search.value');
+
+        if ($statusFilter && $statusFilter !== 'Semua') {
+            $query->where('status', $statusFilter);
+        }
+
+        $recordsFiltered = $query->count();
+
+        $columns = [
+            0 => null,
+            1 => 'contacts.nama',
+            2 => 'contacts.email',
+            3 => 'contacts.subjek',
+            4 => 'contacts.status',
+            5 => 'contacts.created_at',
+            6 => null,
+        ];
+
+        $orderColumn = (int) $request->input('order.0.column', 5);
+        $orderDir = $request->input('order.0.dir', 'desc');
+
+        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
+            $query->orderBy($columns[$orderColumn], $orderDir);
+        } else {
+            $query->orderBy('contacts.created_at', 'desc');
+        }
+
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        if ($length > 0 && $length !== -1) {
+            $query->offset($start)->limit($length);
+        }
+
+        $contacts = $query->get();
+
+        $data = $contacts->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'nama' => $item->nama,
+                'email' => $item->email,
+                'subjek' => $item->subjek,
+                'pesan' => $item->pesan,
+                'status' => $item->status,
+                'balasan' => $item->balasan,
+                'dibalas_pada' => $item->dibalas_pada,
+                'created_at' => $item->created_at,
+                'updated_at' => $item->updated_at,
+            ];
+        });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
+    }
+
+
+    /**
      * Admin melihat semua pesan
      */
     public function index()
     {
-        $contacts = Contact::latest()->get();
+        $contacts = Contact::latest()->paginate(10);
 
         $totalPesan = Contact::count();
 
@@ -92,14 +173,23 @@ class ContactController extends Controller
             'totalPesan',
             'belumDibaca',
             'sudahDibalas'
-        ));
+        ))->with('pageTitle', 'Hubungi Kami');
     }
 
 
     /**
-     * Admin melihat detail pesan
+     * Admin lihat detail satu pesan (AJAX)
      */
-    public function show(Contact $contact)
+    public function detail(Contact $contact)
+    {
+        return response()->json($contact);
+    }
+
+
+    /**
+     * Admin mark as read (AJAX)
+     */
+    public function markAsRead(Contact $contact)
     {
         if ($contact->status === 'Belum Dibaca') {
             $contact->update([
@@ -107,7 +197,7 @@ class ContactController extends Controller
             ]);
         }
 
-        return view('admin.contacts.show', compact('contact'));
+        return response()->json(['success' => true]);
     }
 
 
@@ -152,12 +242,10 @@ class ContactController extends Controller
             'dibalas_pada' => now(),
         ]);
 
-        return redirect()
-            ->route('contacts.show', $contact)
-            ->with(
-                'success',
-                'Balasan berhasil dikirim ke email ' . $contact->email
-            );
+        return response()->json([
+            'success' => true,
+            'message' => 'Balasan berhasil dikirim ke email ' . $contact->email
+        ]);
     }
 
 
@@ -168,8 +256,9 @@ class ContactController extends Controller
     {
         $contact->delete();
 
-        return redirect()
-            ->route('contacts.index')
-            ->with('success', 'Pesan berhasil dihapus.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Pesan berhasil dihapus.'
+        ]);
     }
 }

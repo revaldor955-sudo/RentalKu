@@ -33,7 +33,7 @@ class MobilController extends Controller
                 'tipeMobils',
                 'cabangs',
                 'fasilitas'
-            ));
+            ))->with('pageTitle', 'Kelola Kendaraan');
         }
 
         return view('mobils.index', compact(
@@ -42,7 +42,7 @@ class MobilController extends Controller
             'tipeMobils',
             'cabangs',
             'fasilitas'
-        ));
+        ))->with('pageTitle', 'Kelola Kendaraan');
     }
 
     /**
@@ -155,7 +155,7 @@ class MobilController extends Controller
             'tipeMobils',
             'cabangs',
             'fasilitas'
-        ));
+        ))->with('pageTitle', 'Kelola Kendaraan - Tambah');
     }
 
     public function store(Request $request)
@@ -280,7 +280,7 @@ class MobilController extends Controller
             'tipeMobils',
             'cabangs',
             'fasilitas'
-        ));
+        ))->with('pageTitle', 'Kelola Kendaraan - Edit');
     }
 
     /**

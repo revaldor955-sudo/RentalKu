@@ -675,7 +675,7 @@ public function confirmCheckout(
      */
     public function index()
     {
-        return view('admin.rentals.index');
+        return view('admin.rentals.index')->with('pageTitle', 'Transaksi Rental');
     }
 
     /**

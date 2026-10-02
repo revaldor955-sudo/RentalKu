@@ -11,7 +11,7 @@ class ServisMobilController extends Controller
     public function index()
     {
         $mobils = Mobil::all();
-        return view('servis_mobils.index', compact('mobils'));
+        return view('servis_mobils.index', compact('mobils'))->with('pageTitle', 'Servis Kendaraan');
     }
 
     public function data(Request $request)
@@ -89,7 +89,7 @@ class ServisMobilController extends Controller
     public function create()
     {
         $mobils = Mobil::all();
-        return view('servis_mobils.create', compact('mobils'));
+        return view('servis_mobils.create', compact('mobils'))->with('pageTitle', 'Servis Kendaraan - Tambah');
     }
 
     public function store(Request $request)
@@ -129,7 +129,7 @@ class ServisMobilController extends Controller
     public function edit(ServisMobil $servisMobil)
     {
         $mobils = Mobil::all();
-        return view('servis_mobils.edit', compact('servisMobil', 'mobils'));
+        return view('servis_mobils.edit', compact('servisMobil', 'mobils'))->with('pageTitle', 'Servis Kendaraan - Edit');
     }
 
     public function update(Request $request, ServisMobil $servisMobil)

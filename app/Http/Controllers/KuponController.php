@@ -11,7 +11,7 @@ class KuponController extends Controller
     {
         $kupons = Kupon::latest()->get();
 
-        return view('kupons.index', compact('kupons'));
+        return view('kupons.index', compact('kupons'))->with('pageTitle', 'Kupon');
     }
 
     /**

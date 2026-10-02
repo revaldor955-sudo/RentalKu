@@ -9,7 +9,7 @@ class CabangController extends Controller
 {
     public function index()
     {
-        return view('cabangs.index');
+        return view('cabangs.index')->with('pageTitle', 'Cabang');
     }
 
     /**

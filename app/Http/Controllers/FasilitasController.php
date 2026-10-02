@@ -13,7 +13,7 @@ class FasilitasController extends Controller
     public function index()
     {
         $fasilitas = Fasilitas::all();
-        return view('fasilitas.index', compact('fasilitas'));
+        return view('fasilitas.index', compact('fasilitas'))->with('pageTitle', 'Fasilitas');
     }
 
     /**

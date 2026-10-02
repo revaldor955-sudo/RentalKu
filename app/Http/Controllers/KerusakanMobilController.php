@@ -9,7 +9,7 @@ class KerusakanMobilController extends Controller
 {
     public function index()
     {
-        return view('kerusakan_mobils.index');
+        return view('kerusakan_mobils.index')->with('pageTitle', 'Kerusakan Kendaraan');
     }
 
     public function data(Request $request)

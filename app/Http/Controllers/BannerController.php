@@ -73,7 +73,7 @@ class BannerController extends Controller
      */
     public function index()
     {
-        return view('banners.index');
+        return view('banners.index')->with('pageTitle', 'Banner');
     }
 
     /**

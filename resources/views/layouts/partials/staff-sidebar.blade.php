@@ -2,6 +2,7 @@
 {{-- Usage: @include('layouts.partials.staff-sidebar') --}}
 
 <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
+<link rel="stylesheet" href="{{ asset('css/action-hover.css') }}">
 <style>
     .nav-link.active::before {
         content: '';
