@@ -34,16 +34,6 @@
                 </div>
                 <span class="brand-text">Rental<span>ku</span>.</span>
             </a>
-            <button
-                class="sidebar-toggle"
-                id="sidebarToggle"
-                aria-label="Collapse sidebar"
-                aria-expanded="true"
-                aria-controls="adminSidebar"
-                type="button"
-            >
-                <i class="bi bi-chevron-left chevron" aria-hidden="true"></i>
-            </button>
         </header>
 
         {{-- Navigation --}}
