@@ -261,7 +261,7 @@
                     <h5 class="fw-bold mb-3">
                         <i class="bi bi-bar-chart me-1"></i> Tren Pendapatan Harian
                     </h5>
-                    <canvas id="trenChart" height="110"></canvas>
+                    <div id="trenChart"></div>
                 </div>
             </div>
 
@@ -426,35 +426,71 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
     const tren = @json($tren);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    new Chart(document.getElementById('trenChart'), {
-        type: 'bar',
-        data: {
-            labels: tren.map(t => t.tanggal),
-            datasets: [{
-                data: tren.map(t => t.total),
-                backgroundColor: '#198754',
-                borderRadius: 6
-            }]
-        },
-        options: {
-            plugins: {
-                legend: {
-                    display: false
-                }
+    const options = {
+        series: [{
+            name: 'Pendapatan',
+            data: tren.map(t => [new Date(t.tanggal).getTime(), t.total])
+        }],
+        chart: {
+            type: 'area',
+            height: 300,
+            zoom: {
+                type: 'x',
+                enabled: true,
+                autoScaleYaxis: true
             },
-            scales: {
-                y: {
-                    ticks: {
-                        callback: v => 'Rp ' + v.toLocaleString('id-ID')
-                    }
-                }
+            toolbar: {
+                autoSelected: 'zoom'
+            },
+            fontFamily: 'inherit',
+            animations: {
+                enabled: !reduceMotion
+            }
+        },
+        colors: ['#198754'],
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            curve: 'smooth',
+            width: 2
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.45,
+                opacityTo: 0.05,
+                stops: [0, 90, 100]
+            }
+        },
+        xaxis: {
+            type: 'datetime',
+            labels: {
+                datetimeUTC: false
+            }
+        },
+        yaxis: {
+            labels: {
+                formatter: val => 'Rp ' + Math.round(val).toLocaleString('id-ID')
+            }
+        },
+        tooltip: {
+            x: {
+                format: 'dd MMM yyyy'
+            },
+            y: {
+                formatter: val => 'Rp ' + Math.round(val).toLocaleString('id-ID')
             }
         }
-    });
+    };
+
+    new ApexCharts(document.getElementById('trenChart'), options).render();
 </script>
 
 {{-- Bootstrap JS: dibutuhkan modal profil di navbar --}}

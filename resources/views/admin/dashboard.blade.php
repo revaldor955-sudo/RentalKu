@@ -491,8 +491,8 @@
                     <i class="bi bi-bar-chart me-1"></i>
                     Tren Pendapatan Harian
                 </h5>
-                <div style="position:relative;height:190px;">
-                    <canvas id="trenChart"></canvas>
+                <div style="position:relative;min-height:200px;">
+                    <div id="trenChart"></div>
                 </div>
             </div>
         </div>
@@ -737,11 +737,11 @@
 </div>
 
 {{-- Chart Laporan (animasi sekali saat pertama terlihat) --}}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const section = document.getElementById('laporan');
-    if (!section || typeof Chart === 'undefined') return;
+    if (!section || typeof ApexCharts === 'undefined') return;
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const tren = @json($laporan['tren']);
@@ -770,36 +770,70 @@ document.addEventListener('DOMContentLoaded', function() {
         if (started) return;
         started = true;
         section.querySelectorAll('[data-countup]').forEach(countUp);
-        new Chart(document.getElementById('trenChart'), {
-            type: 'bar',
-            data: {
-                labels: tren.map(t => t.tanggal),
-                datasets: [{
-                    data: tren.map(t => t.total),
-                    backgroundColor: '#198754',
-                    borderRadius: 6,
-                }],
+
+        const chartData = tren.map(t => [new Date(t.tanggal).getTime(), t.total]);
+
+        const options = {
+            series: [{
+                name: 'Pendapatan',
+                data: chartData
+            }],
+            chart: {
+                type: 'area',
+                height: 200,
+                zoom: {
+                    type: 'x',
+                    enabled: true,
+                    autoScaleYaxis: true
+                },
+                toolbar: {
+                    autoSelected: 'zoom'
+                },
+                fontFamily: 'inherit',
+                animations: {
+                    enabled: !reduceMotion
+                }
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: reduceMotion ? false : {
-                    duration: 1200,
-                    easing: 'easeOutQuart',
-                    delay: (ctx) => ctx.dataIndex * 60,
-                },
-                plugins: {
-                    legend: { display: false },
-                },
-                scales: {
-                    y: {
-                        ticks: {
-                            callback: v => 'Rp ' + Number(v).toLocaleString('id-ID'),
-                        },
-                    },
-                },
+            colors: ['#198754'],
+            dataLabels: {
+                enabled: false
             },
-        });
+            stroke: {
+                curve: 'smooth',
+                width: 2
+            },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.45,
+                    opacityTo: 0.05,
+                    stops: [0, 90, 100]
+                }
+            },
+            xaxis: {
+                type: 'datetime',
+                labels: {
+                    datetimeUTC: false
+                }
+            },
+            yaxis: {
+                labels: {
+                    formatter: val => 'Rp ' + Math.round(val).toLocaleString('id-ID')
+                }
+            },
+            tooltip: {
+                x: {
+                    format: 'dd MMM yyyy'
+                },
+                y: {
+                    formatter: val => 'Rp ' + Math.round(val).toLocaleString('id-ID')
+                }
+            }
+        };
+
+        const chart = new ApexCharts(document.getElementById('trenChart'), options);
+        chart.render();
     }
 
     if (reduceMotion || !('IntersectionObserver' in window)) {
