@@ -522,14 +522,40 @@
                             <div class="input-group">
                                 <span class="input-group-text">Rp</span>
                                 <input
-                                    type="number"
+                                    type="text"
+                                    name="nominal_display"
+                                    id="ajuanNominalDisplay"
+                                    class="form-control rupiah-input"
+                                    placeholder="50.000"
+                                    inputmode="numeric"
+                                    autocomplete="off"
+                                    data-target="nominal"
+                                    required>
+                                <input
+                                    type="hidden"
                                     name="nominal"
-                                    id="ajuanNominal"
-                                    class="form-control"
-                                    placeholder="Contoh: 50000"
-                                    min="0"
-                                    step="0.01">
+                                    id="nominal">
                             </div>
+
+                                <script>
+                                    function formatRupiahInput(value) {
+                                        let angka = String(value || '').replace(/\D/g, '');
+                                        if (!angka) return '';
+                                        return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                                    }
+
+                                    function getRawRupiah(value) {
+                                        return String(value || '').replace(/\D/g, '');
+                                    }
+
+                                    $(document).on('input', '.rupiah-input', function() {
+                                        const input = this;
+                                        const rawValue = getRawRupiah(input.value);
+                                        input.value = formatRupiahInput(rawValue);
+                                        $('#' + $(input).data('target')).val(rawValue);
+                                        });
+                                        </script>
+                                        </div>
 
                             <small class="text-muted" id="nominalHint">Wajib diisi untuk jenis "Pengembalian Dana"</small>
 

@@ -184,13 +184,17 @@
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
                             <input
-                                type="number"
-                                name="biaya"
-                                class="form-control"
-                                value="{{ $servisMobil->biaya }}"
-                                min="0"
-                                step="0.01"
+                                type="text"
+                                name="biaya_display"
+                                id="biayaDisplay"
+                                class="form-control rupiah-input"
+                                placeholder="50.000"
+                                inputmode="numeric"
+                                autocomplete="off"
+                                data-target="biaya"
+                                value="{{ formatRupiahInput($servisMobil->biaya) }}"
                                 required>
+                            <input type="hidden" name="biaya" id="biaya" value="{{ $servisMobil->biaya }}">
                         </div>
                     </div>
 
@@ -253,6 +257,23 @@
     <script>
 
         var CSRF_TOKEN = '{{ csrf_token() }}';
+
+        function formatRupiahInput(value) {
+            let angka = String(value || '').replace(/\D/g, '');
+            if (!angka) return '';
+            return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        function getRawRupiah(value) {
+            return String(value || '').replace(/\D/g, '');
+        }
+
+        $(document).on('input', '.rupiah-input', function() {
+            const input = this;
+            const rawValue = getRawRupiah(input.value);
+            input.value = formatRupiahInput(rawValue);
+            $('#' + $(input).data('target')).val(rawValue);
+        });
 
         var $flashSuccess = $('#flashSuccess');
 

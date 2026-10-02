@@ -22,7 +22,26 @@
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-    <style>
+    <script>
+        function formatRupiahInput(value) {
+            let angka = String(value || '').replace(/\D/g, '');
+            if (!angka) return '';
+            return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        function getRawRupiah(value) {
+            return String(value || '').replace(/\D/g, '');
+        }
+
+        $(document).on('input', '.rupiah-input', function() {
+            const input = this;
+            const rawValue = getRawRupiah(input.value);
+            input.value = formatRupiahInput(rawValue);
+            $('#' + $(input).attr('id').replace('_display', '')).val(rawValue);
+        });
+    </script>
+
+        <style>
 
         body {
             background: #f5f7f6;
@@ -659,13 +678,18 @@
                             </span>
 
                             <input
-                                type="number"
-                                name="harga_perhari"
-                                value="{{ old('harga_perhari') }}"
-                                class="form-control @error('harga_perhari') is-invalid @enderror"
-                                min="0"
-                                placeholder="350000"
-                            >
+                                                            type="text"
+                                                            id="harga_perhari_display"
+                                                            class="form-control rupiah-input @error('harga_perhari') is-invalid @enderror"
+                                                            placeholder="350.000"
+                                                            inputmode="numeric"
+                                                            autocomplete="off"
+                                                            value="{{ old('harga_perhari') }}"
+                                                            required>
+                                                        <input type="hidden"
+                                                               name="harga_perhari"
+                                                               id="harga_perhari_hidden"
+                                                               value="{{ old('harga_perhari') }}">
 
                         </div>
 
@@ -700,13 +724,18 @@
                             </span>
 
                             <input
-                                type="number"
-                                name="deposit"
-                                value="{{ old('deposit') }}"
-                                class="form-control @error('deposit') is-invalid @enderror"
-                                min="0"
-                                placeholder="500000"
-                            >
+                                                            type="text"
+                                                            id="deposit_display"
+                                                            class="form-control rupiah-input @error('deposit') is-invalid @enderror"
+                                                            placeholder="500.000"
+                                                            inputmode="numeric"
+                                                            autocomplete="off"
+                                                            value="{{ old('deposit') }}"
+                                                            required>
+                                                        <input type="hidden"
+                                                               name="deposit"
+                                                               id="deposit_hidden"
+                                                               value="{{ old('deposit') }}">
 
                         </div>
 

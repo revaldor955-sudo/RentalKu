@@ -152,6 +152,10 @@
             border: 1px solid rgba(255, 255, 255, .25);
             padding: 8px 16px;
             border-radius: 50px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            backdrop-filter: blur(8px);
+        }
 
         /* Loading Skeleton */
         .search-skeleton {
@@ -186,10 +190,6 @@
         @keyframes shimmer {
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
-        }
-            margin-bottom: 18px;
-            font-size: 13px;
-            backdrop-filter: blur(8px);
         }
 
         .hero h1 {
