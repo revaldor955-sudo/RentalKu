@@ -620,6 +620,15 @@
                 </ul>
             </div>
 
+            <li class="nav-item">
+    <a href="{{ route('contacts.index') }}"
+       class="nav-link {{ request()->routeIs('contacts*') ? 'active' : '' }}"
+       aria-current="{{ request()->routeIs('contacts*') ? 'page' : 'false' }}">
+        <i class="bi bi-envelope nav-icon" aria-hidden="true"></i>
+        <span class="nav-text">Hubungi Kami</span>
+    </a>
+</li>
+
             <div class="sidebar-section" data-section="reports">
                 <div class="section-label" data-section-label="reports">Laporan & Lainnya</div>
                 <ul class="nav-list" role="list">
