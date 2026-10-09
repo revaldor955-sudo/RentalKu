@@ -73,8 +73,8 @@ class PembayaranController extends Controller
             $query->orderBy('pembayarans.tanggal_bayar', 'desc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $pembayarans = $query->offset($start)->limit($length)->get();
 
@@ -104,6 +104,10 @@ class PembayaranController extends Controller
      */
     public function detail(Pembayaran $pembayaran)
     {
+        if (! $pembayaran->rental) {
+            abort(404, 'Data rental tidak ditemukan.');
+        }
+
         // Ownership check: customer hanya bisa lihat pembayaran rental sendiri
         if (auth()->user()->roles_id === 3 && $pembayaran->rental->user_id !== auth()->id()) {
             abort(403, 'Anda tidak memiliki akses ke pembayaran ini.');

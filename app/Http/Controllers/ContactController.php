@@ -108,7 +108,7 @@ class ContactController extends Controller
         ];
 
         $orderColumn = (int) $request->input('order.0.column', 5);
-        $orderDir = $request->input('order.0.dir', 'desc');
+        $orderDir = strtolower($request->input('order.0.dir', 'desc')) === 'asc' ? 'asc' : 'desc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -116,8 +116,14 @@ class ContactController extends Controller
             $query->orderBy('contacts.created_at', 'desc');
         }
 
-        $start = (int) $request->input('start', 0);
+        $start = max(0, (int) $request->input('start', 0));
         $length = (int) $request->input('length', 10);
+
+        if ($length === -1) {
+            $length = 500;
+        }
+
+        $length = min(max($length, 1), 500);
 
         if ($length > 0 && $length !== -1) {
             $query->offset($start)->limit($length);
