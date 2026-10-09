@@ -9,6 +9,7 @@ use App\Models\Mobil;
 use App\Models\Supir;
 use App\Models\TipeMobil;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class MobilController extends Controller
 {
@@ -97,7 +98,7 @@ class MobilController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 1);
-        $orderDir = $request->input('order.0.dir', 'asc');
+        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -105,8 +106,8 @@ class MobilController extends Controller
             $query->orderBy('mobils.name', 'asc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $mobils = $query->offset($start)->limit($length)->get();
 
@@ -150,14 +151,14 @@ class MobilController extends Controller
             'tipe_mobil_id' => 'required|exists:tipe_mobils,id',
             'cabang_id' => 'required|exists:cabangs,id',
             'name' => 'required|string|max:45',
-            'plate_number' => 'required|string|max:7|unique:mobils,plate_number',
+            'plate_number' => 'required|string|max:20|unique:mobils,plate_number',
             'tahun' => 'required|integer|min:1990|max:'.date('Y'),
             'transmisi' => 'required|in:manual,matic,Manual,Matic',
             'kapasitas' => 'required|integer|min:1',
             'warna' => 'required|string|max:20',
             'harga_perhari' => 'required|numeric|min:0',
             'deposit' => 'required|numeric|min:0',
-            'image' => 'nullable|mimes:jpeg,png,jpg,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'status' => 'required|in:Tersedia,Disewa,Maintenance',
             'description' => 'nullable|string',
             'fasilitas' => 'nullable|array',
@@ -252,14 +253,14 @@ class MobilController extends Controller
             'tipe_mobil_id' => 'required|exists:tipe_mobils,id',
             'cabang_id' => 'required|exists:cabangs,id',
             'name' => 'required|string|max:45',
-            'plate_number' => 'required|string|max:10|unique:mobils,plate_number,'.$mobil->id,
+            'plate_number' => 'required|string|max:20|unique:mobils,plate_number,'.$mobil->id,
             'tahun' => 'required|integer|min:1990|max:'.date('Y'),
             'transmisi' => 'required|in:Manual,Matic',
             'kapasitas' => 'required|integer|min:1',
             'warna' => 'required|string|max:20',
             'harga_perhari' => 'required|numeric|min:0',
             'deposit' => 'required|numeric|min:0',
-            'image' => 'nullable|mimes:jpeg,png,jpg,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'status' => 'required|in:Tersedia,Disewa,Maintenance',
             'description' => 'nullable|string',
             'fasilitas' => 'nullable|array',
@@ -268,6 +269,10 @@ class MobilController extends Controller
 
         // Upload foto baru
         if ($request->hasFile('image')) {
+
+            if ($mobil->image && File::exists(public_path($mobil->image))) {
+                File::delete(public_path($mobil->image));
+            }
 
             $image = $request->file('image');
 
@@ -294,8 +299,12 @@ class MobilController extends Controller
             ]);
         }
 
-        // Selalu kembali ke data mobil STAFF
-        return redirect()->route('staff.mobils.index')->with('success', 'Mobil berhasil diperbarui.');
+        // Selalu kembali ke asal halaman (admin vs staff)
+        if ($request->routeIs('staff.mobils.*')) {
+            return redirect()->route('staff.mobils.index')->with('success', 'Mobil berhasil diperbarui.');
+        }
+
+        return redirect()->route('mobils.index')->with('success', 'Mobil berhasil diperbarui.');
     }
 
     /**
@@ -303,6 +312,25 @@ class MobilController extends Controller
      */
     public function destroy(Request $request, Mobil $mobil)
     {
+        // Cegah penghapusan jika masih punya riwayat rental (cascade akan hapus transaksi).
+        if ($mobil->rentals()->exists()) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'message' => 'Mobil tidak dapat dihapus karena masih memiliki riwayat rental.',
+                ], 422);
+            }
+
+            if ($request->routeIs('staff.mobils.destroy')) {
+                return redirect()->route('staff.mobils.index')->with('error', 'Mobil tidak dapat dihapus karena masih memiliki riwayat rental.');
+            }
+
+            return redirect()->route('mobils.index')->with('error', 'Mobil tidak dapat dihapus karena masih memiliki riwayat rental.');
+        }
+
+        if ($mobil->image && File::exists(public_path($mobil->image))) {
+            File::delete(public_path($mobil->image));
+        }
+
         $mobil->delete();
 
         // Respons JSON untuk request AJAX (tombol hapus di halaman admin)
