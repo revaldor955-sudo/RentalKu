@@ -85,6 +85,8 @@ class DendaController extends Controller
                 'foto_bukti' => $item->foto_bukti,
                 'syarat_dan_ketentuan' => $item->syarat_dan_ketentuan,
                 'status' => $item->status,
+                'bukti_bayar_url' => $item->bukti_bayar ? asset('storage/'.$item->bukti_bayar) : null,
+                'tanggal_bayar' => $item->tanggal_bayar ? \Carbon\Carbon::parse($item->tanggal_bayar)->format('d/m/Y') : null,
                 'created_at' => $item->created_at?->format('d/m/Y H:i'),
             ];
         });
