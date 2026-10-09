@@ -112,6 +112,12 @@ class BannerController extends Controller
 
         Banner::create($validated);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Banner berhasil ditambahkan.',
+            ]);
+        }
+
         return redirect()->route('banners.index')
             ->with('success', 'Banner berhasil ditambahkan.');
     }
@@ -164,6 +170,12 @@ class BannerController extends Controller
 
         $banner->update($validated);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Banner berhasil diperbarui.',
+            ]);
+        }
+
         return redirect()->route('banners.index')
             ->with('success', 'Banner berhasil diperbarui.');
     }
@@ -171,13 +183,19 @@ class BannerController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Banner $banner)
+    public function destroy(Request $request, Banner $banner)
     {
         if ($banner->gambar && file_exists(public_path($banner->gambar))) {
             unlink(public_path($banner->gambar));
         }
 
         $banner->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Banner berhasil dihapus.',
+            ]);
+        }
 
         return redirect()->route('banners.index')
             ->with('success', 'Banner berhasil dihapus.');

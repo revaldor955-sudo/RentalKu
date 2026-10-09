@@ -95,6 +95,12 @@ class FaqController extends Controller
 
         Faq::create($validated);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'FAQ berhasil ditambahkan.',
+            ]);
+        }
+
         return redirect()->route('faqs.index')
             ->with('success', 'FAQ berhasil ditambahkan.');
     }
@@ -125,13 +131,25 @@ class FaqController extends Controller
 
         $faq->update($validated);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'FAQ berhasil diperbarui.',
+            ]);
+        }
+
         return redirect()->route('faqs.index')
             ->with('success', 'FAQ berhasil diperbarui.');
     }
 
-    public function destroy(Faq $faq)
+    public function destroy(Request $request, Faq $faq)
     {
         $faq->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'FAQ berhasil dihapus.',
+            ]);
+        }
 
         return redirect()->route('faqs.index')
             ->with('success', 'FAQ berhasil dihapus.');
