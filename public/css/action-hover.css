@@ -1,0 +1,32 @@
+/* Shared action button hover styles — applied to ALL admin pages */
+.table .btn.p-1[title],
+.table .btn.btn-sm[title],
+.action-btn,
+.action-btn-danger {
+    border: none !important;
+    background: transparent !important;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    padding: 6px;
+    font-size: 16px;
+    transition: background 0.2s, color 0.2s;
+}
+.action-btn,
+.table .btn.p-1[title],
+.table .btn.btn-sm[title] { color: #6c757d !important; }
+.action-btn:hover,
+.table .btn.p-1[title]:hover,
+.table .btn.btn-sm[title]:hover { background: #e7f1ff !important; color: #0d6efd !important; }
+.action-btn-danger { color: #dc3545 !important; }
+.action-btn-danger:hover { background: #f8d7da !important; color: #bb2d3b !important; }
+.table .btn.p-1.text-primary[title],
+.table .btn.btn-sm.text-primary[title] { color: #0d6efd !important; }
+.table .btn.p-1.text-danger[title],
+.table .btn.btn-sm.text-danger[title] { color: #dc3545 !important; }
+.table .btn.p-1.text-danger[title]:hover,
+.table .btn.btn-sm.text-danger[title]:hover { background: #f8d7da !important; color: #bb2d3b !important; }

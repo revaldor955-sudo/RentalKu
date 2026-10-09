@@ -944,7 +944,7 @@
 
         $.ajax({
             url: form.getAttribute('action'),
-            method: 'PUT',
+            method: 'POST',
             data: new FormData(form),
             processData: false,
             contentType: false,

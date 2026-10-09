@@ -80,6 +80,13 @@
         background: #f9fafb;
         color: #374151;
     }
+    @media (prefers-reduced-motion: reduce) {
+        .checkout-summary .cs-btn-confirm,
+        .checkout-summary .cs-btn-back {
+            transition: none;
+            transform: none;
+        }
+    }
 </style>
 
 <div class="checkout-summary text-start">
@@ -218,6 +225,10 @@
     $(document).off('submit', '#checkoutConfirmForm').on('submit', '#checkoutConfirmForm', function(e) {
         e.preventDefault();
         var $form = $(this);
+        var $submit = $form.find('button[type="submit"]');
+        var submitHtml = $submit.html();
+        $submit.prop('disabled', true);
+        $submit.html('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Mengirim...');
         Swal.showLoading();
         $.ajax({
             url: $form.attr('action'),
@@ -238,17 +249,27 @@
                         window.location.reload();
                     });
                 } else {
+                    $submit.prop('disabled', false);
+                    $submit.html(submitHtml);
+                    var errs = res.errors || {};
+                    if (errs.kode_promo) $('#cs-promo-message').html('<span class="text-danger">' + errs.kode_promo[0] + '</span>');
                     Swal.fire({
                         icon: 'error',
                         title: 'Gagal',
-                        text: res.message || 'Terjadi kesalahan.',
+                        text: res.errors ? Object.values(res.errors).flat()[0] : (res.message || 'Terjadi kesalahan.'),
                     });
                 }
             },
             error: function(xhr) {
                 Swal.hideLoading();
+                $submit.prop('disabled', false);
+                $submit.html(submitHtml);
+                var r = (xhr && xhr.responseJSON) || {};
                 var msg = 'Terjadi kesalahan. Silakan coba lagi.';
-                if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
+                if (r.errors) {
+                    msg = Object.values(r.errors).flat()[0] || msg;
+                    if (r.errors.kode_promo) $('#cs-promo-message').html('<span class="text-danger">' + r.errors.kode_promo[0] + '</span>');
+                } else if (r.message) msg = r.message;
                 Swal.fire({
                     icon: 'error',
                     title: 'Gagal',

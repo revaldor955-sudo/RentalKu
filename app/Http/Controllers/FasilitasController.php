@@ -12,8 +12,7 @@ class FasilitasController extends Controller
      */
     public function index()
     {
-        $fasilitas = Fasilitas::all();
-        return view('fasilitas.index', compact('fasilitas'));
+        return view('fasilitas.index')->with('pageTitle', 'Fasilitas');
     }
 
     /**
@@ -39,7 +38,7 @@ class FasilitasController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 1);
-        $orderDir = $request->input('order.0.dir', 'asc');
+        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -47,8 +46,8 @@ class FasilitasController extends Controller
             $query->orderBy('fasilitas.name', 'asc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $fasilitas = $query->offset($start)->limit($length)->get();
 

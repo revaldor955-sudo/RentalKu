@@ -227,6 +227,10 @@
                                     Urutan
                                 </th>
 
+                                <th>
+                                    Tampil
+                                </th>
+
                                 <th class="text-center">
                                     Aksi
                                 </th>
@@ -302,6 +306,22 @@
                             placeholder="0"
                             min="0"
                             value="0">
+
+                        <div class="form-check mt-3">
+
+                            <input
+                                type="checkbox"
+                                name="is_active"
+                                value="1"
+                                class="form-check-input"
+                                id="tambahIsActive"
+                                checked>
+
+                            <label class="form-check-label fw-semibold" for="tambahIsActive">
+                                Tampilkan di landing
+                            </label>
+
+                        </div>
 
                     </div>
 
@@ -385,14 +405,29 @@
                             Urutan
                         </label>
 
-                        <input
-                            type="number"
-                            name="urutan"
-                            id="editUrutan"
-                            class="form-control"
-                            placeholder="0"
-                            min="0"
-                            value="0">
+                            <input
+                                type="number"
+                                name="urutan"
+                                id="editUrutan"
+                                class="form-control"
+                                placeholder="0"
+                                min="0"
+                                value="0">
+
+                            <div class="form-check mt-3">
+
+                                <input
+                                    type="checkbox"
+                                    name="is_active"
+                                    value="1"
+                                    class="form-check-input"
+                                    id="editIsActive">
+
+                                <label class="form-check-label fw-semibold" for="editIsActive">
+                                    Tampilkan di landing
+                                </label>
+
+                            </div>
 
                     </div>
 
@@ -498,6 +533,16 @@
                     searchable: false,
                 },
                 {
+                    data: 'is_active',
+                    orderable: true,
+                    searchable: false,
+                    render: function(data) {
+                        return data
+                            ? '<span class="badge text-bg-success">Aktif</span>'
+                            : '<span class="badge text-bg-secondary">Nonaktif</span>';
+                    },
+                },
+                {
                     data: 'id',
                     orderable: false,
                     searchable: false,
@@ -597,6 +642,7 @@
         $('#editPertanyaan').val(data.pertanyaan);
         $('#editJawaban').val(data.jawaban);
         $('#editUrutan').val(data.urutan);
+        $('#editIsActive').prop('checked', !!data.is_active);
 
         $('#formEditFaq').attr('action',
             "{{ route('faqs.update', '__ID__') }}".replace('__ID__', id));
@@ -654,7 +700,7 @@
 
         $.ajax({
             url: $(this).attr('action'),
-            method: 'PUT',
+            method: 'POST',
             data: formData,
             processData: false,
             contentType: false,

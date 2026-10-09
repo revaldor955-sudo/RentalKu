@@ -10,7 +10,7 @@ class RatingController extends Controller
 {
     public function index()
     {
-        return view('admin.ratings.index');
+        return view('admin.ratings.index')->with('pageTitle', 'Customer Rating');
     }
 
     public function data(Request $request)
@@ -32,7 +32,7 @@ class RatingController extends Controller
         $recordsFiltered = $query->count();
 
         $orderColumn = (int)$request->input('order.0.column', 0);
-        $orderDir = $request->input('order.0.dir', 'desc');
+        $orderDir = strtolower($request->input('order.0.dir', 'desc')) === 'asc' ? 'asc' : 'desc';
 
         if ($orderColumn === 0) {
             $query->orderBy('id', $orderDir);
@@ -40,8 +40,8 @@ class RatingController extends Controller
             $query->orderBy('id', 'desc');
         }
 
-        $start = (int)$request->input('start', 0);
-        $length = (int)$request->input('length', 10);
+        $start = max(0, (int)$request->input('start', 0));
+        $length = min(max((int)$request->input('length', 10), 1), 100);
 
         $ratings = $query->offset($start)->limit($length)->get();
 

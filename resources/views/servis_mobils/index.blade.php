@@ -335,16 +335,19 @@
                         </label>
 
                         <div class="input-group">
-                            <span class="input-group-text">Rp</span>
-                            <input
-                                type="number"
-                                name="biaya"
-                                class="form-control"
-                                placeholder="Contoh: 500000"
-                                min="0"
-                                step="0.01"
-                                required>
-                        </div>
+                                                    <span class="input-group-text">Rp</span>
+                                                    <input
+                                                        type="text"
+                                                        name="biaya_display"
+                                                        id="biayaDisplay"
+                                                        class="form-control rupiah-input"
+                                                        placeholder="50.000"
+                                                        inputmode="numeric"
+                                                        autocomplete="off"
+                                                        data-target="biaya"
+                                                        required>
+                                                    <input type="hidden" name="biaya" id="biaya">
+                                                </div>
 
                         <label class="form-label fw-semibold mt-3">
                             Bengkel
@@ -459,17 +462,19 @@
                         </label>
 
                         <div class="input-group">
-                            <span class="input-group-text">Rp</span>
-                            <input
-                                type="number"
-                                name="biaya"
-                                id="editBiayaServis"
-                                class="form-control"
-                                placeholder="Contoh: 500000"
-                                min="0"
-                                step="0.01"
-                                required>
-                        </div>
+                                                    <span class="input-group-text">Rp</span>
+                                                    <input
+                                                        type="text"
+                                                        name="biaya_display"
+                                                        id="editBiayaServisDisplay"
+                                                        class="form-control rupiah-input"
+                                                        placeholder="50.000"
+                                                        inputmode="numeric"
+                                                        autocomplete="off"
+                                                        data-target="editBiayaServis"
+                                                        required>
+                                                    <input type="hidden" name="biaya" id="editBiayaServis">
+                                                </div>
 
                         <label class="form-label fw-semibold mt-3">
                             Bengkel
@@ -567,9 +572,22 @@
         return '<span class="jenis-badge ' + cls + '">' + label + '</span>';
     }
 
-    function formatRupiah(value) {
-        return 'Rp ' + Number(value).toLocaleString('id-ID');
+    function formatRupiahInput(value) {
+        let angka = String(value || '').replace(/\D/g, '');
+        if (!angka) return '';
+        return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
+
+    function getRawRupiah(value) {
+        return String(value || '').replace(/\D/g, '');
+    }
+
+    $(document).on('input', '.rupiah-input', function() {
+        const input = this;
+        const rawValue = getRawRupiah(input.value);
+        input.value = formatRupiahInput(rawValue);
+        $('#' + $(input).data('target')).val(rawValue);
+    });
 
     $(document).ready(function() {
 
@@ -615,7 +633,7 @@
                     orderable: true,
                     searchable: false,
                     render: function(data) {
-                        return '<span class="fw-semibold">' + formatRupiah(data) + '</span>';
+                        return '<span class="fw-semibold">Rp ' + formatRupiahInput(data) + '</span>';
                     },
                 },
                 {
@@ -736,9 +754,10 @@
         }
 
         $('#editMobilIdServis').val(data.mobil_id);
-        $('#editTanggalServis').val(data.tanggal);
+        $('#editTanggalServis').val(data.tanggal_input || data.tanggal);
         $('#editJenisServis').val(data.jenis);
         $('#editBiayaServis').val(data.biaya);
+        $('#editBiayaServisDisplay').val(formatRupiahInput(data.biaya));
         $('#editBengkelServis').val(data.bengkel);
         $('#editKeteranganServis').val(data.keterangan);
 
@@ -798,7 +817,7 @@
 
         $.ajax({
             url: $(this).attr('action'),
-            method: 'PUT',
+            method: 'POST',
             data: formData,
             processData: false,
             contentType: false,

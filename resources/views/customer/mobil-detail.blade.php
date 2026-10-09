@@ -994,7 +994,12 @@
                     event.preventDefault();
 
                     var formData = new FormData($form[0]);
-
+                    var $submit = $form.find('button[type="submit"]');
+                    var submitHtml = $submit.html();
+                    $form.find('.is-invalid').removeClass('is-invalid');
+                    $form.find('.invalid-feedback').remove();
+                    $submit.prop('disabled', true);
+                    $submit.html('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Mengirim...');
                     Swal.showLoading();
 
                     $.ajax({
@@ -1012,6 +1017,16 @@
                         Swal.hideLoading();
 
                         if (xhr.status !== 200) {
+                            $submit.prop('disabled', false);
+                            $submit.html(submitHtml);
+                            var errs = data.errors || {};
+                            Object.keys(errs).forEach(function(key) {
+                                var $input = $form.find('[name="' + key + '"]');
+                                if ($input.length) {
+                                    $input.addClass('is-invalid');
+                                    $input.after('<div class="invalid-feedback d-block">' + errs[key][0] + '</div>');
+                                }
+                            });
                             var firstError = data.errors
                                 ? Object.values(data.errors).flat()[0]
                                 : (data.message || 'Terjadi kesalahan.');
@@ -1033,12 +1048,23 @@
                             window.location.href = '{{ route('customer.dashboard') }}';
                         });
                     })
-                    .fail(function() {
+                    .fail(function(xhr) {
                         Swal.hideLoading();
+                        $submit.prop('disabled', false);
+                        $submit.html(submitHtml);
+                        var r = (xhr && xhr.responseJSON) || {};
+                        var errs = r.errors || {};
+                        Object.keys(errs).forEach(function(key) {
+                            var $input = $form.find('[name="' + key + '"]');
+                            if ($input.length) {
+                                $input.addClass('is-invalid');
+                                $input.after('<div class="invalid-feedback d-block">' + errs[key][0] + '</div>');
+                            }
+                        });
                         Swal.fire({
                             icon: 'error',
                             title: 'Gagal',
-                            text: 'Koneksi bermasalah. Silakan coba lagi.',
+                            text: errs && Object.keys(errs).length ? Object.values(errs).flat()[0] : (r.message || 'Koneksi bermasalah. Silakan coba lagi.'),
                         });
                     });
                 });

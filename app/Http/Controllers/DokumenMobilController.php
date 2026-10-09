@@ -11,7 +11,7 @@ class DokumenMobilController extends Controller
     public function index()
     {
         $mobils = Mobil::all();
-        return view('dokumen_mobils.index', compact('mobils'));
+        return view('dokumen_mobils.index', compact('mobils'))->with('pageTitle', 'Dokumen Kendaraan');
     }
 
     /**
@@ -49,7 +49,7 @@ class DokumenMobilController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 1);
-        $orderDir = $request->input('order.0.dir', 'asc');
+        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -57,8 +57,8 @@ class DokumenMobilController extends Controller
             $query->orderBy('dokumen_mobils.created_at', 'desc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $dokumenMobils = $query->offset($start)->limit($length)->get();
 
@@ -155,6 +155,10 @@ class DokumenMobilController extends Controller
         ]);
 
         if ($request->hasFile('file')) {
+            if ($dokumenMobil->file && file_exists(public_path($dokumenMobil->file))) {
+                unlink(public_path($dokumenMobil->file));
+            }
+
             $file = $request->file('file');
             $fileName = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('images/dokumen_mobils'), $fileName);
@@ -175,6 +179,10 @@ class DokumenMobilController extends Controller
 
     public function destroy(Request $request, DokumenMobil $dokumenMobil)
     {
+        if ($dokumenMobil->file && file_exists(public_path($dokumenMobil->file))) {
+            unlink(public_path($dokumenMobil->file));
+        }
+
         $dokumenMobil->delete();
 
         if ($request->wantsJson()) {

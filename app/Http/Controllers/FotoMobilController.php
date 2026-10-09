@@ -11,7 +11,7 @@ class FotoMobilController extends Controller
     public function index()
     {
         $mobils = Mobil::all();
-        return view('foto_mobils.index', compact('mobils'));
+        return view('foto_mobils.index', compact('mobils'))->with('pageTitle', 'Foto Kendaraan');
     }
 
     /**
@@ -44,7 +44,7 @@ class FotoMobilController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 1);
-        $orderDir = $request->input('order.0.dir', 'asc');
+        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -52,8 +52,8 @@ class FotoMobilController extends Controller
             $query->orderBy('foto_mobils.created_at', 'desc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $fotoMobils = $query->offset($start)->limit($length)->get();
 
@@ -134,6 +134,10 @@ class FotoMobilController extends Controller
         ]);
 
         if ($request->hasFile('url')) {
+            if ($fotoMobil->url && file_exists(public_path($fotoMobil->url))) {
+                unlink(public_path($fotoMobil->url));
+            }
+
             $image = $request->file('url');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $image->move(public_path('images/foto_mobils'), $imageName);
@@ -154,6 +158,10 @@ class FotoMobilController extends Controller
 
     public function destroy(Request $request, FotoMobil $fotoMobil)
     {
+        if ($fotoMobil->url && file_exists(public_path($fotoMobil->url))) {
+            unlink(public_path($fotoMobil->url));
+        }
+
         $fotoMobil->delete();
 
         if ($request->wantsJson()) {

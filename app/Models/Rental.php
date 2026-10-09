@@ -18,6 +18,8 @@ class Rental extends Model
         'harga_perhari',
         'subtotal',
         'deposit',
+        'kode_promo',
+        'diskon',
         'total_harga',
         'status',
         'catatan',
@@ -29,6 +31,7 @@ class Rental extends Model
         'harga_perhari' => 'decimal:2',
         'subtotal' => 'decimal:2',
         'deposit' => 'decimal:2',
+        'diskon' => 'decimal:2',
         'total_harga' => 'decimal:2',
     ];
 

@@ -463,6 +463,7 @@
                             name="tanggal_bayar"
                             class="form-control @error('tanggal_bayar') is-invalid @enderror"
                             value="{{ old('tanggal_bayar', date('Y-m-d')) }}"
+                            max="{{ date('Y-m-d') }}"
                             required
                         >
 
@@ -538,6 +539,7 @@
                         <button
                             type="submit"
                             class="btn btn-payment"
+                            id="bayarSubmit"
                         >
 
                             <i class="bi bi-send me-1"></i>
