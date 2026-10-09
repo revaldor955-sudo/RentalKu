@@ -76,6 +76,18 @@
                         <h1 class="h5 mb-0 fw-bold text-dark">Dashboard</h1>
                     @endif
                 </div>
+
+                {{-- Tombol cetak: hanya di halaman laporan yang ada datanya --}}
+                @if(request()->routeIs('laporan.*') && ($tampilkanCetak ?? false))
+                    <button
+                        type="button"
+                        class="btn btn-success btn-sm no-print"
+                        onclick="window.print()"
+                    >
+                        <i class="bi bi-printer me-1"></i>
+                        Cetak Laporan
+                    </button>
+                @endif
             </div>
 
         </div>

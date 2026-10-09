@@ -125,7 +125,10 @@
 <body>
 
 {{-- Sidebar Layout --}}
-@include('layouts.partials.sidebar')
+@php
+$adaArus = $pembayarans->isNotEmpty() || $dendas->isNotEmpty() || $kompensasis->isNotEmpty();
+@endphp
+@include('layouts.partials.sidebar', ['tampilkanCetak' => $adaArus])
 
 <script>
     // Inject navbar into sidebar layout
@@ -408,18 +411,6 @@
                     </p>
 
                 </div>
-
-            </div>
-        @endif
-
-        {{-- Tombol cetak --}}
-        @if ($arus->isNotEmpty())
-            <div class="text-center mt-4 no-print">
-
-                <button type="button" class="btn btn-success px-5" onclick="window.print()">
-                    <i class="bi bi-printer me-1"></i>
-                    Cetak Laporan
-                </button>
 
             </div>
         @endif
