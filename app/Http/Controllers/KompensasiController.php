@@ -100,32 +100,57 @@ class KompensasiController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        // Jalur admin/staff (POST /kompensasis): customer_id wajib dari input
+        // terverifikasi; jalur customer (POST /customer/kompensasi): milik sendiri.
+        $isPetugas = auth()->user()->roles_id !== 3;
+
+        $rules = [
             'mobil_id' => 'required|exists:mobils,id',
             'rental_id' => 'required|exists:rentals,id',
             'jenis' => 'required|in:pengembalian_dana,diskon,gratis_sewa',
             'nominal' => 'required_if:jenis,pengembalian_dana|numeric|min:0',
             'alasan' => 'required|string',
             'tanggal' => 'required|date',
-        ], [
+        ];
+
+        if ($isPetugas) {
+            $rules['customer_id'] = 'required|exists:users,id';
+        }
+
+        $validated = $request->validate($rules, [
             'mobil_id.required' => 'Mobil wajib dipilih',
             'rental_id.required' => 'Rental wajib dipilih',
             'jenis.required' => 'Jenis kompensasi wajib dipilih',
             'nominal.required_if' => 'Nominal wajib diisi untuk pengembalian dana',
             'alasan.required' => 'Alasan wajib diisi',
             'tanggal.required' => 'Tanggal wajib diisi',
+            'customer_id.required' => 'Customer wajib dipilih',
+            'customer_id.exists' => 'Customer tidak valid.',
         ]);
 
-        $validated['customer_id'] = auth()->id();
-        $validated['status'] = 'diajukan';
+        if ($isPetugas) {
+            // Klaim dibuatkan untuk customer: rental harus milik customer tersebut.
+            $rental = Rental::where('id', $validated['rental_id'])
+                ->where('user_id', $validated['customer_id'])
+                ->first();
+            if (! $rental) {
+                abort(403, 'Rental ini bukan milik customer tersebut.');
+            }
 
-        // Klaim hanya boleh atas rental milik sendiri; mobil mengikuti rental.
-        $rental = Rental::where('id', $validated['rental_id'])
-            ->where('user_id', auth()->id())
-            ->first();
-        if (! $rental) {
-            abort(403, 'Rental ini bukan milik Anda.');
+            $validated['customer_id'] = $rental->user_id;
+        } else {
+            $validated['customer_id'] = auth()->id();
+
+            // Klaim hanya boleh atas rental milik sendiri; mobil mengikuti rental.
+            $rental = Rental::where('id', $validated['rental_id'])
+                ->where('user_id', auth()->id())
+                ->first();
+            if (! $rental) {
+                abort(403, 'Rental ini bukan milik Anda.');
+            }
         }
+
+        $validated['status'] = 'diajukan';
 
         // Satu rental hanya boleh punya satu klaim (klaim ditolak boleh diajukan ulang).
         $klaimAktif = Kompensasi::where('rental_id', $validated['rental_id'])
@@ -145,12 +170,23 @@ class KompensasiController extends Controller
         }
         $validated['mobil_id'] = $rental->mobil_id;
 
+        // Nominal hanya bermakna untuk pengembalian dana; jenis lain dipaksa 0
+        // agar tidak tersimpan angka sampah (kolom default 0, tidak nullable).
+        if ($validated['jenis'] !== 'pengembalian_dana') {
+            $validated['nominal'] = 0;
+        }
+
         Kompensasi::create($validated);
 
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'Klaim kompensasi berhasil diajukan.',
             ]);
+        }
+
+        if ($isPetugas) {
+            return redirect()->route('kompensasis.index')
+                ->with('success', 'Klaim kompensasi berhasil dibuat.');
         }
 
         return redirect()->route('customer.kompensasi.index')
