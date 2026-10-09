@@ -750,7 +750,7 @@
 
         $.ajax({
             url: $(this).attr('action'),
-            method: 'PUT',
+            method: 'POST',
             data: formData,
             processData: false,
             contentType: false,
