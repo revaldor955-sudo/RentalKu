@@ -870,6 +870,8 @@ public function confirmCheckout(
         $rental->load([
             'user',
             'mobil',
+            'cabangAmbil',
+            'cabangKembali',
             'pembayaran',
             'rating',
             'supirs',
@@ -902,6 +904,12 @@ public function confirmCheckout(
 
             'jumlah_hari' =>
                 $rental->jumlah_hari,
+
+            'cabang_ambil' =>
+                $rental->cabangAmbil->name ?? '-',
+
+            'cabang_kembali' =>
+                $rental->cabangKembali->name ?? '-',
 
             'harga_perhari' =>
                 (float) $rental->harga_perhari,
@@ -967,7 +975,8 @@ public function confirmCheckout(
             'Berjalan' => ['Selesai'],
         ];
 
-        if (! in_array($status, $transisi[$rental->status] ?? [], true)) {
+        if ($rental->status !== $status
+            && ! in_array($status, $transisi[$rental->status] ?? [], true)) {
             return response()->json([
                 'message' =>
                     'Status rental tidak dapat diubah dari '.$rental->status.' ke '.$status.'.',
