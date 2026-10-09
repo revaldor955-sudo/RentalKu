@@ -9,7 +9,7 @@ class RoleController extends Controller
 {
     public function index()
     {
-        return view('roles.index');
+        return view('roles.index')->with('pageTitle', 'Role');
     }
 
     /**
@@ -37,7 +37,7 @@ class RoleController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 1);
-        $orderDir = $request->input('order.0.dir', 'asc');
+        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -45,8 +45,8 @@ class RoleController extends Controller
             $query->orderBy('roles.name', 'asc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $roles = $query->offset($start)->limit($length)->get();
 

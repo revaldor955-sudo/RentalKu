@@ -7,16 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 class Rating extends Model
 {
     protected $fillable = [
-        'booking_id',
+        'rental_id',
         'customer_id',
         'staff_id',
         'rating',
         'komentar',
     ];
 
+    public function rental()
+    {
+        return $this->belongsTo(Rental::class, 'rental_id');
+    }
+
     public function booking()
     {
-        return $this->belongsTo(Rental::class, 'booking_id');
+        return $this->rental();
     }
 
     public function customer()

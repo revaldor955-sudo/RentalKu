@@ -10,7 +10,7 @@ class KompensasiController extends Controller
 {
     public function index()
     {
-        return view('kompensasis.index');
+        return view('kompensasis.index')->with('pageTitle', 'Kompensasi');
     }
 
     public function data(Request $request)
@@ -59,7 +59,7 @@ class KompensasiController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 7);
-        $orderDir = $request->input('order.0.dir', 'desc');
+        $orderDir = strtolower($request->input('order.0.dir', 'desc')) === 'asc' ? 'asc' : 'desc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -67,8 +67,8 @@ class KompensasiController extends Controller
             $query->orderBy('kompensasis.created_at', 'desc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $kompensasis = $query->offset($start)->limit($length)->get();
 
@@ -100,36 +100,62 @@ class KompensasiController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        // Jalur admin/staff (POST /kompensasis): customer_id wajib dari input
+        // terverifikasi; jalur customer (POST /customer/kompensasi): milik sendiri.
+        $isPetugas = auth()->user()->roles_id !== 3;
+
+        $rules = [
             'mobil_id' => 'required|exists:mobils,id',
             'rental_id' => 'required|exists:rentals,id',
             'jenis' => 'required|in:pengembalian_dana,diskon,gratis_sewa',
             'nominal' => 'required_if:jenis,pengembalian_dana|numeric|min:0',
             'alasan' => 'required|string',
-            'tanggal' => 'required|date',
-        ], [
+            'tanggal' => 'required|date|before_or_equal:today',
+        ];
+
+        if ($isPetugas) {
+            $rules['customer_id'] = 'required|exists:users,id';
+        }
+
+        $validated = $request->validate($rules, [
             'mobil_id.required' => 'Mobil wajib dipilih',
             'rental_id.required' => 'Rental wajib dipilih',
             'jenis.required' => 'Jenis kompensasi wajib dipilih',
             'nominal.required_if' => 'Nominal wajib diisi untuk pengembalian dana',
             'alasan.required' => 'Alasan wajib diisi',
             'tanggal.required' => 'Tanggal wajib diisi',
+            'tanggal.before_or_equal' => 'Tanggal pembayaran tidak boleh melebihi hari ini.',
+            'customer_id.required' => 'Customer wajib dipilih',
+            'customer_id.exists' => 'Customer tidak valid.',
         ]);
 
-        $validated['customer_id'] = auth()->id();
-        $validated['status'] = 'diajukan';
+        if ($isPetugas) {
+            // Klaim dibuatkan untuk customer: rental harus milik customer tersebut.
+            $rental = Rental::where('id', $validated['rental_id'])
+                ->where('user_id', $validated['customer_id'])
+                ->first();
+            if (! $rental) {
+                abort(403, 'Rental ini bukan milik customer tersebut.');
+            }
 
-        // Klaim hanya boleh atas rental milik sendiri; mobil mengikuti rental.
-        $rental = Rental::where('id', $validated['rental_id'])
-            ->where('user_id', auth()->id())
-            ->first();
-        if (! $rental) {
-            abort(403, 'Rental ini bukan milik Anda.');
+            $validated['customer_id'] = $rental->user_id;
+        } else {
+            $validated['customer_id'] = auth()->id();
+
+            // Klaim hanya boleh atas rental milik sendiri; mobil mengikuti rental.
+            $rental = Rental::where('id', $validated['rental_id'])
+                ->where('user_id', auth()->id())
+                ->first();
+            if (! $rental) {
+                abort(403, 'Rental ini bukan milik Anda.');
+            }
         }
 
-        // Satu rental hanya boleh punya satu klaim aktif (klaim ditolak boleh diajukan ulang).
+        $validated['status'] = 'diajukan';
+
+        // Satu rental hanya boleh punya satu klaim (klaim ditolak boleh diajukan ulang).
         $klaimAktif = Kompensasi::where('rental_id', $validated['rental_id'])
-            ->whereIn('status', ['diajukan', 'disetujui'])
+            ->whereIn('status', ['diajukan', 'disetujui', 'selesai'])
             ->exists();
         if ($klaimAktif) {
             if ($request->wantsJson()) {
@@ -145,6 +171,12 @@ class KompensasiController extends Controller
         }
         $validated['mobil_id'] = $rental->mobil_id;
 
+        // Nominal hanya bermakna untuk pengembalian dana; jenis lain dipaksa 0
+        // agar tidak tersimpan angka sampah (kolom default 0, tidak nullable).
+        if ($validated['jenis'] !== 'pengembalian_dana') {
+            $validated['nominal'] = 0;
+        }
+
         Kompensasi::create($validated);
 
         if ($request->wantsJson()) {
@@ -153,12 +185,18 @@ class KompensasiController extends Controller
             ]);
         }
 
+        if ($isPetugas) {
+            return redirect()->route('kompensasis.index')
+                ->with('success', 'Klaim kompensasi berhasil dibuat.');
+        }
+
         return redirect()->route('customer.kompensasi.index')
             ->with('success', 'Klaim kompensasi berhasil diajukan.');
     }
 
     public function update(Request $request, Kompensasi $kompensasi)
     {
+        if (auth()->user()->roles_id === 3) abort(403, 'Anda tidak memiliki akses.');
         $validated = $request->validate([
             'status' => 'required|in:disetujui,ditolak,selesai',
             'catatan' => 'nullable|string',
@@ -166,10 +204,36 @@ class KompensasiController extends Controller
             'status.required' => 'Status wajib dipilih',
         ]);
 
+        // Transisi legal: diajukan -> disetujui/ditolak, disetujui -> selesai.
+        // Status final tidak bisa diubah lagi.
+        $transisi = [
+            'diajukan' => ['disetujui', 'ditolak'],
+            'disetujui' => ['selesai'],
+        ];
+
+        if ($kompensasi->status !== $validated['status']
+            && ! in_array($validated['status'], $transisi[$kompensasi->status] ?? [], true)) {
+            $pesan = 'Status kompensasi tidak dapat diubah dari '.$kompensasi->status.' ke '.$validated['status'].'.';
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => $pesan,
+                ], 422);
+            }
+
+            return back()
+                ->withErrors(['status' => $pesan])
+                ->withInput();
+        }
+
         $validated['staff_id'] = auth()->id();
 
-        // Keputusan baru = belum dibaca customer.
-        $validated['dibaca_at'] = null;
+        // Keputusan baru = belum dibaca customer; edit tanpa ubah status tidak picu notifikasi.
+        if ($kompensasi->status !== $validated['status']) {
+            $validated['dibaca_at'] = null;
+        } else {
+            unset($validated['dibaca_at']);
+        }
 
         $kompensasi->update($validated);
 
@@ -185,6 +249,7 @@ class KompensasiController extends Controller
 
     public function destroy(Request $request, Kompensasi $kompensasi)
     {
+        if (auth()->user()->roles_id === 3) abort(403, 'Anda tidak memiliki akses.');
         $kompensasi->delete();
 
         if ($request->wantsJson()) {
@@ -199,11 +264,6 @@ class KompensasiController extends Controller
 
     public function customerIndex()
     {
-        // Tandai update status klaim sebagai sudah dibaca saat halaman dibuka.
-        Kompensasi::where('customer_id', auth()->id())
-            ->whereNull('dibaca_at')
-            ->update(['dibaca_at' => now()]);
-
         $rentals = Rental::with('mobil')
             ->where('user_id', auth()->id())
             ->where('status', 'Selesai')
@@ -211,7 +271,7 @@ class KompensasiController extends Controller
                 $query->selectRaw('1')
                     ->from('kompensasis')
                     ->whereColumn('kompensasis.rental_id', 'rentals.id')
-                    ->whereIn('kompensasis.status', ['diajukan', 'disetujui']);
+                    ->whereIn('kompensasis.status', ['diajukan', 'disetujui', 'selesai']);
             })
             ->get();
 
@@ -251,7 +311,7 @@ class KompensasiController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 6);
-        $orderDir = $request->input('order.0.dir', 'desc');
+        $orderDir = strtolower($request->input('order.0.dir', 'desc')) === 'asc' ? 'asc' : 'desc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -259,10 +319,18 @@ class KompensasiController extends Controller
             $query->orderBy('kompensasis.created_at', 'desc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $kompensasis = $query->offset($start)->limit($length)->get();
+
+        // Tandai keputusan yang tampil sebagai sudah dibaca.
+        $terbaca = $kompensasis->whereNull('dibaca_at')
+            ->whereIn('status', ['disetujui', 'ditolak', 'selesai'])
+            ->pluck('id');
+        if ($terbaca->isNotEmpty()) {
+            Kompensasi::whereIn('id', $terbaca)->update(['dibaca_at' => now()]);
+        }
 
         $data = $kompensasis->map(function ($item) {
             return [

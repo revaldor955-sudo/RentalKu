@@ -11,7 +11,7 @@ class ServisMobilController extends Controller
     public function index()
     {
         $mobils = Mobil::all();
-        return view('servis_mobils.index', compact('mobils'));
+        return view('servis_mobils.index', compact('mobils'))->with('pageTitle', 'Servis Kendaraan');
     }
 
     public function data(Request $request)
@@ -50,7 +50,7 @@ class ServisMobilController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 6);
-        $orderDir = $request->input('order.0.dir', 'desc');
+        $orderDir = strtolower($request->input('order.0.dir', 'desc')) === 'asc' ? 'asc' : 'desc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -58,8 +58,8 @@ class ServisMobilController extends Controller
             $query->orderBy('servis_mobils.created_at', 'desc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $servisMobils = $query->offset($start)->limit($length)->get();
 
@@ -68,6 +68,7 @@ class ServisMobilController extends Controller
                 'id' => $item->id,
                 'mobil_id' => $item->mobil_id,
                 'tanggal' => $item->tanggal?->format('d/m/Y'),
+                'tanggal_input' => $item->tanggal?->format('Y-m-d'),
                 'mobil_name' => $item->mobil->name ?? '-',
                 'mobil_plate' => $item->mobil->plate_number ?? '-',
                 'jenis' => $item->jenis,
@@ -84,12 +85,6 @@ class ServisMobilController extends Controller
             'recordsFiltered' => $recordsFiltered,
             'data' => $data,
         ]);
-    }
-
-    public function create()
-    {
-        $mobils = Mobil::all();
-        return view('servis_mobils.create', compact('mobils'));
     }
 
     public function store(Request $request)
@@ -120,16 +115,6 @@ class ServisMobilController extends Controller
 
         return redirect()->route('servis_mobils.index')
             ->with('success', 'Servis mobil berhasil ditambahkan.');
-    }
-
-    public function show(ServisMobil $servisMobil)
-    {
-    }
-
-    public function edit(ServisMobil $servisMobil)
-    {
-        $mobils = Mobil::all();
-        return view('servis_mobils.edit', compact('servisMobil', 'mobils'));
     }
 
     public function update(Request $request, ServisMobil $servisMobil)

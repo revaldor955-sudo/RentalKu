@@ -8,6 +8,6 @@ class PengembalianController extends Controller
 {
     public function index()
     {
-        return view('pengembalian.index');
+        return view('pengembalian.index')->with('pageTitle', 'Pengembalian');
     }
 }

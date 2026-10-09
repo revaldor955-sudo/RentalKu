@@ -61,6 +61,14 @@ class RentalController extends Controller
                 'string',
                 'max:500',
             ],
+            'cabang_ambil_id' => [
+                'required',
+                'exists:cabangs,id',
+            ],
+            'cabang_kembali_id' => [
+                'required',
+                'exists:cabangs,id',
+            ],
         ], [
             'tanggal_mulai.required' =>
                 'Tanggal mulai wajib diisi.',
@@ -74,6 +82,14 @@ class RentalController extends Controller
                 'Supir yang dipilih tidak tersedia.',
             'catatan.max' =>
                 'Catatan maksimal 500 karakter.',
+            'cabang_ambil_id.required' =>
+                'Cabang ambil wajib dipilih.',
+            'cabang_ambil_id.exists' =>
+                'Cabang ambil tidak valid.',
+            'cabang_kembali_id.required' =>
+                'Cabang kembali wajib dipilih.',
+            'cabang_kembali_id.exists' =>
+                'Cabang kembali tidak valid.',
         ]);
 
         $tanggalMulai = Carbon::parse(
@@ -179,10 +195,10 @@ class RentalController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $totalMobilSameType = Mobil::where('tipe_mobil_id', $validated['tipe_mobil_id'] ?? $mobil->tipe_mobil_id)->count();
+        $totalMobilSameType = Mobil::where('tipe_mobil_id', $mobil->tipe_mobil_id)->count();
 
-        $rentalsSameTypeConflict = Rental::whereHas('mobil', function ($q) use ($validated, $mobil) {
-            $q->where('tipe_mobil_id', $validated['tipe_mobil_id'] ?? $mobil->tipe_mobil_id);
+        $rentalsSameTypeConflict = Rental::whereHas('mobil', function ($q) use ($mobil) {
+            $q->where('tipe_mobil_id', $mobil->tipe_mobil_id);
         })
             ->whereIn('status', ['Menunggu', 'Disetujui', 'Berjalan'])
             ->where(function ($query) use ($tanggalMulai, $tanggalSelesai) {
@@ -194,7 +210,7 @@ class RentalController extends Controller
         if ($rentalsSameTypeConflict >= $totalMobilSameType) {
             return $this->errorResponse(
                 $request,
-                'Semua mobil tipe "' . ($validated['tipe_mobil_id'] ?? $mobil->tipe_mobil->name ?? $mobil->name) . '" sedang disewa.'
+                'Semua mobil tipe "' . ($mobil->tipe_mobil->name ?? $mobil->name) . '" sedang disewa.'
             );
         }
 
@@ -276,6 +292,10 @@ class RentalController extends Controller
             $rental = Rental::create([
                 'user_id' => auth()->id(),
                 'mobil_id' => $mobil->id,
+                'cabang_ambil_id' =>
+                    $validated['cabang_ambil_id'],
+                'cabang_kembali_id' =>
+                    $validated['cabang_kembali_id'],
                 'tanggal_mulai' =>
                     $tanggalMulai->format('Y-m-d'),
                 'tanggal_selesai' =>
@@ -370,6 +390,14 @@ class RentalController extends Controller
                     'string',
                     'max:500',
                 ],
+                'cabang_ambil_id' => [
+                    'required',
+                    'exists:cabangs,id',
+                ],
+                'cabang_kembali_id' => [
+                    'required',
+                    'exists:cabangs,id',
+                ],
             ],
             [
                 'tanggal_mulai.required' =>
@@ -384,6 +412,14 @@ class RentalController extends Controller
                     'Supir yang dipilih tidak tersedia.',
                 'catatan.max' =>
                     'Catatan maksimal 500 karakter.',
+                'cabang_ambil_id.required' =>
+                    'Cabang ambil wajib dipilih.',
+                'cabang_ambil_id.exists' =>
+                    'Cabang ambil tidak valid.',
+                'cabang_kembali_id.required' =>
+                    'Cabang kembali wajib dipilih.',
+                'cabang_kembali_id.exists' =>
+                    'Cabang kembali tidak valid.',
             ]
         );
 
@@ -493,6 +529,10 @@ class RentalController extends Controller
         session([
             'checkout_rental' => [
                 'mobil_id' => $mobil->id,
+                'cabang_ambil_id' =>
+                    $validated['cabang_ambil_id'],
+                'cabang_kembali_id' =>
+                    $validated['cabang_kembali_id'],
                 'tanggal_mulai' =>
                     $validated['tanggal_mulai'],
                 'tanggal_selesai' =>
@@ -628,6 +668,12 @@ public function confirmCheckout(
             );
     }
 
+    if ((int) ($checkout['mobil_id'] ?? 0) !== (int) $mobil->id) {
+        session()->forget('checkout_rental');
+
+        return redirect()->route('home')->with('error', 'Data checkout tidak sesuai dengan mobil.');
+    }
+
     /*
     |--------------------------------------------------------------
     | Ambil kode promo dari input checkout
@@ -654,6 +700,12 @@ public function confirmCheckout(
 
         'catatan' =>
             $checkout['catatan'] ?? null,
+
+        'cabang_ambil_id' =>
+            $checkout['cabang_ambil_id'] ?? null,
+
+        'cabang_kembali_id' =>
+            $checkout['cabang_kembali_id'] ?? null,
     ]);
 
     $response = $this->store(
@@ -675,7 +727,7 @@ public function confirmCheckout(
      */
     public function index()
     {
-        return view('admin.rentals.index');
+        return view('admin.rentals.index')->with('pageTitle', 'Transaksi Rental');
     }
 
     /**
@@ -867,9 +919,15 @@ public function confirmCheckout(
      */
     public function detail(Rental $rental)
     {
+        if (auth()->user()->roles_id === 3 && $rental->user_id !== auth()->id()) {
+            abort(403, 'Anda tidak berhak mengakses data rental ini.');
+        }
+
         $rental->load([
             'user',
             'mobil',
+            'cabangAmbil',
+            'cabangKembali',
             'pembayaran',
             'rating',
             'supirs',
@@ -902,6 +960,12 @@ public function confirmCheckout(
 
             'jumlah_hari' =>
                 $rental->jumlah_hari,
+
+            'cabang_ambil' =>
+                $rental->cabangAmbil->name ?? '-',
+
+            'cabang_kembali' =>
+                $rental->cabangKembali->name ?? '-',
 
             'harga_perhari' =>
                 (float) $rental->harga_perhari,
@@ -950,6 +1014,10 @@ public function confirmCheckout(
         Request $request,
         Rental $rental
     ) {
+        if (auth()->user()->roles_id === 3) {
+            abort(403, 'Anda tidak berhak mengubah status rental.');
+        }
+
         $request->validate([
             'status' => [
                 'required',
@@ -958,6 +1026,30 @@ public function confirmCheckout(
         ]);
 
         $status = $request->status;
+
+        // Transisi legal mengikuti tombol di UI: Menunggu -> Disetujui/Ditolak,
+        // Disetujui -> Selesai. Status final tidak bisa diubah lagi.
+        $transisi = [
+            'Menunggu' => ['Disetujui', 'Ditolak'],
+            'Disetujui' => ['Selesai'],
+            'Berjalan' => ['Selesai'],
+        ];
+
+        if ($rental->status !== $status
+            && ! in_array($status, $transisi[$rental->status] ?? [], true)) {
+            return response()->json([
+                'message' =>
+                    'Status rental tidak dapat diubah dari '.$rental->status.' ke '.$status.'.',
+            ], 422);
+        }
+
+        // Replay status sama = no-op (jangan tembak side-effect dua kali).
+        if ($rental->status === $status) {
+            return response()->json([
+                'message' =>
+                    'Status rental sudah '.$status.'.',
+            ]);
+        }
 
         if ($status === 'Disetujui') {
             if (
@@ -970,15 +1062,17 @@ public function confirmCheckout(
                 ], 422);
             }
 
-            $rental->update([
-                'status' => 'Disetujui',
-            ]);
-
-            if ($rental->mobil) {
-                $rental->mobil->update([
-                    'status' => 'Disewa',
+            DB::transaction(function () use ($rental) {
+                $rental->update([
+                    'status' => 'Disetujui',
                 ]);
-            }
+
+                if ($rental->mobil) {
+                    $rental->mobil->update([
+                        'status' => 'Disewa',
+                    ]);
+                }
+            });
 
             return response()->json([
                 'message' =>
@@ -987,15 +1081,17 @@ public function confirmCheckout(
         }
 
         if ($status === 'Ditolak') {
-            $rental->update([
-                'status' => 'Ditolak',
-            ]);
-
-            if ($rental->mobil) {
-                $rental->mobil->update([
-                    'status' => 'Tersedia',
+            DB::transaction(function () use ($rental) {
+                $rental->update([
+                    'status' => 'Ditolak',
                 ]);
-            }
+
+                if ($rental->mobil) {
+                    $rental->mobil->update([
+                        'status' => 'Tersedia',
+                    ]);
+                }
+            });
 
             return response()->json([
                 'message' =>
@@ -1015,15 +1111,17 @@ public function confirmCheckout(
         }
 
         if ($status === 'Selesai') {
-            $rental->update([
-                'status' => 'Selesai',
-            ]);
-
-            if ($rental->mobil) {
-                $rental->mobil->update([
-                    'status' => 'Tersedia',
+            DB::transaction(function () use ($rental) {
+                $rental->update([
+                    'status' => 'Selesai',
                 ]);
-            }
+
+                if ($rental->mobil) {
+                    $rental->mobil->update([
+                        'status' => 'Tersedia',
+                    ]);
+                }
+            });
 
             return response()->json([
                 'message' =>

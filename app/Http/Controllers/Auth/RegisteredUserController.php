@@ -50,14 +50,16 @@ class RegisteredUserController extends Controller
             ]);
         }
 
-        $user = User::create([
+        // roles_id di luar Fillable User: set eksplisit (selalu Customer).
+        $user = new User([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
             'address' => $request->address,
-            'roles_id' => $customerRole->id,
             'password' => Hash::make($request->password),
         ]);
+        $user->roles_id = $customerRole->id;
+        $user->save();
 
         event(new Registered($user));
 

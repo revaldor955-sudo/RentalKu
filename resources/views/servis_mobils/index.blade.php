@@ -633,7 +633,7 @@
                     orderable: true,
                     searchable: false,
                     render: function(data) {
-                        return '<span class="fw-semibold">' + formatRupiah(data) + '</span>';
+                        return '<span class="fw-semibold">Rp ' + formatRupiahInput(data) + '</span>';
                     },
                 },
                 {
@@ -754,9 +754,10 @@
         }
 
         $('#editMobilIdServis').val(data.mobil_id);
-        $('#editTanggalServis').val(data.tanggal);
+        $('#editTanggalServis').val(data.tanggal_input || data.tanggal);
         $('#editJenisServis').val(data.jenis);
         $('#editBiayaServis').val(data.biaya);
+        $('#editBiayaServisDisplay').val(formatRupiahInput(data.biaya));
         $('#editBengkelServis').val(data.bengkel);
         $('#editKeteranganServis').val(data.keterangan);
 
@@ -816,7 +817,7 @@
 
         $.ajax({
             url: $(this).attr('action'),
-            method: 'PUT',
+            method: 'POST',
             data: formData,
             processData: false,
             contentType: false,

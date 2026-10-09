@@ -9,9 +9,7 @@ class KuponController extends Controller
 {
     public function index()
     {
-        $kupons = Kupon::latest()->get();
-
-        return view('kupons.index', compact('kupons'));
+        return view('kupons.index')->with('pageTitle', 'Kupon');
     }
 
     /**
@@ -48,7 +46,7 @@ class KuponController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 7);
-        $orderDir = $request->input('order.0.dir', 'asc');
+        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         if ($orderColumn == 7) {
             // status dihitung di PHP, urutkan dengan CASE agar Aktif > Belum Aktif > Tidak Aktif
@@ -64,8 +62,8 @@ class KuponController extends Controller
             $query->orderBy('kupons.code', 'asc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $kupons = $query->offset($start)->limit($length)->get();
 
@@ -151,10 +149,44 @@ class KuponController extends Controller
             'jenis' => 'required|in:persen,nominal',
             'value' => 'required|numeric|min:1',
             'kuota' => 'required|integer|min:1',
+            'terpakai' => 'nullable|integer|min:0|lte:kuota',
             'minimal_pembelian' => 'required|numeric|min:0',
             'active_at' => 'required|date',
             'expired_at' => 'required|date|after_or_equal:active_at',
+        ], [
+            'code.required' => 'Kode promo wajib diisi.',
+            'code.unique' => 'Kode promo sudah digunakan.',
+            'jenis.required' => 'Jenis promo wajib dipilih.',
+            'jenis.in' => 'Jenis promo tidak valid.',
+            'value.required' => 'Nilai promo wajib diisi.',
+            'value.min' => 'Nilai promo minimal 1.',
+            'kuota.required' => 'Kuota wajib diisi.',
+            'kuota.min' => 'Kuota minimal 1.',
+            'terpakai.integer' => 'Terpakai harus berupa angka.',
+            'terpakai.min' => 'Terpakai tidak boleh negatif.',
+            'terpakai.lte' => 'Terpakai tidak boleh melebihi kuota.',
+            'minimal_pembelian.required' => 'Minimal pembelian wajib diisi.',
+            'active_at.required' => 'Tanggal mulai wajib diisi.',
+            'expired_at.required' => 'Tanggal berakhir wajib diisi.',
+            'expired_at.after_or_equal' => 'Tanggal berakhir harus setelah tanggal mulai.',
         ]);
+
+        // Kuota tidak boleh turun di bawah jumlah yang sudah terpakai.
+        $terpakaiAktual = array_key_exists('terpakai', $validated)
+            ? (int) $validated['terpakai']
+            : (int) $kupon->terpakai;
+        if ((int) $validated['kuota'] < $terpakaiAktual) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => "Kuota tidak boleh lebih kecil dari jumlah terpakai ({$terpakaiAktual}).",
+                    'errors' => ['kuota' => ["Kuota tidak boleh lebih kecil dari jumlah terpakai ({$terpakaiAktual})."]],
+                ], 422);
+            }
+
+            return back()
+                ->withErrors(['kuota' => "Kuota tidak boleh lebih kecil dari jumlah terpakai ({$terpakaiAktual})."])
+                ->withInput();
+        }
 
         $kupon->update($validated);
 

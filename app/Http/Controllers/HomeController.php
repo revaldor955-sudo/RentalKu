@@ -93,6 +93,7 @@ $ratings = DB::table('ratings')
         $selectedFaqIds = json_decode($landingSettings['selected_faq_ids'] ?? 'null', true);
 
         $faqs = DB::table('faqs')
+            ->where('is_active', true)
             ->when(! empty($selectedFaqIds), function ($query) use ($selectedFaqIds) {
                 $query->whereIn('id', array_values(array_unique($selectedFaqIds)));
             })

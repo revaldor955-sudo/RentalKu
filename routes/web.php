@@ -40,11 +40,12 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | MASTER DATA
 |--------------------------------------------------------------------------
-| Admin dan Staff
+| Admin saja — data referensi (role, brand, tipe, cabang, fasilitas,
+| metode, supir, kupon) hanya boleh diubah Admin; Staff memakai lewat dropdown.
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('adminstaff')->group(function () {
+Route::middleware('admin')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
@@ -174,9 +175,6 @@ Route::get('/mobils/{mobil}', [MobilController::class, 'show'])
     ->name('mobils.show');
 
 Route::middleware('admin')->group(function () {
-
-    Route::get('/mobils/{mobil}/edit', [MobilController::class, 'edit'])
-        ->name('mobils.edit');
 
     Route::put('/mobils/{mobil}', [MobilController::class, 'update'])
         ->name('mobils.update');
@@ -315,18 +313,19 @@ Route::get(
 Route::resource(
     'servis_mobils',
     ServisMobilController::class
-)->middleware('adminstaff');
+)->except(['create', 'edit', 'show'])->middleware('adminstaff');
 
 
 /*
 |--------------------------------------------------------------------------
 | MASTER KONTEN
 |--------------------------------------------------------------------------
-| Admin saja
+| Admin saja — konten landing (banner, FAQ) dikelola bersama
+| landing-settings yang sudah admin-only; Staff fokus operasional rental.
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('adminstaff')->group(function () {
+Route::middleware('admin')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
@@ -334,15 +333,15 @@ Route::middleware('adminstaff')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::resource(
-        'banners',
-        BannerController::class
-    )->except(['create', 'edit', 'show']);
-
     Route::get(
         'banners/data',
         [BannerController::class, 'data']
     )->name('banners.data');
+
+    Route::resource(
+        'banners',
+        BannerController::class
+    )->except(['create', 'edit']);
 
 
     /*
@@ -401,9 +400,21 @@ Route::middleware('admin')->group(function () {
 
 
     Route::get(
-        '/admin/contacts/{contact}',
-        [ContactController::class, 'show']
-    )->name('contacts.show');
+        '/admin/contacts/data',
+        [ContactController::class, 'data']
+    )->name('contacts.data');
+
+
+    Route::get(
+        '/admin/contacts/{contact}/detail',
+        [ContactController::class, 'detail']
+    )->name('contacts.detail');
+
+
+    Route::patch(
+        '/admin/contacts/{contact}/read',
+        [ContactController::class, 'markAsRead']
+    )->name('contacts.read');
 
 
     Route::post(
@@ -508,20 +519,10 @@ Route::middleware('staff')->group(function () {
         [MobilController::class, 'index']
     )->name('staff.mobils.index');
 
-    Route::get(
-        '/staff/mobils/create',
-        [MobilController::class, 'create']
-    )->name('staff.mobils.create');
-
     Route::post(
         '/staff/mobils',
         [MobilController::class, 'store']
     )->name('staff.mobils.store');
-
-    Route::get(
-        '/staff/mobils/{mobil}/edit',
-        [MobilController::class, 'edit']
-    )->name('staff.mobils.edit');
 
     Route::put(
         '/staff/mobils/{mobil}',
@@ -740,7 +741,7 @@ Route::middleware('adminstaff')->group(function () {
 |--------------------------------------------------------------------------
 | USERS
 |--------------------------------------------------------------------------
-| Admin dan Staff
+| Admin saja — kelola identitas dan role; satu-satunya jalur eskalasi hak.
 |--------------------------------------------------------------------------
 */
 
@@ -749,10 +750,10 @@ Route::resource(
     UserController::class
 )
     ->except(['create', 'edit', 'show'])
-    ->middleware('adminstaff');
+    ->middleware('admin');
 
 
-Route::middleware('adminstaff')->group(function () {
+Route::middleware('admin')->group(function () {
 
     Route::get(
         '/users/data',
@@ -840,11 +841,6 @@ Route::middleware('adminstaff')->group(function () {
 */
 
 Route::middleware(['auth', 'customer'])->group(function () {
-
-    Route::get(
-        '/customer/ratings/create/{rental}',
-        [CustomerRatingController::class, 'create']
-    )->name('customer.ratings.create');
 
     Route::post(
         '/customer/ratings/{rental}',

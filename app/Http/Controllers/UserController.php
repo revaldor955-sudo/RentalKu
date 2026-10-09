@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Rental;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ class UserController extends Controller
     {
         $roles = Role::all();
 
-        return view('users.index', compact('roles'));
+        return view('users.index', compact('roles'))->with('pageTitle', 'Pengguna');
     }
 
     /**
@@ -56,7 +57,7 @@ class UserController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 1);
-        $orderDir = $request->input('order.0.dir', 'asc');
+        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -64,8 +65,8 @@ class UserController extends Controller
             $query->orderBy('users.name', 'asc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $users = $query->offset($start)->limit($length)->get();
 
@@ -133,6 +134,16 @@ class UserController extends Controller
             'photo.mimes' => 'Foto harus JPG, JPEG, atau PNG.',
             'photo.max' => 'Ukuran foto maksimal 2 MB.',
         ]);
+
+        // Defense-in-depth: hanya Admin yang boleh memberi role Admin.
+        if ((int) $validated['roles_id'] === 1 && auth()->user()->roles_id !== 1) {
+            abort(403, 'Hanya Admin yang boleh memberi role Admin.');
+        }
+
+        // roles_id di luar Fillable: set eksplisit pasca-gate.
+        $rolesId = $validated['roles_id'];
+        unset($validated['roles_id']);
+
         if ($request->hasFile('photo')) {
 
             $folder = public_path('images/users');
@@ -152,7 +163,9 @@ class UserController extends Controller
 
         $validated['password'] = Hash::make($validated['password']);
 
-        User::create($validated);
+        $user = User::create($validated);
+        $user->roles_id = $rolesId;
+        $user->save();
 
         return response()->json([
             'message' => 'Pengguna berhasil ditambahkan.',
@@ -169,7 +182,28 @@ class UserController extends Controller
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
+        ], [
+            'name.required' => 'Nama pengguna wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan.',
+            'password.min' => 'Password minimal 6 karakter.',
+            'roles_id.required' => 'Role wajib dipilih.',
+            'roles_id.exists' => 'Role tidak valid.',
+            'photo.image' => 'Foto harus berupa gambar.',
+            'photo.mimes' => 'Foto harus JPG, JPEG, atau PNG.',
+            'photo.max' => 'Ukuran foto maksimal 2 MB.',
         ]);
+
+        // Defense-in-depth: akun Admin hanya boleh diubah Admin;
+        // hanya Admin yang boleh memberi atau mencabut role Admin.
+        if (auth()->user()->roles_id !== 1 && ($user->roles_id === 1 || (int) $validated['roles_id'] === 1)) {
+            abort(403, 'Hanya Admin yang boleh mengubah akun Admin.');
+        }
+
+        // roles_id di luar Fillable: set eksplisit pasca-gate.
+        $rolesId = $validated['roles_id'];
+        unset($validated['roles_id']);
 
         if ($request->hasFile('photo')) {
 
@@ -198,7 +232,9 @@ class UserController extends Controller
             unset($validated['password']);
         }
 
-        $user->update($validated);
+        $user->fill($validated);
+        $user->roles_id = $rolesId;
+        $user->save();
 
         return response()->json([
             'message' => 'Pengguna berhasil diperbarui.',
@@ -210,6 +246,18 @@ class UserController extends Controller
         if ($user->id === auth()->id()) {
             return response()->json([
                 'message' => 'Akun yang sedang digunakan tidak dapat dihapus.',
+            ], 422);
+        }
+
+        // Defense-in-depth: akun Admin hanya boleh dihapus Admin.
+        if ($user->roles_id === 1 && auth()->user()->roles_id !== 1) {
+            abort(403, 'Hanya Admin yang boleh menghapus akun Admin.');
+        }
+
+        // Hapus user = cascade hapus rentals + pembayaran/denda/klaim — cegah bila ada riwayat.
+        if (Rental::where('user_id', $user->id)->exists()) {
+            return response()->json([
+                'message' => 'Pengguna tidak dapat dihapus karena masih memiliki riwayat rental.',
             ], 422);
         }
 

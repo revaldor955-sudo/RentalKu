@@ -93,6 +93,7 @@
         .jenis-kehilangan { background: #e7f1ff; color: #0d6efd; }
 
         .status-belum-bayar { background: #fff3cd; color: #997404; }
+        .status-menunggu { background: #e7f1ff; color: #0d6efd; }
         .status-lunas { background: #d1e7dd; color: #0f5132; }
 
         .foto-thumb {
@@ -361,7 +362,6 @@
 
                     <select name="status" class="form-select" required>
                         <option value="belum bayar">Belum Bayar</option>
-                        <option value="lunas">Lunas</option>
                     </select>
 
                 </div>
@@ -501,6 +501,7 @@
 
                     <select name="status" id="editStatusDenda" class="form-select" required>
                         <option value="belum bayar">Belum Bayar</option>
+                        <option value="menunggu verifikasi">Menunggu Verifikasi</option>
                         <option value="lunas">Lunas</option>
                     </select>
 
@@ -590,6 +591,7 @@
     function statusBadge(status) {
         const map = {
             'belum bayar': 'status-belum-bayar',
+            'menunggu verifikasi': 'status-menunggu',
             'lunas': 'status-lunas',
         };
 
@@ -703,15 +705,33 @@
                                     className: 'text-center',
                                     width: '140px',
                                     render: function(data, type, row) {
-                                        return '<div class="d-flex justify-content-center gap-2">' +
-                                            '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
+                                        let html = '<div class="d-flex justify-content-center gap-2">';
+
+                                        if (row.status === 'menunggu verifikasi') {
+                                            if (row.bukti_bayar_url) {
+                                                html += '<button type="button" class="btn p-1 text-info" style="border:none;background:none;" ' +
+                                                    'title="Lihat Bukti" onclick="openFotoDenda(\'' + row.bukti_bayar_url + '\')">' +
+                                                    '<i class="bi bi-eye"></i></button>';
+                                            }
+
+                                            html += '<button type="button" class="btn p-1 text-success" style="border:none;background:none;" ' +
+                                                'title="Verifikasi Lunas" onclick="verifikasiDenda(' + data + ', \'lunas\')">' +
+                                                '<i class="bi bi-check-circle"></i></button>';
+
+                                            html += '<button type="button" class="btn p-1 text-warning" style="border:none;background:none;" ' +
+                                                'title="Tolak Bukti" onclick="verifikasiDenda(' + data + ', \'belum bayar\')">' +
+                                                '<i class="bi bi-x-circle"></i></button>';
+                                        }
+
+                                        html += '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
                                             'title="Edit" onclick="editDenda(' + data + ')">' +
                                             '<i class="bi bi-pencil-square"></i></button>' +
                                             '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" ' +
                                             'title="Hapus" onclick="deleteDenda(' + data +
                                             ', \'' + row.pelanggan.replace(/'/g, "\\'") + '\')">' +
-                                            '<i class="bi bi-trash"></i></button>' +
-                                            '</div>';
+                                            '<i class="bi bi-trash"></i></button>';
+
+                                        return html + '</div>';
                                     },
                                 },
                             ],
@@ -774,6 +794,61 @@
                                         title: 'Gagal',
                                         text: result.message ||
                                             'Terjadi kesalahan saat menghapus denda.',
+                                    });
+                                }
+                            });
+                        });
+                    }
+
+                    function verifikasiDenda(id, status) {
+                        const data = $('#dendas-table').DataTable().rows().data().toArray()
+                            .find(r => r.id == id);
+
+                        const isLunas = status === 'lunas';
+
+                        Swal.fire({
+                            title: isLunas ? 'Verifikasi Lunas?' : 'Tolak Bukti Bayar?',
+                            text: isLunas
+                                ? 'Bukti pembayaran customer akan disetujui dan denda menjadi lunas.'
+                                : 'Denda dikembalikan menjadi belum bayar agar customer upload ulang.',
+                            imageUrl: (data && data.bukti_bayar_url) ? data.bukti_bayar_url : undefined,
+                            imageWidth: 320,
+                            icon: isLunas ? 'question' : 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: isLunas ? 'Ya, Lunaskan' : 'Ya, Tolak',
+                            cancelButtonText: 'Batal',
+                        }).then(function(result) {
+                            if (!result.isConfirmed) return;
+
+                            $.ajax({
+                                url: "{{ route('dendas.updateStatus', '__ID__') }}".replace('__ID__', id),
+                                method: 'PUT',
+                                headers: {
+                                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                },
+                                data: {
+                                    status: status
+                                },
+                                success: function(result) {
+                                    $('#dendas-table').DataTable().ajax.reload();
+
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Berhasil',
+                                        text: (result && result.message) ? result.message : 'Status denda berhasil diperbarui.',
+                                        timer: 1500,
+                                        showConfirmButton: false,
+                                    });
+                                },
+                                error: function(xhr) {
+                                    const result = xhr.responseJSON || {};
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Gagal',
+                                        text: result.message ||
+                                            'Terjadi kesalahan saat memverifikasi denda.',
                                     });
                                 }
                             });
@@ -862,7 +937,7 @@
 
                         $.ajax({
                             url: $(this).attr('action'),
-                            method: 'PUT',
+                            method: 'POST',
                             data: formData,
                             processData: false,
                             contentType: false,

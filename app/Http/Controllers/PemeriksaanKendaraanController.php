@@ -6,6 +6,7 @@ use App\Models\KerusakanMobil;
 use App\Models\PemeriksaanMobil;
 use App\Models\Rental;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PemeriksaanKendaraanController extends Controller
 {
@@ -18,7 +19,7 @@ class PemeriksaanKendaraanController extends Controller
 
         $kerusakanList = KerusakanMobil::orderBy('jenis_kerusakan')->get();
 
-        return view('pemeriksaan_kendaraan.index', compact('rentals', 'kerusakanList'));
+        return view('pemeriksaan_kendaraan.index', compact('rentals', 'kerusakanList'))->with('pageTitle', 'Pemeriksaan Kendaraan');
     }
 
     /**
@@ -66,7 +67,7 @@ class PemeriksaanKendaraanController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 5);
-        $orderDir = $request->input('order.0.dir', 'desc');
+        $orderDir = strtolower($request->input('order.0.dir', 'desc')) === 'asc' ? 'asc' : 'desc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -74,8 +75,8 @@ class PemeriksaanKendaraanController extends Controller
             $query->orderBy('pemeriksaan_mobils.tanggal', 'desc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $pemeriksaan = $query->offset($start)->limit($length)->get();
 
@@ -126,6 +127,7 @@ class PemeriksaanKendaraanController extends Controller
             'kondisi' => 'required|in:baik,rusak',
             'tanggal' => 'required|date',
             'catatan' => 'nullable|string|max:1000',
+            'foto_bukti' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'kerusakan' => 'nullable|array',
             'kerusakan.*' => 'exists:kerusakan_mobils,id',
             'keterangan' => 'nullable|array',
@@ -169,6 +171,7 @@ class PemeriksaanKendaraanController extends Controller
             'kondisi' => 'required|in:baik,rusak',
             'tanggal' => 'required|date',
             'catatan' => 'nullable|string|max:1000',
+            'foto_bukti' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'kerusakan' => 'nullable|array',
             'kerusakan.*' => 'exists:kerusakan_mobils,id',
             'keterangan' => 'nullable|array',
@@ -189,6 +192,10 @@ class PemeriksaanKendaraanController extends Controller
         ];
 
         if ($request->hasFile('foto_bukti')) {
+            if ($pemeriksaan->foto_bukti) {
+                Storage::disk('public')->delete($pemeriksaan->foto_bukti);
+            }
+
             $data['foto_bukti'] = $request->file('foto_bukti')->store('pemeriksaan', 'public');
         }
 
@@ -203,6 +210,10 @@ class PemeriksaanKendaraanController extends Controller
 
     public function destroy(Request $request, PemeriksaanMobil $pemeriksaan)
     {
+        if ($pemeriksaan->foto_bukti) {
+            Storage::disk('public')->delete($pemeriksaan->foto_bukti);
+        }
+
         $pemeriksaan->delete();
 
         return response()->json([

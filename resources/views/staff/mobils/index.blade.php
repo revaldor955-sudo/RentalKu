@@ -17,6 +17,8 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     >
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
     <style>
         body {
             background: #f5f7f6;
@@ -357,16 +359,18 @@
 
                                     <div class="d-flex justify-content-center gap-2">
 
-                                        <a
-                                            href="{{ route('staff.mobils.edit', $mobil->id) }}"
+                                        <button
+                                            type="button"
                                             class="btn p-1 text-primary"
                                             style="border:none;background:none;"
                                             title="Edit"
+                                            data-id="{{ $mobil->id }}"
+                                            onclick="editMobilStaff(this.dataset.id)"
                                         >
 
                                             <i class="bi bi-pencil-square"></i>
 
-                                        </a>
+                                        </button>
 
 
                                         <form
@@ -828,6 +832,48 @@
                         </div>
 
 
+                        {{-- FASILITAS --}}
+
+                        <div class="col-12">
+
+                            <label class="form-label fw-semibold">
+                                Fasilitas
+                            </label>
+
+                            <div class="row g-2">
+
+                                @foreach($fasilitas ?? [] as $item)
+
+                                    <div class="col-md-4">
+
+                                        <div class="form-check">
+
+                                            <input
+                                                type="checkbox"
+                                                name="fasilitas[]"
+                                                value="{{ $item->id }}"
+                                                class="form-check-input"
+                                                id="tambahFasilitas{{ $item->id }}"
+                                            >
+
+                                            <label
+                                                class="form-check-label"
+                                                for="tambahFasilitas{{ $item->id }}"
+                                            >
+                                                {{ $item->name }}
+                                            </label>
+
+                                        </div>
+
+                                    </div>
+
+                                @endforeach
+
+                            </div>
+
+                        </div>
+
+
                         {{-- DESKRIPSI --}}
 
                         <div class="col-12">
@@ -884,6 +930,464 @@
 </div>
 
 
+{{-- MODAL EDIT MOBIL --}}
+
+<div
+    class="modal fade"
+    id="editMobilModal"
+    tabindex="-1"
+    aria-labelledby="editMobilModalLabel"
+    aria-hidden="true"
+>
+
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            @include(
+                'layouts.partials.modal-head',
+                [
+                    'title' => 'Edit Mobil',
+                    'icon' => 'bi-pencil-square',
+                    'titleId' => 'editMobilModalLabel'
+                ]
+            )
+
+
+            <form
+                action=""
+                method="POST"
+                enctype="multipart/form-data"
+                id="formEditMobil"
+            >
+
+                @csrf
+
+                @method('PUT')
+
+
+                <div class="modal-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <label class="form-label fw-semibold">
+                                Nama Mobil
+                            </label>
+
+                            <input
+                                type="text"
+                                name="name"
+                                id="editName"
+                                class="form-control"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label fw-semibold">
+                                Plat Nomor
+                            </label>
+
+                            <input
+                                type="text"
+                                name="plate_number"
+                                id="editPlateNumber"
+                                class="form-control"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label fw-semibold">
+                                Brand
+                            </label>
+
+                            <select
+                                name="brand_id"
+                                id="editBrandId"
+                                class="form-select"
+                                required
+                            >
+
+                                <option value="">
+                                    -- Pilih Brand --
+                                </option>
+
+                                @foreach($brands ?? [] as $brand)
+
+                                    <option value="{{ $brand->id }}">
+                                        {{ $brand->name }}
+                                    </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label fw-semibold">
+                                Tipe Mobil
+                            </label>
+
+                            <select
+                                name="tipe_mobil_id"
+                                id="editTipeMobilId"
+                                class="form-select"
+                                required
+                            >
+
+                                <option value="">
+                                    -- Pilih Tipe --
+                                </option>
+
+                                @foreach($tipeMobils ?? [] as $tipe)
+
+                                    <option value="{{ $tipe->id }}">
+                                        {{ $tipe->name }}
+                                    </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label fw-semibold">
+                                Cabang
+                            </label>
+
+                            <select
+                                name="cabang_id"
+                                id="editCabangId"
+                                class="form-select"
+                                required
+                            >
+
+                                <option value="">
+                                    -- Pilih Cabang --
+                                </option>
+
+                                @foreach($cabangs ?? [] as $cabang)
+
+                                    <option value="{{ $cabang->id }}">
+                                        {{ $cabang->name }}
+                                    </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label fw-semibold">
+                                Tahun
+                            </label>
+
+                            <input
+                                type="number"
+                                name="tahun"
+                                id="editTahun"
+                                class="form-control"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label fw-semibold">
+                                Transmisi
+                            </label>
+
+                            <select
+                                name="transmisi"
+                                id="editTransmisi"
+                                class="form-select"
+                                required
+                            >
+
+                                <option value="Manual">
+                                    Manual
+                                </option>
+
+                                <option value="Matic">
+                                    Matic
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label fw-semibold">
+                                Kapasitas
+                            </label>
+
+                            <input
+                                type="number"
+                                name="kapasitas"
+                                id="editKapasitas"
+                                class="form-control"
+                                min="1"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label fw-semibold">
+                                Warna
+                            </label>
+
+                            <input
+                                type="text"
+                                name="warna"
+                                id="editWarna"
+                                class="form-control"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label fw-semibold">
+                                Harga / Hari
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    Rp
+                                </span>
+
+                                <input
+                                    type="text"
+                                    id="editHargaDisplay"
+                                    class="form-control rupiah-input"
+                                    autocomplete="off"
+                                    inputmode="numeric"
+                                    required
+                                >
+
+                            </div>
+
+                            <input
+                                type="hidden"
+                                name="harga_perhari"
+                                id="editHarga"
+                            >
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label fw-semibold">
+                                Deposit
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    Rp
+                                </span>
+
+                                <input
+                                    type="text"
+                                    id="editDepositDisplay"
+                                    class="form-control rupiah-input"
+                                    autocomplete="off"
+                                    inputmode="numeric"
+                                    required
+                                >
+
+                            </div>
+
+                            <input
+                                type="hidden"
+                                name="deposit"
+                                id="editDeposit"
+                            >
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label fw-semibold">
+                                Status
+                            </label>
+
+                            <select
+                                name="status"
+                                id="editStatus"
+                                class="form-select"
+                                required
+                            >
+
+                                <option value="Tersedia">
+                                    Tersedia
+                                </option>
+
+                                <option value="Disewa">
+                                    Disewa
+                                </option>
+
+                                <option value="Maintenance">
+                                    Maintenance
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label class="form-label fw-semibold">
+                                Foto Mobil
+                            </label>
+
+                            <img
+                                id="editFotoPreview"
+                                src=""
+                                class="mb-2"
+                                style="width:120px;height:90px;object-fit:cover;border-radius:10px;display:none;"
+                                alt="Preview foto mobil"
+                            >
+
+                            <input
+                                type="file"
+                                name="image"
+                                class="form-control"
+                                accept=".jpg,.jpeg,.png,.svg"
+                            >
+
+                            <small class="text-muted">
+                                Kosongkan jika foto tidak diganti.
+                            </small>
+
+                        </div>
+
+
+                        <div class="col-12">
+
+                            <label class="form-label fw-semibold">
+                                Fasilitas
+                            </label>
+
+                            <div class="row g-2">
+
+                                @foreach($fasilitas ?? [] as $item)
+
+                                    <div class="col-md-4">
+
+                                        <div class="form-check">
+
+                                            <input
+                                                type="checkbox"
+                                                name="fasilitas[]"
+                                                value="{{ $item->id }}"
+                                                class="form-check-input edit-fasilitas-checkbox"
+                                                id="editFasilitas{{ $item->id }}"
+                                            >
+
+                                            <label
+                                                class="form-check-label"
+                                                for="editFasilitas{{ $item->id }}"
+                                            >
+                                                {{ $item->name }}
+                                            </label>
+
+                                        </div>
+
+                                    </div>
+
+                                @endforeach
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-12">
+
+                            <label class="form-label fw-semibold">
+                                Deskripsi
+                            </label>
+
+                            <textarea
+                                name="description"
+                                id="editDescription"
+                                class="form-control"
+                                rows="3"
+                            ></textarea>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Batal
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-green"
+                    >
+
+                        <i class="bi bi-save me-1"></i>
+
+                        Simpan Perubahan
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
 </script>
@@ -896,12 +1400,31 @@
 
 <script>
 
-/* ============================================================
-   FORMAT RUPIAH
-   Contoh:
-   400000  -> 400.000
-   1250000 -> 1.250.000
-============================================================ */
+@php
+$mobilsData = [];
+foreach ($mobils as $m) {
+    $mobilsData[$m->id] = [
+        'id' => $m->id,
+        'brand_id' => $m->brand_id,
+        'tipe_mobil_id' => $m->tipe_mobil_id,
+        'cabang_id' => $m->cabang_id,
+        'name' => $m->name,
+        'plate_number' => $m->plate_number,
+        'tahun' => $m->tahun,
+        'transmisi' => $m->transmisi,
+        'kapasitas' => $m->kapasitas,
+        'warna' => $m->warna,
+        'harga_perhari' => $m->harga_perhari,
+        'deposit' => $m->deposit,
+        'status' => $m->status,
+        'description' => $m->description,
+        'image' => $m->image ? asset($m->image) : null,
+        'fasilitas_ids' => $m->fasilitas->pluck('id')->values()->all(),
+    ];
+}
+@endphp
+
+const MOBILS_DATA = @json($mobilsData);
 
 function formatRupiah(angka) {
 
@@ -919,60 +1442,125 @@ function formatRupiah(angka) {
 }
 
 
-/* ============================================================
-   HARGA PER HARI
-============================================================ */
+$(document).on('input', '#harga_perhari_display', function () {
 
-const hargaDisplay = document.getElementById('harga_perhari_display');
-const hargaHidden = document.getElementById('harga_perhari');
+    var angka = $(this).val().replace(/\D/g, '');
 
-hargaDisplay.addEventListener('input', function () {
+    $('#harga_perhari').val(angka);
 
-    // Ambil hanya angka
-    let angka = this.value.replace(/\D/g, '');
-
-    // Simpan angka asli untuk Laravel
-    hargaHidden.value = angka;
-
-    // Tampilkan dengan titik
-    this.value = formatRupiah(angka);
+    $(this).val(formatRupiah(angka));
 
 });
 
 
-/* ============================================================
-   DEPOSIT
-============================================================ */
+$(document).on('input', '#deposit_display', function () {
 
-const depositDisplay = document.getElementById('deposit_display');
-const depositHidden = document.getElementById('deposit');
+    var angka = $(this).val().replace(/\D/g, '');
 
-depositDisplay.addEventListener('input', function () {
+    $('#deposit').val(angka);
 
-    // Ambil hanya angka
-    let angka = this.value.replace(/\D/g, '');
-
-    // Simpan angka asli untuk Laravel
-    depositHidden.value = angka;
-
-    // Tampilkan dengan titik
-    this.value = formatRupiah(angka);
+    $(this).val(formatRupiah(angka));
 
 });
 
 
-/* ============================================================
-   SAAT FORM DI-SUBMIT
-   Pastikan nilai hidden tetap berupa angka.
-============================================================ */
+$(document).on('input', '#editHargaDisplay', function () {
 
-document.getElementById('formTambahMobil').addEventListener('submit', function () {
+    var angka = $(this).val().replace(/\D/g, '');
 
-    hargaHidden.value = hargaDisplay.value.replace(/\D/g, '');
+    $('#editHarga').val(angka);
 
-    depositHidden.value = depositDisplay.value.replace(/\D/g, '');
+    $(this).val(formatRupiah(angka));
 
 });
+
+
+$(document).on('input', '#editDepositDisplay', function () {
+
+    var angka = $(this).val().replace(/\D/g, '');
+
+    $('#editDeposit').val(angka);
+
+    $(this).val(formatRupiah(angka));
+
+});
+
+
+$(document).on('submit', '#formTambahMobil', function () {
+
+    $('#harga_perhari').val($('#harga_perhari_display').val().replace(/\D/g, ''));
+
+    $('#deposit').val($('#deposit_display').val().replace(/\D/g, ''));
+
+});
+
+
+$(document).on('submit', '#formEditMobil', function () {
+
+    $('#editHarga').val($('#editHargaDisplay').val().replace(/\D/g, ''));
+
+    $('#editDeposit').val($('#editDepositDisplay').val().replace(/\D/g, ''));
+
+});
+
+
+function editMobilStaff(id) {
+
+    var data = MOBILS_DATA[id];
+
+    if (!data) {
+
+        Swal.fire({
+
+            icon: 'error',
+
+            title: 'Gagal',
+
+            text: 'Data mobil tidak ditemukan.',
+
+        });
+
+        return;
+    }
+
+    $('#editBrandId').val(data.brand_id);
+    $('#editTipeMobilId').val(data.tipe_mobil_id);
+    $('#editCabangId').val(data.cabang_id);
+    $('#editName').val(data.name);
+    $('#editPlateNumber').val(data.plate_number);
+    $('#editTahun').val(data.tahun);
+    $('#editTransmisi').val(data.transmisi);
+    $('#editKapasitas').val(data.kapasitas);
+    $('#editWarna').val(data.warna);
+    $('#editHarga').val(data.harga_perhari);
+    $('#editDeposit').val(data.deposit);
+    $('#editStatus').val(data.status);
+    $('#editDescription').val(data.description);
+
+    $('#editHargaDisplay').val(formatRupiah(data.harga_perhari));
+    $('#editDepositDisplay').val(formatRupiah(data.deposit));
+
+    if (data.image) {
+        $('#editFotoPreview').attr('src', data.image).show();
+    } else {
+        $('#editFotoPreview').hide();
+    }
+
+    $('.edit-fasilitas-checkbox').prop('checked', false);
+
+    if (data.fasilitas_ids && data.fasilitas_ids.length) {
+        $.each(data.fasilitas_ids, function (i, fid) {
+            $('.edit-fasilitas-checkbox[value="' + fid + '"]').prop('checked', true);
+        });
+    }
+
+    $('#formEditMobil').attr(
+        'action',
+        "{{ route('staff.mobils.update', '__ID__') }}".replace('__ID__', id)
+    );
+
+    bootstrap.Modal.getOrCreateInstance($('#editMobilModal')[0]).show();
+}
 
 
 /* ============================================================

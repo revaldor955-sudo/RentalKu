@@ -13,7 +13,7 @@ class SupirController extends Controller
 {
     $cabangs = Cabang::orderBy('name')->get();
 
-    return view('supirs.index', compact('cabangs'));
+    return view('supirs.index', compact('cabangs'))->with('pageTitle', 'Supir');
 }
 
     /**
@@ -44,7 +44,7 @@ class SupirController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 1);
-        $orderDir = $request->input('order.0.dir', 'asc');
+        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -52,8 +52,8 @@ class SupirController extends Controller
             $query->orderBy('supirs.name', 'asc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $supirs = $query->offset($start)->limit($length)->get();
 
@@ -152,6 +152,10 @@ class SupirController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
+            if ($supir->image && file_exists(public_path($supir->image))) {
+                unlink(public_path($supir->image));
+            }
+
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $image->move(public_path('images/supirs'), $imageName);
@@ -172,6 +176,10 @@ class SupirController extends Controller
 
     public function destroy(Request $request, Supir $supir)
     {
+        if ($supir->image && file_exists(public_path($supir->image))) {
+            unlink(public_path($supir->image));
+        }
+
         $supir->delete();
 
         if ($request->wantsJson()) {
