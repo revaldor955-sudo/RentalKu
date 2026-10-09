@@ -55,7 +55,7 @@ class MetodePembayaranController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 1);
-        $orderDir = $request->input('order.0.dir', 'asc');
+        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -63,8 +63,8 @@ class MetodePembayaranController extends Controller
             $query->orderBy('metode_pembayarans.name', 'asc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $metodePembayarans = $query->offset($start)->limit($length)->get();
 
@@ -139,6 +139,17 @@ class MetodePembayaranController extends Controller
 
     public function destroy(Request $request, MetodePembayaran $metodePembayaran)
     {
+        // FK pembayarans.metode_pembayaran_id RESTRICT — tolak dengan 422, bukan 500.
+        if ($metodePembayaran->pembayaran()->exists()) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Metode pembayaran tidak dapat dihapus karena masih dipakai pembayaran.',
+                ], 422);
+            }
+
+            return redirect()->route('metode_pembayarans.index')->with('error', 'Metode pembayaran tidak dapat dihapus karena masih dipakai pembayaran.');
+        }
+
         $metodePembayaran->delete();
 
         if ($request->wantsJson()) {

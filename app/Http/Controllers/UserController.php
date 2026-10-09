@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Rental;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -56,7 +57,7 @@ class UserController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 1);
-        $orderDir = $request->input('order.0.dir', 'asc');
+        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -64,8 +65,8 @@ class UserController extends Controller
             $query->orderBy('users.name', 'asc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $users = $query->offset($start)->limit($length)->get();
 
@@ -221,6 +222,13 @@ class UserController extends Controller
         if ($user->id === auth()->id()) {
             return response()->json([
                 'message' => 'Akun yang sedang digunakan tidak dapat dihapus.',
+            ], 422);
+        }
+
+        // Hapus user = cascade hapus rentals + pembayaran/denda/klaim — cegah bila ada riwayat.
+        if (Rental::where('user_id', $user->id)->exists()) {
+            return response()->json([
+                'message' => 'Pengguna tidak dapat dihapus karena masih memiliki riwayat rental.',
             ], 422);
         }
 
