@@ -68,6 +68,7 @@ class ServisMobilController extends Controller
                 'id' => $item->id,
                 'mobil_id' => $item->mobil_id,
                 'tanggal' => $item->tanggal?->format('d/m/Y'),
+                'tanggal_input' => $item->tanggal?->format('Y-m-d'),
                 'mobil_name' => $item->mobil->name ?? '-',
                 'mobil_plate' => $item->mobil->plate_number ?? '-',
                 'jenis' => $item->jenis,
@@ -84,12 +85,6 @@ class ServisMobilController extends Controller
             'recordsFiltered' => $recordsFiltered,
             'data' => $data,
         ]);
-    }
-
-    public function create()
-    {
-        $mobils = Mobil::all();
-        return view('servis_mobils.create', compact('mobils'))->with('pageTitle', 'Servis Kendaraan - Tambah');
     }
 
     public function store(Request $request)
@@ -120,16 +115,6 @@ class ServisMobilController extends Controller
 
         return redirect()->route('servis_mobils.index')
             ->with('success', 'Servis mobil berhasil ditambahkan.');
-    }
-
-    public function show(ServisMobil $servisMobil)
-    {
-    }
-
-    public function edit(ServisMobil $servisMobil)
-    {
-        $mobils = Mobil::all();
-        return view('servis_mobils.edit', compact('servisMobil', 'mobils'))->with('pageTitle', 'Servis Kendaraan - Edit');
     }
 
     public function update(Request $request, ServisMobil $servisMobil)
