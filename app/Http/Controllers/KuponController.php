@@ -171,6 +171,23 @@ class KuponController extends Controller
             'expired_at.after_or_equal' => 'Tanggal berakhir harus setelah tanggal mulai.',
         ]);
 
+        // Kuota tidak boleh turun di bawah jumlah yang sudah terpakai.
+        $terpakaiAktual = array_key_exists('terpakai', $validated)
+            ? (int) $validated['terpakai']
+            : (int) $kupon->terpakai;
+        if ((int) $validated['kuota'] < $terpakaiAktual) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => "Kuota tidak boleh lebih kecil dari jumlah terpakai ({$terpakaiAktual}).",
+                    'errors' => ['kuota' => ["Kuota tidak boleh lebih kecil dari jumlah terpakai ({$terpakaiAktual})."]],
+                ], 422);
+            }
+
+            return back()
+                ->withErrors(['kuota' => "Kuota tidak boleh lebih kecil dari jumlah terpakai ({$terpakaiAktual})."])
+                ->withInput();
+        }
+
         $kupon->update($validated);
 
         if ($request->wantsJson()) {
