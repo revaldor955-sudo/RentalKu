@@ -362,7 +362,6 @@
 
                     <select name="status" class="form-select" required>
                         <option value="belum bayar">Belum Bayar</option>
-                        <option value="lunas">Lunas</option>
                     </select>
 
                 </div>
@@ -502,6 +501,7 @@
 
                     <select name="status" id="editStatusDenda" class="form-select" required>
                         <option value="belum bayar">Belum Bayar</option>
+                        <option value="menunggu verifikasi">Menunggu Verifikasi</option>
                         <option value="lunas">Lunas</option>
                     </select>
 

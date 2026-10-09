@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Denda;
 use App\Models\Rental;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class DendaController extends Controller
 {
@@ -60,7 +62,7 @@ class DendaController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 6);
-        $orderDir = $request->input('order.0.dir', 'desc');
+        $orderDir = strtolower($request->input('order.0.dir', 'desc')) === 'asc' ? 'asc' : 'desc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -68,8 +70,8 @@ class DendaController extends Controller
             $query->orderBy('dendas.created_at', 'desc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $dendas = $query->offset($start)->limit($length)->get();
 
@@ -172,10 +174,26 @@ class DendaController extends Controller
         ]);
 
         if ($request->hasFile('foto_bukti')) {
+            if ($denda->foto_bukti && File::exists(public_path($denda->foto_bukti))) {
+                File::delete(public_path($denda->foto_bukti));
+            }
             $file = $request->file('foto_bukti');
             $fileName = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('images/dendas'), $fileName);
             $validated['foto_bukti'] = 'images/dendas/' . $fileName;
+        }
+
+        // Lunas wajib ada bukti bayar (sama seperti updateStatus).
+        if ($validated['status'] === 'lunas' && ! $denda->bukti_bayar) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Denda belum bisa dilunaskan karena belum ada bukti bayar.',
+                ], 422);
+            }
+
+            return back()
+                ->withErrors(['status' => 'Denda belum bisa dilunaskan karena belum ada bukti bayar.'])
+                ->withInput();
         }
 
         $denda->update($validated);
@@ -192,6 +210,14 @@ class DendaController extends Controller
 
     public function destroy(Request $request, Denda $denda)
     {
+        if ($denda->foto_bukti && File::exists(public_path($denda->foto_bukti))) {
+            File::delete(public_path($denda->foto_bukti));
+        }
+
+        if ($denda->bukti_bayar) {
+            Storage::disk('public')->delete($denda->bukti_bayar);
+        }
+
         $denda->delete();
 
         if ($request->wantsJson()) {
@@ -208,7 +234,7 @@ class DendaController extends Controller
     {
         $denda->load('rental');
 
-        if ($denda->rental->user_id != auth()->id()) {
+        if (! $denda->rental || $denda->rental->user_id != auth()->id()) {
             abort(403, 'Anda tidak memiliki akses ke denda ini.');
         }
 
