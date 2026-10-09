@@ -143,21 +143,6 @@ class MobilController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        $brands = Brand::all();
-        $tipeMobils = TipeMobil::all();
-        $cabangs = Cabang::all();
-        $fasilitas = Fasilitas::all();
-
-        return view('staff.mobils.create', compact(
-            'brands',
-            'tipeMobils',
-            'cabangs',
-            'fasilitas'
-        ))->with('pageTitle', 'Kelola Kendaraan - Tambah');
-    }
-
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -255,32 +240,6 @@ class MobilController extends Controller
         }
 
         return view('customer.mobil-detail', compact('mobil', 'cabangs', 'supirs'));
-    }
-
-    /**
-     * Form edit
-     */
-    public function edit(Mobil $mobil)
-    {
-        $brands = Brand::all();
-        $tipeMobils = TipeMobil::all();
-        $cabangs = Cabang::all();
-        $fasilitas = Fasilitas::all();
-
-        $mobil->load([
-            'brand',
-            'tipeMobil',
-            'cabang',
-            'fasilitas',
-        ]);
-
-        return view('staff.mobils.edit', compact(
-            'mobil',
-            'brands',
-            'tipeMobils',
-            'cabangs',
-            'fasilitas'
-        ))->with('pageTitle', 'Kelola Kendaraan - Edit');
     }
 
     /**

@@ -175,9 +175,6 @@ Route::get('/mobils/{mobil}', [MobilController::class, 'show'])
 
 Route::middleware('admin')->group(function () {
 
-    Route::get('/mobils/{mobil}/edit', [MobilController::class, 'edit'])
-        ->name('mobils.edit');
-
     Route::put('/mobils/{mobil}', [MobilController::class, 'update'])
         ->name('mobils.update');
 
@@ -315,7 +312,7 @@ Route::get(
 Route::resource(
     'servis_mobils',
     ServisMobilController::class
-)->middleware('adminstaff');
+)->except(['create', 'edit', 'show'])->middleware('adminstaff');
 
 
 /*
@@ -520,20 +517,10 @@ Route::middleware('staff')->group(function () {
         [MobilController::class, 'index']
     )->name('staff.mobils.index');
 
-    Route::get(
-        '/staff/mobils/create',
-        [MobilController::class, 'create']
-    )->name('staff.mobils.create');
-
     Route::post(
         '/staff/mobils',
         [MobilController::class, 'store']
     )->name('staff.mobils.store');
-
-    Route::get(
-        '/staff/mobils/{mobil}/edit',
-        [MobilController::class, 'edit']
-    )->name('staff.mobils.edit');
 
     Route::put(
         '/staff/mobils/{mobil}',
