@@ -37,7 +37,7 @@ class TipeMobilController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 1);
-        $orderDir = $request->input('order.0.dir', 'asc');
+        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -45,8 +45,8 @@ class TipeMobilController extends Controller
             $query->orderBy('tipe_mobils.name', 'asc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $tipeMobils = $query->offset($start)->limit($length)->get();
 
@@ -127,6 +127,17 @@ class TipeMobilController extends Controller
 
     public function destroy(Request $request, TipeMobil $tipeMobil)
     {
+        // Cegah penghapusan jika masih dipakai mobil.
+        if ($tipeMobil->mobils()->exists()) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Tipe mobil tidak dapat dihapus karena masih digunakan oleh mobil.',
+                ], 422);
+            }
+
+            return redirect()->route('tipe_mobils.index')->with('error', 'Tipe mobil tidak dapat dihapus karena masih digunakan oleh mobil.');
+        }
+
         $tipeMobil->delete();
 
         if ($request->wantsJson()) {

@@ -24,9 +24,11 @@ class CabangController extends Controller
         $search = $request->input('search.value');
 
         if ($search) {
-            $query->where('cabangs.name', 'like', "%{$search}%")
+            $query->where(function ($q) use ($search) {
+                $q->where('cabangs.name', 'like', "%{$search}%")
                   ->orWhere('cabangs.address', 'like', "%{$search}%")
                   ->orWhere('cabangs.phone', 'like', "%{$search}%");
+            });
         }
 
         $recordsFiltered = $query->count();
@@ -39,7 +41,7 @@ class CabangController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 1);
-        $orderDir = $request->input('order.0.dir', 'asc');
+        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -47,8 +49,8 @@ class CabangController extends Controller
             $query->orderBy('cabangs.name', 'asc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $cabangs = $query->offset($start)->limit($length)->get();
 
@@ -137,6 +139,17 @@ class CabangController extends Controller
 
     public function destroy(Request $request, Cabang $cabang)
     {
+        // Cegah penghapusan jika masih dipakai mobil (cascade akan hapus riwayat cabang).
+        if ($cabang->mobils()->exists()) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Cabang tidak dapat dihapus karena masih digunakan oleh mobil.',
+                ], 422);
+            }
+
+            return redirect()->route('cabangs.index')->with('error', 'Cabang tidak dapat dihapus karena masih digunakan oleh mobil.');
+        }
+
         $cabang->delete();
 
         if ($request->wantsJson()) {
