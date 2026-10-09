@@ -983,6 +983,14 @@ public function confirmCheckout(
             ], 422);
         }
 
+        // Replay status sama = no-op (jangan tembak side-effect dua kali).
+        if ($rental->status === $status) {
+            return response()->json([
+                'message' =>
+                    'Status rental sudah '.$status.'.',
+            ]);
+        }
+
         if ($status === 'Disetujui') {
             if (
                 $rental->mobil &&
@@ -994,15 +1002,17 @@ public function confirmCheckout(
                 ], 422);
             }
 
-            $rental->update([
-                'status' => 'Disetujui',
-            ]);
-
-            if ($rental->mobil) {
-                $rental->mobil->update([
-                    'status' => 'Disewa',
+            DB::transaction(function () use ($rental) {
+                $rental->update([
+                    'status' => 'Disetujui',
                 ]);
-            }
+
+                if ($rental->mobil) {
+                    $rental->mobil->update([
+                        'status' => 'Disewa',
+                    ]);
+                }
+            });
 
             return response()->json([
                 'message' =>
@@ -1011,15 +1021,17 @@ public function confirmCheckout(
         }
 
         if ($status === 'Ditolak') {
-            $rental->update([
-                'status' => 'Ditolak',
-            ]);
-
-            if ($rental->mobil) {
-                $rental->mobil->update([
-                    'status' => 'Tersedia',
+            DB::transaction(function () use ($rental) {
+                $rental->update([
+                    'status' => 'Ditolak',
                 ]);
-            }
+
+                if ($rental->mobil) {
+                    $rental->mobil->update([
+                        'status' => 'Tersedia',
+                    ]);
+                }
+            });
 
             return response()->json([
                 'message' =>
@@ -1039,15 +1051,17 @@ public function confirmCheckout(
         }
 
         if ($status === 'Selesai') {
-            $rental->update([
-                'status' => 'Selesai',
-            ]);
-
-            if ($rental->mobil) {
-                $rental->mobil->update([
-                    'status' => 'Tersedia',
+            DB::transaction(function () use ($rental) {
+                $rental->update([
+                    'status' => 'Selesai',
                 ]);
-            }
+
+                if ($rental->mobil) {
+                    $rental->mobil->update([
+                        'status' => 'Tersedia',
+                    ]);
+                }
+            });
 
             return response()->json([
                 'message' =>
