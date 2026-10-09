@@ -127,9 +127,9 @@ class KompensasiController extends Controller
             abort(403, 'Rental ini bukan milik Anda.');
         }
 
-        // Satu rental hanya boleh punya satu klaim aktif (klaim ditolak boleh diajukan ulang).
+        // Satu rental hanya boleh punya satu klaim (klaim ditolak boleh diajukan ulang).
         $klaimAktif = Kompensasi::where('rental_id', $validated['rental_id'])
-            ->whereIn('status', ['diajukan', 'disetujui'])
+            ->whereIn('status', ['diajukan', 'disetujui', 'selesai'])
             ->exists();
         if ($klaimAktif) {
             if ($request->wantsJson()) {
@@ -173,7 +173,8 @@ class KompensasiController extends Controller
             'disetujui' => ['selesai'],
         ];
 
-        if (! in_array($validated['status'], $transisi[$kompensasi->status] ?? [], true)) {
+        if ($kompensasi->status !== $validated['status']
+            && ! in_array($validated['status'], $transisi[$kompensasi->status] ?? [], true)) {
             $pesan = 'Status kompensasi tidak dapat diubah dari '.$kompensasi->status.' ke '.$validated['status'].'.';
 
             if ($request->wantsJson()) {
@@ -189,8 +190,12 @@ class KompensasiController extends Controller
 
         $validated['staff_id'] = auth()->id();
 
-        // Keputusan baru = belum dibaca customer.
-        $validated['dibaca_at'] = null;
+        // Keputusan baru = belum dibaca customer; edit tanpa ubah status tidak picu notifikasi.
+        if ($kompensasi->status !== $validated['status']) {
+            $validated['dibaca_at'] = null;
+        } else {
+            unset($validated['dibaca_at']);
+        }
 
         $kompensasi->update($validated);
 
@@ -220,11 +225,6 @@ class KompensasiController extends Controller
 
     public function customerIndex()
     {
-        // Tandai update status klaim sebagai sudah dibaca saat halaman dibuka.
-        Kompensasi::where('customer_id', auth()->id())
-            ->whereNull('dibaca_at')
-            ->update(['dibaca_at' => now()]);
-
         $rentals = Rental::with('mobil')
             ->where('user_id', auth()->id())
             ->where('status', 'Selesai')
@@ -232,7 +232,7 @@ class KompensasiController extends Controller
                 $query->selectRaw('1')
                     ->from('kompensasis')
                     ->whereColumn('kompensasis.rental_id', 'rentals.id')
-                    ->whereIn('kompensasis.status', ['diajukan', 'disetujui']);
+                    ->whereIn('kompensasis.status', ['diajukan', 'disetujui', 'selesai']);
             })
             ->get();
 
@@ -284,6 +284,14 @@ class KompensasiController extends Controller
         $length = (int) $request->input('length', 10);
 
         $kompensasis = $query->offset($start)->limit($length)->get();
+
+        // Tandai keputusan yang tampil sebagai sudah dibaca.
+        $terbaca = $kompensasis->whereNull('dibaca_at')
+            ->whereIn('status', ['disetujui', 'ditolak', 'selesai'])
+            ->pluck('id');
+        if ($terbaca->isNotEmpty()) {
+            Kompensasi::whereIn('id', $terbaca)->update(['dibaca_at' => now()]);
+        }
 
         $data = $kompensasis->map(function ($item) {
             return [

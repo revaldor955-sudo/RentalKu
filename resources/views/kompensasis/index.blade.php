@@ -485,11 +485,14 @@
             return;
         }
 
-        const statusValid = ['disetujui', 'ditolak', 'selesai'].includes(data.status)
-            ? data.status
-            : 'disetujui';
+        const $status = $('#editStatusKompensasi');
+        $status.find('option[data-saat-ini]').remove();
 
-        $('#editStatusKompensasi').val(statusValid);
+        if (data.status === 'diajukan') {
+            $status.prepend('<option value="" selected disabled data-saat-ini>Saat ini: Diajukan — pilih keputusan</option>');
+        } else {
+            $status.val(data.status);
+        }
         $('#editCatatanKompensasi').val(data.catatan || '');
 
         $('#formUpdateKompensasi').attr('action',
