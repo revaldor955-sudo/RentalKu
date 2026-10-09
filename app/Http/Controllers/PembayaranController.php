@@ -242,6 +242,13 @@ class PembayaranController extends Controller
             'status' => 'required|in:Disetujui,Ditolak'
         ]);
 
+        // Pembayaran yang sudah diputuskan bersifat final.
+        if ($pembayaran->status !== 'Menunggu') {
+            return response()->json([
+                'message' => 'Pembayaran yang sudah diputuskan tidak dapat diubah lagi.',
+            ], 422);
+        }
+
         $pembayaran->update([
             'status' => $validated['status']
         ]);

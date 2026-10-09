@@ -959,6 +959,21 @@ public function confirmCheckout(
 
         $status = $request->status;
 
+        // Transisi legal mengikuti tombol di UI: Menunggu -> Disetujui/Ditolak,
+        // Disetujui -> Selesai. Status final tidak bisa diubah lagi.
+        $transisi = [
+            'Menunggu' => ['Disetujui', 'Ditolak'],
+            'Disetujui' => ['Selesai'],
+            'Berjalan' => ['Selesai'],
+        ];
+
+        if (! in_array($status, $transisi[$rental->status] ?? [], true)) {
+            return response()->json([
+                'message' =>
+                    'Status rental tidak dapat diubah dari '.$rental->status.' ke '.$status.'.',
+            ], 422);
+        }
+
         if ($status === 'Disetujui') {
             if (
                 $rental->mobil &&

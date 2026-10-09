@@ -166,6 +166,27 @@ class KompensasiController extends Controller
             'status.required' => 'Status wajib dipilih',
         ]);
 
+        // Transisi legal: diajukan -> disetujui/ditolak, disetujui -> selesai.
+        // Status final tidak bisa diubah lagi.
+        $transisi = [
+            'diajukan' => ['disetujui', 'ditolak'],
+            'disetujui' => ['selesai'],
+        ];
+
+        if (! in_array($validated['status'], $transisi[$kompensasi->status] ?? [], true)) {
+            $pesan = 'Status kompensasi tidak dapat diubah dari '.$kompensasi->status.' ke '.$validated['status'].'.';
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => $pesan,
+                ], 422);
+            }
+
+            return back()
+                ->withErrors(['status' => $pesan])
+                ->withInput();
+        }
+
         $validated['staff_id'] = auth()->id();
 
         // Keputusan baru = belum dibaca customer.
