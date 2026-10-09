@@ -211,6 +211,7 @@
                                 <form
                                     action="{{ route('customer.ratings.store', $rental->id) }}"
                                     method="POST"
+                                    onsubmit="var b=this.querySelector('button[type=submit]');if(b){b.disabled=true;b.innerHTML='<span class=\'spinner-border spinner-border-sm me-1\' role=\'status\' aria-hidden=\'true\'></span> Mengirim...';}"
                                 >
 
                                     @csrf
@@ -459,7 +460,8 @@
                                     method="POST"
                                     action="{{ route('customer.dendas.bayar', $d->id) }}"
                                     enctype="multipart/form-data"
-                                    class="mt-2"
+                                    class="mt-2 denda-bayar-form"
+                                    onsubmit="var b=this.querySelector('button[type=submit]');if(b){b.disabled=true;b.innerHTML='<span class=\'spinner-border spinner-border-sm me-1\' role=\'status\' aria-hidden=\'true\'></span> Mengirim...';}"
                                 >
 
                                     @csrf
@@ -471,10 +473,22 @@
                                             <input
                                                 type="file"
                                                 name="bukti_bayar"
-                                                class="form-control form-control-sm"
-                                                accept="image/*"
+                                                class="form-control form-control-sm @error('bukti_bayar') is-invalid @enderror"
+                                                accept=".jpg,.jpeg,.png"
                                                 required
                                             >
+
+                                            <div class="form-text small">
+                                                Format JPG, JPEG, atau PNG. Maksimal 2 MB.
+                                            </div>
+
+                                            @error('bukti_bayar')
+
+                                                <div class="invalid-feedback d-block">
+                                                    {{ $message }}
+                                                </div>
+
+                                            @enderror
 
                                         </div>
 
@@ -484,9 +498,19 @@
                                             <input
                                                 type="date"
                                                 name="tanggal_bayar"
-                                                class="form-control form-control-sm"
+                                                class="form-control form-control-sm @error('tanggal_bayar') is-invalid @enderror"
+                                                value="{{ old('tanggal_bayar', date('Y-m-d')) }}"
+                                                max="{{ date('Y-m-d') }}"
                                                 required
                                             >
+
+                                            @error('tanggal_bayar')
+
+                                                <div class="invalid-feedback d-block">
+                                                    {{ $message }}
+                                                </div>
+
+                                            @enderror
 
                                         </div>
 
@@ -563,6 +587,9 @@
 }
 
 .rating-modal-box .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     padding: 20px 22px 12px;
     border-bottom: 1px solid #eee;
 }
@@ -699,6 +726,37 @@ document.addEventListener('keydown', function(event) {
 
     document.body.classList.remove('rating-modal-open');
 
+});
+
+document.addEventListener('change', function(event) {
+    var input = event.target;
+    if (!input || input.name !== 'bukti_bayar') return;
+    var file = input.files && input.files[0];
+    if (file && file.size > 2 * 1024 * 1024) {
+        input.value = '';
+        if (window.Swal) {
+            Swal.fire({ icon: 'error', title: 'Gagal', text: 'Ukuran bukti maksimal 2 MB.' });
+        } else {
+            alert('Ukuran bukti maksimal 2 MB.');
+        }
+    }
+});
+
+document.addEventListener('submit', function(event) {
+    var form = event.target;
+    if (!form || !form.classList || !form.classList.contains('denda-bayar-form')) return;
+    var input = form.querySelector('input[name="bukti_bayar"]');
+    var file = input && input.files && input.files[0];
+    if (file && file.size > 2 * 1024 * 1024) {
+        event.preventDefault();
+        var b = form.querySelector('button[type=submit]');
+        if (b) { b.disabled = false; b.innerHTML = '<i class="bi bi-cash-coin me-1"></i> Bayar'; }
+        if (window.Swal) {
+            Swal.fire({ icon: 'error', title: 'Gagal', text: 'Ukuran bukti maksimal 2 MB.' });
+        } else {
+            alert('Ukuran bukti maksimal 2 MB.');
+        }
+    }
 });
 
 </script>

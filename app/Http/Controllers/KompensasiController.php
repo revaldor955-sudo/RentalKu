@@ -110,7 +110,7 @@ class KompensasiController extends Controller
             'jenis' => 'required|in:pengembalian_dana,diskon,gratis_sewa',
             'nominal' => 'required_if:jenis,pengembalian_dana|numeric|min:0',
             'alasan' => 'required|string',
-            'tanggal' => 'required|date',
+            'tanggal' => 'required|date|before_or_equal:today',
         ];
 
         if ($isPetugas) {
@@ -124,6 +124,7 @@ class KompensasiController extends Controller
             'nominal.required_if' => 'Nominal wajib diisi untuk pengembalian dana',
             'alasan.required' => 'Alasan wajib diisi',
             'tanggal.required' => 'Tanggal wajib diisi',
+            'tanggal.before_or_equal' => 'Tanggal pembayaran tidak boleh melebihi hari ini.',
             'customer_id.required' => 'Customer wajib dipilih',
             'customer_id.exists' => 'Customer tidak valid.',
         ]);
@@ -195,6 +196,7 @@ class KompensasiController extends Controller
 
     public function update(Request $request, Kompensasi $kompensasi)
     {
+        if (auth()->user()->roles_id === 3) abort(403, 'Anda tidak memiliki akses.');
         $validated = $request->validate([
             'status' => 'required|in:disetujui,ditolak,selesai',
             'catatan' => 'nullable|string',
@@ -247,6 +249,7 @@ class KompensasiController extends Controller
 
     public function destroy(Request $request, Kompensasi $kompensasi)
     {
+        if (auth()->user()->roles_id === 3) abort(403, 'Anda tidak memiliki akses.');
         $kompensasi->delete();
 
         if ($request->wantsJson()) {

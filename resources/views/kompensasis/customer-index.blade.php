@@ -20,6 +20,14 @@
             background: #f5f7f6;
             font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
             color: #1f2937;
+            padding-top: 70px;
+            padding-bottom: 30px;
+        }
+
+        @media (max-width: 991.98px) {
+            body {
+                padding-bottom: 70px;
+            }
         }
 
         .navbar {
@@ -35,6 +43,10 @@
 
         .brand span {
             color: #198754;
+        }
+
+        .user-box.no-caret.dropdown-toggle::after {
+            display: none;
         }
 
         .user-box {
@@ -149,63 +161,7 @@
 
 <body>
 
-<nav class="navbar navbar-expand-lg sticky-top">
-
-    <div class="container py-3">
-
-        <a href="{{ route('customer.dashboard') }}" class="text-decoration-none brand">
-            Rental<span>ku</span>.
-        </a>
-
-        <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#customerNav" aria-controls="customerNav" aria-expanded="false" aria-label="Menu navigasi">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="customerNav">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-2">
-                <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="{{ route('customer.dashboard') }}#mobil">Cari Mobil</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="{{ route('customer.dashboard') }}#rental-saya">Rental Saya</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="{{ route('customer.kompensasi.index') }}">Kompensasi</a>
-                </li>
-                <li class="nav-item d-lg-none">
-                    <form action="{{ route('logout') }}" method="POST" class="m-0">
-                        @csrf
-                        <button type="submit" class="btn btn-outline-danger btn-sm w-100">
-                            <i class="bi bi-box-arrow-right me-1"></i>
-                            Logout
-                        </button>
-                    </form>
-                </li>
-            </ul>
-        </div>
-
-        <div class="d-flex align-items-center gap-3 ms-2">
-
-            <div class="user-box d-none d-md-flex"
-                 data-bs-toggle="modal"
-                 data-bs-target="#profileModal"
-                 style="cursor: pointer;">
-
-                <div class="user-icon">
-                    <i class="bi bi-person"></i>
-                </div>
-
-                <span>
-                    {{ Auth::user()->name }}
-                </span>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</nav>
+@include('layouts.partials.customer-nav')
 
     <div class="container py-5">
 

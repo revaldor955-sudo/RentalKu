@@ -257,6 +257,8 @@ class AuditFindingsTest extends TestCase
         $this->actingAs($this->customer)->post("/customer/rental/{$this->mobil->id}", [
             'tanggal_mulai' => now()->addDay()->toDateString(),
             'tanggal_selesai' => now()->addDays(3)->toDateString(),
+            'cabang_ambil_id' => $this->cabang->id,
+            'cabang_kembali_id' => $this->cabang->id,
             'status' => 'Selesai',
             'total_harga' => 1,
         ])->assertRedirect();
@@ -265,6 +267,7 @@ class AuditFindingsTest extends TestCase
         $this->assertEquals('Menunggu', $rental->status);
         $this->assertNotEquals(1, (int) $rental->total_harga);
         $this->assertEquals($this->customer->id, $rental->user_id);
+        $this->assertEquals($this->cabang->id, $rental->cabang_ambil_id);
     }
 
     public function test_kompensasi_abaikan_customer_id_palsu(): void

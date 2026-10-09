@@ -842,11 +842,6 @@ Route::middleware('adminstaff')->group(function () {
 
 Route::middleware(['auth', 'customer'])->group(function () {
 
-    Route::get(
-        '/customer/ratings/create/{rental}',
-        [CustomerRatingController::class, 'create']
-    )->name('customer.ratings.create');
-
     Route::post(
         '/customer/ratings/{rental}',
         [CustomerRatingController::class, 'store']

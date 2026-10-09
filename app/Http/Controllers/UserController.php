@@ -139,6 +139,11 @@ class UserController extends Controller
         if ((int) $validated['roles_id'] === 1 && auth()->user()->roles_id !== 1) {
             abort(403, 'Hanya Admin yang boleh memberi role Admin.');
         }
+
+        // roles_id di luar Fillable: set eksplisit pasca-gate.
+        $rolesId = $validated['roles_id'];
+        unset($validated['roles_id']);
+
         if ($request->hasFile('photo')) {
 
             $folder = public_path('images/users');
@@ -158,7 +163,9 @@ class UserController extends Controller
 
         $validated['password'] = Hash::make($validated['password']);
 
-        User::create($validated);
+        $user = User::create($validated);
+        $user->roles_id = $rolesId;
+        $user->save();
 
         return response()->json([
             'message' => 'Pengguna berhasil ditambahkan.',
@@ -194,6 +201,10 @@ class UserController extends Controller
             abort(403, 'Hanya Admin yang boleh mengubah akun Admin.');
         }
 
+        // roles_id di luar Fillable: set eksplisit pasca-gate.
+        $rolesId = $validated['roles_id'];
+        unset($validated['roles_id']);
+
         if ($request->hasFile('photo')) {
 
             if ($user->photo && File::exists(public_path($user->photo))) {
@@ -221,7 +232,9 @@ class UserController extends Controller
             unset($validated['password']);
         }
 
-        $user->update($validated);
+        $user->fill($validated);
+        $user->roles_id = $rolesId;
+        $user->save();
 
         return response()->json([
             'message' => 'Pengguna berhasil diperbarui.',

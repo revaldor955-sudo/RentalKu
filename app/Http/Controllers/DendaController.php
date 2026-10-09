@@ -162,7 +162,7 @@ class DendaController extends Controller
             'nominal' => 'required|numeric|min:0',
             'foto_bukti' => 'nullable|mimes:jpeg,png,jpg|max:2048',
             'syarat_dan_ketentuan' => 'nullable|string',
-            'status' => 'required|in:belum bayar,lunas,menunggu verifikasi',
+            'status' => 'required|in:belum bayar,lunas',
         ], [
             'rental_id.required' => 'Rental wajib dipilih',
             'jenis.required' => 'Jenis denda wajib dipilih',
@@ -171,6 +171,7 @@ class DendaController extends Controller
             'foto_bukti.mimes' => 'Foto bukti harus berupa gambar (jpg, png)',
             'foto_bukti.max' => 'Ukuran foto maksimal 2MB',
             'status.required' => 'Status wajib dipilih',
+            'status.in' => 'Status tidak valid.',
         ]);
 
         if ($request->hasFile('foto_bukti')) {
@@ -234,7 +235,7 @@ class DendaController extends Controller
     {
         $denda->load('rental');
 
-        if (! $denda->rental || $denda->rental->user_id != auth()->id()) {
+        if (! $denda->rental || $denda->rental->user_id !== auth()->id()) {
             abort(403, 'Anda tidak memiliki akses ke denda ini.');
         }
 
@@ -251,7 +252,7 @@ class DendaController extends Controller
 
         $validated = $request->validate([
             'bukti_bayar' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-            'tanggal_bayar' => 'required|date',
+            'tanggal_bayar' => 'required|date|before_or_equal:today',
         ], [
             'bukti_bayar.required' => 'Bukti pembayaran denda wajib diupload.',
             'bukti_bayar.image' => 'File bukti harus berupa gambar.',
@@ -259,6 +260,7 @@ class DendaController extends Controller
             'bukti_bayar.max' => 'Ukuran bukti maksimal 2 MB.',
             'tanggal_bayar.required' => 'Tanggal pembayaran wajib diisi.',
             'tanggal_bayar.date' => 'Tanggal pembayaran tidak valid.',
+            'tanggal_bayar.before_or_equal' => 'Tanggal pembayaran tidak boleh melebihi hari ini.',
         ]);
 
         $path = $request->file('bukti_bayar')->store('bukti_denda', 'public');

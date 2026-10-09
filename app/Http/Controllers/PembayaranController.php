@@ -158,7 +158,7 @@ class PembayaranController extends Controller
 
     public function create(Rental $rental)
     {
-        if ($rental->user_id != Auth::id()) {
+        if ($rental->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -176,7 +176,7 @@ class PembayaranController extends Controller
 
     public function store(Request $request, Rental $rental)
     {
-        if ($rental->user_id != Auth::id()) {
+        if ($rental->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -207,13 +207,14 @@ class PembayaranController extends Controller
 
         $validated = $request->validate([
             'metode_pembayaran_id' => 'required|exists:metode_pembayarans,id',
-            'tanggal_bayar' => 'required|date',
+            'tanggal_bayar' => 'required|date|before_or_equal:today',
             'bukti' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ], [
             'metode_pembayaran_id.required' => 'Metode pembayaran wajib dipilih.',
             'metode_pembayaran_id.exists' => 'Metode pembayaran tidak valid.',
             'tanggal_bayar.required' => 'Tanggal pembayaran wajib diisi.',
             'tanggal_bayar.date' => 'Tanggal pembayaran tidak valid.',
+            'tanggal_bayar.before_or_equal' => 'Tanggal pembayaran tidak boleh melebihi hari ini.',
             'bukti.required' => 'Bukti pembayaran wajib diupload.',
             'bukti.image' => 'File bukti harus berupa gambar.',
             'bukti.mimes' => 'Bukti harus berformat JPG, JPEG, atau PNG.',
