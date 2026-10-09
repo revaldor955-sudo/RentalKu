@@ -134,6 +134,11 @@ class UserController extends Controller
             'photo.mimes' => 'Foto harus JPG, JPEG, atau PNG.',
             'photo.max' => 'Ukuran foto maksimal 2 MB.',
         ]);
+
+        // Defense-in-depth: hanya Admin yang boleh memberi role Admin.
+        if ((int) $validated['roles_id'] === 1 && auth()->user()->roles_id !== 1) {
+            abort(403, 'Hanya Admin yang boleh memberi role Admin.');
+        }
         if ($request->hasFile('photo')) {
 
             $folder = public_path('images/users');
@@ -183,6 +188,12 @@ class UserController extends Controller
             'photo.max' => 'Ukuran foto maksimal 2 MB.',
         ]);
 
+        // Defense-in-depth: akun Admin hanya boleh diubah Admin;
+        // hanya Admin yang boleh memberi atau mencabut role Admin.
+        if (auth()->user()->roles_id !== 1 && ($user->roles_id === 1 || (int) $validated['roles_id'] === 1)) {
+            abort(403, 'Hanya Admin yang boleh mengubah akun Admin.');
+        }
+
         if ($request->hasFile('photo')) {
 
             if ($user->photo && File::exists(public_path($user->photo))) {
@@ -223,6 +234,11 @@ class UserController extends Controller
             return response()->json([
                 'message' => 'Akun yang sedang digunakan tidak dapat dihapus.',
             ], 422);
+        }
+
+        // Defense-in-depth: akun Admin hanya boleh dihapus Admin.
+        if ($user->roles_id === 1 && auth()->user()->roles_id !== 1) {
+            abort(403, 'Hanya Admin yang boleh menghapus akun Admin.');
         }
 
         // Hapus user = cascade hapus rentals + pembayaran/denda/klaim — cegah bila ada riwayat.

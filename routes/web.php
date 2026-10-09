@@ -40,11 +40,12 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | MASTER DATA
 |--------------------------------------------------------------------------
-| Admin dan Staff
+| Admin saja — data referensi (role, brand, tipe, cabang, fasilitas,
+| metode, supir, kupon) hanya boleh diubah Admin; Staff memakai lewat dropdown.
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('adminstaff')->group(function () {
+Route::middleware('admin')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
@@ -319,11 +320,12 @@ Route::resource(
 |--------------------------------------------------------------------------
 | MASTER KONTEN
 |--------------------------------------------------------------------------
-| Admin saja
+| Admin saja — konten landing (banner, FAQ) dikelola bersama
+| landing-settings yang sudah admin-only; Staff fokus operasional rental.
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('adminstaff')->group(function () {
+Route::middleware('admin')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
@@ -739,7 +741,7 @@ Route::middleware('adminstaff')->group(function () {
 |--------------------------------------------------------------------------
 | USERS
 |--------------------------------------------------------------------------
-| Admin dan Staff
+| Admin saja — kelola identitas dan role; satu-satunya jalur eskalasi hak.
 |--------------------------------------------------------------------------
 */
 
@@ -748,10 +750,10 @@ Route::resource(
     UserController::class
 )
     ->except(['create', 'edit', 'show'])
-    ->middleware('adminstaff');
+    ->middleware('admin');
 
 
-Route::middleware('adminstaff')->group(function () {
+Route::middleware('admin')->group(function () {
 
     Route::get(
         '/users/data',
