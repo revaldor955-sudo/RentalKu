@@ -176,6 +176,31 @@ class PembayaranController extends Controller
             abort(403);
         }
 
+        // Bayar hanya untuk rental yang sudah disetujui.
+        if ($rental->status !== 'Disetujui') {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Rental belum disetujui.',
+                ], 422);
+            }
+
+            return redirect()->route('customer.dashboard')->with('error', 'Rental belum disetujui.');
+        }
+
+        // Satu pembayaran aktif per rental; upload ulang hanya setelah ditolak.
+        $adaAktif = Pembayaran::where('rental_id', $rental->id)
+            ->whereIn('status', ['Menunggu', 'Disetujui'])
+            ->exists();
+        if ($adaAktif) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Rental ini sudah memiliki pembayaran aktif.',
+                ], 422);
+            }
+
+            return redirect()->route('customer.dashboard')->with('error', 'Rental ini sudah memiliki pembayaran aktif.');
+        }
+
         $validated = $request->validate([
             'metode_pembayaran_id' => 'required|exists:metode_pembayarans,id',
             'tanggal_bayar' => 'required|date',
@@ -191,12 +216,8 @@ class PembayaranController extends Controller
             'bukti.max' => 'Ukuran bukti maksimal 2 MB.',
         ]);
 
-        $path = $request->file('bukti')->store(
-            'bukti_pembayaran',
-            'public'
-        );
-
         // Metode harus milik cabang rental (atau pusat bila cabang belum punya).
+        // Cek dulu sebelum file disimpan agar tidak ada file yatim.
         $metodeAllowed = $this->metodeUntukCabang($rental->cabang_ambil_id)
             ->contains('id', (int) $validated['metode_pembayaran_id']);
 
@@ -212,6 +233,11 @@ class PembayaranController extends Controller
                 ->withErrors(['metode_pembayaran_id' => 'Metode pembayaran tidak tersedia untuk cabang ini.'])
                 ->withInput();
         }
+
+        $path = $request->file('bukti')->store(
+            'bukti_pembayaran',
+            'public'
+        );
 
         Pembayaran::create([
             'rental_id' => $rental->id,
