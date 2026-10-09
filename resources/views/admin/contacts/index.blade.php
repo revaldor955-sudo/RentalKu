@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    @include('layouts.partials.modal-head-style')
     <style>
         body { background: #f5f7f6; font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif; color: #1f2937; margin: 0; padding: 0; }
         .page-content { padding: 24px; }
@@ -42,7 +43,6 @@
         .pagination .page-link { background: white; border: 1px solid #dee2e6; color: #0d6efd; }
         .pagination .page-link:hover { background: #e7f1ff; border: 1px solid #0d6efd; color: #0a58ca; }
         .pagination .page-item.active .page-link { background: #0d6efd; border: 1px solid #0d6efd; color: white; }
-        .modal-header { border-bottom: 1px solid #e9ecef; }
         .modal-body { background: #fafbfa; }
         .field-group { margin-bottom: 16px; }
         .field-label { font-size: 12px; font-weight: 600; text-transform: uppercase; color: #6c757d; margin-bottom: 6px; }
@@ -143,11 +143,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="detailModalLabel">Detail Pesan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
+            <div class="modal-content">
+            @include('layouts.partials.modal-head', ['title' => 'Detail Pesan', 'icon' => 'bi-envelope-open', 'titleId' => 'detailModalLabel'])
             <div class="modal-body">
                 <div class="field-group">
                     <div class="field-label">Nama Pengunjung</div>
@@ -191,11 +188,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 <div class="modal fade" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="replyModalLabel">Balas Pesan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
+            <div class="modal-content">
+            @include('layouts.partials.modal-head', ['title' => 'Balas Pesan', 'icon' => 'bi-reply', 'titleId' => 'replyModalLabel'])
             <form id="replyForm">
                 <div class="modal-body">
                     <div class="mb-3">
