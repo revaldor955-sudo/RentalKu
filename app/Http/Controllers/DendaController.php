@@ -107,7 +107,7 @@ class DendaController extends Controller
             'nominal' => 'required|numeric|min:0',
             'foto_bukti' => 'nullable|mimes:jpeg,png,jpg|max:2048',
             'syarat_dan_ketentuan' => 'nullable|string',
-            'status' => 'required|in:belum bayar,lunas,menunggu verifikasi',
+            'status' => 'required|in:belum bayar',
         ], [
             'rental_id.required' => 'Rental wajib dipilih',
             'jenis.required' => 'Jenis denda wajib dipilih',
@@ -116,7 +116,22 @@ class DendaController extends Controller
             'foto_bukti.mimes' => 'Foto bukti harus berupa gambar (jpg, png)',
             'foto_bukti.max' => 'Ukuran foto maksimal 2MB',
             'status.required' => 'Status wajib dipilih',
+            'status.in' => 'Denda baru selalu berstatus belum bayar.',
         ]);
+
+        // Denda hanya untuk rental yang sudah selesai.
+        $rental = Rental::findOrFail($validated['rental_id']);
+        if ($rental->status !== 'Selesai') {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Denda hanya bisa dibuat untuk rental yang sudah selesai.',
+                ], 422);
+            }
+
+            return back()
+                ->withErrors(['rental_id' => 'Denda hanya bisa dibuat untuk rental yang sudah selesai.'])
+                ->withInput();
+        }
 
         if ($request->hasFile('foto_bukti')) {
             $file = $request->file('foto_bukti');
@@ -197,6 +212,17 @@ class DendaController extends Controller
             abort(403, 'Anda tidak memiliki akses ke denda ini.');
         }
 
+        // Hanya denda belum bayar yang bisa dibayar.
+        if ($denda->status !== 'belum bayar') {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Denda ini sudah dibayar atau sedang diverifikasi.',
+                ], 422);
+            }
+
+            return back()->withErrors(['denda' => 'Denda ini sudah dibayar atau sedang diverifikasi.']);
+        }
+
         $validated = $request->validate([
             'bukti_bayar' => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'tanggal_bayar' => 'required|date',
@@ -234,11 +260,25 @@ class DendaController extends Controller
         }
 
         $validated = $request->validate([
-            'status' => 'required|in:belum bayar,lunas,menunggu verifikasi',
+            'status' => 'required|in:belum bayar,lunas',
         ], [
             'status.required' => 'Status wajib dipilih.',
             'status.in' => 'Status tidak valid.',
         ]);
+
+        // Status menunggu verifikasi hanya dari upload bukti customer.
+        // Lunas wajib ada bukti bayar.
+        if ($validated['status'] === 'lunas' && ! $denda->bukti_bayar) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Denda belum bisa dilunaskan karena belum ada bukti bayar.',
+                ], 422);
+            }
+
+            return back()
+                ->withErrors(['status' => 'Denda belum bisa dilunaskan karena belum ada bukti bayar.'])
+                ->withInput();
+        }
 
         $denda->update([
             'status' => $validated['status'],
