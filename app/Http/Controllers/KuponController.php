@@ -46,7 +46,7 @@ class KuponController extends Controller
         ];
 
         $orderColumn = $request->input('order.0.column', 7);
-        $orderDir = $request->input('order.0.dir', 'asc');
+        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         if ($orderColumn == 7) {
             // status dihitung di PHP, urutkan dengan CASE agar Aktif > Belum Aktif > Tidak Aktif
@@ -62,8 +62,8 @@ class KuponController extends Controller
             $query->orderBy('kupons.code', 'asc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $kupons = $query->offset($start)->limit($length)->get();
 
