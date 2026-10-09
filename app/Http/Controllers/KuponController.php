@@ -9,9 +9,7 @@ class KuponController extends Controller
 {
     public function index()
     {
-        $kupons = Kupon::latest()->get();
-
-        return view('kupons.index', compact('kupons'))->with('pageTitle', 'Kupon');
+        return view('kupons.index')->with('pageTitle', 'Kupon');
     }
 
     /**
@@ -151,9 +149,26 @@ class KuponController extends Controller
             'jenis' => 'required|in:persen,nominal',
             'value' => 'required|numeric|min:1',
             'kuota' => 'required|integer|min:1',
+            'terpakai' => 'nullable|integer|min:0|lte:kuota',
             'minimal_pembelian' => 'required|numeric|min:0',
             'active_at' => 'required|date',
             'expired_at' => 'required|date|after_or_equal:active_at',
+        ], [
+            'code.required' => 'Kode promo wajib diisi.',
+            'code.unique' => 'Kode promo sudah digunakan.',
+            'jenis.required' => 'Jenis promo wajib dipilih.',
+            'jenis.in' => 'Jenis promo tidak valid.',
+            'value.required' => 'Nilai promo wajib diisi.',
+            'value.min' => 'Nilai promo minimal 1.',
+            'kuota.required' => 'Kuota wajib diisi.',
+            'kuota.min' => 'Kuota minimal 1.',
+            'terpakai.integer' => 'Terpakai harus berupa angka.',
+            'terpakai.min' => 'Terpakai tidak boleh negatif.',
+            'terpakai.lte' => 'Terpakai tidak boleh melebihi kuota.',
+            'minimal_pembelian.required' => 'Minimal pembelian wajib diisi.',
+            'active_at.required' => 'Tanggal mulai wajib diisi.',
+            'expired_at.required' => 'Tanggal berakhir wajib diisi.',
+            'expired_at.after_or_equal' => 'Tanggal berakhir harus setelah tanggal mulai.',
         ]);
 
         $kupon->update($validated);

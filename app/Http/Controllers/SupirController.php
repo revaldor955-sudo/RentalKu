@@ -152,6 +152,10 @@ class SupirController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
+            if ($supir->image && file_exists(public_path($supir->image))) {
+                unlink(public_path($supir->image));
+            }
+
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $image->move(public_path('images/supirs'), $imageName);
@@ -172,6 +176,10 @@ class SupirController extends Controller
 
     public function destroy(Request $request, Supir $supir)
     {
+        if ($supir->image && file_exists(public_path($supir->image))) {
+            unlink(public_path($supir->image));
+        }
+
         $supir->delete();
 
         if ($request->wantsJson()) {

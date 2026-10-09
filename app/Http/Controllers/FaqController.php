@@ -9,8 +9,7 @@ class FaqController extends Controller
 {
     public function index()
     {
-        $faqs = Faq::all();
-        return view('faqs.index', compact('faqs'))->with('pageTitle', 'FAQ');
+        return view('faqs.index')->with('pageTitle', 'FAQ');
     }
 
     /**
@@ -36,7 +35,8 @@ class FaqController extends Controller
             1 => 'faqs.pertanyaan',
             2 => null,
             3 => 'faqs.urutan',
-            4 => null,
+            4 => 'faqs.is_active',
+            5 => null,
         ];
 
         $orderColumn = $request->input('order.0.column', 3);
@@ -59,6 +59,7 @@ class FaqController extends Controller
                 'pertanyaan' => $item->pertanyaan,
                 'jawaban' => $item->jawaban,
                 'urutan' => $item->urutan,
+                'is_active' => (bool) $item->is_active,
             ];
         });
 
@@ -84,10 +85,13 @@ class FaqController extends Controller
             'pertanyaan' => 'required|string',
             'jawaban' => 'required|string',
             'urutan' => 'nullable|integer|min:0',
+            'is_active' => 'nullable|boolean',
         ], [
             'pertanyaan.required' => 'Pertanyaan wajib diisi',
             'jawaban.required' => 'Jawaban wajib diisi',
         ]);
+
+        $validated['is_active'] = $request->boolean('is_active');
 
         Faq::create($validated);
 
@@ -111,10 +115,13 @@ class FaqController extends Controller
             'pertanyaan' => 'required|string',
             'jawaban' => 'required|string',
             'urutan' => 'nullable|integer|min:0',
+            'is_active' => 'nullable|boolean',
         ], [
             'pertanyaan.required' => 'Pertanyaan wajib diisi',
             'jawaban.required' => 'Jawaban wajib diisi',
         ]);
+
+        $validated['is_active'] = $request->boolean('is_active');
 
         $faq->update($validated);
 

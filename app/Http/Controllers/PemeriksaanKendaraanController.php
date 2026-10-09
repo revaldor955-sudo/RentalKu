@@ -6,6 +6,7 @@ use App\Models\KerusakanMobil;
 use App\Models\PemeriksaanMobil;
 use App\Models\Rental;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PemeriksaanKendaraanController extends Controller
 {
@@ -189,6 +190,10 @@ class PemeriksaanKendaraanController extends Controller
         ];
 
         if ($request->hasFile('foto_bukti')) {
+            if ($pemeriksaan->foto_bukti) {
+                Storage::disk('public')->delete($pemeriksaan->foto_bukti);
+            }
+
             $data['foto_bukti'] = $request->file('foto_bukti')->store('pemeriksaan', 'public');
         }
 
@@ -203,6 +208,10 @@ class PemeriksaanKendaraanController extends Controller
 
     public function destroy(Request $request, PemeriksaanMobil $pemeriksaan)
     {
+        if ($pemeriksaan->foto_bukti) {
+            Storage::disk('public')->delete($pemeriksaan->foto_bukti);
+        }
+
         $pemeriksaan->delete();
 
         return response()->json([

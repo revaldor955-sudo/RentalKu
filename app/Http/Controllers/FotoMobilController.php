@@ -134,6 +134,10 @@ class FotoMobilController extends Controller
         ]);
 
         if ($request->hasFile('url')) {
+            if ($fotoMobil->url && file_exists(public_path($fotoMobil->url))) {
+                unlink(public_path($fotoMobil->url));
+            }
+
             $image = $request->file('url');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $image->move(public_path('images/foto_mobils'), $imageName);
@@ -154,6 +158,10 @@ class FotoMobilController extends Controller
 
     public function destroy(Request $request, FotoMobil $fotoMobil)
     {
+        if ($fotoMobil->url && file_exists(public_path($fotoMobil->url))) {
+            unlink(public_path($fotoMobil->url));
+        }
+
         $fotoMobil->delete();
 
         if ($request->wantsJson()) {

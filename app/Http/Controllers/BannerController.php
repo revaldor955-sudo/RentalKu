@@ -152,6 +152,10 @@ class BannerController extends Controller
         ]);
 
         if ($request->hasFile('gambar')) {
+            if ($banner->gambar && file_exists(public_path($banner->gambar))) {
+                unlink(public_path($banner->gambar));
+            }
+
             $image = $request->file('gambar');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $image->move(public_path('images/banners'), $imageName);
@@ -169,6 +173,10 @@ class BannerController extends Controller
      */
     public function destroy(Banner $banner)
     {
+        if ($banner->gambar && file_exists(public_path($banner->gambar))) {
+            unlink(public_path($banner->gambar));
+        }
+
         $banner->delete();
 
         return redirect()->route('banners.index')

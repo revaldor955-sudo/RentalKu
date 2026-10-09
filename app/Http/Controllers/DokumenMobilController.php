@@ -155,6 +155,10 @@ class DokumenMobilController extends Controller
         ]);
 
         if ($request->hasFile('file')) {
+            if ($dokumenMobil->file && file_exists(public_path($dokumenMobil->file))) {
+                unlink(public_path($dokumenMobil->file));
+            }
+
             $file = $request->file('file');
             $fileName = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('images/dokumen_mobils'), $fileName);
@@ -175,6 +179,10 @@ class DokumenMobilController extends Controller
 
     public function destroy(Request $request, DokumenMobil $dokumenMobil)
     {
+        if ($dokumenMobil->file && file_exists(public_path($dokumenMobil->file))) {
+            unlink(public_path($dokumenMobil->file));
+        }
+
         $dokumenMobil->delete();
 
         if ($request->wantsJson()) {

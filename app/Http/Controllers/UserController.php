@@ -169,6 +169,17 @@ class UserController extends Controller
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
+        ], [
+            'name.required' => 'Nama pengguna wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan.',
+            'password.min' => 'Password minimal 6 karakter.',
+            'roles_id.required' => 'Role wajib dipilih.',
+            'roles_id.exists' => 'Role tidak valid.',
+            'photo.image' => 'Foto harus berupa gambar.',
+            'photo.mimes' => 'Foto harus JPG, JPEG, atau PNG.',
+            'photo.max' => 'Ukuran foto maksimal 2 MB.',
         ]);
 
         if ($request->hasFile('photo')) {
