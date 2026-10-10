@@ -517,10 +517,8 @@
                                     },
                                 },
                             ],
-                            order: [
-                                [7, 'desc'],
-                                [5, 'desc']
-                            ],
+                           order: [],
+                            ordering: false,    
                             language: {
                                 processing: 'Memproses...',
                                 search: 'Cari:',

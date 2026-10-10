@@ -12,16 +12,41 @@ class PembayaranController extends Controller
 {
     public function index()
     {
-        return view('admin.pembayaran.index')->with('pageTitle', 'Pembayaran');
+        return view('admin.pembayaran.index')
+            ->with('pageTitle', 'Pembayaran');
     }
 
+    /**
+     * Data pembayaran untuk DataTables.
+     * Pembayaran yang baru dibuat ditampilkan terlebih dahulu.
+     */
     public function data(Request $request)
     {
         $query = Pembayaran::query()
-            ->leftJoin('rentals', 'pembayarans.rental_id', '=', 'rentals.id')
-            ->leftJoin('users', 'rentals.user_id', '=', 'users.id')
-            ->leftJoin('mobils', 'rentals.mobil_id', '=', 'mobils.id')
-            ->leftJoin('metode_pembayarans', 'pembayarans.metode_pembayaran_id', '=', 'metode_pembayarans.id')
+            ->leftJoin(
+                'rentals',
+                'pembayarans.rental_id',
+                '=',
+                'rentals.id'
+            )
+            ->leftJoin(
+                'users',
+                'rentals.user_id',
+                '=',
+                'users.id'
+            )
+            ->leftJoin(
+                'mobils',
+                'rentals.mobil_id',
+                '=',
+                'mobils.id'
+            )
+            ->leftJoin(
+                'metode_pembayarans',
+                'pembayarans.metode_pembayaran_id',
+                '=',
+                'metode_pembayarans.id'
+            )
             ->select(
                 'pembayarans.*',
                 'users.name as user_name',
@@ -29,78 +54,103 @@ class PembayaranController extends Controller
                 'metode_pembayarans.name as metode_name'
             );
 
-        $recordsTotal = $query->count();
+        // Total semua data pembayaran.
+        $recordsTotal = Pembayaran::count();
 
+        // Pencarian.
         $search = $request->input('search.value');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('users.name', 'like', "%{$search}%")
-                    ->orWhere('mobils.name', 'like', "%{$search}%")
-                    ->orWhere('metode_pembayarans.name', 'like', "%{$search}%")
-                    ->orWhere('pembayarans.status', 'like', "%{$search}%");
+                $q->where(
+                    'users.name',
+                    'like',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'mobils.name',
+                    'like',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'metode_pembayarans.name',
+                    'like',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'pembayarans.status',
+                    'like',
+                    "%{$search}%"
+                );
             });
         }
 
-        $recordsFiltered = $query->count();
+        // Total data setelah pencarian.
+        $recordsFiltered = (clone $query)->count(
+            'pembayarans.id'
+        );
 
-        $columns = [
-            0 => null,
-            1 => 'users.name',
-            2 => null,
-            3 => 'mobils.name',
-            4 => 'metode_pembayarans.name',
-            5 => 'pembayarans.tanggal_bayar',
-            6 => 'pembayarans.jumlah',
-            7 => 'pembayarans.status',
-            8 => null,
-        ];
+        /*
+         * Default selalu berdasarkan pembayaran yang terakhir dibuat.
+         * Urutan DataTables dari browser tidak digunakan agar tidak
+         * mengalahkan urutan pembayaran terbaru.
+         */
+        $query->reorder()
+            ->orderByDesc('pembayarans.created_at')
+            ->orderByDesc('pembayarans.id');
 
-        $orders = $request->input('order', [['column' => 5, 'dir' => 'desc']]);
-        $applied = false;
+        // Pagination DataTables.
+        $start = max(
+            0,
+            (int) $request->input('start', 0)
+        );
 
-        foreach ($orders as $o) {
-            $c = $o['column'] ?? null;
-            $d = (($o['dir'] ?? 'asc') === 'desc') ? 'desc' : 'asc';
+        $length = (int) $request->input('length', 10);
 
-            if (isset($columns[$c]) && $columns[$c]) {
-                $query->orderBy($columns[$c], $d);
-                $applied = true;
-            }
-        }
+        $length = min(max($length, 1), 100);
 
-        if (! $applied) {
-            $query->orderBy('pembayarans.tanggal_bayar', 'desc');
-        }
-
-        $start = max(0, (int) $request->input('start', 0));
-        $length = min(max((int) $request->input('length', 10), 1), 100);
-
-        $pembayarans = $query->offset($start)->limit($length)->get();
+        $pembayarans = $query
+            ->offset($start)
+            ->limit($length)
+            ->get();
 
         $data = $pembayarans->map(function ($pembayaran) {
             return [
                 'id' => $pembayaran->id,
+
                 'user_name' => $pembayaran->user_name ?? '-',
+
                 'mobil_name' => $pembayaran->mobil_name ?? '-',
+
                 'metode_name' => $pembayaran->metode_name ?? '-',
-                'tanggal_bayar' => $pembayaran->tanggal_bayar?->format('d/m/Y'),
+
+                'tanggal_bayar' => $pembayaran->tanggal_bayar
+                    ? \Illuminate\Support\Carbon::parse(
+                        $pembayaran->tanggal_bayar
+                    )->format('d/m/Y')
+                    : '-',
+
                 'jumlah' => (float) $pembayaran->jumlah,
+
                 'bukti' => $pembayaran->bukti,
+
                 'status' => $pembayaran->status,
             ];
         });
 
         return response()->json([
             'draw' => (int) $request->input('draw'),
+
             'recordsTotal' => $recordsTotal,
+
             'recordsFiltered' => $recordsFiltered,
+
             'data' => $data,
         ]);
     }
 
     /**
-     * Detail pembayaran untuk modal popup (AJAX)
+     * Detail pembayaran untuk modal popup.
      */
     public function detail(Pembayaran $pembayaran)
     {
@@ -108,9 +158,15 @@ class PembayaranController extends Controller
             abort(404, 'Data rental tidak ditemukan.');
         }
 
-        // Ownership check: customer hanya bisa lihat pembayaran rental sendiri
-        if (auth()->user()->roles_id === 3 && $pembayaran->rental->user_id !== auth()->id()) {
-            abort(403, 'Anda tidak memiliki akses ke pembayaran ini.');
+        // Customer hanya dapat melihat pembayaran rental miliknya.
+        if (
+            auth()->user()->roles_id === 3
+            && $pembayaran->rental->user_id !== auth()->id()
+        ) {
+            abort(
+                403,
+                'Anda tidak memiliki akses ke pembayaran ini.'
+            );
         }
 
         $pembayaran->load([
@@ -123,27 +179,43 @@ class PembayaranController extends Controller
 
         return response()->json([
             'id' => $pembayaran->id,
+
             'pelanggan' => $pembayaran->rental->user->name ?? '-',
+
             'email' => $pembayaran->rental->user->email ?? '-',
+
             'mobil' => $pembayaran->rental->mobil->name ?? '-',
+
             'plat' => $pembayaran->rental->mobil->plate_number ?? '-',
+
             'metode' => $pembayaran->metodePembayaran->name ?? '-',
-            'tanggal_bayar' => $pembayaran->tanggal_bayar?->format('d/m/Y'),
+
+            'tanggal_bayar' => $pembayaran->tanggal_bayar
+                ? \Illuminate\Support\Carbon::parse(
+                    $pembayaran->tanggal_bayar
+                )->format('d/m/Y')
+                : '-',
+
             'jumlah' => (float) $pembayaran->jumlah,
+
             'bukti_url' => $pembayaran->bukti
                 ? asset('storage/' . $pembayaran->bukti)
                 : null,
+
             'status' => $pembayaran->status,
         ]);
     }
 
     /**
-     * Rekening yang boleh dipakai untuk satu cabang: milik cabang itu;
-     * kalau cabang belum punya, pakai milik pusat.
+     * Mengambil metode pembayaran milik cabang.
+     * Jika cabang belum memiliki metode, gunakan metode pusat.
      */
     private function metodeUntukCabang($cabangId)
     {
-        $milikCabang = MetodePembayaran::where('cabang_id', $cabangId)
+        $milikCabang = MetodePembayaran::where(
+            'cabang_id',
+            $cabangId
+        )
             ->orderBy('name')
             ->get();
 
@@ -156,6 +228,9 @@ class PembayaranController extends Controller
             ->get();
     }
 
+    /**
+     * Halaman pembayaran customer.
+     */
     public function create(Rental $rental)
     {
         if ($rental->user_id !== Auth::id()) {
@@ -163,24 +238,31 @@ class PembayaranController extends Controller
         }
 
         if ($rental->status !== 'Disetujui') {
-            return redirect()->route('customer.dashboard')->with('error', 'Rental belum disetujui.');
+            return redirect()
+                ->route('customer.dashboard')
+                ->with('error', 'Rental belum disetujui.');
         }
 
-        $metodePembayarans = $this->metodeUntukCabang($rental->cabang_ambil_id);
+        $metodePembayarans = $this->metodeUntukCabang(
+            $rental->cabang_ambil_id
+        );
 
-        return view('customer.pembayaran.create', compact(
-            'rental',
-            'metodePembayarans'
-        ));
+        return view(
+            'customer.pembayaran.create',
+            compact('rental', 'metodePembayarans')
+        );
     }
 
+    /**
+     * Menyimpan pembayaran customer.
+     */
     public function store(Request $request, Rental $rental)
     {
         if ($rental->user_id !== Auth::id()) {
             abort(403);
         }
 
-        // Bayar hanya untuk rental yang sudah disetujui.
+        // Pembayaran hanya untuk rental yang disetujui.
         if ($rental->status !== 'Disetujui') {
             if ($request->wantsJson()) {
                 return response()->json([
@@ -188,68 +270,124 @@ class PembayaranController extends Controller
                 ], 422);
             }
 
-            return redirect()->route('customer.dashboard')->with('error', 'Rental belum disetujui.');
+            return redirect()
+                ->route('customer.dashboard')
+                ->with('error', 'Rental belum disetujui.');
         }
 
-        // Satu pembayaran aktif per rental; upload ulang hanya setelah ditolak.
-        $adaAktif = Pembayaran::where('rental_id', $rental->id)
+        // Satu pembayaran aktif per rental.
+        // Upload ulang dapat dilakukan setelah pembayaran ditolak.
+        $adaAktif = Pembayaran::where(
+            'rental_id',
+            $rental->id
+        )
             ->whereIn('status', ['Menunggu', 'Disetujui'])
             ->exists();
+
         if ($adaAktif) {
             if ($request->wantsJson()) {
                 return response()->json([
-                    'message' => 'Rental ini sudah memiliki pembayaran aktif.',
+                    'message' =>
+                        'Rental ini sudah memiliki pembayaran aktif.',
                 ], 422);
             }
 
-            return redirect()->route('customer.dashboard')->with('error', 'Rental ini sudah memiliki pembayaran aktif.');
+            return redirect()
+                ->route('customer.dashboard')
+                ->with(
+                    'error',
+                    'Rental ini sudah memiliki pembayaran aktif.'
+                );
         }
 
         $validated = $request->validate([
-            'metode_pembayaran_id' => 'required|exists:metode_pembayarans,id',
-            'tanggal_bayar' => 'required|date|before_or_equal:today',
-            'bukti' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'metode_pembayaran_id' =>
+                'required|exists:metode_pembayarans,id',
+
+            'tanggal_bayar' =>
+                'required|date|before_or_equal:today',
+
+            'bukti' =>
+                'required|image|mimes:jpg,jpeg,png|max:2048',
         ], [
-            'metode_pembayaran_id.required' => 'Metode pembayaran wajib dipilih.',
-            'metode_pembayaran_id.exists' => 'Metode pembayaran tidak valid.',
-            'tanggal_bayar.required' => 'Tanggal pembayaran wajib diisi.',
-            'tanggal_bayar.date' => 'Tanggal pembayaran tidak valid.',
-            'tanggal_bayar.before_or_equal' => 'Tanggal pembayaran tidak boleh melebihi hari ini.',
-            'bukti.required' => 'Bukti pembayaran wajib diupload.',
-            'bukti.image' => 'File bukti harus berupa gambar.',
-            'bukti.mimes' => 'Bukti harus berformat JPG, JPEG, atau PNG.',
-            'bukti.max' => 'Ukuran bukti maksimal 2 MB.',
+            'metode_pembayaran_id.required' =>
+                'Metode pembayaran wajib dipilih.',
+
+            'metode_pembayaran_id.exists' =>
+                'Metode pembayaran tidak valid.',
+
+            'tanggal_bayar.required' =>
+                'Tanggal pembayaran wajib diisi.',
+
+            'tanggal_bayar.date' =>
+                'Tanggal pembayaran tidak valid.',
+
+            'tanggal_bayar.before_or_equal' =>
+                'Tanggal pembayaran tidak boleh melebihi hari ini.',
+
+            'bukti.required' =>
+                'Bukti pembayaran wajib diupload.',
+
+            'bukti.image' =>
+                'File bukti harus berupa gambar.',
+
+            'bukti.mimes' =>
+                'Bukti harus berformat JPG, JPEG, atau PNG.',
+
+            'bukti.max' =>
+                'Ukuran bukti maksimal 2 MB.',
         ]);
 
-        // Metode harus milik cabang rental (atau pusat bila cabang belum punya).
-        // Cek dulu sebelum file disimpan agar tidak ada file yatim.
-        $metodeAllowed = $this->metodeUntukCabang($rental->cabang_ambil_id)
-            ->contains('id', (int) $validated['metode_pembayaran_id']);
+        // Pastikan metode pembayaran sesuai cabang rental.
+        $metodeAllowed = $this->metodeUntukCabang(
+            $rental->cabang_ambil_id
+        )->contains(
+            'id',
+            (int) $validated['metode_pembayaran_id']
+        );
 
         if (! $metodeAllowed) {
             if ($request->wantsJson()) {
                 return response()->json([
-                    'message' => 'Metode pembayaran tidak tersedia untuk cabang ini.',
-                    'errors' => ['metode_pembayaran_id' => ['Metode pembayaran tidak tersedia untuk cabang ini.']],
+                    'message' =>
+                        'Metode pembayaran tidak tersedia untuk cabang ini.',
+
+                    'errors' => [
+                        'metode_pembayaran_id' => [
+                            'Metode pembayaran tidak tersedia untuk cabang ini.',
+                        ],
+                    ],
                 ], 422);
             }
 
             return back()
-                ->withErrors(['metode_pembayaran_id' => 'Metode pembayaran tidak tersedia untuk cabang ini.'])
+                ->withErrors([
+                    'metode_pembayaran_id' =>
+                        'Metode pembayaran tidak tersedia untuk cabang ini.',
+                ])
                 ->withInput();
         }
 
+        // Simpan bukti pembayaran.
         $path = $request->file('bukti')->store(
             'bukti_pembayaran',
             'public'
         );
 
+        // created_at akan diisi otomatis oleh Eloquent jika
+        // timestamps aktif pada model Pembayaran.
         Pembayaran::create([
             'rental_id' => $rental->id,
-            'metode_pembayaran_id' => $validated['metode_pembayaran_id'],
+
+            'metode_pembayaran_id' =>
+                $validated['metode_pembayaran_id'],
+
             'tanggal_bayar' => $validated['tanggal_bayar'],
+
             'jumlah' => $rental->total_harga,
+
             'bukti' => $path,
+
             'status' => 'Menunggu',
         ]);
 
@@ -259,33 +397,49 @@ class PembayaranController extends Controller
             ]);
         }
 
-        return redirect()->route('customer.dashboard')->with('success', 'Bukti pembayaran berhasil dikirim.');
+        return redirect()
+            ->route('customer.dashboard')
+            ->with(
+                'success',
+                'Bukti pembayaran berhasil dikirim.'
+            );
     }
 
-    public function updateStatus(Request $request, Pembayaran $pembayaran)
-    {
-        // Ownership check: customer tidak boleh update status
+    /**
+     * Memperbarui status pembayaran.
+     */
+    public function updateStatus(
+        Request $request,
+        Pembayaran $pembayaran
+    ) {
+        // Customer tidak boleh mengubah status pembayaran.
         if (auth()->user()->roles_id === 3) {
-            abort(403, 'Anda tidak memiliki akses untuk mengubah status pembayaran.');
+            abort(
+                403,
+                'Anda tidak memiliki akses untuk mengubah status pembayaran.'
+            );
         }
 
         $validated = $request->validate([
-            'status' => 'required|in:Disetujui,Ditolak'
+            'status' => 'required|in:Disetujui,Ditolak',
         ]);
 
-        // Pembayaran yang sudah diputuskan bersifat final.
+        // Status yang sudah diputuskan tidak dapat diubah lagi.
         if ($pembayaran->status !== 'Menunggu') {
             return response()->json([
-                'message' => 'Pembayaran yang sudah diputuskan tidak dapat diubah lagi.',
+                'message' =>
+                    'Pembayaran yang sudah diputuskan tidak dapat diubah lagi.',
             ], 422);
         }
 
         $pembayaran->update([
-            'status' => $validated['status']
+            'status' => $validated['status'],
         ]);
 
         return response()->json([
-            'message' => 'Status pembayaran berhasil diperbarui menjadi ' . $validated['status'] . '.',
+            'message' =>
+                'Status pembayaran berhasil diperbarui menjadi '
+                . $validated['status'] . '.',
         ]);
     }
 }

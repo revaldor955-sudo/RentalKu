@@ -7,48 +7,98 @@ use Illuminate\Http\Request;
 
 class TipeMobilController extends Controller
 {
+    /**
+     * Menampilkan halaman kelola tipe mobil.
+     */
     public function index()
     {
-        return view('tipe_mobils.index')->with('pageTitle', 'Tipe Kendaraan');
+        return view('tipe_mobils.index')
+            ->with('pageTitle', 'Tipe Kendaraan');
     }
 
     /**
-     * Server-side DataTables: daftar tipe mobil (search, sort, pagination)
+     * Data tipe mobil untuk DataTables.
+     * Default: data terbaru berada paling atas.
      */
     public function data(Request $request)
     {
         $query = TipeMobil::query();
 
-        $recordsTotal = $query->count();
+        $recordsTotal = TipeMobil::count();
 
-        $search = $request->input('search.value');
+        $search = trim((string) $request->input('search.value', ''));
 
-        if ($search) {
-            $query->where('tipe_mobils.name', 'like', "%{$search}%")
-                  ->orWhere('tipe_mobils.description', 'like', "%{$search}%");
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('tipe_mobils.name', 'like', "%{$search}%")
+                    ->orWhere(
+                        'tipe_mobils.description',
+                        'like',
+                        "%{$search}%"
+                    );
+            });
         }
 
-        $recordsFiltered = $query->count();
+        $recordsFiltered = (clone $query)->count('tipe_mobils.id');
 
         $columns = [
             0 => null,
             1 => 'tipe_mobils.name',
             2 => 'tipe_mobils.description',
+            3 => null,
         ];
 
-        $orderColumn = $request->input('order.0.column', 1);
-        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
+        $orders = $request->input('order', []);
+        $orderApplied = false;
 
-        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
-            $query->orderBy($columns[$orderColumn], $orderDir);
-        } else {
-            $query->orderBy('tipe_mobils.name', 'asc');
+        foreach ($orders as $order) {
+            $columnIndex = (int) ($order['column'] ?? -1);
+
+            if (
+                !isset($columns[$columnIndex]) ||
+                $columns[$columnIndex] === null
+            ) {
+                continue;
+            }
+
+            $direction = strtolower(
+                $order['dir'] ?? 'asc'
+            ) === 'desc' ? 'desc' : 'asc';
+
+            $query->orderBy(
+                $columns[$columnIndex],
+                $direction
+            );
+
+            $orderApplied = true;
         }
 
-        $start = max(0, (int) $request->input('start', 0));
-        $length = min(max((int) $request->input('length', 10), 1), 100);
+        // Urutan default: tipe mobil terbaru terlebih dahulu.
+        if (!$orderApplied) {
+            $query->orderByDesc('tipe_mobils.created_at')
+                ->orderByDesc('tipe_mobils.id');
+        } else {
+            // Jika nilai kolom yang dipilih sama,
+            // dahulukan data yang lebih baru.
+            $query->orderByDesc('tipe_mobils.created_at')
+                ->orderByDesc('tipe_mobils.id');
+        }
 
-        $tipeMobils = $query->offset($start)->limit($length)->get();
+        $start = max(
+            0,
+            (int) $request->input('start', 0)
+        );
+
+        $requestedLength = (int) $request->input('length', 10);
+
+        $length = $requestedLength === -1
+            ? 100
+            : min(max($requestedLength, 1), 100);
+
+        $tipeMobils = $query
+            ->offset($start)
+            ->limit($length)
+            ->get();
 
         $data = $tipeMobils->map(function ($item) {
             return [
@@ -71,82 +121,102 @@ class TipeMobilController extends Controller
         //
     }
 
+    /**
+     * Menambahkan tipe mobil.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ], [
-            'name.required' => 'Nama tipe mobil wajib diisi',
-            'name.max' => 'Nama tipe mobil maksimal 255 karakter',
+            'name.required' => 'Nama tipe mobil wajib diisi.',
+            'name.max' => 'Nama tipe mobil maksimal 255 karakter.',
         ]);
 
-        TipeMobil::create($validated);
+        $tipeMobil = TipeMobil::create($validated);
 
-        if ($request->wantsJson()) {
+        if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
-                'message' => 'Tipe Mobil berhasil ditambahkan.',
-            ]);
+                'message' => 'Tipe mobil berhasil ditambahkan.',
+                'id' => $tipeMobil->id,
+            ], 201);
         }
 
-        return redirect()->route('tipe_mobils.index')
-            ->with('success', 'Tipe Mobil berhasil ditambahkan.');
+        return redirect()
+            ->route('tipe_mobils.index')
+            ->with('success', 'Tipe mobil berhasil ditambahkan.');
     }
 
     public function show(TipeMobil $tipeMobil)
     {
-        //
+        return response()->json([
+            'id' => $tipeMobil->id,
+            'name' => $tipeMobil->name,
+            'description' => $tipeMobil->description,
+        ]);
     }
 
     public function edit(TipeMobil $tipeMobil)
     {
-        //
+        return view('tipe_mobils.edit', compact('tipeMobil'));
     }
 
+    /**
+     * Memperbarui tipe mobil.
+     */
     public function update(Request $request, TipeMobil $tipeMobil)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ], [
-            'name.required' => 'Nama tipe mobil wajib diisi',
-            'name.max' => 'Nama tipe mobil maksimal 255 karakter',
+            'name.required' => 'Nama tipe mobil wajib diisi.',
+            'name.max' => 'Nama tipe mobil maksimal 255 karakter.',
         ]);
 
         $tipeMobil->update($validated);
 
-        if ($request->wantsJson()) {
+        if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
-                'message' => 'Tipe Mobil berhasil diperbarui.',
+                'message' => 'Tipe mobil berhasil diperbarui.',
             ]);
         }
 
-        return redirect()->route('tipe_mobils.index')
-            ->with('success', 'Tipe Mobil berhasil diperbarui.');
+        return redirect()
+            ->route('tipe_mobils.index')
+            ->with('success', 'Tipe mobil berhasil diperbarui.');
     }
 
+    /**
+     * Menghapus tipe mobil.
+     */
     public function destroy(Request $request, TipeMobil $tipeMobil)
     {
-        // Cegah penghapusan jika masih dipakai mobil.
         if ($tipeMobil->mobils()->exists()) {
-            if ($request->wantsJson()) {
+            $message = 'Tipe mobil tidak dapat dihapus karena masih digunakan oleh mobil.';
+
+            if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
-                    'message' => 'Tipe mobil tidak dapat dihapus karena masih digunakan oleh mobil.',
+                    'message' => $message,
                 ], 422);
             }
 
-            return redirect()->route('tipe_mobils.index')->with('error', 'Tipe mobil tidak dapat dihapus karena masih digunakan oleh mobil.');
+            return redirect()
+                ->route('tipe_mobils.index')
+                ->with('error', $message);
         }
 
         $tipeMobil->delete();
 
-        if ($request->wantsJson()) {
+        if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
-                'message' => 'Tipe Mobil berhasil dihapus.',
+                'message' => 'Tipe mobil berhasil dihapus.',
             ]);
         }
 
-        return redirect()->route('tipe_mobils.index')
-            ->with('success', 'Tipe Mobil berhasil dihapus.');
+        return redirect()
+            ->route('tipe_mobils.index')
+            ->with('success', 'Tipe mobil berhasil dihapus.');
     }
 }
