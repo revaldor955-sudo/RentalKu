@@ -925,13 +925,17 @@
 
                     </button>
 
-                    <button type="submit"
-                            class="btn btn-green">
+                
+<button type="submit"
+        class="btn btn-green"
+        form="formTambahMobil"
+        id="btnSimpanMobil">
 
-                        <i class="bi bi-save me-1"></i>
-                        Simpan Mobil
+    <i class="bi bi-save me-1"></i>
+    Simpan Mobil
 
-                    </button>
+</button>
+
 
                 </div>
 
@@ -1342,13 +1346,17 @@
 
                     </button>
 
-                    <button type="submit"
-                            class="btn btn-green">
+                
+<button type="submit"
+        class="btn btn-green"
+        form="formTambahMobil"
+        id="btnSimpanMobil">
 
-                        <i class="bi bi-save me-1"></i>
-                        Simpan Perubahan
+    <i class="bi bi-save me-1"></i>
+    Simpan Mobil
 
-                    </button>
+</button>
+
 
                 </div>
 
@@ -1501,9 +1509,9 @@
                     },
                 },
             ],
-            order: [
-                [1, 'asc']
-            ],
+           order: [
+    [0, 'asc']
+],  
             language: {
                 processing: 'Memproses...',
                 search: 'Cari:',

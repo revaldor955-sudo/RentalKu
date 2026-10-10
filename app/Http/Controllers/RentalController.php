@@ -733,186 +733,262 @@ public function confirmCheckout(
     /**
      * DataTables rental
      */
-    public function data(Request $request)
-    {
-        $query = Rental::query()
-            ->leftJoin(
-                'users',
-                'rentals.user_id',
-                '=',
-                'users.id'
-            )
-            ->leftJoin(
-                'mobils',
-                'rentals.mobil_id',
-                '=',
-                'mobils.id'
-            )
-            ->select(
-                'rentals.*',
-                'users.name as user_name',
-                'users.email as user_email',
-                'mobils.name as mobil_name',
-                'mobils.plate_number as mobil_plate'
-            );
+  
+/**
+ * DataTables rental
+ * Data rental terbaru ditampilkan paling atas secara default.
+ */
+public function data(Request $request)
+{
+    $query = Rental::query()
+        ->leftJoin(
+            'users',
+            'rentals.user_id',
+            '=',
+            'users.id'
+        )
+        ->leftJoin(
+            'mobils',
+            'rentals.mobil_id',
+            '=',
+            'mobils.id'
+        )
+        ->select(
+            'rentals.*',
+            'users.name as user_name',
+            'users.email as user_email',
+            'mobils.name as mobil_name',
+            'mobils.plate_number as mobil_plate'
+        );
 
-        if ($request->filled('status')) {
-            $query->where(
+    /*
+    |--------------------------------------------------------------------------
+    | Filter status
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->filled('status')) {
+        $query->where(
+            'rentals.status',
+            $request->input('status')
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Total data sebelum pencarian
+    |--------------------------------------------------------------------------
+    */
+
+    $recordsTotal = Rental::when(
+        $request->filled('status'),
+        function ($q) use ($request) {
+            $q->where(
+                'status',
+                $request->input('status')
+            );
+        }
+    )->count();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pencarian DataTables
+    |--------------------------------------------------------------------------
+    */
+
+    $search = trim(
+        (string) $request->input('search.value', '')
+    );
+
+    if ($search !== '') {
+        $query->where(function ($q) use ($search) {
+            $q->where(
+                'users.name',
+                'like',
+                "%{$search}%"
+            )
+            ->orWhere(
+                'users.email',
+                'like',
+                "%{$search}%"
+            )
+            ->orWhere(
+                'mobils.name',
+                'like',
+                "%{$search}%"
+            )
+            ->orWhere(
+                'mobils.plate_number',
+                'like',
+                "%{$search}%"
+            )
+            ->orWhere(
                 'rentals.status',
-                $request->status
+                'like',
+                "%{$search}%"
             );
-        }
+        });
+    }
 
-        $recordsTotal = Rental::count();
+    /*
+    |--------------------------------------------------------------------------
+    | Jumlah data setelah pencarian
+    |--------------------------------------------------------------------------
+    */
 
-        $search = $request->input(
-            'search.value'
-        );
+    $recordsFiltered = (clone $query)->count(
+        'rentals.id'
+    );
 
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where(
-                    'users.name',
-                    'like',
-                    "%{$search}%"
-                )
-                    ->orWhere(
-                        'users.email',
-                        'like',
-                        "%{$search}%"
-                    )
-                    ->orWhere(
-                        'mobils.name',
-                        'like',
-                        "%{$search}%"
-                    )
-                    ->orWhere(
-                        'mobils.plate_number',
-                        'like',
-                        "%{$search}%"
-                    )
-                    ->orWhere(
-                        'rentals.status',
-                        'like',
-                        "%{$search}%"
-                    );
-            });
-        }
+    /*
+    |--------------------------------------------------------------------------
+    | Pengurutan kolom DataTables
+    |--------------------------------------------------------------------------
+    */
 
-        $recordsFiltered = $query->count();
+    $columns = [
+        0 => null,
+        1 => 'users.name',
+        2 => 'mobils.name',
+        3 => 'rentals.tanggal_mulai',
+        4 => 'rentals.jumlah_hari',
+        5 => 'rentals.total_harga',
+        6 => 'rentals.status',
+        7 => null,
+    ];
 
-        $columns = [
-            0 => null,
-            1 => 'users.name',
-            2 => 'mobils.name',
-            3 => 'rentals.tanggal_mulai',
-            4 => 'rentals.jumlah_hari',
-            5 => 'rentals.total_harga',
-            6 => 'rentals.status',
-            7 => null,
-        ];
+    $orderColumn = $request->input(
+        'order.0.column'
+    );
 
-        $orderColumn = $request->input(
-            'order.0.column',
-            3
-        );
-
-        $orderDir = $request->input(
+    $orderDir = strtolower(
+        (string) $request->input(
             'order.0.dir',
             'desc'
+        )
+    );
+
+    /*
+     * Jika tidak ada kolom yang diminta untuk diurutkan,
+     * gunakan created_at terbaru sebagai urutan utama.
+     */
+    if (
+        $orderColumn === null ||
+        !isset($columns[(int) $orderColumn]) ||
+        $columns[(int) $orderColumn] === null
+    ) {
+        $query->orderByDesc('rentals.created_at')
+              ->orderByDesc('rentals.id');
+    } else {
+        /*
+         * Tetap dukung pengurutan kolom yang dipilih pengguna.
+         * Nama kolom berasal dari daftar yang diizinkan,
+         * bukan langsung dari input request.
+         */
+        $direction = $orderDir === 'asc'
+            ? 'asc'
+            : 'desc';
+
+        $query->orderBy(
+            $columns[(int) $orderColumn],
+            $direction
         );
 
-        if (
-            isset($columns[$orderColumn]) &&
-            $columns[$orderColumn]
-        ) {
-            $query->orderBy(
-                $columns[$orderColumn],
-                $orderDir === 'asc'
-                    ? 'asc'
-                    : 'desc'
-            );
-        } else {
-            $query->orderBy(
-                'rentals.tanggal_mulai',
-                'desc'
-            );
-        }
+        // Jika nilainya sama, rental terbaru tetap didahulukan.
+        $query->orderByDesc('rentals.created_at')
+              ->orderByDesc('rentals.id');
+    }
 
-        $start = max(
-            0,
-            (int) $request->input('start', 0)
-        );
+    /*
+    |--------------------------------------------------------------------------
+    | Pagination DataTables
+    |--------------------------------------------------------------------------
+    */
 
-        $length = (int) $request->input(
-            'length',
-            10
-        );
+    $start = max(
+        0,
+        (int) $request->input('start', 0)
+    );
 
-        $length = $length > 0
-            ? $length
-            : 10;
+    $length = (int) $request->input('length', 10);
+
+    // Mendukung permintaan seluruh data jika DataTables
+    // mengirim length = -1.
+    if ($length === -1) {
+        $rentals = $query
+            ->offset($start)
+            ->get();
+    } else {
+        $length = max(1, min($length, 500));
 
         $rentals = $query
             ->offset($start)
             ->limit($length)
             ->get();
-
-        $data = $rentals->map(function ($rental) {
-            return [
-                'id' => $rental->id,
-
-                'user_name' =>
-                    $rental->user_name ?? '-',
-
-                'user_email' =>
-                    $rental->user_email ?? '-',
-
-                'mobil_name' =>
-                    $rental->mobil_name ?? '-',
-
-                'mobil_plate' =>
-                    $rental->mobil_plate ?? '-',
-
-                'tanggal_mulai' =>
-                    $rental->tanggal_mulai
-                        ? Carbon::parse(
-                            $rental->tanggal_mulai
-                        )->format('d/m/Y')
-                        : '-',
-
-                'tanggal_selesai' =>
-                    $rental->tanggal_selesai
-                        ? Carbon::parse(
-                            $rental->tanggal_selesai
-                        )->format('d/m/Y')
-                        : '-',
-
-                'jumlah_hari' =>
-                    $rental->jumlah_hari,
-
-                'total_harga' =>
-                    (float) $rental->total_harga,
-
-                'status' =>
-                    $rental->status,
-            ];
-        });
-
-        return response()->json([
-            'draw' =>
-                (int) $request->input('draw'),
-
-            'recordsTotal' =>
-                $recordsTotal,
-
-            'recordsFiltered' =>
-                $recordsFiltered,
-
-            'data' =>
-                $data,
-        ]);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Format respons JSON
+    |--------------------------------------------------------------------------
+    */
+
+    $data = $rentals->map(function ($rental) {
+        return [
+            'id' => $rental->id,
+
+            'user_name' =>
+                $rental->user_name ?? '-',
+
+            'user_email' =>
+                $rental->user_email ?? '-',
+
+            'mobil_name' =>
+                $rental->mobil_name ?? '-',
+
+            'mobil_plate' =>
+                $rental->mobil_plate ?? '-',
+
+            'tanggal_mulai' =>
+                $rental->tanggal_mulai
+                    ? Carbon::parse(
+                        $rental->tanggal_mulai
+                    )->format('d/m/Y')
+                    : '-',
+
+            'tanggal_selesai' =>
+                $rental->tanggal_selesai
+                    ? Carbon::parse(
+                        $rental->tanggal_selesai
+                    )->format('d/m/Y')
+                    : '-',
+
+            'jumlah_hari' =>
+                $rental->jumlah_hari,
+
+            'total_harga' =>
+                (float) $rental->total_harga,
+
+            'status' =>
+                $rental->status,
+        ];
+    });
+
+    return response()->json([
+        'draw' =>
+            (int) $request->input('draw', 0),
+
+        'recordsTotal' =>
+            $recordsTotal,
+
+        'recordsFiltered' =>
+            $recordsFiltered,
+
+        'data' =>
+            $data,
+    ]);
+}
+
 
     /**
      * Detail rental untuk AJAX

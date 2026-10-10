@@ -4,57 +4,113 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class BrandController extends Controller
 {
     /**
-     * Menampilkan semua brand
+     * Menampilkan halaman kelola merek.
      */
     public function index()
     {
-        return view('brands.index')->with('pageTitle', 'Merek');
+        return view('brands.index')
+            ->with('pageTitle', 'Merek');
     }
 
     /**
-     * Server-side DataTables: daftar brand (search, sort, pagination)
+     * Data merek untuk DataTables.
+     * Pengurutan default: merek terbaru berada paling atas.
      */
     public function data(Request $request)
     {
         $query = Brand::query()->withCount('mobils');
 
-        $recordsTotal = $query->count();
+        // Total semua merek sebelum pencarian.
+        $recordsTotal = Brand::count();
 
-        $search = $request->input('search.value');
+        // Pencarian merek.
+        $search = trim((string) $request->input('search.value', ''));
 
-        if ($search) {
+        if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->where('brands.name', 'like', "%{$search}%")
-                    ->orWhere('brands.description', 'like', "%{$search}%");
+                    ->orWhere(
+                        'brands.description',
+                        'like',
+                        "%{$search}%"
+                    );
             });
         }
 
-        $recordsFiltered = $query->count();
+        // Total merek setelah pencarian.
+        $recordsFiltered = (clone $query)->count('brands.id');
 
+        // Kolom yang boleh digunakan untuk pengurutan.
         $columns = [
-            0 => null,
-            1 => 'brands.name',
-            2 => 'brands.description',
+            0 => null, // Nomor
+            1 => null, // Logo
+            2 => 'brands.name',
+            3 => 'brands.description',
+            4 => null, // Jumlah mobil
+            5 => null, // Aksi
         ];
 
-        $orderColumn = $request->input('order.0.column', 1);
-        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
+        $orders = $request->input('order', []);
+        $orderApplied = false;
 
-        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
-            $query->orderBy($columns[$orderColumn], $orderDir);
-        } else {
-            $query->orderBy('brands.name', 'asc');
+        // Jika pengguna memilih pengurutan kolom,
+        // gunakan pilihan tersebut.
+        foreach ($orders as $order) {
+            $columnIndex = (int) ($order['column'] ?? -1);
+
+            if (
+                !isset($columns[$columnIndex]) ||
+                $columns[$columnIndex] === null
+            ) {
+                continue;
+            }
+
+            $direction = strtolower(
+                $order['dir'] ?? 'asc'
+            ) === 'desc' ? 'desc' : 'asc';
+
+            $query->orderBy(
+                $columns[$columnIndex],
+                $direction
+            );
+
+            $orderApplied = true;
         }
 
-        $start = max(0, (int) $request->input('start', 0));
-        $length = min(max((int) $request->input('length', 10), 1), 100);
+        // Pengurutan default: merek terbaru lebih dahulu.
+        if (!$orderApplied) {
+            $query->orderByDesc('brands.created_at')
+                ->orderByDesc('brands.id');
+        } else {
+            // Jika nilai kolom yang diurutkan sama,
+            // dahulukan merek yang lebih baru.
+            $query->orderByDesc('brands.created_at')
+                ->orderByDesc('brands.id');
+        }
 
-        $brands = $query->offset($start)->limit($length)->get();
+        // Pagination.
+        $start = max(
+            0,
+            (int) $request->input('start', 0)
+        );
 
+        $requestedLength = (int) $request->input('length', 10);
+
+        $length = $requestedLength === -1
+            ? 100
+            : min(max($requestedLength, 1), 100);
+
+        $brands = $query
+            ->offset($start)
+            ->limit($length)
+            ->get();
+
+        // Data yang dikirim ke DataTables.
         $data = $brands->map(function ($brand) {
             return [
                 'id' => $brand->id,
@@ -74,7 +130,7 @@ class BrandController extends Controller
     }
 
     /**
-     * Detail brand untuk edit modal (AJAX)
+     * Detail merek untuk modal edit.
      */
     public function show(Brand $brand)
     {
@@ -88,7 +144,7 @@ class BrandController extends Controller
     }
 
     /**
-     * Menyimpan brand baru
+     * Menyimpan merek baru.
      */
     public function store(Request $request)
     {
@@ -97,42 +153,48 @@ class BrandController extends Controller
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
             'description' => 'nullable|string|max:1000',
         ], [
-            'name.required' => 'Nama brand wajib diisi.',
-            'name.unique' => 'Nama brand sudah digunakan.',
-            'name.max' => 'Nama brand maksimal 50 karakter.',
+            'name.required' => 'Nama merek wajib diisi.',
+            'name.unique' => 'Nama merek sudah digunakan.',
+            'name.max' => 'Nama merek maksimal 50 karakter.',
             'logo.image' => 'Logo harus berupa gambar.',
             'logo.mimes' => 'Logo harus berformat JPG, JPEG, PNG, atau SVG.',
             'logo.max' => 'Ukuran logo maksimal 2 MB.',
             'description.max' => 'Deskripsi maksimal 1000 karakter.',
         ]);
 
+        // Pastikan folder penyimpanan logo tersedia.
+        $directory = public_path('images/brands');
+
+        if (!File::isDirectory($directory)) {
+            File::makeDirectory($directory, 0755, true);
+        }
+
+        // Upload logo jika pengguna memilih file.
         if ($request->hasFile('logo')) {
-
             $image = $request->file('logo');
+            $imageName = time() . '_' . $image->hashName();
 
-            $imageName = time() . '_' . $image->getClientOriginalName();
-
-            $image->move(
-                public_path('images/brands'),
-                $imageName
-            );
+            $image->move($directory, $imageName);
 
             $validated['logo'] = 'images/brands/' . $imageName;
         }
 
-        Brand::create($validated);
+        $brand = Brand::create($validated);
 
-        if ($request->wantsJson()) {
+        if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
-                'message' => 'Brand berhasil ditambahkan.',
-            ]);
+                'message' => 'Merek berhasil ditambahkan.',
+                'id' => $brand->id,
+            ], 201);
         }
 
-        return redirect()->route('brands.index')->with('success', 'Brand berhasil ditambahkan.');
+        return redirect()
+            ->route('brands.index')
+            ->with('success', 'Merek berhasil ditambahkan.');
     }
 
     /**
-     * Memperbarui brand
+     * Memperbarui merek.
      */
     public function update(Request $request, Brand $brand)
     {
@@ -141,79 +203,90 @@ class BrandController extends Controller
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
             'description' => 'nullable|string|max:1000',
         ], [
-            'name.required' => 'Nama brand wajib diisi.',
-            'name.unique' => 'Nama brand sudah digunakan.',
-            'name.max' => 'Nama brand maksimal 50 karakter.',
+            'name.required' => 'Nama merek wajib diisi.',
+            'name.unique' => 'Nama merek sudah digunakan.',
+            'name.max' => 'Nama merek maksimal 50 karakter.',
             'logo.image' => 'Logo harus berupa gambar.',
             'logo.mimes' => 'Logo harus berformat JPG, JPEG, PNG, atau SVG.',
             'logo.max' => 'Ukuran logo maksimal 2 MB.',
             'description.max' => 'Deskripsi maksimal 1000 karakter.',
         ]);
 
-        if ($request->hasFile('logo')) {
+        // Pastikan folder logo tersedia.
+        $directory = public_path('images/brands');
 
-            // Hapus logo lama
+        if (!File::isDirectory($directory)) {
+            File::makeDirectory($directory, 0755, true);
+        }
+
+        // Ganti logo jika ada file baru.
+        if ($request->hasFile('logo')) {
             if (
                 $brand->logo &&
-                file_exists(public_path($brand->logo))
+                File::exists(public_path($brand->logo))
             ) {
-                unlink(public_path($brand->logo));
+                File::delete(public_path($brand->logo));
             }
 
             $image = $request->file('logo');
+            $imageName = time() . '_' . $image->hashName();
 
-            $imageName = time() . '_' . $image->getClientOriginalName();
-
-            $image->move(
-                public_path('images/brands'),
-                $imageName
-            );
+            $image->move($directory, $imageName);
 
             $validated['logo'] = 'images/brands/' . $imageName;
         }
 
         $brand->update($validated);
 
-        if ($request->wantsJson()) {
+        if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
-                'message' => 'Brand berhasil diperbarui.',
+                'message' => 'Merek berhasil diperbarui.',
             ]);
         }
 
-        return redirect()->route('brands.index')->with('success', 'Brand berhasil diperbarui.');
+        return redirect()
+            ->route('brands.index')
+            ->with('success', 'Merek berhasil diperbarui.');
     }
 
     /**
-     * Menghapus brand
+     * Menghapus merek.
      */
     public function destroy(Request $request, Brand $brand)
     {
-        // Cegah penghapusan jika masih digunakan mobil
+        // Cegah penghapusan jika merek masih digunakan mobil.
         if ($brand->mobils()->exists()) {
-            if ($request->wantsJson()) {
+            $message = 'Merek tidak dapat dihapus karena masih digunakan oleh mobil.';
+
+            if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
-                    'message' => 'Brand tidak dapat dihapus karena masih digunakan oleh mobil.',
+                    'message' => $message,
                 ], 422);
             }
 
-            return redirect()->route('brands.index')->with('error', 'Brand tidak dapat dihapus karena masih digunakan oleh mobil.');
-            }
+            return redirect()
+                ->route('brands.index')
+                ->with('error', $message);
+        }
 
+        // Hapus logo dari folder jika ada.
         if (
             $brand->logo &&
-            file_exists(public_path($brand->logo))
+            File::exists(public_path($brand->logo))
         ) {
-            unlink(public_path($brand->logo));
+            File::delete(public_path($brand->logo));
         }
 
         $brand->delete();
 
-        if ($request->wantsJson()) {
+        if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
-                'message' => 'Brand berhasil dihapus.',
+                'message' => 'Merek berhasil dihapus.',
             ]);
         }
 
-        return redirect()->route('brands.index')->with('success', 'Brand berhasil dihapus.');
+        return redirect()
+            ->route('brands.index')
+            ->with('success', 'Merek berhasil dihapus.');
     }
 }
