@@ -356,20 +356,20 @@
         <div class="container">
             <div class="row text-center g-4">
             <div class="col-6 col-md-3">
-                <h2 class="fw-bold display-5 mb-1">{{ $totalMobil }}+</h2>
-                <p class="mb-0 opacity-75">Mobil Tersedia</p>
+                <h2 class="fw-bold display-5 mb-1">{{ !empty($landingSettings['stats_mobil_value']) ? $landingSettings['stats_mobil_value'] . '+' : $totalMobil . '+' }}</h2>
+                <p class="mb-0 opacity-75">{{ $landingSettings['stats_mobil_label'] ?? 'Mobil Tersedia' }}</p>
             </div>
             <div class="col-6 col-md-3">
-                <h2 class="fw-bold display-5 mb-1">{{ $totalPuas }}+</h2>
-                <p class="mb-0 opacity-75">Pelanggan Puas</p>
+                <h2 class="fw-bold display-5 mb-1">{{ !empty($landingSettings['stats_pelanggan_value']) ? $landingSettings['stats_pelanggan_value'] . '+' : $totalPuas . '+' }}</h2>
+                <p class="mb-0 opacity-75">{{ $landingSettings['stats_pelanggan_label'] ?? 'Pelanggan Puas' }}</p>
             </div>
             <div class="col-6 col-md-3">
-                <h2 class="fw-bold display-5 mb-1">24/7</h2>
-                <p class="mb-0 opacity-75">Layanan Support</p>
+                <h2 class="fw-bold display-5 mb-1">{{ $landingSettings['stats_support_value'] ?? '24/7' }}</h2>
+                <p class="mb-0 opacity-75">{{ $landingSettings['stats_support_label'] ?? 'Layanan Support' }}</p>
             </div>
             <div class="col-6 col-md-3">
-                <h2 class="fw-bold display-5 mb-1">{{ $ratingRata ?: '4.9' }}</h2>
-                <p class="mb-0 opacity-75">Rating Rata-rata</p>
+                <h2 class="fw-bold display-5 mb-1">{{ !empty($landingSettings['stats_rating_value']) ? $landingSettings['stats_rating_value'] : ($ratingRata ?: '4.9') }}</h2>
+                <p class="mb-0 opacity-75">{{ $landingSettings['stats_rating_label'] ?? 'Rating Rata-rata' }}</p>
             </div>
             </div>
         </div>
@@ -397,8 +397,8 @@
                     </div>
                 </div>
                 <div class="col-auto">
-                    <a href="#mobil" class="btn btn-sm fw-bold" style="background-color: var(--primary); color: white; border-radius: 20px;">
-                        Klaim Sekarang →
+                    <a href="{{ $landingSettings['promo_button_url'] ?? '#mobil' }}" class="btn btn-sm fw-bold" style="background-color: var(--primary); color: white; border-radius: 20px;">
+                        {{ $landingSettings['promo_button_label'] ?? 'Klaim Sekarang →' }}
                     </a>
                 </div>
             </div>
