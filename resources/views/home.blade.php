@@ -100,7 +100,7 @@
 
                     <div class="row g-3 align-items-end">
 
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
 
                             <div class="search-label">
                                 Lokasi Pengambilan
@@ -124,29 +124,27 @@
 
                         </div>
 
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
 
-                            <div class="search-label" id="tanggal-mulai-label">
-                                Tanggal Mulai
+                            <div class="search-label" id="status-label">
+                                Status Mobil
                             </div>
 
-                            <input type="date" name="tanggal_mulai" value="{{ $mulai?->toDateString() }}"
-                                min="{{ now()->toDateString() }}" id="tanggal_mulai" aria-labelledby="tanggal-mulai-label" class="form-control search-input">
+                            <select name="status" aria-labelledby="status-label" class="form-select search-input">
+
+                                <option value="tersedia" @selected($statusInput !== 'tidak_tersedia')>
+                                    Tersedia
+                                </option>
+
+                                <option value="tidak_tersedia" @selected($statusInput === 'tidak_tersedia')>
+                                    Tidak Tersedia
+                                </option>
+
+                            </select>
 
                         </div>
 
-                        <div class="col-lg-3">
-
-                            <div class="search-label" id="tanggal-selesai-label">
-                                Tanggal Selesai
-                            </div>
-
-                            <input type="date" name="tanggal_selesai" value="{{ $selesai?->toDateString() }}"
-                                min="{{ now()->toDateString() }}" id="tanggal_selesai" aria-labelledby="tanggal-selesai-label" class="form-control search-input">
-
-                        </div>
-
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
 
                             <button type="submit" class="btn btn-rent w-100 py-3">
                                 <i class="bi bi-search me-2"></i>
@@ -1238,48 +1236,15 @@
             if (!$form.length) return;
 
             var form = $form[0];
-            var $mulai = $(form.elements.tanggal_mulai);
-            var $selesai = $(form.elements.tanggal_selesai);
+            var $statusEl = $(form.elements.status);
             var $cabangEl = $(form.elements.cabang);
             var $tombol = $form.find('button[type="submit"]');
             var $kontainer = $('#daftar-mobil');
 
-            function sinkronMin() {
-                $selesai.attr('min', $mulai.val() || '');
-            }
-            $mulai.on('change', sinkronMin);
-            sinkronMin();
-
-            function pesanError() {
-                var adaMulai = $mulai.val() !== '';
-                var adaSelesai = $selesai.val() !== '';
-
-                $selesai[0].setCustomValidity('');
-
-                if (adaMulai !== adaSelesai) {
-                    return 'Lengkapi kedua tanggal (mulai dan selesai) atau kosongkan keduanya.';
-                }
-                if (adaSelesai && $selesai.val() < $mulai.val()) {
-                    return 'Tanggal selesai tidak boleh sebelum tanggal mulai.';
-                }
-                return '';
-            }
-
-            function valid() {
-                var pesan = pesanError();
-                if (pesan !== '') {
-                    $selesai[0].setCustomValidity(pesan);
-                    $selesai[0].reportValidity();
-                    return false;
-                }
-                return true;
-            }
-
             function bangunQuery() {
                 var params = new URLSearchParams();
                 if ($cabangEl.val() !== '') params.set('cabang', $cabangEl.val());
-                if ($mulai.val() !== '') params.set('tanggal_mulai', $mulai.val());
-                if ($selesai.val() !== '') params.set('tanggal_selesai', $selesai.val());
+                if ($statusEl.val() !== '') params.set('status', $statusEl.val());
                 return params.toString();
             }
 
@@ -1314,8 +1279,6 @@
 
             $form.on('submit', function (e) {
                 e.preventDefault();
-
-                if (!valid()) return;
 
                 var query = bangunQuery();
 
