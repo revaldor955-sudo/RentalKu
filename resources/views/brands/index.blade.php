@@ -366,7 +366,7 @@
                     },
                 },
             ],
-            order: [[2, 'asc']],
+          order: [],
             language: {
                 processing: 'Memproses...',
                 search: 'Cari:',

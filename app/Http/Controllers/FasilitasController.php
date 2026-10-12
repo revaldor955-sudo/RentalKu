@@ -7,49 +7,75 @@ use Illuminate\Http\Request;
 
 class FasilitasController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return view('fasilitas.index')->with('pageTitle', 'Fasilitas');
+        return view('fasilitas.index')
+            ->with('pageTitle', 'Fasilitas');
     }
 
     /**
-     * Server-side DataTables: daftar fasilitas (search, sort, pagination)
+     * DataTables: pencarian, pengurutan, dan pagination.
+     * Urutan default menggunakan ID terbaru.
      */
     public function data(Request $request)
     {
         $query = Fasilitas::query();
 
-        $recordsTotal = $query->count();
+        $recordsTotal = (clone $query)->count();
 
         $search = $request->input('search.value');
 
         if ($search) {
-            $query->where('fasilitas.name', 'like', "%{$search}%");
+            $query->where(
+                'fasilitas.name',
+                'like',
+                "%{$search}%"
+            );
         }
 
-        $recordsFiltered = $query->count();
+        $recordsFiltered = (clone $query)->count();
 
         $columns = [
             0 => null,
             1 => 'fasilitas.name',
+            2 => null,
         ];
 
-        $orderColumn = $request->input('order.0.column', 1);
-        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
+        $orderColumn = $request->input('order.0.column');
+        $orderDir = strtolower(
+            $request->input('order.0.dir', 'asc')
+        ) === 'desc' ? 'desc' : 'asc';
 
-        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
-            $query->orderBy($columns[$orderColumn], $orderDir);
+        // Gunakan pengurutan kolom jika pengguna memilihnya.
+        if (
+            $orderColumn !== null &&
+            isset($columns[(int) $orderColumn]) &&
+            $columns[(int) $orderColumn] !== null
+        ) {
+            $query->orderBy(
+                $columns[(int) $orderColumn],
+                $orderDir
+            );
+
+            // Jika nilainya sama, prioritaskan ID terbaru.
+            $query->orderByDesc('fasilitas.id');
         } else {
-            $query->orderBy('fasilitas.name', 'asc');
+            // Default: fasilitas terbaru tampil paling atas.
+            $query->orderByDesc('fasilitas.id');
         }
 
         $start = max(0, (int) $request->input('start', 0));
-        $length = min(max((int) $request->input('length', 10), 1), 100);
 
-        $fasilitas = $query->offset($start)->limit($length)->get();
+        $requestedLength = (int) $request->input('length', 10);
+
+        $length = $requestedLength === -1
+            ? 100
+            : min(max($requestedLength, 1), 100);
+
+        $fasilitas = $query
+            ->offset($start)
+            ->limit($length)
+            ->get();
 
         $data = $fasilitas->map(function ($item) {
             return [
@@ -66,90 +92,76 @@ class FasilitasController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('fasilitas.index')
+            ->with('pageTitle', 'Fasilitas');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
         ], [
-            'name.required' => 'Nama fasilitas wajib diisi',
+            'name.required' => 'Nama fasilitas wajib diisi.',
         ]);
 
         Fasilitas::create($validated);
 
-        if ($request->wantsJson()) {
+        if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'message' => 'Fasilitas berhasil ditambahkan.',
-            ]);
+            ], 201);
         }
 
-        return redirect()->route('fasilitas.index')
+        return redirect()
+            ->route('fasilitas.index')
             ->with('success', 'Fasilitas berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Fasilitas $fasilita)
     {
-        //
+        return response()->json($fasilita);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Fasilitas $fasilita)
     {
-        //
+        return response()->json($fasilita);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Fasilitas $fasilita)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
         ], [
-            'name.required' => 'Nama fasilitas wajib diisi',
+            'name.required' => 'Nama fasilitas wajib diisi.',
         ]);
 
         $fasilita->update($validated);
 
-        if ($request->wantsJson()) {
+        if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'message' => 'Fasilitas berhasil diperbarui.',
             ]);
         }
 
-        return redirect()->route('fasilitas.index')
+        return redirect()
+            ->route('fasilitas.index')
             ->with('success', 'Fasilitas berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Request $request, Fasilitas $fasilita)
     {
         $fasilita->delete();
 
-        if ($request->wantsJson()) {
+        if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'message' => 'Fasilitas berhasil dihapus.',
             ]);
         }
 
-        return redirect()->route('fasilitas.index')
+        return redirect()
+            ->route('fasilitas.index')
             ->with('success', 'Fasilitas berhasil dihapus.');
     }
 }

@@ -670,9 +670,7 @@
                     },
                 },
             ],
-            order: [
-                [5, 'desc']
-            ],
+           order: [],
             language: {
                 processing: 'Memproses...',
                 search: 'Cari:',
