@@ -653,9 +653,9 @@
                     },
                 },
             ],
-            order: [
-                [4, 'asc']
-            ],
+           
+order: [],
+
             language: {
                 processing: 'Memproses...',
                 search: 'Cari:',
@@ -696,7 +696,8 @@
                     'X-Requested-With': 'XMLHttpRequest',
                 },
                 success: function(result) {
-                    $('#dokumenMobils-table').DataTable().ajax.reload();
+
+$('#dokumenMobils-table').DataTable().ajax.reload(null, true);
 
                     Swal.fire({
                         icon: 'success',

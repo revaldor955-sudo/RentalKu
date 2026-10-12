@@ -536,9 +536,9 @@
                     },
                 },
             ],
-            order: [
-                [1, 'asc']
-            ],
+          
+order: [],
+
             language: {
                 processing: 'Memproses...',
                 search: 'Cari:',
@@ -578,7 +578,8 @@
                     'X-Requested-With': 'XMLHttpRequest',
                 },
                 success: function(result) {
-                    $('#kerusakanMobils-table').DataTable().ajax.reload();
+
+$('#kerusakanMobils-table').DataTable().ajax.reload(null, true);
 
                     Swal.fire({
                         icon: 'success',

@@ -738,6 +738,11 @@ public function confirmCheckout(
  * DataTables rental
  * Data rental terbaru ditampilkan paling atas secara default.
  */
+
+/**
+ * DataTables rental
+ * Data rental terbaru selalu ditampilkan paling atas.
+ */
 public function data(Request $request)
 {
     $query = Rental::query()
@@ -766,7 +771,6 @@ public function data(Request $request)
     | Filter status
     |--------------------------------------------------------------------------
     */
-
     if ($request->filled('status')) {
         $query->where(
             'rentals.status',
@@ -779,7 +783,6 @@ public function data(Request $request)
     | Total data sebelum pencarian
     |--------------------------------------------------------------------------
     */
-
     $recordsTotal = Rental::when(
         $request->filled('status'),
         function ($q) use ($request) {
@@ -795,7 +798,6 @@ public function data(Request $request)
     | Pencarian DataTables
     |--------------------------------------------------------------------------
     */
-
     $search = trim(
         (string) $request->input('search.value', '')
     );
@@ -835,76 +837,28 @@ public function data(Request $request)
     | Jumlah data setelah pencarian
     |--------------------------------------------------------------------------
     */
-
     $recordsFiltered = (clone $query)->count(
         'rentals.id'
     );
 
     /*
     |--------------------------------------------------------------------------
-    | Pengurutan kolom DataTables
+    | Urutan data terbaru
     |--------------------------------------------------------------------------
+    |
+    | ID terbesar menjadi prioritas utama karena setiap rental
+    | baru mendapatkan ID baru.
+    |
+    | created_at digunakan sebagai urutan tambahan.
     */
-
-    $columns = [
-        0 => null,
-        1 => 'users.name',
-        2 => 'mobils.name',
-        3 => 'rentals.tanggal_mulai',
-        4 => 'rentals.jumlah_hari',
-        5 => 'rentals.total_harga',
-        6 => 'rentals.status',
-        7 => null,
-    ];
-
-    $orderColumn = $request->input(
-        'order.0.column'
-    );
-
-    $orderDir = strtolower(
-        (string) $request->input(
-            'order.0.dir',
-            'desc'
-        )
-    );
-
-    /*
-     * Jika tidak ada kolom yang diminta untuk diurutkan,
-     * gunakan created_at terbaru sebagai urutan utama.
-     */
-    if (
-        $orderColumn === null ||
-        !isset($columns[(int) $orderColumn]) ||
-        $columns[(int) $orderColumn] === null
-    ) {
-        $query->orderByDesc('rentals.created_at')
-              ->orderByDesc('rentals.id');
-    } else {
-        /*
-         * Tetap dukung pengurutan kolom yang dipilih pengguna.
-         * Nama kolom berasal dari daftar yang diizinkan,
-         * bukan langsung dari input request.
-         */
-        $direction = $orderDir === 'asc'
-            ? 'asc'
-            : 'desc';
-
-        $query->orderBy(
-            $columns[(int) $orderColumn],
-            $direction
-        );
-
-        // Jika nilainya sama, rental terbaru tetap didahulukan.
-        $query->orderByDesc('rentals.created_at')
-              ->orderByDesc('rentals.id');
-    }
+    $query->orderByDesc('rentals.id')
+          ->orderByDesc('rentals.created_at');
 
     /*
     |--------------------------------------------------------------------------
     | Pagination DataTables
     |--------------------------------------------------------------------------
     */
-
     $start = max(
         0,
         (int) $request->input('start', 0)
@@ -912,8 +866,6 @@ public function data(Request $request)
 
     $length = (int) $request->input('length', 10);
 
-    // Mendukung permintaan seluruh data jika DataTables
-    // mengirim length = -1.
     if ($length === -1) {
         $rentals = $query
             ->offset($start)
@@ -932,7 +884,6 @@ public function data(Request $request)
     | Format respons JSON
     |--------------------------------------------------------------------------
     */
-
     $data = $rentals->map(function ($rental) {
         return [
             'id' => $rental->id,
