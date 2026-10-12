@@ -24,24 +24,35 @@ class LandingSettingController extends Controller
             'hero_title' => 'nullable|string|max:255',
             'hero_description' => 'nullable|string',
 
+            'about_badge' => 'nullable|string|max:255',
             'about_title' => 'nullable|string|max:255',
             'about_description' => 'nullable|string',
 
-            'cta_title' => 'nullable|string|max:255',
-            'cta_description' => 'nullable|string',
+            'about_feature_1_icon' => 'nullable|string|max:50',
+            'about_feature_1_title' => 'nullable|string|max:255',
+            'about_feature_1_desc' => 'nullable|string',
+            'about_feature_2_icon' => 'nullable|string|max:50',
+            'about_feature_2_title' => 'nullable|string|max:255',
+            'about_feature_2_desc' => 'nullable|string',
+            'about_feature_3_icon' => 'nullable|string|max:50',
+            'about_feature_3_title' => 'nullable|string|max:255',
+            'about_feature_3_desc' => 'nullable|string',
+            'about_feature_4_icon' => 'nullable|string|max:50',
+            'about_feature_4_title' => 'nullable|string|max:255',
+            'about_feature_4_desc' => 'nullable|string',
 
+            'brand_badge' => 'nullable|string|max:255',
             'brand_title' => 'nullable|string|max:255',
             'brand_description' => 'nullable|string',
 
             'promo_title' => 'nullable|string|max:255',
             'promo_description' => 'nullable|string',
 
-            'feature_title' => 'nullable|string|max:255',
-            'feature_description' => 'nullable|string',
-
+            'steps_badge' => 'nullable|string|max:255',
             'steps_title' => 'nullable|string|max:255',
             'steps_description' => 'nullable|string',
 
+            'testimonial_badge' => 'nullable|string|max:255',
             'testimonial_title' => 'nullable|string|max:255',
             'testimonial_description' => 'nullable|string',
 
