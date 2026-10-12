@@ -4,6 +4,33 @@
 <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
 <link rel="stylesheet" href="{{ asset('css/action-hover.css') }}">
 <style>
+    /* Animasi dropdown profil mirip customer */
+    .dropdown-menu {
+        animation: slideDown 0.2s ease;
+    }
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    /* Samakan hover dropdown profil dengan customer */
+    .dropdown-item:hover,
+    .dropdown-item:focus {
+        background: #f5f7f6;
+        color: #198754;
+    }
+    /* Samakan hover logout dengan customer: merah muda, bukan biru Bootstrap */
+    .dropdown-item.text-danger:hover,
+    .dropdown-item.text-danger:focus,
+    .dropdown-item.text-danger:active {
+        background: #fee;
+        color: #dc3545;
+    }
     .nav-link.active::before {
         content: '';
         position: absolute;
