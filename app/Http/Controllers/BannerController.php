@@ -4,17 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\Banner;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class BannerController extends Controller
 {
+    public function index()
+    {
+        return view('banners.index')->with('pageTitle', 'Banner');
+    }
+
     /**
-     * Server-side DataTables: daftar banner (search, sort, pagination)
+     * DataTables: pencarian, pengurutan, dan pagination.
      */
     public function data(Request $request)
     {
         $query = Banner::query();
 
-        $recordsTotal = $query->count();
+        $recordsTotal = Banner::count();
 
         $search = $request->input('search.value');
 
@@ -25,28 +31,53 @@ class BannerController extends Controller
             });
         }
 
-        $recordsFiltered = $query->count();
+        $recordsFiltered = (clone $query)->count();
 
         $columns = [
             0 => null,
-            1 => 'judul',
-            2 => 'urutan',
-            3 => 'status',
+            1 => null,
+            2 => 'judul',
+            3 => 'urutan',
+            4 => 'status',
+            5 => null,
         ];
 
-        $orderColumn = $request->input('order.0.column', 0);
-        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
+        $orderColumn = $request->input('order.0.column');
+        $orderDir = strtolower(
+            (string) $request->input('order.0.dir', 'desc')
+        ) === 'asc' ? 'asc' : 'desc';
 
-        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
-            $query->orderBy($columns[$orderColumn], $orderDir);
+        /*
+         * Urutan default: banner terbaru di atas.
+         */
+        if (
+            $orderColumn === null ||
+            !isset($columns[(int) $orderColumn]) ||
+            $columns[(int) $orderColumn] === null
+        ) {
+            $query->orderByDesc('banners.created_at')
+                ->orderByDesc('banners.id');
         } else {
-            $query->orderBy('urutan', 'asc');
+            $query->orderBy(
+                $columns[(int) $orderColumn],
+                $orderDir
+            )->orderByDesc('banners.created_at')
+                ->orderByDesc('banners.id');
         }
 
         $start = max(0, (int) $request->input('start', 0));
-        $length = min(max((int) $request->input('length', 10), 1), 100);
+        $length = (int) $request->input('length', 10);
 
-        $banners = $query->offset($start)->limit($length)->get();
+        if ($length === -1) {
+            $length = 100;
+        } else {
+            $length = min(max($length, 1), 100);
+        }
+
+        $banners = $query
+            ->offset($start)
+            ->limit($length)
+            ->get();
 
         $data = $banners->map(function ($banner) {
             return [
@@ -57,6 +88,7 @@ class BannerController extends Controller
                 'link' => $banner->link,
                 'status' => $banner->status,
                 'urutan' => $banner->urutan,
+                'created_at' => $banner->created_at,
             ];
         });
 
@@ -68,47 +100,48 @@ class BannerController extends Controller
         ]);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function create()
     {
         return view('banners.index')->with('pageTitle', 'Banner');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'judul' => 'required|string|max:100',
-            'gambar' => 'nullable|mimes:jpeg,png,jpg,svg|max:2048',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
             'description' => 'nullable|string',
             'link' => 'nullable|string|max:255',
             'status' => 'required|in:aktif,nonaktif',
             'urutan' => 'nullable|integer|min:0',
         ], [
-            'judul.required' => 'Judul wajib diisi',
-            'gambar.mimes' => 'Gambar harus berupa gambar (jpg, png, svg)',
-            'gambar.max' => 'Ukuran gambar maksimal 2MB',
-            'status.required' => 'Status wajib dipilih',
+            'judul.required' => 'Judul banner wajib diisi.',
+            'gambar.image' => 'File harus berupa gambar.',
+            'gambar.mimes' => 'Gambar harus berformat JPG, JPEG, PNG, atau SVG.',
+            'gambar.max' => 'Ukuran gambar maksimal 2 MB.',
+            'status.required' => 'Status banner wajib dipilih.',
+            'status.in' => 'Status banner tidak valid.',
+            'urutan.integer' => 'Urutan harus berupa angka.',
+            'urutan.min' => 'Urutan tidak boleh negatif.',
         ]);
 
         if ($request->hasFile('gambar')) {
+            $folder = public_path('images/banners');
+
+            if (!File::isDirectory($folder)) {
+                File::makeDirectory($folder, 0755, true);
+            }
+
             $image = $request->file('gambar');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('images/banners'), $imageName);
+            $imageName = uniqid('banner_', true) . '.' .
+                $image->getClientOriginalExtension();
+
+            $image->move($folder, $imageName);
+
             $validated['gambar'] = 'images/banners/' . $imageName;
         }
+
+        $validated['urutan'] = $validated['urutan'] ?? 0;
 
         Banner::create($validated);
 
@@ -118,55 +151,67 @@ class BannerController extends Controller
             ]);
         }
 
-        return redirect()->route('banners.index')
+        return redirect()
+            ->route('banners.index')
             ->with('success', 'Banner berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Banner $banner)
     {
         return response()->json($banner);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Banner $banner)
     {
-        //
+        return response()->json($banner);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Banner $banner)
     {
         $validated = $request->validate([
             'judul' => 'required|string|max:100',
-            'gambar' => 'nullable|mimes:jpeg,png,jpg,svg|max:2048',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
             'description' => 'nullable|string',
             'link' => 'nullable|string|max:255',
             'status' => 'required|in:aktif,nonaktif',
             'urutan' => 'nullable|integer|min:0',
         ], [
-            'judul.required' => 'Judul wajib diisi',
-            'gambar.mimes' => 'Gambar harus berupa gambar (jpg, png, svg)',
-            'gambar.max' => 'Ukuran gambar maksimal 2MB',
-            'status.required' => 'Status wajib dipilih',
+            'judul.required' => 'Judul banner wajib diisi.',
+            'gambar.image' => 'File harus berupa gambar.',
+            'gambar.mimes' => 'Gambar harus berformat JPG, JPEG, PNG, atau SVG.',
+            'gambar.max' => 'Ukuran gambar maksimal 2 MB.',
+            'status.required' => 'Status banner wajib dipilih.',
+            'status.in' => 'Status banner tidak valid.',
+            'urutan.integer' => 'Urutan harus berupa angka.',
+            'urutan.min' => 'Urutan tidak boleh negatif.',
         ]);
 
         if ($request->hasFile('gambar')) {
-            if ($banner->gambar && file_exists(public_path($banner->gambar))) {
-                unlink(public_path($banner->gambar));
+            $folder = public_path('images/banners');
+
+            if (!File::isDirectory($folder)) {
+                File::makeDirectory($folder, 0755, true);
             }
 
             $image = $request->file('gambar');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('images/banners'), $imageName);
+            $imageName = uniqid('banner_', true) . '.' .
+                $image->getClientOriginalExtension();
+
+            $image->move($folder, $imageName);
+
+            // Hapus gambar lama jika berada di folder banner.
+            if (
+                $banner->gambar &&
+                str_starts_with($banner->gambar, 'images/banners/') &&
+                File::exists(public_path($banner->gambar))
+            ) {
+                File::delete(public_path($banner->gambar));
+            }
+
             $validated['gambar'] = 'images/banners/' . $imageName;
         }
+
+        $validated['urutan'] = $validated['urutan'] ?? 0;
 
         $banner->update($validated);
 
@@ -176,17 +221,19 @@ class BannerController extends Controller
             ]);
         }
 
-        return redirect()->route('banners.index')
+        return redirect()
+            ->route('banners.index')
             ->with('success', 'Banner berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Request $request, Banner $banner)
     {
-        if ($banner->gambar && file_exists(public_path($banner->gambar))) {
-            unlink(public_path($banner->gambar));
+        if (
+            $banner->gambar &&
+            str_starts_with($banner->gambar, 'images/banners/') &&
+            File::exists(public_path($banner->gambar))
+        ) {
+            File::delete(public_path($banner->gambar));
         }
 
         $banner->delete();
@@ -197,7 +244,8 @@ class BannerController extends Controller
             ]);
         }
 
-        return redirect()->route('banners.index')
+        return redirect()
+            ->route('banners.index')
             ->with('success', 'Banner berhasil dihapus.');
     }
 }

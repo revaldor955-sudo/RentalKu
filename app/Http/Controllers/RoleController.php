@@ -15,57 +15,99 @@ class RoleController extends Controller
     /**
      * Server-side DataTables: daftar role (search, sort, pagination)
      */
-    public function data(Request $request)
-    {
-        $query = Role::query()->withCount('users');
+   
+/**
+ * Server-side DataTables: daftar role.
+ * Role terbaru tampil paling atas secara default.
+ */
+public function data(Request $request)
+{
+    $query = Role::query()->withCount('users');
 
-        $recordsTotal = $query->count();
+    // Jumlah seluruh role sebelum pencarian.
+    $recordsTotal = Role::count();
 
-        $search = $request->input('search.value');
+    // Pencarian role.
+    $search = $request->input('search.value');
 
-        if ($search) {
-            $query->where('roles.name', 'like', "%{$search}%")
-                  ->orWhere('roles.description', 'like', "%{$search}%");
-        }
-
-        $recordsFiltered = $query->count();
-
-        $columns = [
-            0 => null,
-            1 => 'roles.name',
-            2 => 'roles.description',
-        ];
-
-        $orderColumn = $request->input('order.0.column', 1);
-        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
-
-        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
-            $query->orderBy($columns[$orderColumn], $orderDir);
-        } else {
-            $query->orderBy('roles.name', 'asc');
-        }
-
-        $start = max(0, (int) $request->input('start', 0));
-        $length = min(max((int) $request->input('length', 10), 1), 100);
-
-        $roles = $query->offset($start)->limit($length)->get();
-
-        $data = $roles->map(function ($item) {
-            return [
-                'id' => $item->id,
-                'name' => $item->name,
-                'description' => $item->description,
-                'users_count' => $item->users_count,
-            ];
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('roles.name', 'like', "%{$search}%")
+                ->orWhere('roles.description', 'like', "%{$search}%");
         });
-
-        return response()->json([
-            'draw' => (int) $request->input('draw'),
-            'recordsTotal' => $recordsTotal,
-            'recordsFiltered' => $recordsFiltered,
-            'data' => $data,
-        ]);
     }
+
+    // Jumlah role setelah pencarian.
+    $recordsFiltered = (clone $query)->count('roles.id');
+
+    // Kolom yang boleh digunakan untuk pengurutan.
+    $columns = [
+        0 => null,
+        1 => 'roles.name',
+        2 => 'roles.description',
+        3 => null,
+    ];
+
+    $orderColumn = $request->input('order.0.column');
+    $orderDir = strtolower(
+        (string) $request->input('order.0.dir', 'desc')
+    ) === 'asc' ? 'asc' : 'desc';
+
+    /*
+     * Jika tidak ada pengurutan kolom dari DataTables,
+     * tampilkan role terbaru terlebih dahulu.
+     */
+    if (
+        $orderColumn === null ||
+        !isset($columns[(int) $orderColumn]) ||
+        $columns[(int) $orderColumn] === null
+    ) {
+        $query->orderByDesc('roles.created_at')
+              ->orderByDesc('roles.id');
+    } else {
+        // Tetap mendukung pengurutan ketika kolom diklik.
+        $query->orderBy(
+            $columns[(int) $orderColumn],
+            $orderDir
+        );
+
+        $query->orderByDesc('roles.created_at')
+              ->orderByDesc('roles.id');
+    }
+
+    // Pagination.
+    $start = max(0, (int) $request->input('start', 0));
+    $length = (int) $request->input('length', 10);
+
+    if ($length === -1) {
+        $length = 100;
+    } else {
+        $length = min(max($length, 1), 100);
+    }
+
+    $roles = $query
+        ->offset($start)
+        ->limit($length)
+        ->get();
+
+    // Data untuk DataTables.
+    $data = $roles->map(function ($item) {
+        return [
+            'id' => $item->id,
+            'name' => $item->name,
+            'description' => $item->description,
+            'users_count' => $item->users_count,
+        ];
+    });
+
+    return response()->json([
+        'draw' => (int) $request->input('draw'),
+        'recordsTotal' => $recordsTotal,
+        'recordsFiltered' => $recordsFiltered,
+        'data' => $data,
+    ]);
+}
+
 
     public function create()
     {

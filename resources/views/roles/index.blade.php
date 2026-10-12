@@ -484,9 +484,7 @@
                     },
                 },
             ],
-            order: [
-                [1, 'asc']
-            ],
+          order: [],
             language: {
                 processing: 'Memproses...',
                 search: 'Cari:',

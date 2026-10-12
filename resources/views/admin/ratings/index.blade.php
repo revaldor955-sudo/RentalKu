@@ -154,7 +154,7 @@
                     },
                     success: function() {
                         showSuccess('Ulasan berhasil dihapus.');
-                        $('#ratings-table').DataTable().ajax.reload();
+                      $('#ratings-table').DataTable().ajax.reload(null, true);
                     },
                     error: function() {
                         Swal.fire({
@@ -231,7 +231,7 @@
                     },
                 },
             ],
-            order: [[0, 'desc']],
+            order: [],
             language: {
                 processing: 'Memproses...',
                 search: 'Cari:',
