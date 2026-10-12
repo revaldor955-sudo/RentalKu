@@ -47,6 +47,7 @@
         <ul class="nav nav-pills mb-4 gap-2 bg-white p-2 rounded-4 shadow-sm border border-light" id="landingTabs" role="tablist">
             <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#hero" type="button">Hero</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#about" type="button">About</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#stats" type="button">Stats</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#brand" type="button">Brand</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#promo" type="button">Promo</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#steps" type="button">Steps</button></li>
@@ -57,64 +58,82 @@
         <div class="tab-content" id="landingTabsContent">
             <div class="tab-pane fade show active" id="hero">
                 <div class="page-card">
-                    <div class="mb-3"><label class="form-label">Hero Badge</label><input type="text" name="hero_badge" class="form-control" value="{{ old('hero_badge', $settings['hero_badge'] ?? '') }}" placeholder="Rental mobil mudah & terpercaya"></div>
-                    <div class="mb-3"><label class="form-label">Hero Title</label><input type="text" name="hero_title" class="form-control" value="{{ old('hero_title', $settings['hero_title'] ?? '') }}" placeholder="Perjalanan lebih mudah dengan Rentalku."></div>
+                    <div class="mb-3"><label class="form-label">Hero Badge</label><input type="text" name="hero_badge" class="form-control" maxlength="255" value="{{ old('hero_badge', $settings['hero_badge'] ?? '') }}" placeholder="Rental mobil mudah & terpercaya"></div>
+                    <div class="mb-3"><label class="form-label">Hero Title</label><input type="text" name="hero_title" class="form-control" maxlength="255" value="{{ old('hero_title', $settings['hero_title'] ?? '') }}" placeholder="Perjalanan lebih mudah dengan Rentalku."></div>
                     <div class="mb-3"><label class="form-label">Hero Description</label><textarea name="hero_description" class="form-control" rows="3" placeholder="Temukan mobil yang sesuai kebutuhanmu. Pilih kendaraan, tentukan tanggal rental, dan lakukan rental dengan mudah secara online.">{{ old('hero_description', $settings['hero_description'] ?? '') }}</textarea></div>
                 </div>
             </div>
             <div class="tab-pane fade" id="about">
                 <div class="page-card">
-                    <div class="mb-3"><label class="form-label">About Badge</label><input type="text" name="about_badge" class="form-control" value="{{ old('about_badge', $settings['about_badge'] ?? '') }}" placeholder="KENAPA RENTALKU?"></div>
-                    <div class="mb-3"><label class="form-label">About Title</label><input type="text" name="about_title" class="form-control" value="{{ old('about_title', $settings['about_title'] ?? '') }}" placeholder="Rental mobil tanpa ribet."></div>
+                    <div class="mb-3"><label class="form-label">About Badge</label><input type="text" name="about_badge" class="form-control" maxlength="255" value="{{ old('about_badge', $settings['about_badge'] ?? '') }}" placeholder="KENAPA RENTALKU?"></div>
+                    <div class="mb-3"><label class="form-label">About Title</label><input type="text" name="about_title" class="form-control" maxlength="255" value="{{ old('about_title', $settings['about_title'] ?? '') }}" placeholder="Rental mobil tanpa ribet."></div>
                     <div class="mb-3"><label class="form-label">About Description</label><textarea name="about_description" class="form-control" rows="3">{{ old('about_description', $settings['about_description'] ?? '') }}</textarea></div>
                     <hr>
-                    <div class="mb-3"><label class="form-label">Fitur 1 — Ikon (class bootstrap-icons)</label><input type="text" name="about_feature_1_icon" class="form-control" value="{{ old('about_feature_1_icon', $settings['about_feature_1_icon'] ?? '') }}" placeholder="bi-shield-check"></div>
-                    <div class="mb-3"><label class="form-label">Fitur 1 — Judul</label><input type="text" name="about_feature_1_title" class="form-control" value="{{ old('about_feature_1_title', $settings['about_feature_1_title'] ?? '') }}" placeholder="Aman & Terpercaya"></div>
+                    <div class="mb-3"><label class="form-label">Fitur 1 — Ikon (class bootstrap-icons)</label><input type="text" name="about_feature_1_icon" class="form-control" maxlength="50" value="{{ old('about_feature_1_icon', $settings['about_feature_1_icon'] ?? '') }}" placeholder="bi-shield-check"></div>
+                    <div class="mb-3"><label class="form-label">Fitur 1 — Judul</label><input type="text" name="about_feature_1_title" class="form-control" maxlength="255" value="{{ old('about_feature_1_title', $settings['about_feature_1_title'] ?? '') }}" placeholder="Aman & Terpercaya"></div>
                     <div class="mb-3"><label class="form-label">Fitur 1 — Deskripsi</label><textarea name="about_feature_1_desc" class="form-control" rows="2">{{ old('about_feature_1_desc', $settings['about_feature_1_desc'] ?? '') }}</textarea></div>
                     <hr>
-                    <div class="mb-3"><label class="form-label">Fitur 2 — Ikon (class bootstrap-icons)</label><input type="text" name="about_feature_2_icon" class="form-control" value="{{ old('about_feature_2_icon', $settings['about_feature_2_icon'] ?? '') }}" placeholder="bi-lightning-charge"></div>
-                    <div class="mb-3"><label class="form-label">Fitur 2 — Judul</label><input type="text" name="about_feature_2_title" class="form-control" value="{{ old('about_feature_2_title', $settings['about_feature_2_title'] ?? '') }}" placeholder="Proses Cepat"></div>
+                    <div class="mb-3"><label class="form-label">Fitur 2 — Ikon (class bootstrap-icons)</label><input type="text" name="about_feature_2_icon" class="form-control" maxlength="50" value="{{ old('about_feature_2_icon', $settings['about_feature_2_icon'] ?? '') }}" placeholder="bi-lightning-charge"></div>
+                    <div class="mb-3"><label class="form-label">Fitur 2 — Judul</label><input type="text" name="about_feature_2_title" class="form-control" maxlength="255" value="{{ old('about_feature_2_title', $settings['about_feature_2_title'] ?? '') }}" placeholder="Proses Cepat"></div>
                     <div class="mb-3"><label class="form-label">Fitur 2 — Deskripsi</label><textarea name="about_feature_2_desc" class="form-control" rows="2">{{ old('about_feature_2_desc', $settings['about_feature_2_desc'] ?? '') }}</textarea></div>
                     <hr>
-                    <div class="mb-3"><label class="form-label">Fitur 3 — Ikon (class bootstrap-icons)</label><input type="text" name="about_feature_3_icon" class="form-control" value="{{ old('about_feature_3_icon', $settings['about_feature_3_icon'] ?? '') }}" placeholder="bi-wallet2"></div>
-                    <div class="mb-3"><label class="form-label">Fitur 3 — Judul</label><input type="text" name="about_feature_3_title" class="form-control" value="{{ old('about_feature_3_title', $settings['about_feature_3_title'] ?? '') }}" placeholder="Harga Transparan"></div>
+                    <div class="mb-3"><label class="form-label">Fitur 3 — Ikon (class bootstrap-icons)</label><input type="text" name="about_feature_3_icon" class="form-control" maxlength="50" value="{{ old('about_feature_3_icon', $settings['about_feature_3_icon'] ?? '') }}" placeholder="bi-wallet2"></div>
+                    <div class="mb-3"><label class="form-label">Fitur 3 — Judul</label><input type="text" name="about_feature_3_title" class="form-control" maxlength="255" value="{{ old('about_feature_3_title', $settings['about_feature_3_title'] ?? '') }}" placeholder="Harga Transparan"></div>
                     <div class="mb-3"><label class="form-label">Fitur 3 — Deskripsi</label><textarea name="about_feature_3_desc" class="form-control" rows="2">{{ old('about_feature_3_desc', $settings['about_feature_3_desc'] ?? '') }}</textarea></div>
                     <hr>
-                    <div class="mb-3"><label class="form-label">Fitur 4 — Ikon (class bootstrap-icons)</label><input type="text" name="about_feature_4_icon" class="form-control" value="{{ old('about_feature_4_icon', $settings['about_feature_4_icon'] ?? '') }}" placeholder="bi-headset"></div>
-                    <div class="mb-3"><label class="form-label">Fitur 4 — Judul</label><input type="text" name="about_feature_4_title" class="form-control" value="{{ old('about_feature_4_title', $settings['about_feature_4_title'] ?? '') }}" placeholder="Layanan Support"></div>
+                    <div class="mb-3"><label class="form-label">Fitur 4 — Ikon (class bootstrap-icons)</label><input type="text" name="about_feature_4_icon" class="form-control" maxlength="50" value="{{ old('about_feature_4_icon', $settings['about_feature_4_icon'] ?? '') }}" placeholder="bi-headset"></div>
+                    <div class="mb-3"><label class="form-label">Fitur 4 — Judul</label><input type="text" name="about_feature_4_title" class="form-control" maxlength="255" value="{{ old('about_feature_4_title', $settings['about_feature_4_title'] ?? '') }}" placeholder="Layanan Support"></div>
                     <div class="mb-0"><label class="form-label">Fitur 4 — Deskripsi</label><textarea name="about_feature_4_desc" class="form-control" rows="2">{{ old('about_feature_4_desc', $settings['about_feature_4_desc'] ?? '') }}</textarea></div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="stats">
+                <div class="page-card">
+                    <p class="text-muted small">Kosongkan angka agar otomatis memakai hitungan database.</p>
+                    <div class="mb-3"><label class="form-label">Mobil — Angka</label><input type="number" min="0" max="9999999" step="1" name="stats_mobil_value" class="form-control" value="{{ old('stats_mobil_value', $settings['stats_mobil_value'] ?? '') }}" placeholder="Otomatis: jumlah mobil Tersedia"></div>
+                    <div class="mb-3"><label class="form-label">Mobil — Label</label><input type="text" name="stats_mobil_label" class="form-control" maxlength="255" value="{{ old('stats_mobil_label', $settings['stats_mobil_label'] ?? '') }}" placeholder="Mobil Tersedia"></div>
+                    <hr>
+                    <div class="mb-3"><label class="form-label">Pelanggan — Angka</label><input type="number" min="0" max="9999999" step="1" name="stats_pelanggan_value" class="form-control" value="{{ old('stats_pelanggan_value', $settings['stats_pelanggan_value'] ?? '') }}" placeholder="Otomatis: rental Selesai + 1200"></div>
+                    <div class="mb-3"><label class="form-label">Pelanggan — Label</label><input type="text" name="stats_pelanggan_label" class="form-control" maxlength="255" value="{{ old('stats_pelanggan_label', $settings['stats_pelanggan_label'] ?? '') }}" placeholder="Pelanggan Puas"></div>
+                    <hr>
+                    <div class="mb-3"><label class="form-label">Support — Angka</label><input type="text" name="stats_support_value" class="form-control" maxlength="50" value="{{ old('stats_support_value', $settings['stats_support_value'] ?? '') }}" placeholder="24/7"></div>
+                    <div class="mb-3"><label class="form-label">Support — Label</label><input type="text" name="stats_support_label" class="form-control" maxlength="255" value="{{ old('stats_support_label', $settings['stats_support_label'] ?? '') }}" placeholder="Layanan Support"></div>
+                    <hr>
+                    <div class="mb-3"><label class="form-label">Rating — Angka</label><input type="number" min="0" max="5" step="0.1" name="stats_rating_value" class="form-control" value="{{ old('stats_rating_value', $settings['stats_rating_value'] ?? '') }}" placeholder="Otomatis: rata-rata rating"></div>
+                    <div class="mb-0"><label class="form-label">Rating — Label</label><input type="text" name="stats_rating_label" class="form-control" maxlength="255" value="{{ old('stats_rating_label', $settings['stats_rating_label'] ?? '') }}" placeholder="Rating Rata-rata"></div>
                 </div>
             </div>
             <div class="tab-pane fade" id="brand">
                 <div class="page-card">
-                    <div class="mb-3"><label class="form-label">Brand Badge</label><input type="text" name="brand_badge" class="form-control" value="{{ old('brand_badge', $settings['brand_badge'] ?? '') }}" placeholder="BRAND PILIHAN"></div>
-                    <div class="mb-3"><label class="form-label">Brand Title</label><input type="text" name="brand_title" class="form-control" value="{{ old('brand_title', $settings['brand_title'] ?? '') }}" placeholder="Pilihan brand untukmu"></div>
+                    <div class="mb-3"><label class="form-label">Brand Badge</label><input type="text" name="brand_badge" class="form-control" maxlength="255" value="{{ old('brand_badge', $settings['brand_badge'] ?? '') }}" placeholder="BRAND PILIHAN"></div>
+                    <div class="mb-3"><label class="form-label">Brand Title</label><input type="text" name="brand_title" class="form-control" maxlength="255" value="{{ old('brand_title', $settings['brand_title'] ?? '') }}" placeholder="Pilihan brand untukmu"></div>
                     <div class="mb-3"><label class="form-label">Brand Description</label><textarea name="brand_description" class="form-control" rows="3" placeholder="Berbagai pilihan merek kendaraan tersedia untuk memenuhi kebutuhan perjalananmu.">{{ old('brand_description', $settings['brand_description'] ?? '') }}</textarea></div>
                 </div>
             </div>
             <div class="tab-pane fade" id="promo">
                 <div class="page-card">
-                    <div class="mb-3"><label class="form-label">Promo Title</label><input type="text" name="promo_title" class="form-control" value="{{ old('promo_title', $settings['promo_title'] ?? '') }}" placeholder="🔥 PROMO SPESIAL"></div>
+                    <div class="mb-3"><label class="form-label">Promo Title</label><input type="text" name="promo_title" class="form-control" maxlength="255" value="{{ old('promo_title', $settings['promo_title'] ?? '') }}" placeholder="🔥 PROMO SPESIAL"></div>
                     <div class="mb-3"><label class="form-label">Promo Description</label><textarea name="promo_description" class="form-control" rows="3" placeholder="Diskon hingga 20% untuk rental mingguan — Berakhir dalam:">{{ old('promo_description', $settings['promo_description'] ?? '') }}</textarea></div>
+                    <div class="mb-3"><label class="form-label">Tombol — Teks</label><input type="text" name="promo_button_label" class="form-control" maxlength="100" value="{{ old('promo_button_label', $settings['promo_button_label'] ?? '') }}" placeholder="Klaim Sekarang →"></div>
+                    <div class="mb-0"><label class="form-label">Tombol — Link</label><input type="text" name="promo_button_url" class="form-control" maxlength="255" value="{{ old('promo_button_url', $settings['promo_button_url'] ?? '') }}" placeholder="#mobil"></div>
                 </div>
             </div>
             <div class="tab-pane fade" id="steps">
                 <div class="page-card">
-                    <div class="mb-3"><label class="form-label">Steps Badge</label><input type="text" name="steps_badge" class="form-control" value="{{ old('steps_badge', $settings['steps_badge'] ?? '') }}" placeholder="CARA RENTAL"></div>
-                    <div class="mb-3"><label class="form-label">Steps Title</label><input type="text" name="steps_title" class="form-control" value="{{ old('steps_title', $settings['steps_title'] ?? '') }}" placeholder="Rental mobil dalam beberapa langkah"></div>
+                    <div class="mb-3"><label class="form-label">Steps Badge</label><input type="text" name="steps_badge" class="form-control" maxlength="255" value="{{ old('steps_badge', $settings['steps_badge'] ?? '') }}" placeholder="CARA RENTAL"></div>
+                    <div class="mb-3"><label class="form-label">Steps Title</label><input type="text" name="steps_title" class="form-control" maxlength="255" value="{{ old('steps_title', $settings['steps_title'] ?? '') }}" placeholder="Rental mobil dalam beberapa langkah"></div>
                     <div class="mb-3"><label class="form-label">Steps Description</label><textarea name="steps_description" class="form-control" rows="3" placeholder="Proses sederhana untuk mendapatkan mobil yang kamu butuhkan.">{{ old('steps_description', $settings['steps_description'] ?? '') }}</textarea></div>
                 </div>
             </div>
             <div class="tab-pane fade" id="testimonial">
                 <div class="page-card">
-                    <div class="mb-3"><label class="form-label">Testimonial Badge</label><input type="text" name="testimonial_badge" class="form-control" value="{{ old('testimonial_badge', $settings['testimonial_badge'] ?? '') }}" placeholder="TESTIMONI"></div>
-                    <div class="mb-3"><label class="form-label">Testimonial Title</label><input type="text" name="testimonial_title" class="form-control" value="{{ old('testimonial_title', $settings['testimonial_title'] ?? '') }}" placeholder="Apa kata pelanggan?"></div>
+                    <div class="mb-3"><label class="form-label">Testimonial Badge</label><input type="text" name="testimonial_badge" class="form-control" maxlength="255" value="{{ old('testimonial_badge', $settings['testimonial_badge'] ?? '') }}" placeholder="TESTIMONI"></div>
+                    <div class="mb-3"><label class="form-label">Testimonial Title</label><input type="text" name="testimonial_title" class="form-control" maxlength="255" value="{{ old('testimonial_title', $settings['testimonial_title'] ?? '') }}" placeholder="Apa kata pelanggan?"></div>
                     <div class="mb-3"><label class="form-label">Testimonial Description</label><textarea name="testimonial_description" class="form-control" rows="3" placeholder="Ribuan pelanggan telah mempercayakan perjalanan mereka kepada Rentalku.">{{ old('testimonial_description', $settings['testimonial_description'] ?? '') }}</textarea></div>
                 </div>
             </div>
             <div class="tab-pane fade" id="faq">
                 <div class="page-card">
-                    <div class="mb-3"><label class="form-label">FAQ Title</label><input type="text" name="faq_title" class="form-control" value="{{ old('faq_title', $settings['faq_title'] ?? '') }}" placeholder="Pertanyaan yang sering ditanyakan"></div>
+                    <div class="mb-3"><label class="form-label">FAQ Title</label><input type="text" name="faq_title" class="form-control" maxlength="255" value="{{ old('faq_title', $settings['faq_title'] ?? '') }}" placeholder="Pertanyaan yang sering ditanyakan"></div>
                     <div class="mb-3"><label class="form-label">FAQ Description</label><textarea name="faq_description" class="form-control" rows="3" placeholder="Deskripsi opsional di bawah judul FAQ.">{{ old('faq_description', $settings['faq_description'] ?? '') }}</textarea></div>
 
                     <div class="mb-3">
@@ -142,6 +161,7 @@
 </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.querySelectorAll('[data-bs-toggle="pill"]').forEach(btn => {
         btn.addEventListener('shown.bs.tab', e => {
@@ -157,22 +177,6 @@
     }
     const form = document.getElementById('landingSettingsForm');
     const btn = document.getElementById('btnSave');
-
-    function showToast(message, type = 'success') {
-        const toast = document.createElement('div');
-        toast.className = `toast align-items-center text-bg-${type} border-0 position-fixed top-0 end-0 m-4 shadow`;
-        toast.style.zIndex = 9999;
-        toast.setAttribute('role', 'alert');
-        toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body"><i class="bi bi-check-circle-fill me-2"></i>${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        `;
-        document.body.appendChild(toast);
-        new bootstrap.Toast(toast, { delay: 3000 }).show();
-        toast.addEventListener('hidden.bs.toast', () => toast.remove());
-    }
 
     form.addEventListener('submit', async e => {
         e.preventDefault();
@@ -192,14 +196,28 @@
 
             const data = await res.json();
             if (res.ok && data.success) {
-                showToast(data.message || 'Berhasil disimpan.');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: data.message || 'Berhasil disimpan.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
             } else {
                 const errs = data.errors || {};
                 const first = Object.values(errs)[0];
-                showToast(first || data.message || 'Gagal menyimpan.', 'danger');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: (Array.isArray(first) ? first[0] : first) || data.message || 'Gagal menyimpan.',
+                });
             }
         } catch (err) {
-            showToast('Terjadi kesalahan jaringan.', 'danger');
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: 'Terjadi kesalahan jaringan.',
+            });
         } finally {
             btn.disabled = false;
             btn.innerHTML = 'Simpan Perubahan';
