@@ -21,75 +21,118 @@ class UserController extends Controller
     /**
      * Server-side DataTables: daftar pengguna (search, sort, pagination)
      */
-    public function data(Request $request)
-    {
-        $query = User::query()
-            ->leftJoin('roles', 'users.roles_id', '=', 'roles.id')
-            ->select(
-                'users.*',
-                'roles.name as role_name'
-            );
+  
+/**
+ * Server-side DataTables: daftar pengguna.
+ * Pengguna terbaru ditampilkan paling atas secara default.
+ */
+public function data(Request $request)
+{
+    $query = User::query()
+        ->leftJoin('roles', 'users.roles_id', '=', 'roles.id')
+        ->select(
+            'users.*',
+            'roles.name as role_name'
+        );
 
-        $recordsTotal = $query->count();
+    // Total pengguna sebelum pencarian.
+    $recordsTotal = User::count();
 
-        $search = $request->input('search.value');
+    // Pencarian pengguna.
+    $search = $request->input('search.value');
 
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('users.name', 'like', "%{$search}%")
-                    ->orWhere('users.email', 'like', "%{$search}%")
-                    ->orWhere('users.phone', 'like', "%{$search}%")
-                    ->orWhere('users.address', 'like', "%{$search}%")
-                    ->orWhere('roles.name', 'like', "%{$search}%");
-            });
-        }
-
-        $recordsFiltered = $query->count();
-
-        $columns = [
-            0 => null,
-            1 => 'users.name',
-            2 => 'users.email',
-            3 => 'roles.name',
-            4 => 'users.phone',
-            5 => 'users.address',
-            6 => null,
-        ];
-
-        $orderColumn = $request->input('order.0.column', 1);
-        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
-
-        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
-            $query->orderBy($columns[$orderColumn], $orderDir);
-        } else {
-            $query->orderBy('users.name', 'asc');
-        }
-
-        $start = max(0, (int) $request->input('start', 0));
-        $length = min(max((int) $request->input('length', 10), 1), 100);
-
-        $users = $query->offset($start)->limit($length)->get();
-
-        $data = $users->map(function ($user) {
-            return [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'roles_id' => $user->roles_id,
-                'role_name' => $user->role_name ?? 'Belum Ada Role',
-                'phone' => $user->phone ?? '-',
-                'address' => $user->address ?? '-',
-                'photo' => $user->photo,
-            ];
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('users.name', 'like', "%{$search}%")
+                ->orWhere('users.email', 'like', "%{$search}%")
+                ->orWhere('users.phone', 'like', "%{$search}%")
+                ->orWhere('users.address', 'like', "%{$search}%")
+                ->orWhere('roles.name', 'like', "%{$search}%");
         });
-
-        return response()->json([
-            'draw' => (int) $request->input('draw'),
-            'recordsTotal' => $recordsTotal,
-            'recordsFiltered' => $recordsFiltered,
-            'data' => $data,
-        ]);
     }
+
+    // Total pengguna setelah pencarian.
+    $recordsFiltered = (clone $query)
+        ->distinct()
+        ->count('users.id');
+
+    /*
+     * Pengurutan default:
+     * pengguna yang baru dibuat tampil paling atas.
+     */
+    $orderColumn = $request->input('order.0.column');
+    $orderDir = strtolower(
+        (string) $request->input('order.0.dir', 'desc')
+    ) === 'asc' ? 'asc' : 'desc';
+
+    $columns = [
+        0 => null,
+        1 => 'users.name',
+        2 => 'users.email',
+        3 => 'roles.name',
+        4 => 'users.phone',
+        5 => 'users.address',
+        6 => null,
+    ];
+
+    // Jika DataTables tidak meminta pengurutan kolom,
+    // tampilkan pengguna terbaru terlebih dahulu.
+    if (
+        $orderColumn === null ||
+        !isset($columns[(int) $orderColumn]) ||
+        $columns[(int) $orderColumn] === null
+    ) {
+        $query->orderByDesc('users.created_at')
+              ->orderByDesc('users.id');
+    } else {
+        // Tetap mendukung pengurutan ketika judul kolom diklik.
+        $query->orderBy(
+            $columns[(int) $orderColumn],
+            $orderDir
+        );
+
+        // Pengurutan tambahan jika nilai kolom sama.
+        $query->orderByDesc('users.created_at')
+              ->orderByDesc('users.id');
+    }
+
+    // Pagination DataTables.
+    $start = max(0, (int) $request->input('start', 0));
+    $length = (int) $request->input('length', 10);
+
+    if ($length === -1) {
+        $length = 100;
+    } else {
+        $length = min(max($length, 1), 100);
+    }
+
+    $users = $query
+        ->offset($start)
+        ->limit($length)
+        ->get();
+
+    // Format data untuk DataTables.
+    $data = $users->map(function ($user) {
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles_id' => $user->roles_id,
+            'role_name' => $user->role_name ?? 'Belum Ada Role',
+            'phone' => $user->phone ?? '-',
+            'address' => $user->address ?? '-',
+            'photo' => $user->photo,
+        ];
+    });
+
+    return response()->json([
+        'draw' => (int) $request->input('draw'),
+        'recordsTotal' => $recordsTotal,
+        'recordsFiltered' => $recordsFiltered,
+        'data' => $data,
+    ]);
+}
+
 
     /**
      * Detail pengguna untuk modal popup (AJAX)

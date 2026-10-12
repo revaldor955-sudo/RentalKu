@@ -67,32 +67,40 @@ public function data(Request $request)
         ->distinct()
         ->count('pemeriksaan_mobils.id');
 
-    // Kolom yang boleh dipakai untuk pengurutan.
-    $columns = [
-        0 => null, // Nomor
-        1 => 'users.name',
-        2 => 'mobils.name',
-        3 => 'pemeriksaan_mobils.jenis',
-        4 => 'pemeriksaan_mobils.kondisi',
-        5 => 'pemeriksaan_mobils.tanggal',
-        6 => null, // Kerusakan
-        7 => null, // Aksi
-    ];
+ 
+/*
+|--------------------------------------------------------------------------
+| Pengurutan DataTables
+|--------------------------------------------------------------------------
+|
+| Data pemeriksaan yang baru dibuat selalu tampil paling atas.
+| created_at menjadi prioritas utama, sedangkan ID menjadi
+| pengurutan tambahan jika waktu pembuatan sama.
+*/
 
-    $orderColumn = (int) $request->input('order.0.column', 5);
-    $orderDir = strtolower(
-        (string) $request->input('order.0.dir', 'desc')
-    ) === 'asc' ? 'asc' : 'desc';
+$query->orderByDesc('pemeriksaan_mobils.created_at')
+      ->orderByDesc('pemeriksaan_mobils.id');
 
-    if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
-        $query->orderBy($columns[$orderColumn], $orderDir);
+/*
+|--------------------------------------------------------------------------
+| Pagination DataTables
+|--------------------------------------------------------------------------
+*/
 
-        // Jika tanggal sama, data dengan ID terbaru lebih dahulu.
-        $query->orderByDesc('pemeriksaan_mobils.id');
-    } else {
-        // Default: pemeriksaan terbaru di atas.
-        $query->orderByDesc('pemeriksaan_mobils.id');
-    }
+$start = max(0, (int) $request->input('start', 0));
+$length = (int) $request->input('length', 10);
+
+if ($length === -1) {
+    $length = 100;
+} else {
+    $length = min(max($length, 1), 100);
+}
+
+$pemeriksaan = $query
+    ->offset($start)
+    ->limit($length)
+    ->get();
+
 
     $start = max(0, (int) $request->input('start', 0));
     $length = (int) $request->input('length', 10);

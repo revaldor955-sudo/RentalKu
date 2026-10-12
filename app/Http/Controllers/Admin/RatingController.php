@@ -10,41 +10,74 @@ class RatingController extends Controller
 {
     public function index()
     {
-        return view('admin.ratings.index')->with('pageTitle', 'Customer Rating');
+        return view('admin.ratings.index')
+            ->with('pageTitle', 'Ulasan Pelanggan');
     }
 
     public function data(Request $request)
     {
-        $query = Rating::with(['customer', 'booking.mobil', 'staff']);
+        // Query dasar ulasan.
+        $query = Rating::query()
+            ->with(['customer', 'booking.mobil', 'staff']);
 
-        $recordsTotal = $query->count();
+        // Total seluruh ulasan sebelum pencarian.
+        $recordsTotal = Rating::count();
 
-        $search = $request->input('search.value');
+        // Pencarian ulasan.
+        $search = trim(
+            (string) $request->input('search.value', '')
+        );
 
-        if ($search) {
+        if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->whereHas('customer', fn($c) => $c->where('name', 'like', "%{$search}%"))
-                  ->orWhere('komentar', 'like', "%{$search}%")
-                  ->orWhere('rating', $search);
+                $q->whereHas('customer', function ($customer) use ($search) {
+                    $customer->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                })
+                    ->orWhereHas('booking.mobil', function ($mobil) use ($search) {
+                        $mobil->where(
+                            'nama_mobil',
+                            'like',
+                            "%{$search}%"
+                        );
+                    })
+                    ->orWhere('komentar', 'like', "%{$search}%")
+                    ->orWhere('rating', 'like', "%{$search}%");
             });
         }
 
-        $recordsFiltered = $query->count();
+        // Total ulasan setelah pencarian.
+        $recordsFiltered = (clone $query)->count();
 
-        $orderColumn = (int)$request->input('order.0.column', 0);
-        $orderDir = strtolower($request->input('order.0.dir', 'desc')) === 'asc' ? 'asc' : 'desc';
+        /*
+         * Pengurutan default:
+         * ID terbesar = ulasan terbaru.
+         *
+         * Pengurutan ini tidak bergantung pada kolom No
+         * di DataTables karena kolom No hanya nomor tampilan.
+         */
+        $query->orderByDesc('id');
 
-        if ($orderColumn === 0) {
-            $query->orderBy('id', $orderDir);
-        } else {
-            $query->orderBy('id', 'desc');
+        // Pagination DataTables.
+        $start = max(
+            0,
+            (int) $request->input('start', 0)
+        );
+
+        $length = (int) $request->input('length', 10);
+
+        if ($length < 1) {
+            $length = 10;
         }
 
-        $start = max(0, (int)$request->input('start', 0));
-        $length = min(max((int)$request->input('length', 10), 1), 100);
+        $length = min($length, 100);
 
-        $ratings = $query->offset($start)->limit($length)->get();
+        $ratings = $query
+            ->offset($start)
+            ->limit($length)
+            ->get();
 
+        // Format data untuk DataTables.
         $data = $ratings->map(function ($r) {
             return [
                 'id' => $r->id,
@@ -58,21 +91,25 @@ class RatingController extends Controller
         });
 
         return response()->json([
-            'draw' => (int)$request->input('draw'),
+            'draw' => (int) $request->input('draw'),
             'recordsTotal' => $recordsTotal,
             'recordsFiltered' => $recordsFiltered,
             'data' => $data,
         ]);
     }
 
-    public function destroy(Rating $rating, Request $request)
+    public function destroy(Request $request, Rating $rating)
     {
         $rating->delete();
 
         if ($request->wantsJson()) {
-            return response()->json(['message' => 'Ulasan berhasil dihapus.']);
+            return response()->json([
+                'message' => 'Ulasan berhasil dihapus.',
+            ]);
         }
 
-        return redirect()->route('admin.ratings.index')->with('success', 'Ulasan berhasil dihapus.');
+        return redirect()
+            ->route('admin.ratings.index')
+            ->with('success', 'Ulasan berhasil dihapus.');
     }
 }

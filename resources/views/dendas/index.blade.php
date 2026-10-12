@@ -735,9 +735,7 @@
                                     },
                                 },
                             ],
-                            order: [
-                                [6, 'desc']
-                            ],
+                          order: [],
                             language: {
                                 processing: 'Memproses...',
                                 search: 'Cari:',

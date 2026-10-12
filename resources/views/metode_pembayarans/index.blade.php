@@ -538,8 +538,7 @@
     }
 
     $(document).on('change', '#filterCabang', function() {
-        $('#metodePembayarans-table').DataTable().ajax.reload();
-    });
+$('#metodePembayarans-table').DataTable().ajax.reload(null, true);    });
 
     // Preset cabang di modal tambah mengikuti filter aktif.
     $(document).on('show.bs.modal', '#tambahMetodePembayaranModal', function() {
@@ -611,9 +610,7 @@
                     },
                 },
             ],
-            order: [
-                [1, 'asc']
-            ],
+           order: [],
             language: {
                 processing: 'Memproses...',
                 search: 'Cari:',

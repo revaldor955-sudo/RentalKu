@@ -675,9 +675,9 @@
                     },
                 },
             ],
-            order: [
-                [5, 'desc']
-            ],
+           
+order: [],
+
             language: {
                 processing: 'Memproses...',
                 search: 'Cari:',
@@ -717,7 +717,8 @@
                     'X-Requested-With': 'XMLHttpRequest',
                 },
                 success: function(result) {
-                    $('#servisMobils-table').DataTable().ajax.reload();
+
+$('#servisMobils-table').DataTable().ajax.reload(null, true);
 
                     Swal.fire({
                         icon: 'success',

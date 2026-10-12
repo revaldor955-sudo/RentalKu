@@ -314,9 +314,7 @@
                     },
                 },
             ],
-            order: [
-                [3, 'desc']
-            ],
+        order: [],
             language: {
                 processing: 'Memproses...',
                 search: 'Cari:',
