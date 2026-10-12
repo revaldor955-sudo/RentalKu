@@ -184,16 +184,15 @@
             <div class="text-center mb-5">
 
                 <div class="text-success fw-bold mb-2">
-                    BRAND PILIHAN
+                    {{ $landingSettings['brand_badge'] ?? 'BRAND PILIHAN' }}
                 </div>
 
                 <h2 class="section-title">
-                    Pilihan brand untukmu
+                    {{ $landingSettings['brand_title'] ?? 'Pilihan brand untukmu' }}
                 </h2>
 
                 <p class="section-subtitle mx-auto">
-                    Berbagai pilihan merek kendaraan tersedia
-                    untuk memenuhi kebutuhan perjalananmu.
+                    {{ $landingSettings['brand_description'] ?? 'Berbagai pilihan merek kendaraan tersedia untuk memenuhi kebutuhan perjalananmu.' }}
                 </p>
 
             </div>
@@ -240,17 +239,15 @@
                 <div class="col-lg-5">
 
                     <div class="text-success fw-bold mb-2">
-                        KENAPA RENTALKU?
+                        {{ $landingSettings['about_badge'] ?? 'KENAPA RENTALKU?' }}
                     </div>
 
                     <h2 class="section-title">
-                        Rental mobil tanpa ribet.
+                        {{ $landingSettings['about_title'] ?? 'Rental mobil tanpa ribet.' }}
                     </h2>
 
                     <p class="section-subtitle">
-                        Kami menghadirkan pengalaman rental mobil
-                        yang praktis dengan proses pemesanan yang
-                        mudah dan transparan.
+                        {{ $landingSettings['about_description'] ?? 'Kami menghadirkan pengalaman rental mobil yang praktis dengan proses pemesanan yang mudah dan transparan.' }}
                     </p>
 
                     <a href="#mobil" class="btn btn-rent mt-4">
@@ -269,16 +266,15 @@
                             <div class="feature-card">
 
                                 <div class="feature-icon">
-                                    <i class="bi bi-shield-check"></i>
+                                    <i class="bi {{ $landingSettings['about_feature_1_icon'] ?? 'bi-shield-check' }}"></i>
                                 </div>
 
                                 <h5>
-                                    Aman & Terpercaya
+                                    {{ $landingSettings['about_feature_1_title'] ?? 'Aman & Terpercaya' }}
                                 </h5>
 
                                 <p>
-                                    Data kendaraan dan proses rental
-                                    dikelola dengan sistem yang terstruktur.
+                                    {{ $landingSettings['about_feature_1_desc'] ?? 'Data kendaraan dan proses rental dikelola dengan sistem yang terstruktur.' }}
                                 </p>
 
                             </div>
@@ -290,16 +286,15 @@
                             <div class="feature-card">
 
                                 <div class="feature-icon">
-                                    <i class="bi bi-lightning-charge"></i>
+                                    <i class="bi {{ $landingSettings['about_feature_2_icon'] ?? 'bi-lightning-charge' }}"></i>
                                 </div>
 
                                 <h5>
-                                    Proses Cepat
+                                    {{ $landingSettings['about_feature_2_title'] ?? 'Proses Cepat' }}
                                 </h5>
 
                                 <p>
-                                    Rental mobil dapat dilakukan
-                                    dengan mudah melalui website.
+                                    {{ $landingSettings['about_feature_2_desc'] ?? 'Rental mobil dapat dilakukan dengan mudah melalui website.' }}
                                 </p>
 
                             </div>
@@ -311,16 +306,15 @@
                             <div class="feature-card">
 
                                 <div class="feature-icon">
-                                    <i class="bi bi-wallet2"></i>
+                                    <i class="bi {{ $landingSettings['about_feature_3_icon'] ?? 'bi-wallet2' }}"></i>
                                 </div>
 
                                 <h5>
-                                    Harga Transparan
+                                    {{ $landingSettings['about_feature_3_title'] ?? 'Harga Transparan' }}
                                 </h5>
 
                                 <p>
-                                    Kamu dapat melihat harga rental
-                                    sebelum melakukan rental.
+                                    {{ $landingSettings['about_feature_3_desc'] ?? 'Kamu dapat melihat harga rental sebelum melakukan rental.' }}
                                 </p>
 
                             </div>
@@ -332,16 +326,15 @@
                             <div class="feature-card">
 
                                 <div class="feature-icon">
-                                    <i class="bi bi-headset"></i>
+                                    <i class="bi {{ $landingSettings['about_feature_4_icon'] ?? 'bi-headset' }}"></i>
                                 </div>
 
                                 <h5>
-                                    Layanan Support
+                                    {{ $landingSettings['about_feature_4_title'] ?? 'Layanan Support' }}
                                 </h5>
 
                                 <p>
-                                    Hubungi tim Rentalku jika membutuhkan
-                                    bantuan selama proses rental.
+                                    {{ $landingSettings['about_feature_4_desc'] ?? 'Hubungi tim Rentalku jika membutuhkan bantuan selama proses rental.' }}
                                 </p>
 
                             </div>
@@ -419,16 +412,15 @@
             <div class="text-center mb-5">
 
                 <div class="text-success fw-bold mb-2">
-                    CARA RENTAL
+                    {{ $landingSettings['steps_badge'] ?? 'CARA RENTAL' }}
                 </div>
 
                 <h2 class="section-title">
-                    Rental mobil dalam beberapa langkah
+                    {{ $landingSettings['steps_title'] ?? 'Rental mobil dalam beberapa langkah' }}
                 </h2>
 
                 <p class="section-subtitle mx-auto">
-                    Proses sederhana untuk mendapatkan mobil
-                    yang kamu butuhkan.
+                    {{ $landingSettings['steps_description'] ?? 'Proses sederhana untuk mendapatkan mobil yang kamu butuhkan.' }}
                 </p>
 
             </div>
@@ -534,15 +526,15 @@
                 <div class="text-center mb-5">
 
                     <div class="text-success fw-bold mb-2">
-                        TESTIMONI
+                        {{ $landingSettings['testimonial_badge'] ?? 'TESTIMONI' }}
                     </div>
 
                     <h2 class="section-title">
-                        Apa kata pelanggan?
+                        {{ $landingSettings['testimonial_title'] ?? 'Apa kata pelanggan?' }}
                     </h2>
 
                     <p class="section-subtitle mx-auto">
-                        Ribuan pelanggan telah mempercayakan perjalanan mereka kepada Rentalku.
+                        {{ $landingSettings['testimonial_description'] ?? 'Ribuan pelanggan telah mempercayakan perjalanan mereka kepada Rentalku.' }}
                     </p>
 
                 </div>
