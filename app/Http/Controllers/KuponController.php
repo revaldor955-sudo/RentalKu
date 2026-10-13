@@ -216,8 +216,7 @@ class KuponController extends Controller
         // Jumlah promo yang telah digunakan tidak boleh diubah dari form.
         $terpakaiAktual = (int) $kupon->terpakai;
 
-        if ((int) $validated['kuota'] < $terpakaiAktual) {
-            $message = "Kuota tidak boleh lebih kecil dari jumlah terpakai ({$terpakaiAktual}).";
+        if ((int) $validated['kuota'] < $terpakaiAktual) {            $message = "Kuota tidak boleh lebih kecil dari jumlah terpakai ({$terpakaiAktual}).";
 
             if ($request->wantsJson()) {
                 return response()->json([
@@ -228,6 +227,24 @@ class KuponController extends Controller
 
             return back()->withErrors([
                 'kuota' => $message,
+            ])->withInput();
+        }
+
+        // Tolak upaya mengubah terpakai melebihi kuota dari form.
+        $terpakaiInput = $request->input('terpakai');
+
+        if ($terpakaiInput !== null && (int) $terpakaiInput > (int) $validated['kuota']) {
+            $message = "Jumlah terpakai tidak boleh melebihi kuota ({$validated['kuota']}).";
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => $message,
+                    'errors' => ['terpakai' => [$message]],
+                ], 422);
+            }
+
+            return back()->withErrors([
+                'terpakai' => $message,
             ])->withInput();
         }
 
