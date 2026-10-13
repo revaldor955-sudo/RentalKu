@@ -243,18 +243,21 @@ class AuditFindingsTest extends TestCase
     // U-06: endpoint publik tetap untuk modal tamu, tanpa data sensitif.
     public function test_tamu_bisa_buka_modal_mobil_tanpa_data_sensitif(): void
     {
-        $this->get("/mobils/{$this->mobil->id}")
+        $this->get("/mobils/{$this->mobil->slug}")
             ->assertOk()
             ->assertSee('Avanza')
             ->assertDontSee('admin@rentalku.test');
 
-        $this->getJson("/mobils/{$this->mobil->id}")->assertOk();
+        $this->getJson("/mobils/{$this->mobil->slug}")->assertOk();
+
+        // URL id lama putus total (slug adalah satu-satunya key URL).
+        $this->get("/mobils/{$this->mobil->id}")->assertNotFound();
     }
 
     // U-07: field liar diabaikan, server penentu nilai sensitif.
     public function test_rental_abaikan_status_dan_total_bawaan_request(): void
     {
-        $this->actingAs($this->customer)->post("/customer/rental/{$this->mobil->id}", [
+        $this->actingAs($this->customer)->post("/customer/rental/{$this->mobil->slug}", [
             'tanggal_mulai' => now()->addDay()->toDateString(),
             'tanggal_selesai' => now()->addDays(3)->toDateString(),
             'cabang_ambil_id' => $this->cabang->id,
