@@ -224,7 +224,7 @@
                     <div class="col-md-6 col-lg-4">
 
                         <div class="car-card"
-                             data-mobil-id="{{ $mobil->id }}"
+                             data-mobil-id="{{ $mobil->slug }}"
                              role="button"
                              style="cursor: pointer;">
 
@@ -291,7 +291,7 @@
                                         <button
                                             type="button"
                                             class="btn btn-rent"
-                                            data-mobil-id="{{ $mobil->id }}"
+                                            data-mobil-id="{{ $mobil->slug }}"
                                             style="pointer-events: none;">
                                             Detail
                                         </button>
@@ -417,21 +417,6 @@
 
     </section>
 
-    {{-- Modal Detail Mobil --}}
-    <div class="modal fade" id="mobilDetailModal" tabindex="-1" aria-labelledby="mobilDetailLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title" id="mobilDetailLabel">Detail Mobil</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
-                    <!-- Content loaded via AJAX -->
-                </div>
-            </div>
-        </div>
-    </div>
-
 @endsection
 
 @push('scripts')
@@ -439,25 +424,7 @@
     $(document).on('click', '.car-card[data-mobil-id], button[data-mobil-id]', function (e) {
         e.preventDefault();
         e.stopPropagation();
-        var mobilId = $(this).data('mobil-id');
-        var modalEl = document.getElementById('mobilDetailModal');
-        var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-        var $body = $('#mobilDetailModal .modal-body');
-
-        $body.html('<div class="text-center py-5"><div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading...</span></div></div>');
-        modal.show();
-
-        $.ajax({
-            url: '/mobils/' + mobilId,
-            headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            method: 'GET'
-        })
-        .done(function (html) {
-            $body.html(html);
-        })
-        .fail(function () {
-            $body.html('<div class="alert alert-danger m-3"><i class="bi bi-exclamation-circle me-2"></i>Gagal memuat detail mobil.</div>');
-        });
+        window.location.href = '/mobils/' + $(this).data('mobil-id') + '?from=katalog';
     });
 </script>
 @endpush

@@ -971,7 +971,7 @@
 
             <div class="col-md-6 col-lg-4">
 
-                    <div class="car-card anim-rise" data-mobil-id="{{ $mobil->id }}" role="button" title="Lihat detail {{ $mobil->name }}" style="animation-delay: {{ min($index * 70, 560) }}ms;">
+                    <div class="car-card anim-rise" data-mobil-id="{{ $mobil->slug }}" role="button" title="Lihat detail {{ $mobil->name }}" style="animation-delay: {{ min($index * 70, 560) }}ms;">
 
                   <div class="car-photo-wrapper">
 
@@ -1231,28 +1231,6 @@
             Rental Saya
         </a>
     </div>
-</div>
-
-{{-- MODAL DETAIL MOBIL (diisi via AJAX, tanpa reload halaman) --}}
-<div
-    class="modal fade"
-    id="mobilDetailModal"
-    tabindex="-1"
-    aria-labelledby="mobilDetailModalLabel"
-    aria-hidden="true">
-
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
-
-        <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
-
-            @include('layouts.partials.modal-head', ['title' => 'Detail Mobil', 'titleId' => 'mobilDetailModalLabel'])
-
-            <div class="modal-body p-0" id="mobilDetailModalBody"></div>
-
-        </div>
-
-    </div>
-
 </div>
 
 {{-- MODAL LIHAT BUKTI FOTO (denda) --}}
@@ -1560,65 +1538,14 @@
 
 <script>
 
-    // Buka modal detail mobil via AJAX — tanpa reload halaman.
-    var $mobilDetailModalBody = $('#mobilDetailModalBody');
-
-    function openMobilDetail(mobilId) {
-        $mobilDetailModalBody.html('<div class="text-center py-5"><div class="spinner-border text-success" role="status"></div></div>');
-
-        $.ajax({
-            url: '/mobils/' + mobilId,
-            headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .done(function(html) {
-            $mobilDetailModalBody.html(html);
-            bootstrap.Modal.getOrCreateInstance($('#mobilDetailModal')[0]).show();
-        })
-        .fail(function() {
-            $mobilDetailModalBody.html('<div class="alert alert-danger m-3 mb-0"><i class="bi bi-exclamation-triangle me-1"></i> Gagal memuat detail mobil. Silakan coba lagi.</div>');
-        });
+    // Klik kartu mobil langsung ke halaman detail.
+    function openMobilDetail(mobilSlug) {
+        window.location.href = '/mobils/' + mobilSlug;
     }
 
     $(document).on('click', '[data-mobil-id]', function() {
         openMobilDetail($(this).data('mobil-id'));
     });
-
-    // Popup form sewa (SweetAlert) — template di-inject dari konten modal.
-    // Modal Bootstrap disembunyikan dulu: focus-trap-nya merebut fokus
-    // sehingga input di dalam SweetAlert (mis. Catatan) tidak bisa diketik.
-    function openSewaPopup() {
-        var $template = $('#sewaFormTemplate');
-        if (!$template.length) return;
-
-        if ($('.mobil-modal .mm-badge-available').length === 0) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal',
-                text: 'Mobil sedang tidak tersedia.',
-            });
-            return;
-        }
-
-        var $modal = $('#mobilDetailModal');
-        if ($modal.length) {
-            bootstrap.Modal.getOrCreateInstance($modal[0]).hide();
-        }
-
-        var $carTitle = $('.mobil-modal .mm-title');
-
-        Swal.fire({
-            title: $carTitle.length ? $carTitle.text().trim() : 'Sewa Mobil',
-            html: $template.html(),
-            width: 600,
-            showConfirmButton: false,
-            didOpen: function() {
-                initSewaForm();
-            }
-        });
-    }
 
     function updateSewaButtonSwal($swal) {
         var form = $swal.find('form#sewaForm')[0] || $swal.find('form')[0];
@@ -1979,7 +1906,7 @@
             var delay = Math.min(i * 70, 560);
             html +=
                 '<div class="col-md-6 col-lg-4">' +
-                    '<div class="car-card anim-rise" data-mobil-id="' + m.id + '" role="button" title="Lihat detail ' + escHtml(m.name) + '" style="animation-delay: ' + delay + 'ms;">' +
+                    '<div class="car-card anim-rise" data-mobil-id="' + m.slug + '" role="button" title="Lihat detail ' + escHtml(m.name) + '" style="animation-delay: ' + delay + 'ms;">' +
                         '<div class="car-photo-wrapper">' +
                             '<img src="' + (m.image_url || mobilFallbackImg) + '" class="car-img" alt="' + escHtml(m.name) + '">' +
                             '<div class="car-status"><i class="bi bi-check-circle-fill me-1"></i>Tersedia</div>' +

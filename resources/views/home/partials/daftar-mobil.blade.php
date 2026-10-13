@@ -96,7 +96,7 @@
         <div class="col-md-6 col-lg-4">
 
             <div class="car-card" 
-                 data-mobil-id="{{ $mobil->id }}"
+                 data-mobil-id="{{ $mobil->slug }}"
                  role="button"
                  style="cursor: pointer;">
 
@@ -162,7 +162,7 @@
                             <button
                                 type="button"
                                 class="btn btn-rent"
-                                data-mobil-id="{{ $mobil->id }}"
+                                data-mobil-id="{{ $mobil->slug }}"
                                 style="pointer-events: none;">
                                 Detail
                             </button>
