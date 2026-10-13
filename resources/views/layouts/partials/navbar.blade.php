@@ -26,31 +26,37 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#mobil">
+                    <a class="nav-link" href="{{ url('/#mobil') }}">
                         Mobil
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#tentang">
+                    <a class="nav-link" href="{{ route('katalog.index') }}">
+                        Katalog
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url('/#tentang') }}">
                         Tentang Kami
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#cara-rental">
+                    <a class="nav-link" href="{{ url('/#cara-rental') }}">
                         Cara Rental
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#faq">
+                    <a class="nav-link" href="{{ url('/#faq') }}">
                         FAQ
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#kontak">
+                    <a class="nav-link" href="{{ url('/#kontak') }}">
                         Kontak
                     </a>
                 </li>
