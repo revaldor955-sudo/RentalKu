@@ -152,8 +152,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             <option value="10">10 / halaman</option>
                             <option value="20">20 / halaman</option>
                             <option value="50">50 / halaman</option>
+                            <option value="100">100 / halaman</option>
+                            <option value="custom">Custom</option>
                         </select>
-                        <input type="number" class="form-control form-control-sm pager-jump" id="contacts-jump" min="1" value="1" aria-label="Lompat ke halaman">
+                        <input type="number" class="form-control form-control-sm pager-jump" id="contacts-custom" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                         <span class="text-secondary" id="contacts-page-label">Halaman 1 / 1</span>
                     </div>
                     <div class="d-flex align-items-center gap-2">
@@ -270,9 +272,6 @@ $(document).ready(function() {
         var start=total?info.start+1:0;
         var pages=info.pages;
         $('#contacts-info').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
-        var max = Math.max(pages, 1);
-        $('#contacts-jump').attr('max', max);
-        $('#contacts-jump').val(pages ? (info.page + 1) : 1);
         $('#contacts-page-label').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
         var first = (info.page === 0 || info.pages <= 1);
         var last = (info.pages <= 1 || info.page === info.pages - 1);
@@ -287,8 +286,8 @@ $(document).ready(function() {
     $('#contacts-prev').on('click', function() { contactsTable.page('previous').draw('page'); });
     $('#contacts-next').on('click', function() { contactsTable.page('next').draw('page'); });
     $('#contacts-last').on('click', function() { contactsTable.page('last').draw('page'); });
-    $('#contacts-perpage').on('change', function() { contactsTable.page.len($(this).val()).draw(); });
-    $('#contacts-jump').on('change', function() { var info = contactsTable.page.info(); var max = Math.max(info.pages, 1); var n = parseInt($(this).val(), 10) || 1; if (n < 1) n = 1; if (n > max) n = max; contactsTable.page(n - 1).draw('page'); });
+    $('#contacts-perpage').on('change', function() { if ($(this).val() === 'custom') { $('#contacts-custom').focus(); return; } var n = Number($(this).val()); $('#contacts-custom').val(n); contactsTable.page.len(n).draw(); });
+    $('#contacts-custom').on('change', function() { var n = parseInt($(this).val(), 10) || 1; n = Math.min(Math.max(n, 1), 500); $(this).val(n); if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#contacts-perpage').val(String(n)); } else { $('#contacts-perpage').val('custom'); } contactsTable.page.len(n).draw(); });
 });
 function viewContact(id) {
     $.ajax({ url:'/admin/contacts/'+id+'/detail', type:'GET', dataType:'json', success:function(contact) {

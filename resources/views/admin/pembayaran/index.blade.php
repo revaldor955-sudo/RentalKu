@@ -244,8 +244,10 @@
                         <option value="10">10 / halaman</option>
                         <option value="20">20 / halaman</option>
                         <option value="50">50 / halaman</option>
+                        <option value="100">100 / halaman</option>
+                        <option value="custom">Custom</option>
                     </select>
-                    <input type="number" id="pembayaran-jump" class="form-control form-control-sm pager-jump" min="1" max="1" value="1" aria-label="Lompat ke halaman">
+                    <input type="number" id="pembayaran-custom" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                     <span class="text-secondary" id="pembayaran-page">Halaman 1 / 1</span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
@@ -581,7 +583,6 @@
             $('#pembayaran-info').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
             var pages = info.pages || 1;
             var page = info.page + 1;
-            $('#pembayaran-jump').attr('max', pages).val(page);
             $('#pembayaran-page').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
             $('#pembayaran-first').toggleClass('disabled', page <= 1);
             $('#pembayaran-prev').toggleClass('disabled', page <= 1);
@@ -596,13 +597,8 @@
         $('#pembayaran-prev').on('click', function() { pembayaranTable.page('previous').draw('page'); });
         $('#pembayaran-next').on('click', function() { pembayaranTable.page('next').draw('page'); });
         $('#pembayaran-last').on('click', function() { pembayaranTable.page('last').draw('page'); });
-        $('#pembayaran-len').on('change', function() { pembayaranTable.page.len(Number($(this).val())).draw(); });
-        $('#pembayaran-jump').on('change', function() {
-            var pages = pembayaranTable.page.info().pages || 1;
-            var n = parseInt($(this).val(), 10) || 1;
-            n = Math.min(Math.max(n, 1), pages);
-            pembayaranTable.page(n - 1).draw('page');
-        });
+        $('#pembayaran-len').on('change', function() { if ($(this).val() === 'custom') { $('#pembayaran-custom').focus(); return; } var n = Number($(this).val()); $('#pembayaran-custom').val(n); pembayaranTable.page.len(n).draw(); });
+        $('#pembayaran-custom').on('change', function() { var n = parseInt($(this).val(), 10) || 1; n = Math.min(Math.max(n, 1), 500); $(this).val(n); if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#pembayaran-len').val(String(n)); } else { $('#pembayaran-len').val('custom'); } pembayaranTable.page.len(n).draw(); });
 
     });
 

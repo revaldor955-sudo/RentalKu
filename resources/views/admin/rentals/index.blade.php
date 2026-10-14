@@ -226,8 +226,10 @@
                             <option value="10">10 / halaman</option>
                             <option value="20">20 / halaman</option>
                             <option value="50">50 / halaman</option>
+                            <option value="100">100 / halaman</option>
+                            <option value="custom">Custom</option>
                         </select>
-                        <input type="number" id="rentals-jump" class="form-control form-control-sm pager-jump" min="1" max="1" value="1" aria-label="Lompat ke halaman">
+                        <input type="number" id="rentals-custom" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                         <span class="text-secondary" id="rentals-page">Halaman 1 / 1</span>
                     </div>
                     <div class="d-flex align-items-center gap-2">
@@ -586,7 +588,6 @@
                 $('#rentals-info').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
                 var pages = info.pages || 1;
                 var page = info.page + 1;
-                $('#rentals-jump').attr('max', pages).val(page);
                 $('#rentals-page').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
                 $('#rentals-first').toggleClass('disabled', page <= 1);
                 $('#rentals-prev').toggleClass('disabled', page <= 1);
@@ -601,13 +602,8 @@
             $('#rentals-prev').on('click', function() { rentalsTable.page('previous').draw('page'); });
             $('#rentals-next').on('click', function() { rentalsTable.page('next').draw('page'); });
             $('#rentals-last').on('click', function() { rentalsTable.page('last').draw('page'); });
-            $('#rentals-len').on('change', function() { rentalsTable.page.len(Number($(this).val())).draw(); });
-            $('#rentals-jump').on('change', function() {
-                var pages = rentalsTable.page.info().pages || 1;
-                var n = parseInt($(this).val(), 10) || 1;
-                n = Math.min(Math.max(n, 1), pages);
-                rentalsTable.page(n - 1).draw('page');
-            });
+            $('#rentals-len').on('change', function() { if ($(this).val() === 'custom') { $('#rentals-custom').focus(); return; } var n = Number($(this).val()); $('#rentals-custom').val(n); rentalsTable.page.len(n).draw(); });
+            $('#rentals-custom').on('change', function() { var n = parseInt($(this).val(), 10) || 1; n = Math.min(Math.max(n, 1), 500); $(this).val(n); if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#rentals-len').val(String(n)); } else { $('#rentals-len').val('custom'); } rentalsTable.page.len(n).draw(); });
 
         });
 

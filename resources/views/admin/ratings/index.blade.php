@@ -125,8 +125,10 @@
                             <option value="10">10 / halaman</option>
                             <option value="20">20 / halaman</option>
                             <option value="50">50 / halaman</option>
+                            <option value="100">100 / halaman</option>
+                            <option value="custom">Custom</option>
                         </select>
-                        <input type="number" class="form-control form-control-sm pager-jump" id="ratings-jump" min="1" value="1" aria-label="Lompat ke halaman">
+                        <input type="number" class="form-control form-control-sm pager-jump" id="ratings-custom" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                         <span class="text-secondary" id="ratings-page-label">Halaman 1 / 1</span>
                     </div>
                     <div class="d-flex align-items-center gap-2">
@@ -279,9 +281,6 @@
             var start=total?info.start+1:0;
             var pages=info.pages;
             $('#ratings-info').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
-            var max = Math.max(pages, 1);
-            $('#ratings-jump').attr('max', max);
-            $('#ratings-jump').val(pages ? (info.page + 1) : 1);
             $('#ratings-page-label').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
             var first = (info.page === 0 || info.pages <= 1);
             var last = (info.pages <= 1 || info.page === info.pages - 1);
@@ -296,8 +295,8 @@
         $('#ratings-prev').on('click', function() { ratingsTable.page('previous').draw('page'); });
         $('#ratings-next').on('click', function() { ratingsTable.page('next').draw('page'); });
         $('#ratings-last').on('click', function() { ratingsTable.page('last').draw('page'); });
-        $('#ratings-perpage').on('change', function() { ratingsTable.page.len($(this).val()).draw(); });
-        $('#ratings-jump').on('change', function() { var info = ratingsTable.page.info(); var max = Math.max(info.pages, 1); var n = parseInt($(this).val(), 10) || 1; if (n < 1) n = 1; if (n > max) n = max; ratingsTable.page(n - 1).draw('page'); });
+        $('#ratings-perpage').on('change', function() { if ($(this).val() === 'custom') { $('#ratings-custom').focus(); return; } var n = Number($(this).val()); $('#ratings-custom').val(n); ratingsTable.page.len(n).draw(); });
+        $('#ratings-custom').on('change', function() { var n = parseInt($(this).val(), 10) || 1; n = Math.min(Math.max(n, 1), 500); $(this).val(n); if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#ratings-perpage').val(String(n)); } else { $('#ratings-perpage').val('custom'); } ratingsTable.page.len(n).draw(); });
     });
 </script>
 
