@@ -26,19 +26,101 @@
             color: #1F2937;
         }
 
-        .navbar {
-            background: #fff;
-            border-bottom: 1px solid #E5E7EB;
+        :root {
+            --primary: #2C666E;
+            --dark: #111827;
         }
 
-        .brand {
+        .navbar {
+            background: rgba(255, 255, 255, .96);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0, 0, 0, .05);
+            padding: 16px 0;
+        }
+
+        .navbar-brand {
+            font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
             font-size: 25px;
             font-weight: 800;
-            color: #1F2937;
+            color: var(--dark) !important;
         }
 
-        .brand span {
-            color: #198754;
+        .navbar-brand span {
+            color: var(--primary);
+        }
+
+        .nav-link {
+            color: #4b5563 !important;
+            font-weight: 600;
+            margin: 0 7px;
+        }
+
+        .nav-link:hover {
+            color: var(--primary) !important;
+        }
+
+        .navbar-nav .nav-link {
+            transition: color 0.2s ease, background 0.2s ease !important;
+            position: relative;
+            border-radius: 10px !important;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--primary) !important;
+            background: rgba(44, 102, 110, 0.1) !important;
+        }
+
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 2px;
+            left: 50%;
+            background-color: var(--primary);
+            transition: width 0.2s ease, left 0.2s ease;
+        }
+
+        .navbar-nav .nav-link:hover::after {
+            width: 60%;
+            left: 20%;
+        }
+
+        .nav-btn-ghost {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            color: var(--dark) !important;
+            background: transparent !important;
+            border-radius: 10px !important;
+            transition: all 0.2s ease !important;
+            position: relative;
+        }
+
+        .nav-btn-ghost:hover,
+        .nav-btn-ghost:focus {
+            background: rgba(44, 102, 110, 0.1) !important;
+            color: var(--primary) !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .nav-btn-ghost::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 2px;
+            left: 50%;
+            background-color: var(--primary);
+            transition: width 0.2s ease, left 0.2s ease;
+        }
+
+        .nav-btn-ghost:hover::after,
+        .nav-btn-ghost:focus::after {
+            width: 60%;
+            left: 20%;
         }
 
         .page-wrap {
@@ -358,51 +440,9 @@
 
 <body>
 
-<nav class="navbar">
-    <div class="container py-3">
+@include('layouts.partials.navbar')
 
-        <a href="{{ url('/') }}" class="text-decoration-none brand">
-            Rental<span>ku</span>.
-        </a>
-
-        <div class="d-flex align-items-center gap-3">
-
-                @auth
-
-                    <span class="d-none d-md-block">
-                        <i class="bi bi-person-circle"></i>
-                        {{ Auth::user()->name }}
-                    </span>
-
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-
-                        <button class="btn btn-outline-danger fw-semibold rounded-3">
-                            <i class="bi bi-box-arrow-right"></i>
-                            Keluar
-                        </button>
-                    </form>
-
-                @else
-
-                    <a href="{{ route('login') }}" class="btn px-3 py-2 fw-semibold d-flex align-items-center gap-2 nav-btn-ghost">
-                        <i class="bi bi-box-arrow-in-right"></i>
-                        Masuk
-                    </a>
-
-                    <a href="{{ route('register') }}" class="btn px-3 py-2 fw-semibold d-flex align-items-center gap-2 nav-btn-ghost">
-                        <i class="bi bi-person-plus"></i>
-                        Daftar
-                    </a>
-
-                @endauth
-
-            </div>
-
-    </div>
-</nav>
-
-<div class="container py-4">
+<div class="container py-4" style="padding-top: 84px !important;">
 
     <div class="page-wrap">
 
