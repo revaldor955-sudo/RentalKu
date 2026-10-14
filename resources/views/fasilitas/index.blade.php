@@ -275,8 +275,10 @@
                             <option value="10">10 / halaman</option>
                             <option value="20">20 / halaman</option>
                             <option value="50">50 / halaman</option>
+                            <option value="100">100 / halaman</option>
+                            <option value="custom">Custom</option>
                         </select>
-                        <input type="number" id="fasilitas-jump" class="form-control form-control-sm pager-jump" min="1" max="1" value="1" aria-label="Lompat ke halaman">
+                        <input type="number" id="pager-custom-fasilitas" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                         <span class="text-secondary" id="fasilitas-pageLabel">Halaman 1 / 1</span>
                     </div>
                     <div class="d-flex align-items-center gap-2">
@@ -527,7 +529,6 @@
             var total = info.recordsDisplay;
             var start = total ? info.start + 1 : 0;
             $('#fasilitas-info').text('Menampilkan '+start+'–'+info.end + ' dari ' + total + ' data');
-            $('#fasilitas-jump').attr('max', pages ? pages : 1).val(pages ? info.page + 1 : 0);
             $('#fasilitas-pageLabel').text('Halaman ' + (pages ? info.page + 1 : 0) + ' / ' + pages);
             $('#fasilitas-first').toggleClass('disabled', info.page <= 0);
             $('#fasilitas-prev').toggleClass('disabled', info.page <= 0);
@@ -540,14 +541,15 @@
         $('#fasilitas-prev').on('click', function() { fasilitasTable.page('previous').draw('page'); });
         $('#fasilitas-next').on('click', function() { fasilitasTable.page('next').draw('page'); });
         $('#fasilitas-last').on('click', function() { fasilitasTable.page('last').draw('page'); });
-        $('#fasilitas-perPage').on('change', function() { fasilitasTable.page.len(Number($(this).val())).draw(); });
-        $('#fasilitas-jump').on('change', function() {
-            var info = fasilitasTable.page.info();
-            var pages = info.pages > 0 ? info.pages : 1;
+        $('#fasilitas-perPage').on('change', function() { var v = $(this).val(); if (v === 'custom') { $('#pager-custom-fasilitas').focus(); return; } var n = Number(v); $('#pager-custom-fasilitas').val(n); fasilitasTable.page.len(n).draw(); });
+        $('#pager-custom-fasilitas').on('change', function() {
             var n = parseInt($(this).val(), 10) || 1;
-            if (n < 1) { n = 1; }
-            if (n > pages) { n = pages; }
-            fasilitasTable.page(n - 1).draw('page');
+            n = Math.min(Math.max(n, 1), 500);
+            $(this).val(n);
+            var $len = $('#fasilitas-perPage');
+            if ($len.find('option[value="' + n + '"]').length) { $len.val(String(n)); }
+            else { $len.val('custom'); }
+            fasilitasTable.page.len(n).draw();
         });
         renderFasilitasPager();
 

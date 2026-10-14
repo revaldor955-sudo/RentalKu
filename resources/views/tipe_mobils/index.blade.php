@@ -256,8 +256,10 @@
                                 <option value="10">10 / halaman</option>
                                 <option value="20">20 / halaman</option>
                                 <option value="50">50 / halaman</option>
+                                <option value="100">100 / halaman</option>
+                                <option value="custom">Custom</option>
                             </select>
-                            <input type="number" id="tipeMobils-jump" class="form-control form-control-sm pager-jump" min="1" max="1" value="1" aria-label="Lompat ke halaman">
+                            <input type="number" id="tipeMobils-custom" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                             <span class="text-secondary" id="tipeMobils-pageLabel">Halaman 1 / 1</span>
                         </div>
                         <div class="d-flex align-items-center gap-2">
@@ -538,7 +540,6 @@ order: [],
             var total = info.recordsDisplay;
             var start = total ? info.start + 1 : 0;
             $('#tipeMobils-info').text('Menampilkan '+start+'–'+info.end + ' dari ' + total + ' data');
-            $('#tipeMobils-jump').attr('max', pages ? pages : 1).val(pages ? info.page + 1 : 0);
             $('#tipeMobils-pageLabel').text('Halaman ' + (pages ? info.page + 1 : 0) + ' / ' + pages);
             $('#tipeMobils-first').toggleClass('disabled', info.page <= 0);
             $('#tipeMobils-prev').toggleClass('disabled', info.page <= 0);
@@ -551,14 +552,19 @@ order: [],
         $('#tipeMobils-prev').on('click', function() { tipeMobilsTable.page('previous').draw('page'); });
         $('#tipeMobils-next').on('click', function() { tipeMobilsTable.page('next').draw('page'); });
         $('#tipeMobils-last').on('click', function() { tipeMobilsTable.page('last').draw('page'); });
-        $('#tipeMobils-perPage').on('change', function() { tipeMobilsTable.page.len(Number($(this).val())).draw(); });
-        $('#tipeMobils-jump').on('change', function() {
-            var info = tipeMobilsTable.page.info();
-            var pages = info.pages > 0 ? info.pages : 1;
+        $('#tipeMobils-perPage').on('change', function() {
+            if ($(this).val() === 'custom') { $('#tipeMobils-custom').focus(); return; }
+            var n = Number($(this).val());
+            $('#tipeMobils-custom').val(n);
+            tipeMobilsTable.page.len(n).draw();
+        });
+        $('#tipeMobils-custom').on('change', function() {
             var n = parseInt($(this).val(), 10) || 1;
-            if (n < 1) { n = 1; }
-            if (n > pages) { n = pages; }
-            tipeMobilsTable.page(n - 1).draw('page');
+            n = Math.min(Math.max(n, 1), 500);
+            $(this).val(n);
+            if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#tipeMobils-perPage').val(String(n)); }
+            else { $('#tipeMobils-perPage').val('custom'); }
+            tipeMobilsTable.page.len(n).draw();
         });
         renderTipeMobilsPager();
 
