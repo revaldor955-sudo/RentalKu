@@ -246,8 +246,10 @@
                             <option value="10">10 / halaman</option>
                             <option value="20">20 / halaman</option>
                             <option value="50">50 / halaman</option>
+                            <option value="100">100 / halaman</option>
+                            <option value="custom">Custom</option>
                         </select>
-                        <input type="number" id="kupons-jump" class="form-control form-control-sm pager-jump" min="1" max="1" value="1" aria-label="Lompat ke halaman">
+                        <input type="number" id="kupons-custom" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                         <span class="text-secondary" id="kupons-pageLabel">Halaman 1 / 1</span>
                     </div>
                     <div class="d-flex align-items-center gap-2">
@@ -728,7 +730,6 @@
             var total = info.recordsDisplay;
             var start = total ? info.start + 1 : 0;
             $('#kupons-info').text('Menampilkan '+start+'–'+info.end + ' dari ' + total + ' data');
-            $('#kupons-jump').attr('max', pages ? pages : 1).val(pages ? info.page + 1 : 0);
             $('#kupons-pageLabel').text('Halaman ' + (pages ? info.page + 1 : 0) + ' / ' + pages);
             $('#kupons-first').toggleClass('disabled', info.page <= 0);
             $('#kupons-prev').toggleClass('disabled', info.page <= 0);
@@ -741,14 +742,20 @@
         $('#kupons-prev').on('click', function() { kuponTable.page('previous').draw('page'); });
         $('#kupons-next').on('click', function() { kuponTable.page('next').draw('page'); });
         $('#kupons-last').on('click', function() { kuponTable.page('last').draw('page'); });
-        $('#kupons-perPage').on('change', function() { kuponTable.page.len(Number($(this).val())).draw(); });
-        $('#kupons-jump').on('change', function() {
-            var info = kuponTable.page.info();
-            var pages = info.pages > 0 ? info.pages : 1;
+        $('#kupons-perPage').on('change', function() {
+            var v = $(this).val();
+            if (v === 'custom') { $('#kupons-custom').focus(); return; }
+            var n = parseInt(v, 10) || 10;
+            $('#kupons-custom').val(n);
+            kuponTable.page.len(n).draw();
+        });
+        $('#kupons-custom').on('change', function() {
             var n = parseInt($(this).val(), 10) || 1;
-            if (n < 1) { n = 1; }
-            if (n > pages) { n = pages; }
-            kuponTable.page(n - 1).draw('page');
+            n = Math.min(Math.max(n, 1), 500);
+            $(this).val(n);
+            if (['10', '20', '50', '100'].indexOf(String(n)) !== -1) { $('#kupons-perPage').val(String(n)); }
+            else { $('#kupons-perPage').val('custom'); }
+            kuponTable.page.len(n).draw();
         });
         renderKuponsPager();
 

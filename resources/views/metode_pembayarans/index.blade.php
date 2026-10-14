@@ -297,8 +297,10 @@
                                 <option value="10">10 / halaman</option>
                                 <option value="20">20 / halaman</option>
                                 <option value="50">50 / halaman</option>
+                                <option value="100">100 / halaman</option>
+                                <option value="custom">Custom</option>
                             </select>
-                            <input type="number" id="metodePembayarans-jump" class="form-control form-control-sm pager-jump" min="1" max="1" value="1" aria-label="Lompat ke halaman">
+                            <input type="number" id="metodePembayarans-custom" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                             <span class="text-secondary" id="metodePembayarans-pageLabel">Halaman 1 / 1</span>
                         </div>
                         <div class="d-flex align-items-center gap-2">
@@ -665,7 +667,6 @@ $('#metodePembayarans-table').DataTable().ajax.reload(null, true);    });
             var total = info.recordsDisplay;
             var start = total ? info.start + 1 : 0;
             $('#metodePembayarans-info').text('Menampilkan '+start+'–'+info.end + ' dari ' + total + ' data');
-            $('#metodePembayarans-jump').attr('max', pages ? pages : 1).val(pages ? info.page + 1 : 0);
             $('#metodePembayarans-pageLabel').text('Halaman ' + (pages ? info.page + 1 : 0) + ' / ' + pages);
             $('#metodePembayarans-first').toggleClass('disabled', info.page <= 0);
             $('#metodePembayarans-prev').toggleClass('disabled', info.page <= 0);
@@ -678,14 +679,20 @@ $('#metodePembayarans-table').DataTable().ajax.reload(null, true);    });
         $('#metodePembayarans-prev').on('click', function() { metodePembayaransTable.page('previous').draw('page'); });
         $('#metodePembayarans-next').on('click', function() { metodePembayaransTable.page('next').draw('page'); });
         $('#metodePembayarans-last').on('click', function() { metodePembayaransTable.page('last').draw('page'); });
-        $('#metodePembayarans-perPage').on('change', function() { metodePembayaransTable.page.len(Number($(this).val())).draw(); });
-        $('#metodePembayarans-jump').on('change', function() {
-            var info = metodePembayaransTable.page.info();
-            var pages = info.pages > 0 ? info.pages : 1;
+        $('#metodePembayarans-perPage').on('change', function() {
+            var v = $(this).val();
+            if (v === 'custom') { $('#metodePembayarans-custom').focus(); return; }
+            var n = parseInt(v, 10) || 10;
+            $('#metodePembayarans-custom').val(n);
+            metodePembayaransTable.page.len(n).draw();
+        });
+        $('#metodePembayarans-custom').on('change', function() {
             var n = parseInt($(this).val(), 10) || 1;
-            if (n < 1) { n = 1; }
-            if (n > pages) { n = pages; }
-            metodePembayaransTable.page(n - 1).draw('page');
+            n = Math.min(Math.max(n, 1), 500);
+            $(this).val(n);
+            if (['10', '20', '50', '100'].indexOf(String(n)) !== -1) { $('#metodePembayarans-perPage').val(String(n)); }
+            else { $('#metodePembayarans-perPage').val('custom'); }
+            metodePembayaransTable.page.len(n).draw();
         });
         renderMetodePembayaransPager();
 

@@ -246,8 +246,10 @@
                                     <option value="10">10 / halaman</option>
                                     <option value="20">20 / halaman</option>
                                     <option value="50">50 / halaman</option>
+                                    <option value="100">100 / halaman</option>
+                                    <option value="custom">Custom</option>
                                 </select>
-                                <input type="number" id="komp-pager-jump" class="form-control form-control-sm pager-jump" min="1" value="1" aria-label="Lompat ke halaman">
+                                <input type="number" id="komp-pager-custom" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                                 <span class="text-secondary" id="komp-pager-pages">
                                     Halaman 1 / 1
                                 </span>
@@ -536,11 +538,6 @@
             var pages = Math.max(info.pages, 1);
             var page = info.page + 1;
             $('#komp-pager-pages').text('Halaman ' + (pages ? info.page + 1 : 0) + ' / ' + pages);
-            var $jump = $('#komp-pager-jump');
-            $jump.attr('max', pages);
-            if (document.activeElement !== $jump[0]) {
-                $jump.val(page);
-            }
             $('#komp-pager-first, #komp-pager-prev').toggleClass('disabled', page <= 1);
             $('#komp-pager-next, #komp-pager-last').toggleClass('disabled', page >= pages);
         }
@@ -561,13 +558,19 @@
             kompTable.page('last').draw('page');
         });
         $('#komp-pager-len').on('change', function() {
-            kompTable.page.len(Number($(this).val())).draw();
+            var v = $(this).val();
+            if (v === 'custom') { $('#komp-pager-custom').focus(); return; }
+            var n = parseInt(v, 10) || 10;
+            $('#komp-pager-custom').val(n);
+            kompTable.page.len(n).draw();
         });
-        $('#komp-pager-jump').on('change', function() {
-            var pages = Math.max(kompTable.page.info().pages, 1);
-            var p = parseInt($(this).val(), 10) || 1;
-            p = Math.min(Math.max(p, 1), pages);
-            kompTable.page(p - 1).draw('page');
+        $('#komp-pager-custom').on('change', function() {
+            var n = parseInt($(this).val(), 10) || 1;
+            n = Math.min(Math.max(n, 1), 500);
+            $(this).val(n);
+            if (['10', '20', '50', '100'].indexOf(String(n)) !== -1) { $('#komp-pager-len').val(String(n)); }
+            else { $('#komp-pager-len').val('custom'); }
+            kompTable.page.len(n).draw();
         });
 
     });
