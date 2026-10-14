@@ -96,4 +96,33 @@ class ProfileTest extends TestCase
 
         $this->assertNotNull($user->fresh());
     }
+
+    public function test_photo_can_be_removed(): void
+    {
+        $user = User::factory()->create();
+
+        $folder = public_path('images/users');
+        if (! is_dir($folder)) {
+            mkdir($folder, 0755, true);
+        }
+        $path = 'images/users/test_hapus.jpg';
+        copy(__DIR__ . '/../../public/favicon.ico', public_path($path));
+        $user->forceFill(['photo' => $path])->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->patchJson('/profile', [
+                'name' => $user->name,
+                'email' => $user->email,
+                'remove_photo' => '1',
+            ]);
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('user.photo_url', null);
+
+        $this->assertNull($user->fresh()->photo);
+        $this->assertFileDoesNotExist(public_path($path));
+    }
 }

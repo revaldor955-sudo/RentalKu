@@ -338,6 +338,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else if (vFallback) {
                         vFallback.outerHTML = `<img src="${u.photo_url}" alt="${u.name}" class="pm-avatar-img" id="pmViewAvatarImg">`;
                     }
+                } else {
+                    const vImg = document.getElementById('pmViewAvatarImg');
+                    if (vImg) {
+                        vImg.outerHTML = `<div class="pm-avatar-fallback" id="pmViewAvatarFallback">${u.name.charAt(0).toUpperCase()}</div>`;
+                    }
                 }
 
                 // Update navbar display names across page if present
