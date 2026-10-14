@@ -59,6 +59,14 @@
         .dataTables_processing { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 16px 32px; border-radius: 8px; font-size: 14px; z-index: 100; }
         .dataTables_wrapper { position: relative; }
         .dataTables_filter, .dataTables_length { display: none; }
+        .pager-bar{background:#fff;border:1px solid #edf0ee;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.05);padding:12px 16px;font-size:14px}
+        .pager-bar .text-secondary{font-size:14px;font-weight:500}.pager-select{width:auto;border-radius:10px;font-size:13px;height:34px;padding:6px 28px 6px 10px}
+        .pager-jump{width:72px;border-radius:10px;text-align:center;font-size:13px;height:34px;padding:6px 8px}
+        .pager-btn{border:1px solid #dee2e6;border-radius:10px;color:#1f2937;font-weight:600;background:#fff;font-size:13px;height:34px;display:inline-flex;align-items:center;padding:6px 12px}
+        .pager-btn:hover{border-color:#198754;color:#198754;background:#f5f7f6}
+        .pager-btn.disabled{opacity:0.4;pointer-events:none}
+        .pager-next{background:#198754;border-color:#198754;color:#fff}
+        .pager-next:hover{background:#146c43;border-color:#146c43;color:#fff}
     </style>
 </head>
 <body>
@@ -137,6 +145,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     </thead>
                     <tbody></tbody>
                 </table>
+                <div class="pager-bar mt-3 d-flex flex-wrap align-items-center justify-content-between gap-3" id="contacts-pager">
+                    <div class="text-secondary small" id="contacts-info">Menampilkan 0–0 dari 0 data</div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <select class="form-select form-select-sm pager-select" id="contacts-perpage" aria-label="Jumlah per halaman">
+                            <option value="10">10 / halaman</option>
+                            <option value="20">20 / halaman</option>
+                            <option value="50">50 / halaman</option>
+                        </select>
+                        <input type="number" class="form-control form-control-sm pager-jump" id="contacts-jump" min="1" value="1" aria-label="Lompat ke halaman">
+                        <span class="text-secondary" id="contacts-page-label">Halaman 1 / 1</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-sm pager-btn" id="contacts-first">First</button>
+                        <button type="button" class="btn btn-sm pager-btn" id="contacts-prev" aria-label="Halaman sebelumnya"><i class="bi bi-chevron-left"></i></button>
+                        <button type="button" class="btn btn-sm pager-btn pager-next" id="contacts-next" aria-label="Halaman berikutnya"><i class="bi bi-chevron-right"></i></button>
+                        <button type="button" class="btn btn-sm pager-btn" id="contacts-last">Last</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -219,7 +245,10 @@ document.addEventListener('DOMContentLoaded', function() {
 var CSRF_TOKEN = '{{ csrf_token() }}';
 var currentContactId = null;
 $(document).ready(function() {
-    $('#contacts-table').DataTable({
+    var contactsTable = $('#contacts-table').DataTable({
+        paging: false,
+        info: false,
+        dom: 'frt',
         processing: true,
         serverSide: true,
         ajax: { url: '{{ route("contacts.data") }}', type: 'GET' },
@@ -233,8 +262,33 @@ $(document).ready(function() {
             { data: 'id', orderable: false, searchable: false, className: 'text-center', width: '100px', render: function(data,type,row) { return '<div class="d-flex justify-content-center gap-2"><button type="button" class="action-btn" title="Lihat Detail" onclick="viewContact('+data+')"><i class="bi bi-eye text-primary"></i></button><button type="button" class="action-btn action-btn-danger" title="Hapus" onclick="deleteContact('+data+',\''+escapeHtml(row.nama).replace(/'/g,"\\'")+'\')"><i class="bi bi-trash"></i></button></div>'; } }
         ],
         order: [[5,'desc']],
-        language: { processing:'Memproses...', search:'Cari:', lengthMenu:'Tampilkan _MENU_ data', info:'Menampilkan _START_ sampai _END_ dari _TOTAL_ data', infoEmpty:'Tidak ada data', infoFiltered:'(difilter dari _MAX_ total data)', loadingRecords:'Memuat...', zeroRecords:'Tidak ditemukan data yang cocok', emptyTable:'Belum ada pesan masuk', paginate:{first:'«',last:'»',next:'›',previous:'‹'}, aria:{sortAscending:': aktifkan untuk urut naik', sortDescending:': aktifkan untuk urut turun'} }
+        language: { processing:'Memproses...', search:'Cari:', lengthMenu:'Tampilkan _MENU_ data', info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data', infoEmpty:'Tidak ada data', infoFiltered:'(difilter dari _MAX_ total data)', loadingRecords:'Memuat...', zeroRecords:'Tidak ditemukan data yang cocok', emptyTable:'Belum ada pesan masuk', paginate:{first:'«',last:'»',next:'›',previous:'‹'}, aria:{sortAscending:': aktifkan untuk urut naik', sortDescending:': aktifkan untuk urut turun'} }
     });
+    function renderContactsPager() {
+        var info = contactsTable.page.info();
+        var total=info.recordsDisplay;
+        var start=total?info.start+1:0;
+        var pages=info.pages;
+        $('#contacts-info').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
+        var max = Math.max(pages, 1);
+        $('#contacts-jump').attr('max', max);
+        $('#contacts-jump').val(pages ? (info.page + 1) : 1);
+        $('#contacts-page-label').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
+        var first = (info.page === 0 || info.pages <= 1);
+        var last = (info.pages <= 1 || info.page === info.pages - 1);
+        $('#contacts-first').toggleClass('disabled', first);
+        $('#contacts-prev').toggleClass('disabled', first);
+        $('#contacts-next').toggleClass('disabled', last);
+        $('#contacts-last').toggleClass('disabled', last);
+    }
+    contactsTable.on('draw.dt', renderContactsPager);
+    renderContactsPager();
+    $('#contacts-first').on('click', function() { contactsTable.page('first').draw('page'); });
+    $('#contacts-prev').on('click', function() { contactsTable.page('previous').draw('page'); });
+    $('#contacts-next').on('click', function() { contactsTable.page('next').draw('page'); });
+    $('#contacts-last').on('click', function() { contactsTable.page('last').draw('page'); });
+    $('#contacts-perpage').on('change', function() { contactsTable.page.len($(this).val()).draw(); });
+    $('#contacts-jump').on('change', function() { var info = contactsTable.page.info(); var max = Math.max(info.pages, 1); var n = parseInt($(this).val(), 10) || 1; if (n < 1) n = 1; if (n > max) n = max; contactsTable.page(n - 1).draw('page'); });
 });
 function viewContact(id) {
     $.ajax({ url:'/admin/contacts/'+id+'/detail', type:'GET', dataType:'json', success:function(contact) {
