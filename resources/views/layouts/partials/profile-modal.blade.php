@@ -120,13 +120,9 @@
                                 <div class="pm-info-label"><i class="bi bi-envelope me-1"></i> Email</div>
                                 <div class="pm-info-val" id="pmViewEmail">{{ Auth::user()->email }}</div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-12">
                                 <div class="pm-info-label"><i class="bi bi-telephone me-1"></i> Nomor HP</div>
                                 <div class="pm-info-val" id="pmViewPhone">{{ Auth::user()->phone ?? '-' }}</div>
-                            </div>
-                            <div class="col-6">
-                                <div class="pm-info-label"><i class="bi bi-shield-check me-1"></i> Role</div>
-                                <div class="pm-info-val">{{ Auth::user()->role->name ?? 'User' }}</div>
                             </div>
                             <div class="col-12">
                                 <div class="pm-info-label"><i class="bi bi-geo-alt me-1"></i> Alamat</div>
