@@ -57,6 +57,7 @@
         box-shadow: 0 8px 20px rgba(0,0,0,0.05);
         padding: 12px 16px;
     }
+    .pager-bar .text-secondary { font-size: 14px; font-weight: 500; }
     .pager-select {
         width: auto;
         border-radius: 10px;
