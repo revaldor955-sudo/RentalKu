@@ -186,8 +186,10 @@
                             <option value="10">10 / halaman</option>
                             <option value="20">20 / halaman</option>
                             <option value="50">50 / halaman</option>
+                            <option value="100">100 / halaman</option>
+                            <option value="custom">Custom</option>
                         </select>
-                        <input type="number" id="pengembalian-jump" class="form-control form-control-sm pager-jump" min="1" max="1" value="1" aria-label="Lompat ke halaman">
+                        <input type="number" id="pengembalian-custom" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                         <span class="text-secondary" id="pengembalian-page">Halaman 1 / 1</span>
                     </div>
                     <div class="d-flex align-items-center gap-2">
@@ -378,7 +380,6 @@
             $('#pengembalian-info').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
             var pages = info.pages || 1;
             var page = info.page + 1;
-            $('#pengembalian-jump').attr('max', pages).val(page);
             $('#pengembalian-page').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
             $('#pengembalian-first').toggleClass('disabled', page <= 1);
             $('#pengembalian-prev').toggleClass('disabled', page <= 1);
@@ -393,12 +394,19 @@
         $('#pengembalian-prev').on('click', function() { pengembalianTable.page('previous').draw('page'); });
         $('#pengembalian-next').on('click', function() { pengembalianTable.page('next').draw('page'); });
         $('#pengembalian-last').on('click', function() { pengembalianTable.page('last').draw('page'); });
-        $('#pengembalian-len').on('change', function() { pengembalianTable.page.len(Number($(this).val())).draw(); });
-        $('#pengembalian-jump').on('change', function() {
-            var pages = pengembalianTable.page.info().pages || 1;
+        $('#pengembalian-len').on('change', function() {
+            if ($(this).val() === 'custom') { $('#pengembalian-custom').focus(); return; }
+            var n = Number($(this).val());
+            $('#pengembalian-custom').val(n);
+            pengembalianTable.page.len(n).draw();
+        });
+        $('#pengembalian-custom').on('change', function() {
             var n = parseInt($(this).val(), 10) || 1;
-            n = Math.min(Math.max(n, 1), pages);
-            pengembalianTable.page(n - 1).draw('page');
+            n = Math.min(Math.max(n, 1), 500);
+            $(this).val(n);
+            if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#pengembalian-len').val(String(n)); }
+            else { $('#pengembalian-len').val('custom'); }
+            pengembalianTable.page.len(n).draw();
         });
 
     });

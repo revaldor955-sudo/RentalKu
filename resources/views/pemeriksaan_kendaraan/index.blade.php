@@ -238,8 +238,10 @@
                             <option value="10">10 / halaman</option>
                             <option value="20">20 / halaman</option>
                             <option value="50">50 / halaman</option>
+                            <option value="100">100 / halaman</option>
+                            <option value="custom">Custom</option>
                         </select>
-                        <input type="number" id="pemeriksaan-jump" class="form-control form-control-sm pager-jump" min="1" max="1" value="1" aria-label="Lompat ke halaman">
+                        <input type="number" id="pemeriksaan-custom" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                         <span class="text-secondary" id="pemeriksaan-page">Halaman 1 / 1</span>
                     </div>
                     <div class="d-flex align-items-center gap-2">
@@ -733,7 +735,6 @@
             $('#pemeriksaan-info').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
             var pages = info.pages || 1;
             var page = info.page + 1;
-            $('#pemeriksaan-jump').attr('max', pages).val(page);
             $('#pemeriksaan-page').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
             $('#pemeriksaan-first').toggleClass('disabled', page <= 1);
             $('#pemeriksaan-prev').toggleClass('disabled', page <= 1);
@@ -748,12 +749,19 @@
         $('#pemeriksaan-prev').on('click', function() { pemeriksaanTable.page('previous').draw('page'); });
         $('#pemeriksaan-next').on('click', function() { pemeriksaanTable.page('next').draw('page'); });
         $('#pemeriksaan-last').on('click', function() { pemeriksaanTable.page('last').draw('page'); });
-        $('#pemeriksaan-len').on('change', function() { pemeriksaanTable.page.len(Number($(this).val())).draw(); });
-        $('#pemeriksaan-jump').on('change', function() {
-            var pages = pemeriksaanTable.page.info().pages || 1;
+        $('#pemeriksaan-len').on('change', function() {
+            if ($(this).val() === 'custom') { $('#pemeriksaan-custom').focus(); return; }
+            var n = Number($(this).val());
+            $('#pemeriksaan-custom').val(n);
+            pemeriksaanTable.page.len(n).draw();
+        });
+        $('#pemeriksaan-custom').on('change', function() {
             var n = parseInt($(this).val(), 10) || 1;
-            n = Math.min(Math.max(n, 1), pages);
-            pemeriksaanTable.page(n - 1).draw('page');
+            n = Math.min(Math.max(n, 1), 500);
+            $(this).val(n);
+            if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#pemeriksaan-len').val(String(n)); }
+            else { $('#pemeriksaan-len').val('custom'); }
+            pemeriksaanTable.page.len(n).draw();
         });
 
     });

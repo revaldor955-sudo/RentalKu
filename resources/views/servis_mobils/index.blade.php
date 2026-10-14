@@ -283,8 +283,10 @@
                                 <option value="10">10 / halaman</option>
                                 <option value="20">20 / halaman</option>
                                 <option value="50">50 / halaman</option>
+                                <option value="100">100 / halaman</option>
+                                <option value="custom">Custom</option>
                             </select>
-                            <input type="number" class="form-control form-control-sm pager-jump" id="servis-jump" min="1" value="1" aria-label="Lompat ke halaman">
+                            <input type="number" class="form-control form-control-sm pager-jump" id="servis-custom" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                             <span class="text-secondary" id="servis-page-label">Halaman 1 / 1</span>
                         </div>
                         <div class="d-flex align-items-center gap-2">
@@ -730,9 +732,6 @@ order: [],
             var start=total?info.start+1:0;
             var pages=info.pages;
             $('#servis-info').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
-            var max = Math.max(pages, 1);
-            $('#servis-jump').attr('max', max);
-            $('#servis-jump').val(pages ? (info.page + 1) : 1);
             $('#servis-page-label').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
             var first = (info.page === 0 || info.pages <= 1);
             var last = (info.pages <= 1 || info.page === info.pages - 1);
@@ -747,8 +746,20 @@ order: [],
         $('#servis-prev').on('click', function() { servisTable.page('previous').draw('page'); });
         $('#servis-next').on('click', function() { servisTable.page('next').draw('page'); });
         $('#servis-last').on('click', function() { servisTable.page('last').draw('page'); });
-        $('#servis-perpage').on('change', function() { servisTable.page.len($(this).val()).draw(); });
-        $('#servis-jump').on('change', function() { var info = servisTable.page.info(); var max = Math.max(info.pages, 1); var n = parseInt($(this).val(), 10) || 1; if (n < 1) n = 1; if (n > max) n = max; servisTable.page(n - 1).draw('page'); });
+        $('#servis-perpage').on('change', function() {
+            if ($(this).val() === 'custom') { $('#servis-custom').focus(); return; }
+            var n = Number($(this).val());
+            $('#servis-custom').val(n);
+            servisTable.page.len(n).draw();
+        });
+        $('#servis-custom').on('change', function() {
+            var n = parseInt($(this).val(), 10) || 1;
+            n = Math.min(Math.max(n, 1), 500);
+            $(this).val(n);
+            if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#servis-perpage').val(String(n)); }
+            else { $('#servis-perpage').val('custom'); }
+            servisTable.page.len(n).draw();
+        });
 
     });
 
