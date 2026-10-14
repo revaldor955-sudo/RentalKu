@@ -528,8 +528,10 @@
                             <option value="10">10 / halaman</option>
                             <option value="20">20 / halaman</option>
                             <option value="50">50 / halaman</option>
+                            <option value="100">100 / halaman</option>
+                            <option value="custom">Custom</option>
                         </select>
-                        <input type="number" id="pager-jump-mobils" class="form-control form-control-sm pager-jump" min="1" value="1" aria-label="Lompat ke halaman">
+                        <input type="number" id="pager-custom-mobils" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                         <span class="text-secondary" id="pager-page-mobils">Halaman 1 / 1</span>
                     </div>
                     <div class="d-flex align-items-center gap-2">
@@ -1568,11 +1570,6 @@
             var pages=info.pages;
             $('#pager-page-mobils').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
             var page=pages?info.page+1:0;
-            var $jump = $('#pager-jump-mobils');
-            $jump.attr('max', pages);
-            if (!$jump.is(':focus')) {
-                $jump.val(page);
-            }
             $('#pager-first-mobils, #pager-prev-mobils').toggleClass('disabled', page <= 1);
             $('#pager-next-mobils, #pager-last-mobils').toggleClass('disabled', page >= pages);
         }
@@ -1590,14 +1587,18 @@
             tabelMobils.page('last').draw('page');
         });
         $('#pager-len-mobils').on('change', function() {
-            tabelMobils.page.len(Number($(this).val())).draw();
+            if ($(this).val() === 'custom') { $('#pager-custom-mobils').focus(); return; }
+            var n = Number($(this).val());
+            $('#pager-custom-mobils').val(n);
+            tabelMobils.page.len(n).draw();
         });
-        $('#pager-jump-mobils').on('change', function() {
-            var pages = tabelMobils.page.info().pages || 1;
+        $('#pager-custom-mobils').on('change', function() {
             var n = parseInt($(this).val(), 10) || 1;
-            n = Math.min(Math.max(n, 1), pages);
+            n = Math.min(Math.max(n, 1), 500);
             $(this).val(n);
-            tabelMobils.page(n - 1).draw('page');
+            if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#pager-len-mobils').val(String(n)); }
+            else { $('#pager-len-mobils').val('custom'); }
+            tabelMobils.page.len(n).draw();
         });
         tabelMobils.on('draw.dt', renderPagerMobils);
         renderPagerMobils();

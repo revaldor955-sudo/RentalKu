@@ -258,8 +258,10 @@
                                 <option value="10">10 / halaman</option>
                                 <option value="20">20 / halaman</option>
                                 <option value="50">50 / halaman</option>
+                                <option value="100">100 / halaman</option>
+                                <option value="custom">Custom</option>
                             </select>
-                            <input type="number" id="pager-jump-cabangs" class="form-control form-control-sm pager-jump" min="1" value="1" aria-label="Lompat ke halaman">
+                            <input type="number" id="pager-custom-cabangs" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                             <span class="text-secondary" id="pager-page-cabangs">Halaman 1 / 1</span>
                         </div>
                         <div class="d-flex align-items-center gap-2">
@@ -570,11 +572,6 @@
             var pages=info.pages;
             $('#pager-page-cabangs').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
             var page=pages?info.page+1:0;
-            var $jump = $('#pager-jump-cabangs');
-            $jump.attr('max', pages);
-            if (!$jump.is(':focus')) {
-                $jump.val(page);
-            }
             $('#pager-first-cabangs, #pager-prev-cabangs').toggleClass('disabled', page <= 1);
             $('#pager-next-cabangs, #pager-last-cabangs').toggleClass('disabled', page >= pages);
         }
@@ -592,14 +589,18 @@
             tabelCabangs.page('last').draw('page');
         });
         $('#pager-len-cabangs').on('change', function() {
-            tabelCabangs.page.len(Number($(this).val())).draw();
+            if ($(this).val() === 'custom') { $('#pager-custom-cabangs').focus(); return; }
+            var n = Number($(this).val());
+            $('#pager-custom-cabangs').val(n);
+            tabelCabangs.page.len(n).draw();
         });
-        $('#pager-jump-cabangs').on('change', function() {
-            var pages = tabelCabangs.page.info().pages || 1;
+        $('#pager-custom-cabangs').on('change', function() {
             var n = parseInt($(this).val(), 10) || 1;
-            n = Math.min(Math.max(n, 1), pages);
+            n = Math.min(Math.max(n, 1), 500);
             $(this).val(n);
-            tabelCabangs.page(n - 1).draw('page');
+            if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#pager-len-cabangs').val(String(n)); }
+            else { $('#pager-len-cabangs').val('custom'); }
+            tabelCabangs.page.len(n).draw();
         });
         tabelCabangs.on('draw.dt', renderPagerCabangs);
         renderPagerCabangs();
