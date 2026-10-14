@@ -20,7 +20,7 @@
             <ul class="navbar-nav mx-auto">
 
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/') }}">
+                    <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ url('/') }}">
                         Beranda
                     </a>
                 </li>
@@ -32,7 +32,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('katalog.index') }}">
+                    <a class="nav-link {{ request()->routeIs('katalog.index', 'mobils.show') ? 'active' : '' }}" href="{{ route('katalog.index') }}">
                         Katalog
                     </a>
                 </li>

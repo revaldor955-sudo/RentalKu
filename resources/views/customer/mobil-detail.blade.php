@@ -86,6 +86,15 @@
             left: 20%;
         }
 
+        .navbar-nav .nav-link.active {
+            color: var(--primary) !important;
+        }
+
+        .navbar-nav .nav-link.active::after {
+            width: 60%;
+            left: 20%;
+        }
+
         .nav-btn-ghost {
             border: none !important;
             outline: none !important;
