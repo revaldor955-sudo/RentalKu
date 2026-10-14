@@ -326,8 +326,10 @@
                                     <option value="10">10 / halaman</option>
                                     <option value="20">20 / halaman</option>
                                     <option value="50">50 / halaman</option>
+                                    <option value="100">100 / halaman</option>
+                                    <option value="custom">Custom</option>
                                 </select>
-                                <input type="number" id="kompensasi-jump" class="form-control form-control-sm pager-jump" min="1" max="1" value="1" aria-label="Lompat ke halaman">
+                                <input type="number" id="kompensasi-custom" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                                 <span class="text-secondary" id="kompensasi-page">Halaman 1 / 1</span>
                             </div>
                             <div class="d-flex align-items-center gap-2">
@@ -815,7 +817,6 @@
                 $('#kompensasi-info').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
                 var pages = info.pages || 1;
                 var page = info.page + 1;
-                $('#kompensasi-jump').attr('max', pages).val(page);
                 $('#kompensasi-page').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
                 $('#kompensasi-first').toggleClass('disabled', page <= 1);
                 $('#kompensasi-prev').toggleClass('disabled', page <= 1);
@@ -830,12 +831,20 @@
             $('#kompensasi-prev').on('click', function() { kompensasiTable.page('previous').draw('page'); });
             $('#kompensasi-next').on('click', function() { kompensasiTable.page('next').draw('page'); });
             $('#kompensasi-last').on('click', function() { kompensasiTable.page('last').draw('page'); });
-            $('#kompensasi-len').on('change', function() { kompensasiTable.page.len(Number($(this).val())).draw(); });
-            $('#kompensasi-jump').on('change', function() {
-                var pages = kompensasiTable.page.info().pages || 1;
+            $('#kompensasi-len').on('change', function() {
+                var v = $(this).val();
+                if (v === 'custom') { $('#kompensasi-custom').focus(); return; }
+                var n = parseInt(v, 10) || 10;
+                $('#kompensasi-custom').val(n);
+                kompensasiTable.page.len(n).draw();
+            });
+            $('#kompensasi-custom').on('change', function() {
                 var n = parseInt($(this).val(), 10) || 1;
-                n = Math.min(Math.max(n, 1), pages);
-                kompensasiTable.page(n - 1).draw('page');
+                n = Math.min(Math.max(n, 1), 500);
+                $(this).val(n);
+                if (['10', '20', '50', '100'].indexOf(String(n)) !== -1) { $('#kompensasi-len').val(String(n)); }
+                else { $('#kompensasi-len').val('custom'); }
+                kompensasiTable.page.len(n).draw();
             });
 
             @if(request('baru'))
