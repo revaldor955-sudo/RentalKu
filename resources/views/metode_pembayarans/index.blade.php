@@ -94,6 +94,15 @@
             padding: 24px;
         }
 
+        .pager-bar{background:#fff;border:1px solid #edf0ee;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.05);padding:12px 16px;font-size:14px}
+        .pager-bar .text-secondary{font-size:14px;font-weight:500}.pager-select{width:auto;border-radius:10px;font-size:13px;height:34px;padding:6px 28px 6px 10px}
+        .pager-jump{width:72px;border-radius:10px;text-align:center;font-size:13px;height:34px;padding:6px 8px}
+        .pager-btn{border:1px solid #dee2e6;border-radius:10px;color:#1f2937;font-weight:600;background:#fff;font-size:13px;height:34px;display:inline-flex;align-items:center;padding:6px 12px}
+        .pager-btn:hover{border-color:#198754;color:#198754;background:#f5f7f6}
+        .pager-btn.disabled{opacity:0.4;pointer-events:none}
+        .pager-next{background:#198754;border-color:#198754;color:#fff}
+        .pager-next:hover{background:#146c43;border-color:#146c43;color:#fff}
+
         @media (max-width: 1024px) {
             .page-content {
                 padding: 16px;
@@ -280,6 +289,25 @@
                         </tbody>
 
                     </table>
+
+                    <div class="pager-bar mt-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                        <div class="text-secondary small" id="metodePembayarans-info">Menampilkan 0–0 dari 0 data</div>
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <select id="metodePembayarans-perPage" class="form-select form-select-sm pager-select" aria-label="Jumlah per halaman">
+                                <option value="10">10 / halaman</option>
+                                <option value="20">20 / halaman</option>
+                                <option value="50">50 / halaman</option>
+                            </select>
+                            <input type="number" id="metodePembayarans-jump" class="form-control form-control-sm pager-jump" min="1" max="1" value="1" aria-label="Lompat ke halaman">
+                            <span class="text-secondary" id="metodePembayarans-pageLabel">Halaman 1 / 1</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-sm pager-btn" id="metodePembayarans-first">First Page</button>
+                            <button type="button" class="btn btn-sm pager-btn" id="metodePembayarans-prev" aria-label="Halaman sebelumnya"><i class="bi bi-chevron-left"></i></button>
+                            <button type="button" class="btn btn-sm pager-btn pager-next" id="metodePembayarans-next" aria-label="Halaman berikutnya"><i class="bi bi-chevron-right"></i></button>
+                            <button type="button" class="btn btn-sm pager-btn" id="metodePembayarans-last">Last Page</button>
+                        </div>
+                    </div>
 
                 </div>
 
@@ -548,9 +576,12 @@ $('#metodePembayarans-table').DataTable().ajax.reload(null, true);    });
 
     $(document).ready(function() {
 
-        $('#metodePembayarans-table').DataTable({
+        var metodePembayaransTable = $('#metodePembayarans-table').DataTable({
             processing: true,
             serverSide: true,
+            paging: false,
+            info: false,
+            dom: 'frt',
             ajax: {
                 url: '{{ route('metode_pembayarans.data') }}',
                 type: 'GET',
@@ -627,6 +658,36 @@ $('#metodePembayarans-table').DataTable().ajax.reload(null, true);    });
                 },
             },
         });
+
+        function renderMetodePembayaransPager() {
+            var info = metodePembayaransTable.page.info();
+            var pages = info.pages;
+            var total = info.recordsDisplay;
+            var start = total ? info.start + 1 : 0;
+            $('#metodePembayarans-info').text('Menampilkan '+start+'–'+info.end + ' dari ' + total + ' data');
+            $('#metodePembayarans-jump').attr('max', pages ? pages : 1).val(pages ? info.page + 1 : 0);
+            $('#metodePembayarans-pageLabel').text('Halaman ' + (pages ? info.page + 1 : 0) + ' / ' + pages);
+            $('#metodePembayarans-first').toggleClass('disabled', info.page <= 0);
+            $('#metodePembayarans-prev').toggleClass('disabled', info.page <= 0);
+            $('#metodePembayarans-next').toggleClass('disabled', info.page >= pages - 1);
+            $('#metodePembayarans-last').toggleClass('disabled', info.page >= pages - 1);
+        }
+
+        $('#metodePembayarans-table').on('draw.dt', renderMetodePembayaransPager);
+        $('#metodePembayarans-first').on('click', function() { metodePembayaransTable.page('first').draw('page'); });
+        $('#metodePembayarans-prev').on('click', function() { metodePembayaransTable.page('previous').draw('page'); });
+        $('#metodePembayarans-next').on('click', function() { metodePembayaransTable.page('next').draw('page'); });
+        $('#metodePembayarans-last').on('click', function() { metodePembayaransTable.page('last').draw('page'); });
+        $('#metodePembayarans-perPage').on('change', function() { metodePembayaransTable.page.len(Number($(this).val())).draw(); });
+        $('#metodePembayarans-jump').on('change', function() {
+            var info = metodePembayaransTable.page.info();
+            var pages = info.pages > 0 ? info.pages : 1;
+            var n = parseInt($(this).val(), 10) || 1;
+            if (n < 1) { n = 1; }
+            if (n > pages) { n = pages; }
+            metodePembayaransTable.page(n - 1).draw('page');
+        });
+        renderMetodePembayaransPager();
 
     });
 
