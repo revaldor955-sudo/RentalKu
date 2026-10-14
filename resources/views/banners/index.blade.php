@@ -210,8 +210,10 @@
                         <option value="10">10 / halaman</option>
                         <option value="20">20 / halaman</option>
                         <option value="50">50 / halaman</option>
+                        <option value="100">100 / halaman</option>
+                        <option value="custom">Custom</option>
                     </select>
-                    <input type="number" class="form-control form-control-sm pager-jump" id="banners-jump" min="1" value="1" aria-label="Lompat ke halaman">
+                    <input type="number" class="form-control form-control-sm pager-jump" id="banners-custom" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                     <span class="text-secondary" id="banners-page-label">Halaman 1 / 1</span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
@@ -485,9 +487,6 @@
             var start=total?info.start+1:0;
             var pages=info.pages;
             $('#banners-info').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
-            var max = Math.max(pages, 1);
-            $('#banners-jump').attr('max', max);
-            $('#banners-jump').val(pages ? (info.page + 1) : 1);
             $('#banners-page-label').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
             var first = (info.page === 0 || info.pages <= 1);
             var last = (info.pages <= 1 || info.page === info.pages - 1);
@@ -502,8 +501,8 @@
         $('#banners-prev').on('click', function() { bannersTable.page('previous').draw('page'); });
         $('#banners-next').on('click', function() { bannersTable.page('next').draw('page'); });
         $('#banners-last').on('click', function() { bannersTable.page('last').draw('page'); });
-        $('#banners-perpage').on('change', function() { bannersTable.page.len($(this).val()).draw(); });
-        $('#banners-jump').on('change', function() { var info = bannersTable.page.info(); var max = Math.max(info.pages, 1); var n = parseInt($(this).val(), 10) || 1; if (n < 1) n = 1; if (n > max) n = max; bannersTable.page(n - 1).draw('page'); });
+        $('#banners-perpage').on('change', function() { if ($(this).val() === 'custom') { $('#banners-custom').focus(); return; } var n = Number($(this).val()); $('#banners-custom').val(n); bannersTable.page.len(n).draw(); });
+        $('#banners-custom').on('change', function() { var n = parseInt($(this).val(), 10) || 1; n = Math.min(Math.max(n, 1), 500); $(this).val(n); if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#banners-perpage').val(String(n)); } else { $('#banners-perpage').val('custom'); } bannersTable.page.len(n).draw(); });
 
     });
 

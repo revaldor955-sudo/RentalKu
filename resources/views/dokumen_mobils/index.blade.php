@@ -331,8 +331,10 @@
                                     <option value="10">10 / halaman</option>
                                     <option value="20">20 / halaman</option>
                                     <option value="50">50 / halaman</option>
+                                    <option value="100">100 / halaman</option>
+                                    <option value="custom">Custom</option>
                                 </select>
-                                <input type="number" id="dm-pager-jump" class="form-control form-control-sm pager-jump" min="1" value="1" aria-label="Lompat ke halaman">
+                                <input type="number" id="pager-custom-dm" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                                 <span class="text-secondary" id="dm-pager-pages">
                                     Halaman 1 / 1
                                 </span>
@@ -766,11 +768,6 @@ order: [],
             var pages = Math.max(info.pages, 1);
             var page = info.page + 1;
             $('#dm-pager-pages').text('Halaman ' + (pages ? info.page + 1 : 0) + ' / ' + pages);
-            var $jump = $('#dm-pager-jump');
-            $jump.attr('max', pages);
-            if (document.activeElement !== $jump[0]) {
-                $jump.val(page);
-            }
             $('#dm-pager-first, #dm-pager-prev').toggleClass('disabled', page <= 1);
             $('#dm-pager-next, #dm-pager-last').toggleClass('disabled', page >= pages);
         }
@@ -791,13 +788,20 @@ order: [],
             dmTable.page('last').draw('page');
         });
         $('#dm-pager-len').on('change', function() {
-            dmTable.page.len(Number($(this).val())).draw();
+            var v = $(this).val();
+            if (v === 'custom') { $('#pager-custom-dm').focus(); return; }
+            var n = Number(v);
+            $('#pager-custom-dm').val(n);
+            dmTable.page.len(n).draw();
         });
-        $('#dm-pager-jump').on('change', function() {
-            var pages = Math.max(dmTable.page.info().pages, 1);
-            var p = parseInt($(this).val(), 10) || 1;
-            p = Math.min(Math.max(p, 1), pages);
-            dmTable.page(p - 1).draw('page');
+        $('#pager-custom-dm').on('change', function() {
+            var n = parseInt($(this).val(), 10) || 1;
+            n = Math.min(Math.max(n, 1), 500);
+            $(this).val(n);
+            var $len = $('#dm-pager-len');
+            if ($len.find('option[value="' + n + '"]').length) { $len.val(String(n)); }
+            else { $len.val('custom'); }
+            dmTable.page.len(n).draw();
         });
 
     });

@@ -314,8 +314,10 @@
                                     <option value="10">10 / halaman</option>
                                     <option value="20">20 / halaman</option>
                                     <option value="50">50 / halaman</option>
+                                    <option value="100">100 / halaman</option>
+                                    <option value="custom">Custom</option>
                                 </select>
-                                <input type="number" id="fm-pager-jump" class="form-control form-control-sm pager-jump" min="1" value="1" aria-label="Lompat ke halaman">
+                                <input type="number" id="pager-custom-fm" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                                 <span class="text-secondary" id="fm-pager-pages">
                                     Halaman 1 / 1
                                 </span>
@@ -644,11 +646,6 @@ order: [],
             var pages = Math.max(info.pages, 1);
             var page = info.page + 1;
             $('#fm-pager-pages').text('Halaman ' + (pages ? info.page + 1 : 0) + ' / ' + pages);
-            var $jump = $('#fm-pager-jump');
-            $jump.attr('max', pages);
-            if (document.activeElement !== $jump[0]) {
-                $jump.val(page);
-            }
             $('#fm-pager-first, #fm-pager-prev').toggleClass('disabled', page <= 1);
             $('#fm-pager-next, #fm-pager-last').toggleClass('disabled', page >= pages);
         }
@@ -669,13 +666,20 @@ order: [],
             fmTable.page('last').draw('page');
         });
         $('#fm-pager-len').on('change', function() {
-            fmTable.page.len(Number($(this).val())).draw();
+            var v = $(this).val();
+            if (v === 'custom') { $('#pager-custom-fm').focus(); return; }
+            var n = Number(v);
+            $('#pager-custom-fm').val(n);
+            fmTable.page.len(n).draw();
         });
-        $('#fm-pager-jump').on('change', function() {
-            var pages = Math.max(fmTable.page.info().pages, 1);
-            var p = parseInt($(this).val(), 10) || 1;
-            p = Math.min(Math.max(p, 1), pages);
-            fmTable.page(p - 1).draw('page');
+        $('#pager-custom-fm').on('change', function() {
+            var n = parseInt($(this).val(), 10) || 1;
+            n = Math.min(Math.max(n, 1), 500);
+            $(this).val(n);
+            var $len = $('#fm-pager-len');
+            if ($len.find('option[value="' + n + '"]').length) { $len.val(String(n)); }
+            else { $len.val('custom'); }
+            fmTable.page.len(n).draw();
         });
 
     });
