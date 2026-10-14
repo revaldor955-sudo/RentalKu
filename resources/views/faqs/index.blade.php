@@ -260,8 +260,10 @@
                                 <option value="10">10 / halaman</option>
                                 <option value="20">20 / halaman</option>
                                 <option value="50">50 / halaman</option>
+                                <option value="100">100 / halaman</option>
+                                <option value="custom">Custom</option>
                             </select>
-                            <input type="number" class="form-control form-control-sm pager-jump" id="faqs-jump" min="1" value="1" aria-label="Lompat ke halaman">
+                            <input type="number" class="form-control form-control-sm pager-jump" id="pager-custom-faqs" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
                             <span class="text-secondary" id="faqs-page-label">Halaman 1 / 1</span>
                         </div>
                         <div class="d-flex align-items-center gap-2">
@@ -616,9 +618,6 @@
             var start=total?info.start+1:0;
             var pages=info.pages;
             $('#faqs-info').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
-            var max = Math.max(pages, 1);
-            $('#faqs-jump').attr('max', max);
-            $('#faqs-jump').val(pages ? (info.page + 1) : 1);
             $('#faqs-page-label').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
             var first = (info.page === 0 || info.pages <= 1);
             var last = (info.pages <= 1 || info.page === info.pages - 1);
@@ -633,8 +632,8 @@
         $('#faqs-prev').on('click', function() { faqsTable.page('previous').draw('page'); });
         $('#faqs-next').on('click', function() { faqsTable.page('next').draw('page'); });
         $('#faqs-last').on('click', function() { faqsTable.page('last').draw('page'); });
-        $('#faqs-perpage').on('change', function() { faqsTable.page.len($(this).val()).draw(); });
-        $('#faqs-jump').on('change', function() { var info = faqsTable.page.info(); var max = Math.max(info.pages, 1); var n = parseInt($(this).val(), 10) || 1; if (n < 1) n = 1; if (n > max) n = max; faqsTable.page(n - 1).draw('page'); });
+        $('#faqs-perpage').on('change', function() { var v = $(this).val(); if (v === 'custom') { $('#pager-custom-faqs').focus(); return; } var n = Number(v); $('#pager-custom-faqs').val(n); faqsTable.page.len(n).draw(); });
+        $('#pager-custom-faqs').on('change', function() { var n = parseInt($(this).val(), 10) || 1; n = Math.min(Math.max(n, 1), 500); $(this).val(n); var $len = $('#faqs-perpage'); if ($len.find('option[value="' + n + '"]').length) { $len.val(String(n)); } else { $len.val('custom'); } faqsTable.page.len(n).draw(); });
 
     });
 
