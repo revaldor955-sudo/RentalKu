@@ -377,6 +377,10 @@ Route::get('/katalog', [HomeController::class, 'katalog'])
     ->middleware('guest')
     ->name('katalog.index');
 
+Route::get('/katalog/data', [HomeController::class, 'katalogData'])
+    ->middleware('guest')
+    ->name('katalog.data');
+
 
 /*
 |--------------------------------------------------------------------------
