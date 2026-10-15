@@ -148,6 +148,72 @@
             min-width: 100px;
         }
 
+        .nav-btn-back {
+            border: none;
+            color: #374151;
+            background: transparent;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            font-weight: 600;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .nav-btn-back::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 4px;
+            width: 0;
+            height: 2px;
+            border-radius: 1px;
+            background: #198754;
+            transform: translateX(-50%);
+            transition: width 0.25s ease-out;
+        }
+
+        .nav-btn-back:hover {
+            color: #198754;
+        }
+
+        .nav-btn-back:hover::after,
+        .nav-btn-back:focus-visible::after {
+            width: calc(100% - 24px);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .nav-btn-back::after {
+                transition: none;
+            }
+        }
+
+        .dropdown-item {
+            font-size: 14px;
+            padding: 10px 16px;
+            color: #1f2937;
+            transition: all 0.15s ease;
+        }
+
+        .dropdown-item:hover,
+        .dropdown-item:focus {
+            background: #f5f7f6;
+            color: #198754;
+        }
+
+        .dropdown-item.text-danger:hover,
+        .dropdown-item.text-danger:focus {
+            background: #fee;
+            color: #dc3545;
+        }
+
+        .dropdown-divider {
+            margin: 6px 0;
+            opacity: 0.5;
+        }
+
         .modal-content {
             border: none;
             border-radius: 18px;
@@ -189,9 +255,9 @@
 
             <div class="d-flex gap-2">
 
-                <a href="{{ route('customer.dashboard') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-1"></i>
-                    Dashboard
+                <a href="{{ route('customer.dashboard') }}" class="nav-btn-back">
+                    <i class="bi bi-arrow-left"></i>
+                    Kembali ke Dashboard
                 </a>
 
             </div>
@@ -547,9 +613,8 @@
                                         $('#' + $(input).data('target')).val(rawValue);
                                         });
                                         </script>
-                                        </div>
 
-                            <small class="text-muted" id="nominalHint">Wajib diisi untuk jenis "Pengembalian Dana"</small>
+                            <small class="text-muted d-block" id="nominalHint">Wajib diisi untuk jenis "Pengembalian Dana"</small>
 
                             <label class="form-label fw-semibold mt-3">
                                 Alasan
