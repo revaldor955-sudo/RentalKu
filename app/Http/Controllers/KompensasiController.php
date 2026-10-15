@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Kompensasi;
 use App\Models\Rental;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class KompensasiController extends Controller
 {
@@ -20,7 +24,7 @@ class KompensasiController extends Controller
             ->leftJoin('users as staff', 'kompensasis.staff_id', '=', 'staff.id')
             ->leftJoin('mobils', 'kompensasis.mobil_id', '=', 'mobils.id')
             ->select('kompensasis.*')
-            ->with(['mobil', 'rental', 'customer', 'staff']);
+            ->with(['mobil', 'rental', 'customer', 'staff', 'buktis']);
 
         $recordsTotal = $query->count();
 
@@ -87,6 +91,7 @@ class KompensasiController extends Controller
                 'staff_name' => $item->staff->name ?? '-',
                 'catatan' => $item->catatan,
                 'created_at' => $item->created_at?->format('d/m/Y H:i'),
+                'bukti_urls' => $item->buktis->map(fn ($b) => asset('storage/'.$b->path))->values()->all(),
             ];
         });
 
@@ -104,29 +109,49 @@ class KompensasiController extends Controller
         // terverifikasi; jalur customer (POST /customer/kompensasi): milik sendiri.
         $isPetugas = auth()->user()->roles_id !== 3;
 
+        // Cek kepemilikan didahulukan agar rental milik orang lain tetap 403
+        // walau customer_id input lolos/gagal validasi peran.
+        if ($isPetugas && $request->filled(['rental_id', 'customer_id'])) {
+            $rentalCek = Rental::find($request->input('rental_id'));
+            if ($rentalCek
+                && User::where('id', $request->input('customer_id'))->exists()
+                && (int) $rentalCek->user_id !== (int) $request->input('customer_id')) {
+                abort(403, 'Rental ini bukan milik customer tersebut.');
+            }
+        }
+
         $rules = [
-            'mobil_id' => 'required|exists:mobils,id',
+            'mobil_id' => 'nullable|exists:mobils,id',
             'rental_id' => 'required|exists:rentals,id',
             'jenis' => 'required|in:pengembalian_dana,diskon,gratis_sewa',
-            'nominal' => 'required_if:jenis,pengembalian_dana|numeric|min:0',
+            'nominal' => 'nullable|required_if:jenis,pengembalian_dana|numeric|min:0',
             'alasan' => 'required|string',
             'tanggal' => 'required|date|before_or_equal:today',
+            'bukti' => $isPetugas ? 'nullable|array|min:2|max:5' : 'required|array|min:2|max:5',
+            'bukti.*' => $isPetugas ? 'image|mimes:jpg,jpeg,png|max:2048' : 'required|image|mimes:jpg,jpeg,png|max:2048',
         ];
 
         if ($isPetugas) {
-            $rules['customer_id'] = 'required|exists:users,id';
+            $rules['customer_id'] = ['required', Rule::exists('users', 'id')->where('roles_id', 3)];
         }
 
         $validated = $request->validate($rules, [
-            'mobil_id.required' => 'Mobil wajib dipilih',
             'rental_id.required' => 'Rental wajib dipilih',
             'jenis.required' => 'Jenis kompensasi wajib dipilih',
             'nominal.required_if' => 'Nominal wajib diisi untuk pengembalian dana',
             'alasan.required' => 'Alasan wajib diisi',
             'tanggal.required' => 'Tanggal wajib diisi',
-            'tanggal.before_or_equal' => 'Tanggal pembayaran tidak boleh melebihi hari ini.',
+            'tanggal.before_or_equal' => 'Tanggal kejadian tidak boleh melebihi hari ini.',
             'customer_id.required' => 'Customer wajib dipilih',
             'customer_id.exists' => 'Customer tidak valid.',
+            'bukti.required' => 'Bukti foto wajib diunggah (minimal 2, maksimal 5).',
+            'bukti.array' => 'Bukti foto tidak valid.',
+            'bukti.min' => 'Bukti foto minimal 2 file.',
+            'bukti.max' => 'Bukti foto maksimal 5 file.',
+            'bukti.*.required' => 'Setiap bukti foto wajib diisi.',
+            'bukti.*.image' => 'Setiap bukti harus berupa gambar.',
+            'bukti.*.mimes' => 'Bukti foto harus berformat jpg, jpeg, atau png.',
+            'bukti.*.max' => 'Ukuran setiap bukti maksimal 2MB.',
         ]);
 
         if ($isPetugas) {
@@ -149,6 +174,21 @@ class KompensasiController extends Controller
             if (! $rental) {
                 abort(403, 'Rental ini bukan milik Anda.');
             }
+        }
+
+        // Klaim hanya boleh dibuat untuk rental yang sudah selesai.
+        if ($rental->status !== 'Selesai') {
+            $pesanSelesai = 'Klaim hanya bisa dibuat untuk rental yang sudah selesai.';
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => $pesanSelesai,
+                    'errors' => ['rental_id' => [$pesanSelesai]],
+                ], 422);
+            }
+
+            return back()
+                ->withErrors(['rental_id' => $pesanSelesai])
+                ->withInput();
         }
 
         $validated['status'] = 'diajukan';
@@ -177,7 +217,30 @@ class KompensasiController extends Controller
             $validated['nominal'] = 0;
         }
 
-        Kompensasi::create($validated);
+        // File disimpan dulu ke disk; DB hanya di dalam transaksi. Bila transaksi
+        // gagal, file yang sudah tersimpan dibersihkan agar tak jadi orphan.
+        $paths = [];
+        foreach ((array) $request->file('bukti', []) as $file) {
+            $paths[] = [
+                'path' => $file->store('bukti_kompensasi', 'public'),
+                'original_name' => $file->getClientOriginalName(),
+            ];
+        }
+
+        try {
+            DB::transaction(function () use ($validated, $paths) {
+                $data = $validated;
+                unset($data['bukti']);
+                $kompensasi = Kompensasi::create($data);
+                foreach ($paths as $bukti) {
+                    $kompensasi->buktis()->create($bukti);
+                }
+            });
+        } catch (\Throwable $e) {
+            Storage::disk('public')->delete(array_column($paths, 'path'));
+
+            throw $e;
+        }
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -218,6 +281,7 @@ class KompensasiController extends Controller
             if ($request->wantsJson()) {
                 return response()->json([
                     'message' => $pesan,
+                    'errors' => ['status' => [$pesan]],
                 ], 422);
             }
 
@@ -250,7 +314,9 @@ class KompensasiController extends Controller
     public function destroy(Request $request, Kompensasi $kompensasi)
     {
         if (auth()->user()->roles_id === 3) abort(403, 'Anda tidak memiliki akses.');
+        $paths = $kompensasi->buktis->pluck('path')->all();
         $kompensasi->delete();
+        Storage::disk('public')->delete($paths);
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -283,7 +349,7 @@ class KompensasiController extends Controller
         $query = Kompensasi::query()
             ->leftJoin('mobils', 'kompensasis.mobil_id', '=', 'mobils.id')
             ->select('kompensasis.*')
-            ->with(['mobil', 'rental', 'staff'])
+            ->with(['mobil', 'rental', 'staff', 'buktis'])
             ->where('kompensasis.customer_id', auth()->id());
 
         $recordsTotal = $query->count();
@@ -345,6 +411,7 @@ class KompensasiController extends Controller
                 'staff_name' => $item->staff->name ?? '-',
                 'catatan' => $item->catatan,
                 'created_at' => $item->created_at?->format('d/m/Y H:i'),
+                'bukti_urls' => $item->buktis->map(fn ($b) => asset('storage/'.$b->path))->values()->all(),
             ];
         });
 

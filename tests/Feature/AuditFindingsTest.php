@@ -153,6 +153,49 @@ class AuditFindingsTest extends TestCase
         $this->assertDatabaseMissing('kompensasis', ['rental_id' => $rental->id]);
     }
 
+    // Bukti: customer wajib min 2, petugas boleh tanpa bukti.
+    public function test_customer_tanpa_bukti_ditolak(): void
+    {
+        $rental = $this->buatRental($this->customer);
+
+        $this->actingAs($this->customer)
+            ->postJson('/customer/kompensasi', $this->klaimPayload($rental))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('bukti');
+
+        $this->assertDatabaseMissing('kompensasis', ['rental_id' => $rental->id]);
+    }
+
+    public function test_customer_dengan_dua_bukti_sukses(): void
+    {
+        Storage::fake('public');
+        $rental = $this->buatRental($this->customer);
+
+        $this->actingAs($this->customer)
+            ->post('/customer/kompensasi', array_merge($this->klaimPayload($rental), [
+                'bukti' => [
+                    UploadedFile::fake()->image('bukti1.jpg'),
+                    UploadedFile::fake()->image('bukti2.jpg'),
+                ],
+            ]))
+            ->assertRedirect(route('customer.kompensasi.index'));
+
+        $kompensasi = Kompensasi::where('rental_id', $rental->id)->firstOrFail();
+        $this->assertSame(2, $kompensasi->buktis()->count());
+    }
+
+    public function test_admin_ditolak_rental_belum_selesai(): void
+    {
+        $rental = $this->buatRental($this->customer, 'Disetujui');
+
+        $this->actingAs($this->admin)
+            ->postJson('/kompensasis', $this->klaimPayload($rental, ['customer_id' => $this->customer->id]))
+            ->assertStatus(422)
+            ->assertJsonPath('errors.rental_id.0', 'Klaim hanya bisa dibuat untuk rental yang sudah selesai.');
+
+        $this->assertDatabaseMissing('kompensasis', ['rental_id' => $rental->id]);
+    }
+
     // U-03: kuota tidak boleh di bawah terpakai.
     private function kuponPayload(Kupon $kupon, array $extra = []): array
     {
