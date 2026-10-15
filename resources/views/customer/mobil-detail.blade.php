@@ -449,7 +449,11 @@
 
 <body>
 
+@if(auth()->check() && (auth()->user()->role->name ?? '') === 'Customer')
+@include('layouts.partials.customer-nav')
+@else
 @include('layouts.partials.navbar')
+@endif
 
 <div class="container py-4" style="padding-top: 84px !important;">
 
@@ -1076,7 +1080,12 @@
         }
     }, true);
 })();
+
 </script>
+
+@auth
+@include('layouts.partials.profile-modal')
+@endauth
 
 </body>
 </html>
