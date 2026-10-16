@@ -20,7 +20,8 @@ use Illuminate\Notifications\Notifiable;
 ])]
 #[Hidden([
     'password',
-    'remember_token'
+    'remember_token',
+    'otp_code'
 ])]
 class User extends Authenticatable
 {
@@ -31,6 +32,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'otp_expires_at' => 'datetime',
         ];
     }
     public function role()

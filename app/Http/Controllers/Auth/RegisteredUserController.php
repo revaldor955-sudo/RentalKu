@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OtpMail;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -10,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -42,6 +44,8 @@ class RegisteredUserController extends Controller
             'address.required' => 'Alamat wajib diisi.',
         ]);
 
+        $code = (string) random_int(100000, 999999);
+
         $customerRole = Role::where('name', 'Customer')->first();
 
         if (! $customerRole) {
@@ -57,14 +61,18 @@ class RegisteredUserController extends Controller
             'phone' => $request->phone,
             'address' => $request->address,
             'password' => Hash::make($request->password),
+            'otp_code' => Hash::make($code),
+            'otp_expires_at' => now()->addMinutes(5),
         ]);
         $user->roles_id = $customerRole->id;
         $user->save();
+
+        Mail::to($user->email)->send(new OtpMail($code, $user->name));
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('customer.dashboard', absolute: false));
+        return redirect(route('otp.show'))->with('status', 'Akun berhasil dibuat. Silahkan cek email untuk kode OTP.');
     }
 }
