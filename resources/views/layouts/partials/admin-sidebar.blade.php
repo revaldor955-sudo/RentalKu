@@ -92,17 +92,6 @@
                 <div class="section-label" data-section-label="master">Master Data</div>
                 <ul class="nav-list" role="list">
                     <li class="nav-item">
-                        <a href="{{ route($sidebarMobilRoute) }}"
-                            class="nav-link {{ request()->routeIs($sidebarMobilPattern) ? 'active' : '' }}"
-                            aria-current="{{ request()->routeIs($sidebarMobilPattern) ? 'page' : 'false' }}">
-                            <i class="bi bi-car-front-fill nav-icon" aria-hidden="true"></i>
-                            <span class="nav-text">Kelola Mobil</span>
-                            @if (($totalMobils ?? 0) > 0)
-                                <span class="nav-badge">{{ $totalMobils }}</span>
-                            @endif
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a href="{{ route('brands.index') }}"
                             class="nav-link {{ request()->routeIs('brands*') ? 'active' : '' }}"
                             aria-current="{{ request()->routeIs('brands*') ? 'page' : 'false' }}">
@@ -148,6 +137,17 @@
             <div class="sidebar-section" data-section="operational">
                 <div class="section-label" data-section-label="operational">Operasional</div>
                 <ul class="nav-list" role="list">
+                    <li class="nav-item">
+                        <a href="{{ route($sidebarMobilRoute) }}"
+                            class="nav-link {{ request()->routeIs($sidebarMobilPattern) ? 'active' : '' }}"
+                            aria-current="{{ request()->routeIs($sidebarMobilPattern) ? 'page' : 'false' }}">
+                            <i class="bi bi-car-front-fill nav-icon" aria-hidden="true"></i>
+                            <span class="nav-text">Kelola Mobil</span>
+                            @if (($totalMobils ?? 0) > 0)
+                                <span class="nav-badge">{{ $totalMobils }}</span>
+                            @endif
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a href="{{ route('rentals.index') }}"
                             class="nav-link {{ request()->routeIs('rentals*') ? 'active' : '' }}"
