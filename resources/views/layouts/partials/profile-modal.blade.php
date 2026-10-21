@@ -45,8 +45,8 @@
         letter-spacing: 0.05em;
         padding: 3px 10px;
         border-radius: 20px;
-        background: rgba(25, 135, 84, 0.12);
-        color: #198754;
+        background: #d1e7dd;
+        color: #0f5132;
     }
     .pm-info-label {
         font-size: 11px;
@@ -84,10 +84,27 @@
         background: #146c43;
         transform: scale(1.08);
     }
+    #profileModal .form-control:focus {
+        border-color: #198754;
+        box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.15);
+    }
+    /* Heading modal pakai Montserrat; fallback ke Poppins/system-ui di halaman admin/staff. */
+    #profileModal .modal-title {
+        font-family: 'Montserrat', 'Poppins', system-ui, sans-serif;
+        letter-spacing: -0.02em;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .pm-upload-btn {
+            transition: none;
+        }
+        .pm-upload-btn:hover {
+            transform: none;
+        }
+    }
 </style>
 
 <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
 
             @include('layouts.partials.modal-head', [
@@ -156,11 +173,11 @@
                         </div>
 
                         <div class="d-flex align-items-center justify-content-center gap-2">
-                            <label for="pmPhotoInput" class="btn btn-sm btn-light border text-secondary cursor-pointer">
-                                Choose Photo
+                            <label for="pmPhotoInput" class="btn btn-sm btn-light border text-secondary">
+                                Pilih Foto
                             </label>
                             <button type="button" class="btn btn-sm btn-link text-danger p-0 text-decoration-none {{ Auth::user()->photo ? '' : 'd-none' }}" id="pmRemovePhotoBtn">
-                                Remove
+                                Hapus
                             </button>
                         </div>
                         <input type="hidden" name="remove_photo" id="pmRemovePhotoVal" value="0">
@@ -177,6 +194,13 @@
                         <label for="pmInputEmail" class="form-label small fw-semibold text-secondary">Alamat Email <span class="text-danger">*</span></label>
                         <input type="email" class="form-control" id="pmInputEmail" name="email" value="{{ Auth::user()->email }}" required>
                         <div class="invalid-feedback small" id="err-email"></div>
+                    </div>
+
+                    <div class="mb-3 d-none" id="pmCurrentPasswordWrap">
+                        <label for="pmInputCurrentPassword" class="form-label small fw-semibold text-secondary">Konfirmasi Password <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="pmInputCurrentPassword" name="current_password" autocomplete="current-password">
+                        <div class="invalid-feedback small" id="err-current_password"></div>
+                        <div class="form-text">Wajib diisi karena Anda mengubah alamat email.</div>
                     </div>
 
                     <div class="mb-3">
@@ -196,13 +220,13 @@
             <div class="modal-footer bg-light border-top-0 rounded-bottom-4 px-4 py-3 d-flex justify-content-end">
                 <div class="d-flex align-items-center gap-2">
                     <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="pmToggleBtn">
-                        <i class="bi bi-pencil me-1"></i> Edit Profile
+                        <i class="bi bi-pencil me-1"></i> Edit Profil
                     </button>
 
                     <button type="button" class="btn btn-success btn-sm rounded-pill px-4 d-none" id="pmSaveBtn">
                         <i class="bi bi-check-lg me-1"></i> Simpan
                     </button>
-                    <button type="button" class="btn btn-light btn-sm rounded-pill px-3 d-none text-secondary" id="pmCancelBtn">
+                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 d-none text-dark" id="pmCancelBtn">
                         Batal
                     </button>
                 </div>
@@ -229,6 +253,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const removeBtn = document.getElementById('pmRemovePhotoBtn');
     const removeVal = document.getElementById('pmRemovePhotoVal');
 
+    const emailInput = document.getElementById('pmInputEmail');
+    const currentPasswordWrap = document.getElementById('pmCurrentPasswordWrap');
+    const currentPasswordInput = document.getElementById('pmInputCurrentPassword');
+
+    function normalizeEmail(value) {
+        return value.trim().toLowerCase();
+    }
+
+    function syncCurrentPassword() {
+        const changed = normalizeEmail(emailInput.value) !== normalizeEmail(emailInput.defaultValue);
+        currentPasswordWrap.classList.toggle('d-none', !changed);
+        currentPasswordInput.required = changed;
+    }
+
+    emailInput.addEventListener('input', syncCurrentPassword);
+
     function clearErrors() {
         document.querySelectorAll('#pmEditForm .is-invalid').forEach(el => el.classList.remove('is-invalid'));
         document.querySelectorAll('#pmEditForm .invalid-feedback').forEach(el => el.textContent = '');
@@ -242,6 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
             saveBtn.classList.remove('d-none');
             cancelBtn.classList.remove('d-none');
             clearErrors();
+            syncCurrentPassword();
         } else {
             viewMode.classList.remove('d-none');
             editForm.classList.add('d-none');
@@ -263,7 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
     modalEl.addEventListener('show.bs.modal', function(e) {
         // If trigger button had data-mode="edit", open directly in edit mode
         const trigger = e.relatedTarget;
-        if (trigger && (trigger.getAttribute('data-mode') === 'edit' || trigger.textContent.trim().includes('Edit Profile'))) {
+        if (trigger && trigger.getAttribute('data-mode') === 'edit') {
             setMode(true);
         } else {
             setMode(false);
@@ -298,6 +339,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Save AJAX
     saveBtn.addEventListener('click', function() {
         clearErrors();
+        if (!editForm.checkValidity()) {
+            editForm.reportValidity();
+            return;
+        }
         saveBtn.disabled = true;
         saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Menyimpan...';
 
@@ -317,6 +362,34 @@ document.addEventListener('DOMContentLoaded', function() {
             saveBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Simpan';
 
             if (status === 200 && body.success) {
+                if (body.requires_verification && body.redirect) {
+                    if (body.mail_failed) {
+                        const modal = window.bootstrap?.Modal?.getInstance(modalEl);
+                        modal?.hide();
+                        const message = body.message || 'Kode OTP gagal dikirim. Silakan coba kirim ulang.';
+                        if (window.Swal) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Kode OTP gagal dikirim',
+                                text: message,
+                                confirmButtonText: 'Ke Halaman Verifikasi',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                borderRadius: '15px'
+                            }).then(() => {
+                                window.location.href = body.redirect;
+                            });
+                        } else {
+                            window.alert(message);
+                            window.location.href = body.redirect;
+                        }
+                        return;
+                    }
+
+                    window.location.href = body.redirect;
+                    return;
+                }
+
                 const u = body.user;
 
                 // Update View UI
@@ -324,6 +397,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('pmViewEmail').textContent = u.email;
                 document.getElementById('pmViewPhone').textContent = u.phone || '-';
                 document.getElementById('pmViewAddress').textContent = u.address || '-';
+
+                // Simpan email server sebagai baseline baru; tanpa ini edit berikutnya mengirim email lama.
+                emailInput.value = u.email;
+                emailInput.defaultValue = u.email;
+                syncCurrentPassword();
 
                 // Update Avatar UI in View & Header/Nav
                 if (u.photo_url) {
@@ -389,7 +467,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 }
                 Object.keys(body.errors).forEach(key => {
-                    const input = document.getElementById('pmInput' + key.charAt(0).toUpperCase() + key.slice(1)) || document.getElementById('pmPhotoInput');
+                    const inputId = key === 'current_password'
+                        ? 'pmInputCurrentPassword'
+                        : 'pmInput' + key.charAt(0).toUpperCase() + key.slice(1);
+                    const input = document.getElementById(inputId) || document.getElementById('pmPhotoInput');
                     const errBox = document.getElementById('err-' + key);
                     if (input) input.classList.add('is-invalid');
                     if (errBox) errBox.textContent = body.errors[key][0];

@@ -30,6 +30,7 @@ class ProfileTest extends TestCase
             ->patch('/profile', [
                 'name' => 'Test User',
                 'email' => 'test@example.com',
+                'current_password' => 'password',
             ]);
 
         $response
@@ -124,5 +125,85 @@ class ProfileTest extends TestCase
 
         $this->assertNull($user->fresh()->photo);
         $this->assertFileDoesNotExist(public_path($path));
+    }
+
+    public function test_profile_email_field_is_editable(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/profile');
+
+        $response->assertOk();
+        $response->assertDontSee('readonly', false);
+    }
+
+    public function test_email_change_requires_current_password(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->from('/profile')
+            ->patch('/profile', [
+                'name' => $user->name,
+                'email' => 'new-email@example.com',
+            ]);
+
+        $response->assertSessionHasErrors('current_password');
+        $this->assertSame($user->email, $user->fresh()->email);
+    }
+
+    public function test_email_change_rejects_incorrect_current_password(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->from('/profile')
+            ->patch('/profile', [
+                'name' => $user->name,
+                'email' => 'new-email@example.com',
+                'current_password' => 'wrong-password',
+            ]);
+
+        $response->assertSessionHasErrors('current_password');
+        $this->assertSame($user->email, $user->fresh()->email);
+    }
+
+    public function test_name_update_with_empty_current_password_is_allowed_when_email_is_unchanged(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->from('/profile')
+            ->patch('/profile', [
+                'name' => 'Nama Baru',
+                'email' => $user->email,
+                'current_password' => '',
+            ]);
+
+        $response->assertRedirect('/profile');
+        $this->assertSame('Nama Baru', $user->fresh()->name);
+    }
+
+    public function test_email_case_change_is_normalized_without_current_password(): void
+    {
+        $user = User::factory()->create(['email' => 'case@example.com']);
+
+        $response = $this
+            ->actingAs($user)
+            ->from('/profile')
+            ->patch('/profile', [
+                'name' => $user->name,
+                'email' => 'CASE@EXAMPLE.COM',
+            ]);
+
+        $response->assertSessionHasNoErrors()->assertRedirect('/profile');
+
+        $user->refresh();
+
+        $this->assertSame('case@example.com', $user->email);
+        $this->assertNotNull($user->email_verified_at);
     }
 }
