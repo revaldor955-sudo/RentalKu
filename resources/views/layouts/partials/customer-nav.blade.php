@@ -61,9 +61,9 @@
                             </div>
                         </li>
                         <li>
-                            <button class="dropdown-item rounded-2 py-2 d-flex align-items-center" type="button" data-bs-toggle="modal" data-bs-target="#profileModal" data-mode="edit">
+                            <button class="dropdown-item rounded-2 py-2 d-flex align-items-center" type="button" data-bs-toggle="modal" data-bs-target="#profileModal">
                                 <i class="bi bi-person-badge me-3 text-secondary"></i>
-                                Edit Profile
+                                Profile
                             </button>
                         </li>
                         <li><hr class="dropdown-divider"></li>
