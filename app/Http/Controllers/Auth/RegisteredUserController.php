@@ -44,8 +44,6 @@ class RegisteredUserController extends Controller
             'address.required' => 'Alamat wajib diisi.',
         ]);
 
-        $code = (string) random_int(100000, 999999);
-
         $customerRole = Role::where('name', 'Customer')->first();
 
         if (! $customerRole) {
@@ -61,11 +59,11 @@ class RegisteredUserController extends Controller
             'address' => $request->address,
             'password' => Hash::make($request->password),
         ]);
-        // roles_id & field OTP di luar Fillable User: set eksplisit (roles_id selalu Customer).
-        $user->otp_code = Hash::make($code);
-        $user->otp_expires_at = now()->addMinutes(5);
+        // roles_id di luar Fillable User: set eksplisit (roles_id selalu Customer).
         $user->roles_id = $customerRole->id;
         $user->save();
+
+        $code = $user->issueOtp();
 
         $mailSent = true;
 
@@ -80,8 +78,12 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('otp.show'))->with('status', $mailSent
-            ? 'Akun berhasil dibuat. Silahkan cek email untuk kode OTP.'
-            : 'Akun berhasil dibuat, tapi kode OTP gagal dikirim. Silahkan klik "Kirim ulang".');
+        if (! $mailSent) {
+            return redirect(route('otp.show'))->withErrors([
+                'resend' => 'Akun berhasil dibuat, tapi kode OTP gagal dikirim. Silahkan klik "Kirim ulang".',
+            ]);
+        }
+
+        return redirect(route('otp.show'))->with('status', 'Akun berhasil dibuat. Silahkan cek email untuk kode OTP.');
     }
 }

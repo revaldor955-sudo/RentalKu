@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 
 #[Fillable([
     'name',
@@ -36,7 +37,27 @@ class User extends Authenticatable
         ];
     }
     public function role()
-{
-    return $this->belongsTo(Role::class, 'roles_id');
-}
+    {
+        return $this->belongsTo(Role::class, 'roles_id');
+    }
+
+    public function issueOtp(): string
+    {
+        $code = (string) random_int(100000, 999999);
+
+        $this->forceFill([
+            'otp_code' => Hash::make($code),
+            'otp_expires_at' => now()->addMinutes(5),
+        ])->save();
+
+        return $code;
+    }
+
+    public function clearOtp(): void
+    {
+        $this->forceFill([
+            'otp_code' => null,
+            'otp_expires_at' => null,
+        ])->save();
+    }
 }

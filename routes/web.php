@@ -335,7 +335,7 @@ Route::get('/dashboard', function () {
         default => redirect()->route('customer.dashboard'),
     };
 })
-    ->middleware(['auth', 'verified'])
+    ->middleware('auth')
     ->name('dashboard');
 
 /*
@@ -603,11 +603,12 @@ Route::middleware('admin')->group(function () {
 // route OTP
 Route::middleware('auth')->group(function () {
     Route::get('/otp', [OtpController::class, 'show'])->name('otp.show');
+    // Bucket route hanya meredam burst; cap 5 salah per user tetap penjaga utama.
     Route::post('/otp', [OtpController::class, 'verify'])
-        ->middleware('throttle:5,1')
+        ->middleware('throttle:10,1,otp-verify')
         ->name('otp.verify');
     Route::post('/otp/resend', [OtpController::class, 'resend'])
-        ->middleware('throttle:3,1')
+        ->middleware('throttle:3,1,otp-resend')
         ->name('otp.resend');
 });
 
