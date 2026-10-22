@@ -10,15 +10,17 @@ class CustomerMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return redirect()->route('login');
         }
 
-        if (auth()->user()->roles_id != 3) {
-            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        $user = auth()->user();
+
+        if ((int) $user->roles_id !== 3) {
+            abort(403, 'Akun ini bukan akun Customer.');
         }
 
-        if (! auth()->user()->email_verified_at) {
+        if (empty($user->email_verified_at)) {
             return redirect()->route('otp.show');
         }
 

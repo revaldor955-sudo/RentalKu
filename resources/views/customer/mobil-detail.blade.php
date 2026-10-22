@@ -807,7 +807,7 @@
                     </div>
                 </div>
 
-                <script>
+                {{-- <script>
                     function updateSupirProfile(select) {
                         const card = document.getElementById('supirProfileCard');
                         const opt = select.options[select.selectedIndex];
@@ -838,7 +838,7 @@
                         dateInputs.forEach(i => i.addEventListener('change', updateSewaButton));
                         updateSewaButton();
                     });
-                </script>
+                </script> --}}
 
                 <div class="form-text mt-2">
                    <i class="bi bi-info-circle me-1"></i>

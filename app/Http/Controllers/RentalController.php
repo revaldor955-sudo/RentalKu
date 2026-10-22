@@ -942,95 +942,104 @@ public function data(Request $request)
     /**
      * Detail rental untuk AJAX
      */
-    public function detail(Rental $rental)
-    {
-        if (auth()->user()->roles_id === 3 && $rental->user_id !== auth()->id()) {
-            abort(403, 'Anda tidak berhak mengakses data rental ini.');
-        }
+    
+/**
+ * Menampilkan detail lengkap rental untuk modal Management Rental.
+ */
+public function detail(Rental $rental)
+{
+    $user = auth()->user();
 
-        $rental->load([
-            'user',
-            'mobil',
-            'cabangAmbil',
-            'cabangKembali',
-            'pembayaran',
-            'rating',
-            'supirs',
-        ]);
-
+    if (!$user) {
         return response()->json([
-            'id' => $rental->id,
-
-            'pelanggan' =>
-                $rental->user->name ?? '-',
-
-            'email' =>
-                $rental->user->email ?? '-',
-
-            'mobil' =>
-                $rental->mobil->name ?? '-',
-
-            'plat' =>
-                $rental->mobil->plate_number ?? '-',
-
-            'tanggal_mulai' =>
-                $rental->tanggal_mulai
-                    ? $rental->tanggal_mulai->format('d/m/Y')
-                    : '-',
-
-            'tanggal_selesai' =>
-                $rental->tanggal_selesai
-                    ? $rental->tanggal_selesai->format('d/m/Y')
-                    : '-',
-
-            'jumlah_hari' =>
-                $rental->jumlah_hari,
-
-            'cabang_ambil' =>
-                $rental->cabangAmbil->name ?? '-',
-
-            'cabang_kembali' =>
-                $rental->cabangKembali->name ?? '-',
-
-            'harga_perhari' =>
-                (float) $rental->harga_perhari,
-
-            'subtotal' =>
-                (float) $rental->subtotal,
-
-            'deposit' =>
-                (float) $rental->deposit,
-
-            'kode_promo' =>
-                $rental->kode_promo ?? '-',
-
-            'diskon' =>
-                (float) ($rental->diskon ?? 0),
-
-            'total_harga' =>
-                (float) $rental->total_harga,
-
-            'status' =>
-                $rental->status,
-
-            'catatan' =>
-                $rental->catatan ?? '-',
-
-            'mobil_image' =>
-                $rental->mobil && $rental->mobil->image
-                    ? asset($rental->mobil->image)
-                    : null,
-
-            'pembayaran' =>
-                $rental->pembayaran,
-
-            'rating' =>
-                $rental->rating,
-
-            'supirs' =>
-                $rental->supirs,
-        ]);
+            'message' => 'Silakan login terlebih dahulu.',
+        ], 401);
     }
+
+    // Customer hanya boleh melihat rental miliknya sendiri.
+    if (
+        (int) $user->roles_id === 3 &&
+        (int) $rental->user_id !== (int) $user->id
+    ) {
+        return response()->json([
+            'message' => 'Anda tidak berhak mengakses data rental ini.',
+        ], 403);
+    }
+
+    $rental->load([
+        'user',
+        'mobil',
+        'cabangAmbil',
+        'cabangKembali',
+        'pembayaran',
+        'rating',
+        'supirs',
+    ]);
+
+    $supirs = $rental->supirs->map(function ($supir) {
+        return [
+            'id' => $supir->id,
+            'nama' => $supir->nama ?? '-',
+            'tarif_perhari' => (float) (
+                $supir->pivot->tarif_perhari
+                ?? $supir->tarif_perhari
+                ?? 0
+            ),
+            'subtotal' => (float) (
+                $supir->pivot->sub_total
+                ?? 0
+            ),
+        ];
+    })->values();
+
+    return response()->json([
+        'id' => $rental->id,
+
+        // Informasi pelanggan
+        'pelanggan' => $rental->user->name ?? '-',
+        'email' => $rental->user->email ?? '-',
+        'telepon' => $rental->user->phone ?? '-',
+        'alamat' => $rental->user->address ?? '-',
+
+        // Informasi mobil
+        'mobil' => $rental->mobil->name ?? '-',
+        'plat' => $rental->mobil->plate_number ?? '-',
+        'mobil_image' => (
+            $rental->mobil && $rental->mobil->image
+        ) ? asset($rental->mobil->image) : null,
+
+        // Periode penyewaan
+        'tanggal_mulai' => $rental->tanggal_mulai
+            ? Carbon::parse($rental->tanggal_mulai)->format('d/m/Y')
+            : '-',
+
+        'tanggal_selesai' => $rental->tanggal_selesai
+            ? Carbon::parse($rental->tanggal_selesai)->format('d/m/Y')
+            : '-',
+
+        'jumlah_hari' => (int) ($rental->jumlah_hari ?? 0),
+
+        // Informasi cabang
+        'cabang_ambil' => $rental->cabangAmbil->name ?? '-',
+        'cabang_kembali' => $rental->cabangKembali->name ?? '-',
+
+        // Rincian biaya
+        'harga_perhari' => (float) ($rental->harga_perhari ?? 0),
+        'subtotal' => (float) ($rental->subtotal ?? 0),
+        'deposit' => (float) ($rental->deposit ?? 0),
+        'kode_promo' => $rental->kode_promo ?? '-',
+        'diskon' => (float) ($rental->diskon ?? 0),
+        'total_harga' => (float) ($rental->total_harga ?? 0),
+
+        // Informasi tambahan
+        'status' => $rental->status,
+        'catatan' => $rental->catatan ?? '-',
+        'supirs' => $supirs,
+        'pembayaran' => $rental->pembayaran,
+        'rating' => $rental->rating,
+    ]);
+}
+
 
     /**
      * Update status rental
