@@ -153,6 +153,49 @@ class AuditFindingsTest extends TestCase
         $this->assertDatabaseMissing('kompensasis', ['rental_id' => $rental->id]);
     }
 
+    // Bukti: customer wajib min 2, petugas boleh tanpa bukti.
+    public function test_customer_tanpa_bukti_ditolak(): void
+    {
+        $rental = $this->buatRental($this->customer);
+
+        $this->actingAs($this->customer)
+            ->postJson('/customer/kompensasi', $this->klaimPayload($rental))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('bukti');
+
+        $this->assertDatabaseMissing('kompensasis', ['rental_id' => $rental->id]);
+    }
+
+    public function test_customer_dengan_dua_bukti_sukses(): void
+    {
+        Storage::fake('public');
+        $rental = $this->buatRental($this->customer);
+
+        $this->actingAs($this->customer)
+            ->post('/customer/kompensasi', array_merge($this->klaimPayload($rental), [
+                'bukti' => [
+                    UploadedFile::fake()->image('bukti1.jpg'),
+                    UploadedFile::fake()->image('bukti2.jpg'),
+                ],
+            ]))
+            ->assertRedirect(route('customer.kompensasi.index'));
+
+        $kompensasi = Kompensasi::where('rental_id', $rental->id)->firstOrFail();
+        $this->assertSame(2, $kompensasi->buktis()->count());
+    }
+
+    public function test_admin_ditolak_rental_belum_selesai(): void
+    {
+        $rental = $this->buatRental($this->customer, 'Disetujui');
+
+        $this->actingAs($this->admin)
+            ->postJson('/kompensasis', $this->klaimPayload($rental, ['customer_id' => $this->customer->id]))
+            ->assertStatus(422)
+            ->assertJsonPath('errors.rental_id.0', 'Klaim hanya bisa dibuat untuk rental yang sudah selesai.');
+
+        $this->assertDatabaseMissing('kompensasis', ['rental_id' => $rental->id]);
+    }
+
     // U-03: kuota tidak boleh di bawah terpakai.
     private function kuponPayload(Kupon $kupon, array $extra = []): array
     {
@@ -243,18 +286,21 @@ class AuditFindingsTest extends TestCase
     // U-06: endpoint publik tetap untuk modal tamu, tanpa data sensitif.
     public function test_tamu_bisa_buka_modal_mobil_tanpa_data_sensitif(): void
     {
-        $this->get("/mobils/{$this->mobil->id}")
+        $this->get("/mobils/{$this->mobil->slug}")
             ->assertOk()
             ->assertSee('Avanza')
             ->assertDontSee('admin@rentalku.test');
 
-        $this->getJson("/mobils/{$this->mobil->id}")->assertOk();
+        $this->getJson("/mobils/{$this->mobil->slug}")->assertOk();
+
+        // URL id lama putus total (slug adalah satu-satunya key URL).
+        $this->get("/mobils/{$this->mobil->id}")->assertNotFound();
     }
 
     // U-07: field liar diabaikan, server penentu nilai sensitif.
     public function test_rental_abaikan_status_dan_total_bawaan_request(): void
     {
-        $this->actingAs($this->customer)->post("/customer/rental/{$this->mobil->id}", [
+        $this->actingAs($this->customer)->post("/customer/rental/{$this->mobil->slug}", [
             'tanggal_mulai' => now()->addDay()->toDateString(),
             'tanggal_selesai' => now()->addDays(3)->toDateString(),
             'cabang_ambil_id' => $this->cabang->id,

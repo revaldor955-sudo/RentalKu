@@ -73,6 +73,14 @@
                 padding: 16px;
             }
         }
+        .pager-bar{background:#fff;border:1px solid #edf0ee;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.05);padding:12px 16px;font-size:14px}
+        .pager-bar .text-secondary{font-size:14px;font-weight:500}.pager-select{width:auto;border-radius:10px;font-size:13px;height:34px;padding:6px 28px 6px 10px}
+        .pager-jump{width:72px;border-radius:10px;text-align:center;font-size:13px;height:34px;padding:6px 8px}
+        .pager-btn{border:1px solid #dee2e6;border-radius:10px;color:#1f2937;font-weight:600;background:#fff;font-size:13px;height:34px;display:inline-flex;align-items:center;padding:6px 12px}
+        .pager-btn:hover{border-color:#198754;color:#198754;background:#f5f7f6}
+        .pager-btn.disabled{opacity:0.4;pointer-events:none}
+        .pager-next{background:#198754;border-color:#198754;color:#fff}
+        .pager-next:hover{background:#146c43;border-color:#146c43;color:#fff}
     </style>
 </head>
 <body>
@@ -110,6 +118,26 @@
                     </thead>
                     <tbody></tbody>
                 </table>
+                <div class="pager-bar mt-3 d-flex flex-wrap align-items-center justify-content-between gap-3" id="ratings-pager">
+                    <div class="text-secondary small" id="ratings-info">Menampilkan 0–0 dari 0 data</div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <select class="form-select form-select-sm pager-select" id="ratings-perpage" aria-label="Jumlah per halaman">
+                            <option value="10">10 / halaman</option>
+                            <option value="20">20 / halaman</option>
+                            <option value="50">50 / halaman</option>
+                            <option value="100">100 / halaman</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                        <input type="number" class="form-control form-control-sm pager-jump" id="ratings-custom" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
+                        <span class="text-secondary" id="ratings-page-label">Halaman 1 / 1</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-sm pager-btn" id="ratings-first">First</button>
+                        <button type="button" class="btn btn-sm pager-btn" id="ratings-prev" aria-label="Halaman sebelumnya"><i class="bi bi-chevron-left"></i></button>
+                        <button type="button" class="btn btn-sm pager-btn pager-next" id="ratings-next" aria-label="Halaman berikutnya"><i class="bi bi-chevron-right"></i></button>
+                        <button type="button" class="btn btn-sm pager-btn" id="ratings-last">Last</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -169,7 +197,10 @@
     }
 
     $(document).ready(function() {
-        $('#ratings-table').DataTable({
+        var ratingsTable = $('#ratings-table').DataTable({
+            paging: false,
+            info: false,
+            dom: 'frt',
             processing: true,
             serverSide: true,
             ajax: {
@@ -244,6 +275,28 @@
                 emptyTable: 'Belum ada ulasan',
             },
         });
+        function renderRatingsPager() {
+            var info = ratingsTable.page.info();
+            var total=info.recordsDisplay;
+            var start=total?info.start+1:0;
+            var pages=info.pages;
+            $('#ratings-info').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
+            $('#ratings-page-label').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
+            var first = (info.page === 0 || info.pages <= 1);
+            var last = (info.pages <= 1 || info.page === info.pages - 1);
+            $('#ratings-first').toggleClass('disabled', first);
+            $('#ratings-prev').toggleClass('disabled', first);
+            $('#ratings-next').toggleClass('disabled', last);
+            $('#ratings-last').toggleClass('disabled', last);
+        }
+        ratingsTable.on('draw.dt', renderRatingsPager);
+        renderRatingsPager();
+        $('#ratings-first').on('click', function() { ratingsTable.page('first').draw('page'); });
+        $('#ratings-prev').on('click', function() { ratingsTable.page('previous').draw('page'); });
+        $('#ratings-next').on('click', function() { ratingsTable.page('next').draw('page'); });
+        $('#ratings-last').on('click', function() { ratingsTable.page('last').draw('page'); });
+        $('#ratings-perpage').on('change', function() { if ($(this).val() === 'custom') { $('#ratings-custom').focus(); return; } var n = Number($(this).val()); $('#ratings-custom').val(n); ratingsTable.page.len(n).draw(); });
+        $('#ratings-custom').on('change', function() { var n = parseInt($(this).val(), 10) || 1; n = Math.min(Math.max(n, 1), 500); $(this).val(n); if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#ratings-perpage').val(String(n)); } else { $('#ratings-perpage').val('custom'); } ratingsTable.page.len(n).draw(); });
     });
 </script>
 

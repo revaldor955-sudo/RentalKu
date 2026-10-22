@@ -28,6 +28,10 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        if (Auth::user()->roles_id == 3 && ! Auth::user()->email_verified_at) {
+            return redirect()->route('otp.show');
+        }
+
         $route = match (Auth::user()->roles_id) {
             1 => 'admin.dashboard',
             2 => 'staff.dashboard',

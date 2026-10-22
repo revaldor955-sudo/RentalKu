@@ -174,6 +174,15 @@
             display: none !important;
         }
 
+        .pager-bar{background:#fff;border:1px solid #edf0ee;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.05);padding:12px 16px;font-size:14px}
+        .pager-bar .text-secondary{font-size:14px;font-weight:500}.pager-select{width:auto;border-radius:10px;font-size:13px;height:34px;padding:6px 28px 6px 10px}
+        .pager-jump{width:72px;border-radius:10px;text-align:center;font-size:13px;height:34px;padding:6px 8px}
+        .pager-btn{border:1px solid #dee2e6;border-radius:10px;color:#1f2937;font-weight:600;background:#fff;font-size:13px;height:34px;display:inline-flex;align-items:center;padding:6px 12px}
+        .pager-btn:hover{border-color:#198754;color:#198754;background:#f5f7f6}
+        .pager-btn.disabled{opacity:0.4;pointer-events:none}
+        .pager-next{background:#198754;border-color:#198754;color:#fff}
+        .pager-next:hover{background:#146c43;border-color:#146c43;color:#fff}
+
         .car-image {
             width: 58px;
             height: 45px;
@@ -511,6 +520,27 @@
                     </tbody>
 
                 </table>
+
+                <div class="pager-bar mt-3 d-flex flex-wrap align-items-center justify-content-between gap-3" id="pager-mobils">
+                    <div class="text-secondary" id="pager-info-mobils">Menampilkan 0–0 dari 0 data</div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <select id="pager-len-mobils" class="form-select form-select-sm pager-select" aria-label="Jumlah per halaman">
+                            <option value="10">10 / halaman</option>
+                            <option value="20">20 / halaman</option>
+                            <option value="50">50 / halaman</option>
+                            <option value="100">100 / halaman</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                        <input type="number" id="pager-custom-mobils" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
+                        <span class="text-secondary" id="pager-page-mobils">Halaman 1 / 1</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-sm pager-btn" id="pager-first-mobils">First</button>
+                        <button type="button" class="btn btn-sm pager-btn" id="pager-prev-mobils" aria-label="Halaman sebelumnya"><i class="bi bi-chevron-left"></i></button>
+                        <button type="button" class="btn btn-sm pager-btn pager-next" id="pager-next-mobils" aria-label="Halaman berikutnya"><i class="bi bi-chevron-right"></i></button>
+                        <button type="button" class="btn btn-sm pager-btn" id="pager-last-mobils">Last</button>
+                    </div>
+                </div>
 
             </div>
 
@@ -1425,7 +1455,10 @@
 
     $(document).ready(function() {
 
-        $('#mobils-table').DataTable({
+        var tabelMobils = $('#mobils-table').DataTable({
+            paging: false,
+            info: false,
+            dom: 'frt',
             processing: true,
             serverSide: true,
             ajax: {
@@ -1528,6 +1561,47 @@
                 },
             },
         });
+
+        function renderPagerMobils() {
+            var info = tabelMobils.page.info();
+            var total=info.recordsDisplay;
+            var start=total?info.start+1:0;
+            $('#pager-info-mobils').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
+            var pages=info.pages;
+            $('#pager-page-mobils').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
+            var page=pages?info.page+1:0;
+            $('#pager-first-mobils, #pager-prev-mobils').toggleClass('disabled', page <= 1);
+            $('#pager-next-mobils, #pager-last-mobils').toggleClass('disabled', page >= pages);
+        }
+
+        $('#pager-first-mobils').on('click', function() {
+            tabelMobils.page('first').draw('page');
+        });
+        $('#pager-prev-mobils').on('click', function() {
+            tabelMobils.page('previous').draw('page');
+        });
+        $('#pager-next-mobils').on('click', function() {
+            tabelMobils.page('next').draw('page');
+        });
+        $('#pager-last-mobils').on('click', function() {
+            tabelMobils.page('last').draw('page');
+        });
+        $('#pager-len-mobils').on('change', function() {
+            if ($(this).val() === 'custom') { $('#pager-custom-mobils').focus(); return; }
+            var n = Number($(this).val());
+            $('#pager-custom-mobils').val(n);
+            tabelMobils.page.len(n).draw();
+        });
+        $('#pager-custom-mobils').on('change', function() {
+            var n = parseInt($(this).val(), 10) || 1;
+            n = Math.min(Math.max(n, 1), 500);
+            $(this).val(n);
+            if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#pager-len-mobils').val(String(n)); }
+            else { $('#pager-len-mobils').val('custom'); }
+            tabelMobils.page.len(n).draw();
+        });
+        tabelMobils.on('draw.dt', renderPagerMobils);
+        renderPagerMobils();
 
     });
 

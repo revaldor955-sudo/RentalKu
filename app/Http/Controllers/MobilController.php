@@ -338,27 +338,20 @@ class MobilController extends Controller
     /**
      * Menampilkan detail mobil.
      */
-    public function show(Request $request, $id)
+    public function show(Mobil $mobil)
     {
-        $mobil = Mobil::with([
+        $mobil->load([
             'brand',
             'tipeMobil',
             'cabang',
             'fasilitas',
-        ])->findOrFail($id);
+        ]);
 
         $cabangs = Cabang::orderBy('name')->get();
 
         $supirs = Supir::where('status', 'tersedia')
             ->orderBy('name')
             ->get();
-
-        if ($request->ajax() || $request->wantsJson()) {
-            return view(
-                'customer.partials.mobil-detail-modal',
-                compact('mobil', 'cabangs', 'supirs')
-            );
-        }
 
         return view(
             'customer.mobil-detail',

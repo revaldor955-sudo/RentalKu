@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OtpMail;
 use App\Models\Rental;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\RateLimiter;
 
 class UserController extends Controller
 {
@@ -208,6 +211,8 @@ public function data(Request $request)
 
         $user = User::create($validated);
         $user->roles_id = $rolesId;
+        // Admin membuat akun, jadi email dianggap tepercaya tanpa OTP.
+        $user->email_verified_at = now();
         $user->save();
 
         return response()->json([
@@ -275,12 +280,45 @@ public function data(Request $request)
             unset($validated['password']);
         }
 
+        $emailChanged = $user->email !== $validated['email'];
+
         $user->fill($validated);
         $user->roles_id = $rolesId;
+
+        $isCustomer = (int) $user->roles_id === 3;
+
+        // Email baru harus diverifikasi ulang oleh customer.
+        if ($emailChanged) {
+            $user->email_verified_at = null;
+
+            if ($isCustomer) {
+                $user->otp_code = null;
+                $user->otp_expires_at = null;
+            }
+        }
+
         $user->save();
 
+        $mailFailed = false;
+
+        if ($emailChanged && $isCustomer) {
+            $otpCode = $user->issueOtp();
+            RateLimiter::clear('otp-attempts:'.$user->id);
+
+            try {
+                Mail::to($user->email)->send(new OtpMail($otpCode, $user->name));
+                RateLimiter::hit('otp-resend-cooldown:'.$user->id, 60);
+            } catch (\Throwable $e) {
+                $mailFailed = true;
+                report($e);
+            }
+        }
+
         return response()->json([
-            'message' => 'Pengguna berhasil diperbarui.',
+            'message' => $mailFailed
+                ? 'Pengguna berhasil diperbarui, tapi kode OTP gagal dikirim. Minta pengguna klik "Kirim ulang".'
+                : 'Pengguna berhasil diperbarui.',
+            'mail_failed' => $mailFailed,
         ]);
     }
 

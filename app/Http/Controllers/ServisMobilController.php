@@ -134,7 +134,7 @@ class ServisMobilController extends Controller
             'mobil_id' => 'required|exists:mobils,id',
             'tanggal' => 'required|date',
             'jenis' => 'required|in:rutin,perbaikan',
-            'biaya' => 'required|numeric|min:0',
+            'biaya' => 'required|numeric|min:0|max:9999999999.99',
             'keterangan' => 'nullable|string',
             'bengkel' => 'nullable|string|max:100',
         ], [
@@ -145,6 +145,7 @@ class ServisMobilController extends Controller
             'biaya.required' => 'Biaya wajib diisi.',
             'biaya.numeric' => 'Biaya harus berupa angka.',
             'biaya.min' => 'Biaya tidak boleh negatif.',
+            'biaya.max' => 'Biaya maksimal Rp 9.999.999.999.',
             'bengkel.max' => 'Nama bengkel maksimal 100 karakter.',
         ]);
 
@@ -167,7 +168,7 @@ class ServisMobilController extends Controller
             'mobil_id' => 'required|exists:mobils,id',
             'tanggal' => 'required|date',
             'jenis' => 'required|in:rutin,perbaikan',
-            'biaya' => 'required|numeric|min:0',
+            'biaya' => 'required|numeric|min:0|max:9999999999.99',
             'keterangan' => 'nullable|string',
             'bengkel' => 'nullable|string|max:100',
         ], [
@@ -178,6 +179,7 @@ class ServisMobilController extends Controller
             'biaya.required' => 'Biaya wajib diisi.',
             'biaya.numeric' => 'Biaya harus berupa angka.',
             'biaya.min' => 'Biaya tidak boleh negatif.',
+            'biaya.max' => 'Biaya maksimal Rp 9.999.999.999.',
             'bengkel.max' => 'Nama bengkel maksimal 100 karakter.',
         ]);
 

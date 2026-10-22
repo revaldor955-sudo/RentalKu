@@ -98,6 +98,8 @@ class CustomerAlurTest extends TestCase
 
     public function test_klaim_ganda_aktif_ditolak(): void
     {
+        Storage::fake('public');
+
         $rental = $this->buatRentalSelesai();
 
         Kompensasi::create([
@@ -119,9 +121,14 @@ class CustomerAlurTest extends TestCase
                 'nominal' => 50000,
                 'alasan' => 'Coba lagi.',
                 'tanggal' => now()->toDateString(),
+                'bukti' => [
+                    UploadedFile::fake()->image('bukti1.jpg'),
+                    UploadedFile::fake()->image('bukti2.jpg'),
+                ],
             ]);
 
         $res->assertStatus(422);
+        $res->assertJsonPath('message', 'Rental ini sudah memiliki klaim aktif.');
         $this->assertSame(1, Kompensasi::where('rental_id', $rental->id)->count());
     }
 
