@@ -33,15 +33,43 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $phone = preg_replace('/[\s\-().]+/', '', (string) $request->input('phone'));
+
+        if (str_starts_with($phone, '+62')) {
+            $phone = '0'.substr($phone, 3);
+        } elseif (str_starts_with($phone, '62')) {
+            $phone = '0'.substr($phone, 2);
+        }
+
+        $request->merge([
+            'name' => preg_replace('/\s+/u', ' ', trim((string) $request->input('name'))),
+            'email' => strtolower(trim((string) $request->input('email'))),
+            'phone' => $phone,
+            'address' => trim((string) $request->input('address')),
+        ]);
+
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'min:2', 'max:255', 'regex:/[\p{L}]/u'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'phone' => ['required', 'string', 'max:25'],
-            'address' => ['required', 'string'],
+            'phone' => ['required', 'string', 'max:25', 'regex:/^08\d{8,11}$/'],
+            'address' => ['required', 'string', 'min:10', 'max:500'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ], [
+            'name.required' => 'Nama lengkap wajib diisi.',
+            'name.min' => 'Nama lengkap minimal 2 karakter.',
+            'name.max' => 'Nama lengkap maksimal 255 karakter.',
+            'name.regex' => 'Nama lengkap harus mengandung huruf.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan oleh akun lain.',
             'phone.required' => 'Nomor HP wajib diisi.',
+            'phone.regex' => 'Format nomor HP tidak valid. Contoh: 081234567890.',
             'address.required' => 'Alamat wajib diisi.',
+            'address.min' => 'Alamat minimal 10 karakter.',
+            'address.max' => 'Alamat maksimal 500 karakter.',
+            'password.required' => 'Password wajib diisi.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'password.min' => 'Password minimal 8 karakter.',
         ]);
 
         $customerRole = Role::where('name', 'Customer')->first();
