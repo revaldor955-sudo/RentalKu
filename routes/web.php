@@ -349,6 +349,10 @@ Route::middleware('auth')->group(function () {
 
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
+    Route::get('/profile/email', [ProfileController::class, 'editEmail'])->name('profile.email.edit');
+
+    Route::patch('/profile/email', [ProfileController::class, 'updateEmail'])->name('profile.email.update');
+
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
