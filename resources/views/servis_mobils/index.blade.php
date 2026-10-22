@@ -110,6 +110,14 @@
                 padding: 16px;
             }
         }
+        .pager-bar{background:#fff;border:1px solid #edf0ee;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.05);padding:12px 16px;font-size:14px}
+        .pager-bar .text-secondary{font-size:14px;font-weight:500}.pager-select{width:auto;border-radius:10px;font-size:13px;height:34px;padding:6px 28px 6px 10px}
+        .pager-jump{width:72px;border-radius:10px;text-align:center;font-size:13px;height:34px;padding:6px 8px}
+        .pager-btn{border:1px solid #dee2e6;border-radius:10px;color:#1f2937;font-weight:600;background:#fff;font-size:13px;height:34px;display:inline-flex;align-items:center;padding:6px 12px}
+        .pager-btn:hover{border-color:#198754;color:#198754;background:#f5f7f6}
+        .pager-btn.disabled{opacity:0.4;pointer-events:none}
+        .pager-next{background:#198754;border-color:#198754;color:#fff}
+        .pager-next:hover{background:#146c43;border-color:#146c43;color:#fff}
     </style>
 
     @include('layouts.partials.modal-head-style')
@@ -267,6 +275,27 @@
                         </tbody>
 
                     </table>
+
+                    <div class="pager-bar mt-3 d-flex flex-wrap align-items-center justify-content-between gap-3" id="servis-pager">
+                        <div class="text-secondary small" id="servis-info">Menampilkan 0–0 dari 0 data</div>
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <select class="form-select form-select-sm pager-select" id="servis-perpage" aria-label="Jumlah per halaman">
+                                <option value="10">10 / halaman</option>
+                                <option value="20">20 / halaman</option>
+                                <option value="50">50 / halaman</option>
+                                <option value="100">100 / halaman</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                            <input type="number" class="form-control form-control-sm pager-jump" id="servis-custom" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
+                            <span class="text-secondary" id="servis-page-label">Halaman 1 / 1</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-sm pager-btn" id="servis-first">First</button>
+                            <button type="button" class="btn btn-sm pager-btn" id="servis-prev" aria-label="Halaman sebelumnya"><i class="bi bi-chevron-left"></i></button>
+                            <button type="button" class="btn btn-sm pager-btn pager-next" id="servis-next" aria-label="Halaman berikutnya"><i class="bi bi-chevron-right"></i></button>
+                            <button type="button" class="btn btn-sm pager-btn" id="servis-last">Last</button>
+                        </div>
+                    </div>
 
                 </div>
 
@@ -591,7 +620,10 @@
 
     $(document).ready(function() {
 
-        $('#servisMobils-table').DataTable({
+        var servisTable = $('#servisMobils-table').DataTable({
+            paging: false,
+            info: false,
+            dom: 'frt',
             processing: true,
             serverSide: true,
             ajax: {
@@ -693,6 +725,40 @@ order: [],
                     sortDescending: ': aktifkan untuk urut turun',
                 },
             },
+        });
+        function renderServisPager() {
+            var info = servisTable.page.info();
+            var total=info.recordsDisplay;
+            var start=total?info.start+1:0;
+            var pages=info.pages;
+            $('#servis-info').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
+            $('#servis-page-label').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
+            var first = (info.page === 0 || info.pages <= 1);
+            var last = (info.pages <= 1 || info.page === info.pages - 1);
+            $('#servis-first').toggleClass('disabled', first);
+            $('#servis-prev').toggleClass('disabled', first);
+            $('#servis-next').toggleClass('disabled', last);
+            $('#servis-last').toggleClass('disabled', last);
+        }
+        servisTable.on('draw.dt', renderServisPager);
+        renderServisPager();
+        $('#servis-first').on('click', function() { servisTable.page('first').draw('page'); });
+        $('#servis-prev').on('click', function() { servisTable.page('previous').draw('page'); });
+        $('#servis-next').on('click', function() { servisTable.page('next').draw('page'); });
+        $('#servis-last').on('click', function() { servisTable.page('last').draw('page'); });
+        $('#servis-perpage').on('change', function() {
+            if ($(this).val() === 'custom') { $('#servis-custom').focus(); return; }
+            var n = Number($(this).val());
+            $('#servis-custom').val(n);
+            servisTable.page.len(n).draw();
+        });
+        $('#servis-custom').on('change', function() {
+            var n = parseInt($(this).val(), 10) || 1;
+            n = Math.min(Math.max(n, 1), 500);
+            $(this).val(n);
+            if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#servis-perpage').val(String(n)); }
+            else { $('#servis-perpage').val('custom'); }
+            servisTable.page.len(n).draw();
         });
 
     });

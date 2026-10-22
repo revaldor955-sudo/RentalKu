@@ -7,6 +7,7 @@ use App\Models\Cabang;
 use App\Models\Mobil;
 use App\Models\TipeMobil;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class MobilSeeder extends Seeder
 {
@@ -219,6 +220,14 @@ class MobilSeeder extends Seeder
         ];
 
         foreach ($mobils as $mobil) {
+            $existingId = Mobil::where('plate_number', $mobil['plate_number'])->value('id');
+            $base = Str::slug($mobil['name'] . '-' . $mobil['plate_number']);
+            $slug = $base;
+            $i = 2;
+            while (Mobil::where('slug', $slug)->when($existingId, fn ($q) => $q->where('id', '!=', $existingId))->exists()) {
+                $slug = $base . '-' . $i;
+                $i++;
+            }
             Mobil::updateOrCreate(
                 ['plate_number' => $mobil['plate_number']],
                 [
@@ -226,6 +235,7 @@ class MobilSeeder extends Seeder
                     'tipe_mobil_id' => $tipes[$mobil['tipe']],
                     'cabang_id' => $cabangs[$mobil['cabang']],
                     'name' => $mobil['name'],
+                    'slug' => $slug,
                     'tahun' => $mobil['tahun'],
                     'transmisi' => $mobil['transmisi'],
                     'kapasitas' => $mobil['kapasitas'],

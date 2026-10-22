@@ -128,6 +128,7 @@ class DashboardController extends Controller
         return response()->json($mobils->map(function ($mobil) {
             return [
                 'id' => $mobil->id,
+                'slug' => $mobil->slug,
                 'name' => $mobil->name,
                 'image_url' => $mobil->image ? asset($mobil->image) : null,
                 'transmisi' => $mobil->transmisi,

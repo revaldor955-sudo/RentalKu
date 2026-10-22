@@ -28,6 +28,7 @@ Thumbs.db
 
 /.omo
 /.playwright-mcp
+/.playwright-cli
 /.opencode
 /.graphify_python
 /graphify-out

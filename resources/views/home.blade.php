@@ -100,7 +100,7 @@
 
                     <div class="row g-3 align-items-end">
 
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
 
                             <div class="search-label">
                                 Lokasi Pengambilan
@@ -124,29 +124,27 @@
 
                         </div>
 
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
 
-                            <div class="search-label" id="tanggal-mulai-label">
-                                Tanggal Mulai
+                            <div class="search-label" id="status-label">
+                                Status Mobil
                             </div>
 
-                            <input type="date" name="tanggal_mulai" value="{{ $mulai?->toDateString() }}"
-                                min="{{ now()->toDateString() }}" id="tanggal_mulai" aria-labelledby="tanggal-mulai-label" class="form-control search-input">
+                            <select name="status" aria-labelledby="status-label" class="form-select search-input">
+
+                                <option value="tersedia" @selected($statusInput !== 'tidak_tersedia')>
+                                    Tersedia
+                                </option>
+
+                                <option value="tidak_tersedia" @selected($statusInput === 'tidak_tersedia')>
+                                    Tidak Tersedia
+                                </option>
+
+                            </select>
 
                         </div>
 
-                        <div class="col-lg-3">
-
-                            <div class="search-label" id="tanggal-selesai-label">
-                                Tanggal Selesai
-                            </div>
-
-                            <input type="date" name="tanggal_selesai" value="{{ $selesai?->toDateString() }}"
-                                min="{{ now()->toDateString() }}" id="tanggal_selesai" aria-labelledby="tanggal-selesai-label" class="form-control search-input">
-
-                        </div>
-
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
 
                             <button type="submit" class="btn btn-rent w-100 py-3">
                                 <i class="bi bi-search me-2"></i>
@@ -184,16 +182,15 @@
             <div class="text-center mb-5">
 
                 <div class="text-success fw-bold mb-2">
-                    BRAND PILIHAN
+                    {{ $landingSettings['brand_badge'] ?? 'BRAND PILIHAN' }}
                 </div>
 
                 <h2 class="section-title">
-                    Pilihan brand untukmu
+                    {{ $landingSettings['brand_title'] ?? 'Pilihan brand untukmu' }}
                 </h2>
 
                 <p class="section-subtitle mx-auto">
-                    Berbagai pilihan merek kendaraan tersedia
-                    untuk memenuhi kebutuhan perjalananmu.
+                    {{ $landingSettings['brand_description'] ?? 'Berbagai pilihan merek kendaraan tersedia untuk memenuhi kebutuhan perjalananmu.' }}
                 </p>
 
             </div>
@@ -240,17 +237,15 @@
                 <div class="col-lg-5">
 
                     <div class="text-success fw-bold mb-2">
-                        KENAPA RENTALKU?
+                        {{ $landingSettings['about_badge'] ?? 'KENAPA RENTALKU?' }}
                     </div>
 
                     <h2 class="section-title">
-                        Rental mobil tanpa ribet.
+                        {{ $landingSettings['about_title'] ?? 'Rental mobil tanpa ribet.' }}
                     </h2>
 
                     <p class="section-subtitle">
-                        Kami menghadirkan pengalaman rental mobil
-                        yang praktis dengan proses pemesanan yang
-                        mudah dan transparan.
+                        {{ $landingSettings['about_description'] ?? 'Kami menghadirkan pengalaman rental mobil yang praktis dengan proses pemesanan yang mudah dan transparan.' }}
                     </p>
 
                     <a href="#mobil" class="btn btn-rent mt-4">
@@ -269,16 +264,15 @@
                             <div class="feature-card">
 
                                 <div class="feature-icon">
-                                    <i class="bi bi-shield-check"></i>
+                                    <i class="bi {{ $landingSettings['about_feature_1_icon'] ?? 'bi-shield-check' }}"></i>
                                 </div>
 
                                 <h5>
-                                    Aman & Terpercaya
+                                    {{ $landingSettings['about_feature_1_title'] ?? 'Aman & Terpercaya' }}
                                 </h5>
 
                                 <p>
-                                    Data kendaraan dan proses rental
-                                    dikelola dengan sistem yang terstruktur.
+                                    {{ $landingSettings['about_feature_1_desc'] ?? 'Data kendaraan dan proses rental dikelola dengan sistem yang terstruktur.' }}
                                 </p>
 
                             </div>
@@ -290,16 +284,15 @@
                             <div class="feature-card">
 
                                 <div class="feature-icon">
-                                    <i class="bi bi-lightning-charge"></i>
+                                    <i class="bi {{ $landingSettings['about_feature_2_icon'] ?? 'bi-lightning-charge' }}"></i>
                                 </div>
 
                                 <h5>
-                                    Proses Cepat
+                                    {{ $landingSettings['about_feature_2_title'] ?? 'Proses Cepat' }}
                                 </h5>
 
                                 <p>
-                                    Rental mobil dapat dilakukan
-                                    dengan mudah melalui website.
+                                    {{ $landingSettings['about_feature_2_desc'] ?? 'Rental mobil dapat dilakukan dengan mudah melalui website.' }}
                                 </p>
 
                             </div>
@@ -311,16 +304,15 @@
                             <div class="feature-card">
 
                                 <div class="feature-icon">
-                                    <i class="bi bi-wallet2"></i>
+                                    <i class="bi {{ $landingSettings['about_feature_3_icon'] ?? 'bi-wallet2' }}"></i>
                                 </div>
 
                                 <h5>
-                                    Harga Transparan
+                                    {{ $landingSettings['about_feature_3_title'] ?? 'Harga Transparan' }}
                                 </h5>
 
                                 <p>
-                                    Kamu dapat melihat harga rental
-                                    sebelum melakukan rental.
+                                    {{ $landingSettings['about_feature_3_desc'] ?? 'Kamu dapat melihat harga rental sebelum melakukan rental.' }}
                                 </p>
 
                             </div>
@@ -332,16 +324,15 @@
                             <div class="feature-card">
 
                                 <div class="feature-icon">
-                                    <i class="bi bi-headset"></i>
+                                    <i class="bi {{ $landingSettings['about_feature_4_icon'] ?? 'bi-headset' }}"></i>
                                 </div>
 
                                 <h5>
-                                    Layanan Support
+                                    {{ $landingSettings['about_feature_4_title'] ?? 'Layanan Support' }}
                                 </h5>
 
                                 <p>
-                                    Hubungi tim Rentalku jika membutuhkan
-                                    bantuan selama proses rental.
+                                    {{ $landingSettings['about_feature_4_desc'] ?? 'Hubungi tim Rentalku jika membutuhkan bantuan selama proses rental.' }}
                                 </p>
 
                             </div>
@@ -363,20 +354,20 @@
         <div class="container">
             <div class="row text-center g-4">
             <div class="col-6 col-md-3">
-                <h2 class="fw-bold display-5 mb-1">{{ $totalMobil }}+</h2>
-                <p class="mb-0 opacity-75">Mobil Tersedia</p>
+                <h2 class="fw-bold display-5 mb-1">{{ !empty($landingSettings['stats_mobil_value']) ? $landingSettings['stats_mobil_value'] . '+' : $totalMobil . '+' }}</h2>
+                <p class="mb-0 opacity-75">{{ $landingSettings['stats_mobil_label'] ?? 'Mobil Tersedia' }}</p>
             </div>
             <div class="col-6 col-md-3">
-                <h2 class="fw-bold display-5 mb-1">{{ $totalPuas }}+</h2>
-                <p class="mb-0 opacity-75">Pelanggan Puas</p>
+                <h2 class="fw-bold display-5 mb-1">{{ !empty($landingSettings['stats_pelanggan_value']) ? $landingSettings['stats_pelanggan_value'] . '+' : $totalPuas . '+' }}</h2>
+                <p class="mb-0 opacity-75">{{ $landingSettings['stats_pelanggan_label'] ?? 'Pelanggan Puas' }}</p>
             </div>
             <div class="col-6 col-md-3">
-                <h2 class="fw-bold display-5 mb-1">24/7</h2>
-                <p class="mb-0 opacity-75">Layanan Support</p>
+                <h2 class="fw-bold display-5 mb-1">{{ $landingSettings['stats_support_value'] ?? '24/7' }}</h2>
+                <p class="mb-0 opacity-75">{{ $landingSettings['stats_support_label'] ?? 'Layanan Support' }}</p>
             </div>
             <div class="col-6 col-md-3">
-                <h2 class="fw-bold display-5 mb-1">{{ $ratingRata ?: '4.9' }}</h2>
-                <p class="mb-0 opacity-75">Rating Rata-rata</p>
+                <h2 class="fw-bold display-5 mb-1">{{ !empty($landingSettings['stats_rating_value']) ? $landingSettings['stats_rating_value'] : ($ratingRata ?: '4.9') }}</h2>
+                <p class="mb-0 opacity-75">{{ $landingSettings['stats_rating_label'] ?? 'Rating Rata-rata' }}</p>
             </div>
             </div>
         </div>
@@ -404,8 +395,8 @@
                     </div>
                 </div>
                 <div class="col-auto">
-                    <a href="#mobil" class="btn btn-sm fw-bold" style="background-color: var(--primary); color: white; border-radius: 20px;">
-                        Klaim Sekarang →
+                    <a href="{{ $landingSettings['promo_button_url'] ?? '#mobil' }}" class="btn btn-sm fw-bold" style="background-color: var(--primary); color: white; border-radius: 20px;">
+                        {{ $landingSettings['promo_button_label'] ?? 'Klaim Sekarang →' }}
                     </a>
                 </div>
             </div>
@@ -419,16 +410,15 @@
             <div class="text-center mb-5">
 
                 <div class="text-success fw-bold mb-2">
-                    CARA RENTAL
+                    {{ $landingSettings['steps_badge'] ?? 'CARA RENTAL' }}
                 </div>
 
                 <h2 class="section-title">
-                    Rental mobil dalam beberapa langkah
+                    {{ $landingSettings['steps_title'] ?? 'Rental mobil dalam beberapa langkah' }}
                 </h2>
 
                 <p class="section-subtitle mx-auto">
-                    Proses sederhana untuk mendapatkan mobil
-                    yang kamu butuhkan.
+                    {{ $landingSettings['steps_description'] ?? 'Proses sederhana untuk mendapatkan mobil yang kamu butuhkan.' }}
                 </p>
 
             </div>
@@ -534,15 +524,15 @@
                 <div class="text-center mb-5">
 
                     <div class="text-success fw-bold mb-2">
-                        TESTIMONI
+                        {{ $landingSettings['testimonial_badge'] ?? 'TESTIMONI' }}
                     </div>
 
                     <h2 class="section-title">
-                        Apa kata pelanggan?
+                        {{ $landingSettings['testimonial_title'] ?? 'Apa kata pelanggan?' }}
                     </h2>
 
                     <p class="section-subtitle mx-auto">
-                        Ribuan pelanggan telah mempercayakan perjalanan mereka kepada Rentalku.
+                        {{ $landingSettings['testimonial_description'] ?? 'Ribuan pelanggan telah mempercayakan perjalanan mereka kepada Rentalku.' }}
                     </p>
 
                 </div>
@@ -1246,48 +1236,15 @@
             if (!$form.length) return;
 
             var form = $form[0];
-            var $mulai = $(form.elements.tanggal_mulai);
-            var $selesai = $(form.elements.tanggal_selesai);
+            var $statusEl = $(form.elements.status);
             var $cabangEl = $(form.elements.cabang);
             var $tombol = $form.find('button[type="submit"]');
             var $kontainer = $('#daftar-mobil');
 
-            function sinkronMin() {
-                $selesai.attr('min', $mulai.val() || '');
-            }
-            $mulai.on('change', sinkronMin);
-            sinkronMin();
-
-            function pesanError() {
-                var adaMulai = $mulai.val() !== '';
-                var adaSelesai = $selesai.val() !== '';
-
-                $selesai[0].setCustomValidity('');
-
-                if (adaMulai !== adaSelesai) {
-                    return 'Lengkapi kedua tanggal (mulai dan selesai) atau kosongkan keduanya.';
-                }
-                if (adaSelesai && $selesai.val() < $mulai.val()) {
-                    return 'Tanggal selesai tidak boleh sebelum tanggal mulai.';
-                }
-                return '';
-            }
-
-            function valid() {
-                var pesan = pesanError();
-                if (pesan !== '') {
-                    $selesai[0].setCustomValidity(pesan);
-                    $selesai[0].reportValidity();
-                    return false;
-                }
-                return true;
-            }
-
             function bangunQuery() {
                 var params = new URLSearchParams();
                 if ($cabangEl.val() !== '') params.set('cabang', $cabangEl.val());
-                if ($mulai.val() !== '') params.set('tanggal_mulai', $mulai.val());
-                if ($selesai.val() !== '') params.set('tanggal_selesai', $selesai.val());
+                if ($statusEl.val() !== '') params.set('status', $statusEl.val());
                 return params.toString();
             }
 
@@ -1323,8 +1280,6 @@
             $form.on('submit', function (e) {
                 e.preventDefault();
 
-                if (!valid()) return;
-
                 var query = bangunQuery();
 
                 if (query === '') {
@@ -1346,126 +1301,12 @@
             });
         });
 
-        // Modal detail mobil — card + button trigger
+        // Klik kartu mobil langsung ke halaman detail.
         $(document).on('click', '.car-card[data-mobil-id], button[data-mobil-id]', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            var mobilId = $(this).data('mobil-id');
-            var modalEl = document.getElementById('mobilDetailModal');
-            var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-            var $body = $('#mobilDetailModal .modal-body');
-
-            $body.html('<div class="text-center py-5"><div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading...</span></div></div>');
-            modal.show();
-
-            $.ajax({
-                url: '/mobils/' + mobilId,
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                method: 'GET'
-            })
-            .done(function (html) {
-                $body.html(html);
-            })
-            .fail(function () {
-                $body.html('<div class="alert alert-danger m-3"><i class="bi bi-exclamation-circle me-2"></i>Gagal memuat detail mobil.</div>');
-            });
+            window.location.href = '/mobils/' + $(this).data('mobil-id');
         });
-
-        // Popup form sewa (SweetAlert) — untuk user yang login
-        @auth
-        window.openSewaPopup = function() {
-            var $template = $('#sewaFormTemplate');
-            if (!$template.length) return;
-
-            if ($('.mobil-modal .mm-badge-available').length === 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal',
-                    text: 'Mobil sedang tidak tersedia.',
-                });
-                return;
-            }
-
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('mobilDetailModal')).hide();
-
-            var $carTitle = $('.mobil-modal .mm-title');
-
-            Swal.fire({
-                title: $carTitle.length ? $carTitle.text().trim() : 'Sewa Mobil',
-                html: $template.html(),
-                width: 600,
-                showConfirmButton: false,
-                didOpen: function() {
-                    var $form = $('#swal2-html-container form#sewaForm');
-                    if (!$form.length) $form = $('#swal2-html-container form').first();
-                    if (!$form.length) return;
-
-                    $form.on('submit', function(event) {
-                        event.preventDefault();
-                        var formData = new FormData($form[0]);
-                        Swal.showLoading();
-
-                        $.ajax({
-                            url: $form.attr('action'),
-                            method: 'POST',
-                            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                            data: formData,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data, textStatus, xhr) {
-                            Swal.hideLoading();
-                            if (xhr.status !== 200) {
-                                var firstError = data.errors ? Object.values(data.errors).flat()[0] : (data.message || 'Terjadi kesalahan.');
-                                Swal.fire({ icon: 'error', title: 'Gagal', text: firstError });
-                                return;
-                            }
-                            Swal.fire({ icon: 'success', title: 'Berhasil!', text: data.message || 'Pengajuan sewa berhasil.', confirmButtonText: 'OK' })
-                                .then(function() { window.location.href = '{{ route('customer.dashboard') }}'; });
-                        })
-                        .fail(function() {
-                            Swal.hideLoading();
-                            Swal.fire({ icon: 'error', title: 'Gagal', text: 'Koneksi bermasalah. Silakan coba lagi.' });
-                        });
-                    });
-
-                    // Supir profile card toggle
-                    var supirSelect = document.querySelector('#supirSelectModal');
-                    if (supirSelect) {
-                        supirSelect.addEventListener('change', function() {
-                            var card = document.querySelector('#supirProfileCardModal');
-                            var opt = this.options[this.selectedIndex];
-                            if (!card) return;
-                            if (this.value === '') {
-                                card.style.display = 'none';
-                            } else {
-                                document.querySelector('#supirNameModal').innerText = opt.dataset.name;
-                                document.querySelector('#supirPhoneModal').innerText = opt.dataset.phone;
-                                document.querySelector('#supirTarifModal').innerText = opt.dataset.tarif;
-                                document.querySelector('#supirImgModal').src = opt.dataset.image;
-                                card.style.display = 'block';
-                            }
-                        });
-                    }
-                }
-            });
-        };
-        @endauth
     </script>
-
-    {{-- Modal Detail Mobil --}}
-    <div class="modal fade" id="mobilDetailModal" tabindex="-1" aria-labelledby="mobilDetailLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title" id="mobilDetailLabel">Detail Mobil</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
-                    <!-- Content loaded via AJAX -->
-                </div>
-            </div>
-        </div>
-    </div>
 
 @endsection

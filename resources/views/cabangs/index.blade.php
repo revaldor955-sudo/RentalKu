@@ -76,6 +76,15 @@
             display: none !important;
         }
 
+        .pager-bar{background:#fff;border:1px solid #edf0ee;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.05);padding:12px 16px;font-size:14px}
+        .pager-bar .text-secondary{font-size:14px;font-weight:500}.pager-select{width:auto;border-radius:10px;font-size:13px;height:34px;padding:6px 28px 6px 10px}
+        .pager-jump{width:72px;border-radius:10px;text-align:center;font-size:13px;height:34px;padding:6px 8px}
+        .pager-btn{border:1px solid #dee2e6;border-radius:10px;color:#1f2937;font-weight:600;background:#fff;font-size:13px;height:34px;display:inline-flex;align-items:center;padding:6px 12px}
+        .pager-btn:hover{border-color:#198754;color:#198754;background:#f5f7f6}
+        .pager-btn.disabled{opacity:0.4;pointer-events:none}
+        .pager-next{background:#198754;border-color:#198754;color:#fff}
+        .pager-next:hover{background:#146c43;border-color:#146c43;color:#fff}
+
         .modal-footer .btn {
             padding: 6px 14px;
             min-width: 100px;
@@ -241,6 +250,27 @@
                         </tbody>
 
                     </table>
+
+                    <div class="pager-bar mt-3 d-flex flex-wrap align-items-center justify-content-between gap-3" id="pager-cabangs">
+                        <div class="text-secondary" id="pager-info-cabangs">Menampilkan 0–0 dari 0 data</div>
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <select id="pager-len-cabangs" class="form-select form-select-sm pager-select" aria-label="Jumlah per halaman">
+                                <option value="10">10 / halaman</option>
+                                <option value="20">20 / halaman</option>
+                                <option value="50">50 / halaman</option>
+                                <option value="100">100 / halaman</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                            <input type="number" id="pager-custom-cabangs" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
+                            <span class="text-secondary" id="pager-page-cabangs">Halaman 1 / 1</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-sm pager-btn" id="pager-first-cabangs">First</button>
+                            <button type="button" class="btn btn-sm pager-btn" id="pager-prev-cabangs" aria-label="Halaman sebelumnya"><i class="bi bi-chevron-left"></i></button>
+                            <button type="button" class="btn btn-sm pager-btn pager-next" id="pager-next-cabangs" aria-label="Halaman berikutnya"><i class="bi bi-chevron-right"></i></button>
+                            <button type="button" class="btn btn-sm pager-btn" id="pager-last-cabangs">Last</button>
+                        </div>
+                    </div>
 
                 </div>
 
@@ -454,7 +484,10 @@
 
     $(document).ready(function() {
 
-        $('#cabangs-table').DataTable({
+        var tabelCabangs = $('#cabangs-table').DataTable({
+            paging: false,
+            info: false,
+            dom: 'frt',
             processing: true,
             serverSide: true,
             ajax: {
@@ -530,6 +563,47 @@
                 },
             },
         });
+
+        function renderPagerCabangs() {
+            var info = tabelCabangs.page.info();
+            var total=info.recordsDisplay;
+            var start=total?info.start+1:0;
+            $('#pager-info-cabangs').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
+            var pages=info.pages;
+            $('#pager-page-cabangs').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
+            var page=pages?info.page+1:0;
+            $('#pager-first-cabangs, #pager-prev-cabangs').toggleClass('disabled', page <= 1);
+            $('#pager-next-cabangs, #pager-last-cabangs').toggleClass('disabled', page >= pages);
+        }
+
+        $('#pager-first-cabangs').on('click', function() {
+            tabelCabangs.page('first').draw('page');
+        });
+        $('#pager-prev-cabangs').on('click', function() {
+            tabelCabangs.page('previous').draw('page');
+        });
+        $('#pager-next-cabangs').on('click', function() {
+            tabelCabangs.page('next').draw('page');
+        });
+        $('#pager-last-cabangs').on('click', function() {
+            tabelCabangs.page('last').draw('page');
+        });
+        $('#pager-len-cabangs').on('change', function() {
+            if ($(this).val() === 'custom') { $('#pager-custom-cabangs').focus(); return; }
+            var n = Number($(this).val());
+            $('#pager-custom-cabangs').val(n);
+            tabelCabangs.page.len(n).draw();
+        });
+        $('#pager-custom-cabangs').on('change', function() {
+            var n = parseInt($(this).val(), 10) || 1;
+            n = Math.min(Math.max(n, 1), 500);
+            $(this).val(n);
+            if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#pager-len-cabangs').val(String(n)); }
+            else { $('#pager-len-cabangs').val('custom'); }
+            tabelCabangs.page.len(n).draw();
+        });
+        tabelCabangs.on('draw.dt', renderPagerCabangs);
+        renderPagerCabangs();
 
     });
 

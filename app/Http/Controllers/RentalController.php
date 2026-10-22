@@ -867,17 +867,15 @@ public function data(Request $request)
     $length = (int) $request->input('length', 10);
 
     if ($length === -1) {
-        $rentals = $query
-            ->offset($start)
-            ->get();
-    } else {
-        $length = max(1, min($length, 500));
-
-        $rentals = $query
-            ->offset($start)
-            ->limit($length)
-            ->get();
+        $length = 500;
     }
+
+    $length = max(1, min($length, 500));
+
+    $rentals = $query
+        ->offset($start)
+        ->limit($length)
+        ->get();
 
     /*
     |--------------------------------------------------------------------------

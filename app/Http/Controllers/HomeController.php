@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Cabang;
 use App\Models\LandingSetting;
 use App\Models\Mobil;
+use App\Models\Rental;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
@@ -20,34 +20,24 @@ class HomeController extends Controller
             $cabangAktif = Cabang::find($cabangId);
         }
 
-        $mulai = $this->tanggalValid($request->query('tanggal_mulai'), minDate: Carbon::today());
-        $selesai = $this->tanggalValid($request->query('tanggal_selesai'));
-        if ($mulai === null || $selesai === null || $selesai->lt($mulai)) {
-            $mulai = null;
-            $selesai = null;
+        // Filter status katalog: tersedia (default) atau tidak_tersedia.
+        $statusInput = strtolower(trim((string) $request->query('status', '')));
+        if (! in_array($statusInput, ['tersedia', 'tidak_tersedia'], true)) {
+            $statusInput = '';
         }
+        $statusMobil = $statusInput === 'tidak_tersedia' ? 'Disewa' : 'Tersedia';
 
-        $jumlah = (int) $request->query('jumlah', 6);
-        $jumlah = max(1, min(48, $jumlah));
-        $punyaFilter = $cabangAktif !== null || $mulai !== null;
-
-        $totalTersedia = Mobil::where('status', 'Tersedia')->count();
+        $punyaFilter = $cabangAktif !== null || $statusInput !== '';
 
         $mobils = Mobil::with(['brand', 'cabang', 'fotoMobils'])
-            ->where('status', 'Tersedia')
+            ->withCount('rentals')
+            ->where('status', $statusMobil)
             ->when($cabangAktif !== null, function ($query) use ($cabangAktif) {
                 $query->where('cabang_id', $cabangAktif->id);
             })
-            ->when($mulai !== null, function ($query) use ($mulai, $selesai) {
-                // Rental Menunggu/Disetujui yang overlap membuat mobil tidak tersedia.
-                $query->whereDoesntHave('rentals', function ($q) use ($mulai, $selesai) {
-                    $q->whereIn('status', ['Menunggu', 'Disetujui'])
-                        ->where('tanggal_mulai', '<=', $selesai)
-                        ->where('tanggal_selesai', '>=', $mulai);
-                });
-            })
+            ->orderByDesc('rentals_count')
             ->orderByDesc('id')
-            ->when(! $punyaFilter, fn ($query) => $query->limit($jumlah))
+            ->limit(6)
             ->get();
 
         // AJAX: kembalikan partial hasil saja, query section lain dilewati.
@@ -56,10 +46,8 @@ class HomeController extends Controller
                 'mobils',
                 'punyaFilter',
                 'cabangAktif',
-                'mulai',
-                'selesai',
-                'jumlah',
-                'totalTersedia'
+                'statusInput',
+                'statusMobil'
             ));
         }
 
@@ -112,11 +100,9 @@ $ratings = DB::table('ratings')
             'faqs',
             'cabangs',
             'cabangAktif',
-            'mulai',
-            'selesai',
+            'statusInput',
+            'statusMobil',
             'punyaFilter',
-            'jumlah',
-            'totalTersedia',
             'landingSettings',
             'totalPuas',
             'ratingRata',
@@ -124,22 +110,200 @@ $ratings = DB::table('ratings')
         ));
     }
 
-    private function tanggalValid(?string $nilai, ?Carbon $minDate = null): ?Carbon
+    public function katalog(Request $request)
     {
-        if ($nilai === null || ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $nilai)) {
-            return null;
+        [$query, $cabangAktif, $transmisi, $kataKunci, $statusInput, $statusMobil] =
+            $this->baseKatalogQuery($request);
+
+        $perPage = (int) $request->query('per_page', 10);
+        if (! in_array($perPage, [10, 20, 50], true)) {
+            $perPage = 10;
         }
 
-        try {
-            $tanggal = Carbon::createFromFormat('Y-m-d', $nilai)->startOfDay();
-        } catch (\Throwable) {
-            return null;
+        $sort = strtolower(trim((string) $request->query('sort', 'populer')));
+        if (! in_array($sort, ['populer', 'harga_asc', 'harga_desc', 'terbaru'], true)) {
+            $sort = 'populer';
         }
 
-        if ($minDate !== null && $tanggal->lt($minDate)) {
-            return null;
+        $mobils = $this->applyKatalogSort(clone $query, $sort)
+            ->paginate($perPage)
+            ->withQueryString();
+
+        // Halaman di luar jangkauan (misal ganti per_page saat di page akhir)
+        // dialihkan ke halaman valid terdekat, bukan grid kosong.
+        if ($mobils->lastPage() > 0 && ($mobils->currentPage() > $mobils->lastPage() || $mobils->currentPage() < 1)) {
+            return redirect()->route('katalog.index', array_merge(
+                $request->query(),
+                ['page' => max(1, min($mobils->currentPage(), $mobils->lastPage()))]
+            ));
         }
 
-        return $tanggal;
+        $cabangs = DB::table('cabangs')->orderBy('name')->get();
+
+        $populerIds = $this->populerMobilIds();
+
+        return view('katalog.index', compact(
+            'mobils',
+            'cabangs',
+            'cabangAktif',
+            'transmisi',
+            'kataKunci',
+            'statusInput',
+            'statusMobil',
+            'populerIds',
+            'perPage',
+            'sort'
+        ));
+    }
+
+    /**
+     * Data grid katalog (AJAX): filter + sort + pagination tanpa reload.
+     * Hanya field yang aman ditampilkan publik.
+     */
+    public function katalogData(Request $request)
+    {
+        [$query, $cabangAktif, $transmisi, $kataKunci, $statusInput, $statusMobil] =
+            $this->baseKatalogQuery($request);
+
+        $sort = strtolower(trim((string) $request->query('sort', 'populer')));
+        if (! in_array($sort, ['populer', 'harga_asc', 'harga_desc', 'terbaru'], true)) {
+            $sort = 'populer';
+        }
+
+        $perPage = (int) $request->query('per_page', 10);
+        if (! in_array($perPage, [10, 20, 50, 100], true)) {
+            $perPage = max(1, min($perPage, 100));
+        }
+
+        $query = match ($sort) {
+            'harga_asc' => $this->applyKatalogSort(clone $query, 'harga_asc'),
+            'harga_desc' => $this->applyKatalogSort(clone $query, 'harga_desc'),
+            'terbaru' => $this->applyKatalogSort(clone $query, 'terbaru'),
+            default => $this->applyKatalogSort(clone $query, 'populer'),
+        };
+
+        $page = max(1, (int) $request->query('page', 1));
+        $paginator = $query->paginate($perPage, ['*'], 'page', $page);
+
+        // Halaman di luar jangkauan dijepit ke halaman valid terdekat.
+        if ($paginator->lastPage() > 0 && $page > $paginator->lastPage()) {
+            $paginator = $query->paginate($perPage, ['*'], 'page', $paginator->lastPage());
+        }
+
+        $populerIds = $this->populerMobilIds();
+
+        $fallbackFoto = 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=900&q=80';
+
+        $data = $paginator->getCollection()->map(function ($mobil) use ($populerIds, $fallbackFoto) {
+            $foto = $mobil->fotoMobils->first()?->url
+                ?? ($mobil->image ? asset($mobil->image) : $fallbackFoto);
+
+            return [
+                'slug' => $mobil->slug,
+                'name' => $mobil->name,
+                'foto_url' => str_starts_with($foto, 'http') ? $foto : asset($foto),
+                'transmisi' => $mobil->transmisi,
+                'kapasitas' => $mobil->kapasitas,
+                'harga_perhari' => (float) $mobil->harga_perhari,
+                'deposit' => (float) ($mobil->deposit ?? 0),
+                'cabang' => $mobil->cabang->name ?? '-',
+                'populer' => in_array((int) $mobil->id, $populerIds, true),
+            ];
+        })->values();
+
+        return response()->json([
+            'data' => $data,
+            'meta' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'from' => $paginator->firstItem(),
+                'to' => $paginator->lastItem(),
+                'tersedia' => $statusMobil === 'Tersedia',
+            ],
+        ]);
+    }
+
+    /**
+     * Query dasar katalog + parameter filter yang sudah dinormalisasi.
+     * Input invalid diabaikan, bukan error — katalog tidak boleh 422.
+     *
+     * @return array{0: \Illuminate\Database\Eloquent\Builder, 1: ?Cabang, 2: string, 3: string, 4: string, 5: string}
+     */
+    private function baseKatalogQuery(Request $request): array
+    {
+        $cabangId = $request->query('cabang');
+        $cabangAktif = null;
+        if ($cabangId !== null && $cabangId !== '') {
+            $cabangAktif = Cabang::find($cabangId);
+        }
+
+        $transmisi = strtolower(trim((string) $request->query('transmisi', '')));
+        if (! in_array($transmisi, ['manual', 'matic'], true)) {
+            $transmisi = '';
+        }
+
+        $kataKunci = trim((string) $request->query('q', ''));
+
+        $statusInput = strtolower(trim((string) $request->query('status', '')));
+        if (! in_array($statusInput, ['tersedia', 'tidak_tersedia'], true)) {
+            $statusInput = '';
+        }
+        $statusMobil = $statusInput === 'tidak_tersedia' ? 'Disewa' : 'Tersedia';
+
+        $query = Mobil::with(['brand', 'cabang', 'fotoMobils'])
+            ->withCount('rentals')
+            ->where('status', $statusMobil)
+            ->when($cabangAktif !== null, function ($query) use ($cabangAktif) {
+                $query->where('cabang_id', $cabangAktif->id);
+            })
+            ->when($transmisi !== '', function ($query) use ($transmisi) {
+                // Kolom enum menyimpan 'Manual'/'Matic' — samakan kapitalisasinya
+                // agar filter lolos di MySQL maupun SQLite (case-sensitive).
+                $query->where('transmisi', ucfirst($transmisi));
+            })
+            ->when($kataKunci !== '', function ($query) use ($kataKunci) {
+                $query->where(function ($q) use ($kataKunci) {
+                    $q->where('name', 'like', "%{$kataKunci}%")
+                        ->orWhere('plate_number', 'like', "%{$kataKunci}%");
+                });
+            });
+
+        return [$query, $cabangAktif, $transmisi, $kataKunci, $statusInput, $statusMobil];
+    }
+
+    /**
+     * Urutan grid katalog.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    private function applyKatalogSort($query, string $sort)
+    {
+        return match ($sort) {
+            'harga_asc' => $query->orderBy('harga_perhari')->orderByDesc('id'),
+            'harga_desc' => $query->orderByDesc('harga_perhari')->orderByDesc('id'),
+            'terbaru' => $query->orderByDesc('id'),
+            default => $query->orderByDesc('rentals_count')->orderByDesc('id'),
+        };
+    }
+
+    /**
+     * 3 mobil paling sering disewa (badge Populer).
+     *
+     * @return int[]
+     */
+    private function populerMobilIds(): array
+    {
+        return array_map(
+            'intval',
+            Rental::selectRaw('mobil_id, COUNT(*) as c')
+                ->groupBy('mobil_id')
+                ->orderByDesc('c')
+                ->limit(3)
+                ->pluck('mobil_id')
+                ->all()
+        );
     }
 }

@@ -18,6 +18,10 @@ class CustomerMiddleware
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
         }
 
+        if (! auth()->user()->email_verified_at) {
+            return redirect()->route('otp.show');
+        }
+
         return $next($request);
     }
 }

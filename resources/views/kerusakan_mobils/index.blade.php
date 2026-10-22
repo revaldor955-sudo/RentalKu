@@ -112,6 +112,62 @@
             padding: 24px;
         }
 
+        .pager-bar {
+            background: #fff;
+            border: 1px solid #edf0ee;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+.pager-bar .text-secondary { font-size: 14px; font-weight: 500; }
+.pager-select {
+            width: auto;
+            border-radius: 10px;
+            font-size: 13px;
+            height: 34px;
+            padding: 6px 28px 6px 10px;
+        }
+        .pager-jump {
+            width: 72px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 13px;
+            height: 34px;
+            padding: 6px 8px;
+        }
+        .pager-btn {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            color: #1f2937;
+            font-weight: 600;
+            background: #fff;
+            font-size: 13px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+        }
+        .pager-btn:hover {
+            border-color: #198754;
+            color: #198754;
+            background: #f5f7f6;
+        }
+        .pager-btn.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .pager-next {
+            background: #198754;
+            border-color: #198754;
+            color: #fff;
+        }
+        .pager-next:hover {
+            background: #146c43;
+            border-color: #146c43;
+            color: #fff;
+        }
+
         @media (max-width: 1024px) {
             .page-content {
                 padding: 16px;
@@ -258,6 +314,33 @@
                         </tbody>
 
                     </table>
+
+                    <div class="p-3">
+                        <div class="pager-bar mt-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                            <div class="text-secondary" id="km-pager-info">
+                                Menampilkan 0–0 dari 0 data
+                            </div>
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <select id="km-pager-len" class="form-select form-select-sm pager-select" aria-label="Jumlah per halaman">
+                                    <option value="10">10 / halaman</option>
+                                    <option value="20">20 / halaman</option>
+                                    <option value="50">50 / halaman</option>
+                                    <option value="100">100 / halaman</option>
+                                    <option value="custom">Custom</option>
+                                </select>
+                                <input type="number" id="km-pager-custom" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
+                                <span class="text-secondary" id="km-pager-pages">
+                                    Halaman 1 / 1
+                                </span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button" class="btn btn-sm pager-btn" id="km-pager-first">First</button>
+                                <button type="button" class="btn btn-sm pager-btn" id="km-pager-prev" aria-label="Halaman sebelumnya"><i class="bi bi-chevron-left"></i></button>
+                                <button type="button" class="btn btn-sm pager-btn pager-next" id="km-pager-next" aria-label="Halaman berikutnya"><i class="bi bi-chevron-right"></i></button>
+                                <button type="button" class="btn btn-sm pager-btn" id="km-pager-last">Last</button>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
 
@@ -482,9 +565,12 @@
 
     $(document).ready(function() {
 
-        $('#kerusakanMobils-table').DataTable({
+        var kmTable = $('#kerusakanMobils-table').DataTable({
             processing: true,
             serverSide: true,
+            paging: false,
+            info: false,
+            dom: 'frt',
             ajax: {
                 url: '{{ route('kerusakan_mobils.data') }}',
                 type: 'GET',
@@ -554,6 +640,49 @@ order: [],
                     sortDescending: ': aktifkan untuk urut turun',
                 },
             },
+        });
+
+        function renderKmPager() {
+            var info = kmTable.page.info();
+            var total = info.recordsDisplay;
+            var start = total ? info.start + 1 : 0;
+            $('#km-pager-info').text('Menampilkan '+start+'–'+info.end + ' dari ' + total + ' data');
+            var pages = Math.max(info.pages, 1);
+            var page = info.page + 1;
+            $('#km-pager-pages').text('Halaman ' + (pages ? info.page + 1 : 0) + ' / ' + pages);
+            $('#km-pager-first, #km-pager-prev').toggleClass('disabled', page <= 1);
+            $('#km-pager-next, #km-pager-last').toggleClass('disabled', page >= pages);
+        }
+
+        kmTable.on('draw.dt', renderKmPager);
+        renderKmPager();
+
+        $('#km-pager-first').on('click', function() {
+            kmTable.page('first').draw('page');
+        });
+        $('#km-pager-prev').on('click', function() {
+            kmTable.page('previous').draw('page');
+        });
+        $('#km-pager-next').on('click', function() {
+            kmTable.page('next').draw('page');
+        });
+        $('#km-pager-last').on('click', function() {
+            kmTable.page('last').draw('page');
+        });
+        $('#km-pager-len').on('change', function() {
+            var v = $(this).val();
+            if (v === 'custom') { $('#km-pager-custom').focus(); return; }
+            var n = parseInt(v, 10) || 10;
+            $('#km-pager-custom').val(n);
+            kmTable.page.len(n).draw();
+        });
+        $('#km-pager-custom').on('change', function() {
+            var n = parseInt($(this).val(), 10) || 1;
+            n = Math.min(Math.max(n, 1), 500);
+            $(this).val(n);
+            if (['10', '20', '50', '100'].indexOf(String(n)) !== -1) { $('#km-pager-len').val(String(n)); }
+            else { $('#km-pager-len').val('custom'); }
+            kmTable.page.len(n).draw();
         });
 
     });
