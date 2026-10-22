@@ -338,7 +338,77 @@
                                 <h5 class="fw-bold text-success mb-0" id="pd-jumlah">-</h5>
                             </div>
                         </div>
+<!-- DETAIL RENTAL -->
+<div class="col-12">
+    <div class="border rounded-3 p-3">
+        <h6 class="fw-bold mb-3">
+            <i class="bi bi-car-front me-2"></i>Detail Rental
+        </h6>
 
+        <div class="row g-3">
+            <div class="col-md-6">
+                <small class="text-muted">ID Rental</small>
+                <div class="fw-semibold" id="pd-rental-id">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Status Rental</small>
+                <div class="fw-semibold" id="pd-rental-status">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Tanggal Mulai</small>
+                <div id="pd-rental-mulai">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Tanggal Selesai</small>
+                <div id="pd-rental-selesai">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Lama Sewa</small>
+                <div id="pd-rental-hari">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Harga per Hari</small>
+                <div id="pd-rental-harga">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Cabang Pengambilan</small>
+                <div id="pd-rental-cabang-ambil">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Cabang Pengembalian</small>
+                <div id="pd-rental-cabang-kembali">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Subtotal</small>
+                <div id="pd-rental-subtotal">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Deposit</small>
+                <div id="pd-rental-deposit">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Diskon</small>
+                <div id="pd-rental-diskon">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Total Rental</small>
+                <h5 class="fw-bold text-success mb-0" id="pd-rental-total">-</h5>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- AKHIR DETAIL RENTAL -->
                         <div class="col-md-6">
                             <div class="border rounded-3 p-3">
                                 <small class="text-muted fw-bold text-uppercase">Status</small>
@@ -628,6 +698,22 @@
                 $('#pd-tanggal').text(data.tanggal_bayar);
                 $('#pd-jumlah').text(formatRupiah(data.jumlah));
                 $('#pd-status').html(statusBadge(data.status));
+                
+const rental = data.rental || {};
+
+$('#pd-rental-id').text(rental.id ?? '-');
+$('#pd-rental-status').text(rental.status ?? '-');
+$('#pd-rental-mulai').text(rental.tanggal_mulai ?? '-');
+$('#pd-rental-selesai').text(rental.tanggal_selesai ?? '-');
+$('#pd-rental-hari').text((rental.jumlah_hari ?? 0) + ' hari');
+$('#pd-rental-harga').text(formatRupiah(rental.harga_perhari ?? 0));
+$('#pd-rental-cabang-ambil').text(rental.cabang_ambil ?? '-');
+$('#pd-rental-cabang-kembali').text(rental.cabang_kembali ?? '-');
+$('#pd-rental-subtotal').text(formatRupiah(rental.subtotal ?? 0));
+$('#pd-rental-deposit').text(formatRupiah(rental.deposit ?? 0));
+$('#pd-rental-diskon').text(formatRupiah(rental.diskon ?? 0));
+$('#pd-rental-total').text(formatRupiah(rental.total_harga ?? 0));
+
 
                 var $buktiContainer = $('#pd-bukti');
                 $buktiContainer.empty();

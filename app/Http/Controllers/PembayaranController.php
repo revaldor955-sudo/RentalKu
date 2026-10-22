@@ -152,59 +152,73 @@ class PembayaranController extends Controller
     /**
      * Detail pembayaran untuk modal popup.
      */
-    public function detail(Pembayaran $pembayaran)
-    {
-        if (! $pembayaran->rental) {
-            abort(404, 'Data rental tidak ditemukan.');
-        }
+   
 
-        // Customer hanya dapat melihat pembayaran rental miliknya.
-        if (
-            auth()->user()->roles_id === 3
-            && $pembayaran->rental->user_id !== auth()->id()
-        ) {
-            abort(
-                403,
-                'Anda tidak memiliki akses ke pembayaran ini.'
-            );
-        }
+public function detail(Pembayaran $pembayaran)
+{
+    $pembayaran->load([
+        'rental.user',
+        'rental.mobil',
+        'rental.cabangAmbil',
+        'rental.cabangKembali',
+        'metodePembayaran',
+    ]);
 
-        $pembayaran->load([
-            'rental.user',
-            'rental.mobil',
-            'rental.cabangAmbil',
-            'rental.cabangKembali',
-            'metodePembayaran',
-        ]);
+    $user = auth()->user();
 
+    if (!$user) {
         return response()->json([
-            'id' => $pembayaran->id,
-
-            'pelanggan' => $pembayaran->rental->user->name ?? '-',
-
-            'email' => $pembayaran->rental->user->email ?? '-',
-
-            'mobil' => $pembayaran->rental->mobil->name ?? '-',
-
-            'plat' => $pembayaran->rental->mobil->plate_number ?? '-',
-
-            'metode' => $pembayaran->metodePembayaran->name ?? '-',
-
-            'tanggal_bayar' => $pembayaran->tanggal_bayar
-                ? \Illuminate\Support\Carbon::parse(
-                    $pembayaran->tanggal_bayar
-                )->format('d/m/Y')
-                : '-',
-
-            'jumlah' => (float) $pembayaran->jumlah,
-
-            'bukti_url' => $pembayaran->bukti
-                ? asset('storage/' . $pembayaran->bukti)
-                : null,
-
-            'status' => $pembayaran->status,
-        ]);
+            'message' => 'Silakan login terlebih dahulu.',
+        ], 401);
     }
+
+    if (
+        (int) $user->roles_id === 3 &&
+        (int) $pembayaran->rental->user_id !== (int) $user->id
+    ) {
+        return response()->json([
+            'message' => 'Anda tidak berhak mengakses pembayaran ini.',
+        ], 403);
+    }
+
+    $rental = $pembayaran->rental;
+
+    return response()->json([
+        'pelanggan' => $rental->user->name ?? '-',
+        'email' => $rental->user->email ?? '-',
+        'mobil' => $rental->mobil->name ?? '-',
+        'plat' => $rental->mobil->plate_number ?? '-',
+        'metode' => $pembayaran->metodePembayaran->nama ?? '-',
+        'tanggal_bayar' => $pembayaran->tanggal_bayar
+            ? \Carbon\Carbon::parse($pembayaran->tanggal_bayar)->format('d/m/Y')
+            : '-',
+        'jumlah' => (float) $pembayaran->jumlah,
+        'status' => $pembayaran->status,
+        'bukti_url' => $pembayaran->bukti
+            ? asset('storage/' . $pembayaran->bukti)
+            : null,
+
+        'rental' => [
+            'id' => $rental->id,
+            'status' => $rental->status,
+            'tanggal_mulai' => $rental->tanggal_mulai
+                ? \Carbon\Carbon::parse($rental->tanggal_mulai)->format('d/m/Y')
+                : '-',
+            'tanggal_selesai' => $rental->tanggal_selesai
+                ? \Carbon\Carbon::parse($rental->tanggal_selesai)->format('d/m/Y')
+                : '-',
+            'jumlah_hari' => (int) ($rental->jumlah_hari ?? 0),
+            'harga_perhari' => (float) ($rental->harga_perhari ?? 0),
+            'cabang_ambil' => $rental->cabangAmbil->name ?? '-',
+            'cabang_kembali' => $rental->cabangKembali->name ?? '-',
+            'subtotal' => (float) ($rental->subtotal ?? 0),
+            'deposit' => (float) ($rental->deposit ?? 0),
+            'diskon' => (float) ($rental->diskon ?? 0),
+            'total_harga' => (float) ($rental->total_harga ?? 0),
+        ],
+    ]);
+}
+
 
     /**
      * Mengambil metode pembayaran milik cabang.

@@ -386,51 +386,130 @@
 <script>
     const CSRF_TOKEN = '{{ csrf_token() }}';
 
-    function updateRentalStatus(id, status) {
-        const confirmTexts = {
-            'Disetujui': 'Setujui pengajuan rental ini?',
-            'Ditolak': 'Tolak pengajuan rental ini?',
-            'Selesai': 'Selesaikan rental ini?',
+    // Mencegah HTML/script dari input pelanggan (mis. catatan) ikut tereksekusi di popup
+    function escapeHtml(str) {
+        return $('<div>').text(str == null ? '' : str).html();
+    }
+
+    // Susun isi popup konfirmasi dari detail pesanan rental
+    function buildRentalConfirmHtml(d, status) {
+        const row = function(label, value) {
+            return '<div class="d-flex justify-content-between py-1 border-bottom">' +
+                '<span class="text-muted">' + label + '</span>' +
+                '<span class="fw-semibold text-end ms-3">' + value + '</span>' +
+                '</div>';
         };
-        const text = confirmTexts[status] || 'Ubah status rental ini?';
 
+        const pesan = {
+            'Disetujui': 'Pastikan data di bawah sudah benar sebelum <b>menyetujui</b> pengajuan ini.',
+            'Ditolak': 'Periksa data di bawah sebelum <b>menolak</b> pengajuan ini.',
+            'Selesai': 'Periksa data di bawah sebelum <b>menyelesaikan</b> rental ini.',
+        }[status] || 'Periksa data pengajuan berikut.';
+
+        return '' +
+            '<div class="text-start" style="font-size:14px;">' +
+                '<p class="mb-3">' + pesan + '</p>' +
+
+                (d.mobil_image
+                    ? '<div class="text-center mb-3"><img src="' + escapeHtml(d.mobil_image) + '" ' +
+                      'style="width:140px;height:90px;object-fit:cover;border-radius:12px;"></div>'
+                    : '') +
+
+                row('Pelanggan', escapeHtml(d.pelanggan)) +
+                row('Email', escapeHtml(d.email)) +
+                row('Mobil', escapeHtml(d.mobil)) +
+                row('Plat Nomor', escapeHtml(d.plat)) +
+                row('Tanggal Sewa', escapeHtml(d.tanggal_mulai) + ' s/d ' + escapeHtml(d.tanggal_selesai)) +
+                row('Lama Sewa', escapeHtml(d.jumlah_hari) + ' hari') +
+                row('Cabang Ambil', escapeHtml(d.cabang_ambil)) +
+                row('Cabang Kembali', escapeHtml(d.cabang_kembali)) +
+                row('Harga / Hari', formatRupiah(d.harga_perhari)) +
+                row('Subtotal', formatRupiah(d.subtotal)) +
+                row('Deposit', formatRupiah(d.deposit)) +
+                row('Total', '<span class="text-success">' + formatRupiah(d.total_harga) + '</span>') +
+                row('Status Saat Ini', statusBadge(d.status)) +
+
+                '<div class="mt-3">' +
+                    '<span class="text-muted">Catatan pelanggan</span>' +
+                    '<div class="border rounded-3 p-2 mt-1">' + escapeHtml(d.catatan || '-') + '</div>' +
+                '</div>' +
+            '</div>';
+    }
+
+    function updateRentalStatus(id, status) {
+        const titles = {
+            'Disetujui': 'Setujui Pengajuan Rental?',
+            'Ditolak': 'Tolak Pengajuan Rental?',
+            'Selesai': 'Selesaikan Rental?',
+        };
+        const confirmColors = {
+            'Disetujui': '#198754',
+            'Ditolak': '#dc3545',
+            'Selesai': '#0dcaf0',
+        };
+
+        // 1. Ambil detail pesanan dulu
         Swal.fire({
-            title: 'Konfirmasi',
-            text: text,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya',
-            cancelButtonText: 'Batal',
-        }).then(function(result) {
-            if (!result.isConfirmed) return;
+            title: 'Memuat detail...',
+            allowOutsideClick: false,
+            didOpen: function() { Swal.showLoading(); },
+        });
 
-            $.ajax({
-                url: "{{ route('rentals.updateStatus', '__ID__') }}".replace('__ID__', id),
-                method: 'PUT',
-                headers: {
-                    'X-CSRF-TOKEN': CSRF_TOKEN,
-                    'Accept': 'application/json',
-                },
-                data: {
-                    status: status
-                },
-                success: function(res) {
-                    $('#rentals-table').DataTable().ajax.reload();
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil',
-                        text: res.message || 'Terjadi kesalahan',
+        $.ajax({
+            url: "{{ route('rentals.detail', '__ID__') }}".replace('__ID__', id),
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            success: function(d) {
+
+                // 2. Tampilkan detail + konfirmasi
+                Swal.fire({
+                    title: titles[status] || 'Ubah Status Rental?',
+                    html: buildRentalConfirmHtml(d, status),
+                    icon: status === 'Ditolak' ? 'warning' : 'question',
+                    width: 520,
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, ' + (status === 'Disetujui' ? 'Setujui' : status === 'Ditolak' ? 'Tolak' : 'Selesaikan'),
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: confirmColors[status] || '#198754',
+                    reverseButtons: true,
+                }).then(function(result) {
+                    if (!result.isConfirmed) return;
+
+                    // 3. Kirim perubahan status
+                    $.ajax({
+                        url: "{{ route('rentals.updateStatus', '__ID__') }}".replace('__ID__', id),
+                        method: 'PUT',
+                        headers: {
+                            'X-CSRF-TOKEN': CSRF_TOKEN,
+                            'Accept': 'application/json',
+                        },
+                        data: { status: status },
+                        success: function(res) {
+                            $('#rentals-table').DataTable().ajax.reload(null, false);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: res.message || 'Status rental berhasil diperbarui',
+                            });
+                        },
+                        error: function(xhr) {
+                            const res = xhr.responseJSON || {};
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: res.message || 'Terjadi kesalahan',
+                            });
+                        },
                     });
-                },
-                error: function(xhr) {
-                    const res = xhr.responseJSON || {};
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal',
-                        text: res.message || 'Terjadi kesalahan',
-                    });
-                },
-            });
+                });
+            },
+            error: function(xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal memuat detail',
+                    text: 'Tidak dapat mengambil detail rental: ' + xhr.status + ' ' + xhr.statusText,
+                });
+            },
         });
     }
 
