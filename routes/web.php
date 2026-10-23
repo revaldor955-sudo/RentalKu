@@ -539,9 +539,23 @@ Route::middleware('admin')->group(function () {
 */
 
 Route::middleware('adminstaff')->group(function () {
-    Route::resource('pengembalian', PengembalianController::class)->only(['index']);
+   Route::middleware('adminstaff')->group(function () {
 
-    Route::resource('pemeriksaan-kendaraan', PemeriksaanKendaraanController::class)->only(['index']);
+    // Menu Pengembalian
+    Route::resource('pengembalian', PengembalianController::class)
+        ->only(['index']);
+
+    // Detail rental pada menu Pengembalian
+    Route::get('/pengembalian/{rental}/detail', [
+        \App\Http\Controllers\PengembalianController::class,
+        'detail'
+    ])->name('pengembalian.detail');
+
+    // Menu Pemeriksaan Kendaraan
+    Route::resource('pemeriksaan-kendaraan', PemeriksaanKendaraanController::class)
+        ->only(['index']);
+
+});
 
     Route::get('/pemeriksaan-kendaraan/data', [PemeriksaanKendaraanController::class, 'data'])->name('pemeriksaan-kendaraan.data');
 

@@ -60,10 +60,12 @@ class Rental extends Model
         return $this->hasOne(Pembayaran::class, 'rental_id');
     }
 
-    public function dendas()
-    {
-        return $this->hasMany(Denda::class, 'rental_id');
-    }
+ 
+public function dendas()
+{
+    return $this->hasMany(\App\Models\Denda::class, 'rental_id');
+}
+
 
     public function kompensasis()
     {

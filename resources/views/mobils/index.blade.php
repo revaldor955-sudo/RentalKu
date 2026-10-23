@@ -484,7 +484,7 @@
                             </th>
 
                             <th>
-                                Tipe
+                                Tipe Mobil
                             </th>
 
                             <th>
@@ -584,7 +584,7 @@
                             <div class="col-md-4">
 
                                 <label class="form-label">
-                                    Brand Mobil
+                                    Brand
                                 </label>
 
                                 <select name="brand_id" class="form-select" required>
@@ -1004,7 +1004,7 @@
                             <div class="col-md-4">
 
                                 <label class="form-label">
-                                    Brand Mobil
+                                    Brand
                                 </label>
 
                                 <select name="brand_id"
