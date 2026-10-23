@@ -20,7 +20,8 @@ class PemeriksaanKendaraanController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        $kerusakanList = KerusakanMobil::orderBy('jenis_kerusakan')->get();
+        $kerusakanList = KerusakanMobil::orderBy('jenis_kerusakan')
+            ->get();
 
         return view('pemeriksaan_kendaraan.index', compact(
             'rentals',
@@ -33,9 +34,24 @@ class PemeriksaanKendaraanController extends Controller
         $recordsTotal = PemeriksaanMobil::count();
 
         $query = PemeriksaanMobil::query()
-            ->leftJoin('rentals', 'pemeriksaan_mobils.rental_id', '=', 'rentals.id')
-            ->leftJoin('users', 'rentals.user_id', '=', 'users.id')
-            ->leftJoin('mobils', 'rentals.mobil_id', '=', 'mobils.id')
+            ->leftJoin(
+                'rentals',
+                'pemeriksaan_mobils.rental_id',
+                '=',
+                'rentals.id'
+            )
+            ->leftJoin(
+                'users',
+                'rentals.user_id',
+                '=',
+                'users.id'
+            )
+            ->leftJoin(
+                'mobils',
+                'rentals.mobil_id',
+                '=',
+                'mobils.id'
+            )
             ->select(
                 'pemeriksaan_mobils.*',
                 'users.name as user_name',
@@ -51,9 +67,21 @@ class PemeriksaanKendaraanController extends Controller
                 $q->where('users.name', 'like', "%{$search}%")
                     ->orWhere('users.email', 'like', "%{$search}%")
                     ->orWhere('mobils.name', 'like', "%{$search}%")
-                    ->orWhere('mobils.plate_number', 'like', "%{$search}%")
-                    ->orWhere('pemeriksaan_mobils.jenis', 'like', "%{$search}%")
-                    ->orWhere('pemeriksaan_mobils.kondisi', 'like', "%{$search}%");
+                    ->orWhere(
+                        'mobils.plate_number',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'pemeriksaan_mobils.jenis',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'pemeriksaan_mobils.kondisi',
+                        'like',
+                        "%{$search}%"
+                    );
             });
         }
 
@@ -63,7 +91,9 @@ class PemeriksaanKendaraanController extends Controller
 
         $start = max(0, (int) $request->input('start', 0));
         $length = (int) $request->input('length', 10);
-        $length = $length === -1 ? 100 : min(max($length, 1), 100);
+        $length = $length === -1
+            ? 100
+            : min(max($length, 1), 100);
 
         $pemeriksaan = $query
             ->orderByDesc('pemeriksaan_mobils.created_at')
@@ -76,46 +106,81 @@ class PemeriksaanKendaraanController extends Controller
             'id',
             $pemeriksaan->pluck('id')
         )->with('kerusakan')->get()->mapWithKeys(function ($item) {
-            return [$item->id => $item->kerusakan->keyBy('id')];
+            return [
+                $item->id => $item->kerusakan->keyBy('id')
+            ];
         });
 
         $data = $pemeriksaan->map(function ($p) use ($kerusakanMap) {
             $kerusakan = $kerusakanMap->get($p->id, collect());
 
+            $fotoUmum = $p->foto_bukti;
+
             return [
                 'id' => $p->id,
                 'rental_id' => $p->rental_id,
+
                 'user_name' => $p->user_name ?? '-',
                 'user_email' => $p->user_email ?? '-',
                 'mobil_name' => $p->mobil_name ?? '-',
                 'mobil_plate' => $p->mobil_plate ?? '-',
+
                 'jenis' => $p->jenis,
                 'kondisi' => $p->kondisi,
+
                 'tanggal' => $p->tanggal
                     ? Carbon::parse($p->tanggal)->format('d/m/Y H:i')
                     : '-',
+
+                // Dibutuhkan oleh form Edit.
+                'tanggal_input' => $p->tanggal
+                    ? Carbon::parse($p->tanggal)->format('Y-m-d\TH:i')
+                    : '',
+
+                // Nama file dan URL foto bukti umum.
+                'foto_bukti' => $fotoUmum,
+                'foto_bukti_url' => $fotoUmum
+                    ? Storage::disk('public')->url($fotoUmum)
+                    : null,
+
                 'kerusakan' => $kerusakan
                     ->pluck('jenis_kerusakan')
                     ->values()
                     ->all(),
-                'kerusakan_ids' => $kerusakan->keys()->values()->all(),
-                'detail_kerusakan' => $kerusakan->mapWithKeys(function ($k) {
-                    return [
-                        $k->id => [
-                            'keterangan' => $k->pivot->keterangan ?? '',
-                            'catatan' => $k->pivot->catatan ?? '',
-                            'foto_bukti' => $k->pivot->foto_bukti ?? null,
-                            'foto_url' => $k->pivot->foto_bukti
-                                ? Storage::disk('public')->url($k->pivot->foto_bukti)
-                                : null,
-                        ],
-                    ];
-                })->all(),
-                'keterangan' => $kerusakan->mapWithKeys(function ($k) {
-                    return [$k->id => $k->pivot->keterangan ?? ''];
-                })->all(),
-                'catatan' => $p->catatan ?? '-',
-                'foto_bukti' => $p->foto_bukti,
+
+                'kerusakan_ids' => $kerusakan
+                    ->keys()
+                    ->values()
+                    ->all(),
+
+                'detail_kerusakan' => $kerusakan->mapWithKeys(
+                    function ($k) {
+                        $fotoBagian = $k->pivot->foto_bukti ?? null;
+
+                        return [
+                            $k->id => [
+                                'keterangan' => $k->pivot->keterangan ?? '',
+                                'catatan' => $k->pivot->catatan ?? '',
+                                'foto_bukti' => $fotoBagian,
+                                'foto_url' => $fotoBagian
+                                    ? Storage::disk('public')->url(
+                                        $fotoBagian
+                                    )
+                                    : null,
+                            ],
+                        ];
+                    }
+                )->all(),
+
+                'keterangan' => $kerusakan->mapWithKeys(
+                    function ($k) {
+                        return [
+                            $k->id => $k->pivot->keterangan ?? ''
+                        ];
+                    }
+                )->all(),
+
+                'catatan' => $p->catatan ?? '',
             ];
         });
 
@@ -135,7 +200,10 @@ class PemeriksaanKendaraanController extends Controller
             $rental = Rental::findOrFail($validated['rental_id']);
 
             $fotoBukti = $request->hasFile('foto_bukti')
-                ? $request->file('foto_bukti')->store('pemeriksaan', 'public')
+                ? $request->file('foto_bukti')->store(
+                    'pemeriksaan',
+                    'public'
+                )
                 : null;
 
             $pemeriksaan = PemeriksaanMobil::create([
@@ -156,11 +224,22 @@ class PemeriksaanKendaraanController extends Controller
         ]);
     }
 
-    public function update(Request $request, PemeriksaanMobil $pemeriksaan)
-    {
+    public function update(
+        Request $request,
+        PemeriksaanMobil $pemeriksaan
+    ) {
         $validated = $this->validatePemeriksaan($request);
 
-        DB::transaction(function () use ($request, $validated, $pemeriksaan) {
+        DB::transaction(function () use (
+            $request,
+            $validated,
+            $pemeriksaan
+        ) {
+            // Ambil ulang data yang akan diperbarui.
+            $pemeriksaan = PemeriksaanMobil::whereKey($pemeriksaan->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
             $rental = Rental::findOrFail($validated['rental_id']);
 
             $data = [
@@ -172,10 +251,16 @@ class PemeriksaanKendaraanController extends Controller
                 'catatan' => $validated['catatan'] ?? null,
             ];
 
+            // Jika tidak memilih foto baru, foto lama tetap dipertahankan.
             if ($request->hasFile('foto_bukti')) {
                 $oldPhoto = $pemeriksaan->foto_bukti;
-                $data['foto_bukti'] = $request->file('foto_bukti')
-                    ->store('pemeriksaan', 'public');
+
+                $newPhoto = $request->file('foto_bukti')->store(
+                    'pemeriksaan',
+                    'public'
+                );
+
+                $data['foto_bukti'] = $newPhoto;
 
                 if ($oldPhoto) {
                     Storage::disk('public')->delete($oldPhoto);
@@ -192,8 +277,10 @@ class PemeriksaanKendaraanController extends Controller
         ]);
     }
 
-    public function destroy(Request $request, PemeriksaanMobil $pemeriksaan)
-    {
+    public function destroy(
+        Request $request,
+        PemeriksaanMobil $pemeriksaan
+    ) {
         DB::transaction(function () use ($pemeriksaan) {
             $pemeriksaan->load('kerusakan');
 
@@ -206,7 +293,9 @@ class PemeriksaanKendaraanController extends Controller
             }
 
             if ($pemeriksaan->foto_bukti) {
-                Storage::disk('public')->delete($pemeriksaan->foto_bukti);
+                Storage::disk('public')->delete(
+                    $pemeriksaan->foto_bukti
+                );
             }
 
             $pemeriksaan->kerusakan()->detach();
@@ -226,6 +315,7 @@ class PemeriksaanKendaraanController extends Controller
             'kondisi' => 'required|in:baik,rusak',
             'tanggal' => 'required|date',
             'catatan' => 'nullable|string|max:1000',
+
             'foto_bukti' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
 
             'kerusakan' => 'nullable|array',
@@ -244,8 +334,13 @@ class PemeriksaanKendaraanController extends Controller
             'jenis.required' => 'Jenis pemeriksaan wajib diisi.',
             'kondisi.required' => 'Kondisi wajib diisi.',
             'tanggal.required' => 'Tanggal wajib diisi.',
-            'foto_kerusakan.*.image' => 'Foto setiap bagian kerusakan harus berupa gambar.',
-            'foto_kerusakan.*.mimes' => 'Foto harus berformat JPG, JPEG, atau PNG.',
+
+            'foto_bukti.image' => 'Foto bukti umum harus berupa gambar.',
+            'foto_bukti.mimes' => 'Foto bukti umum harus berformat JPG, JPEG, atau PNG.',
+            'foto_bukti.max' => 'Ukuran foto bukti umum maksimal 2 MB.',
+
+            'foto_kerusakan.*.image' => 'Foto setiap bagian harus berupa gambar.',
+            'foto_kerusakan.*.mimes' => 'Foto setiap bagian harus berformat JPG, JPEG, atau PNG.',
             'foto_kerusakan.*.max' => 'Ukuran setiap foto maksimal 2 MB.',
         ]);
 
@@ -254,21 +349,27 @@ class PemeriksaanKendaraanController extends Controller
             $validated['kerusakan'] ?? []
         );
 
-        foreach (['keterangan', 'catatan_kerusakan', 'foto_kerusakan'] as $field) {
+        foreach (
+            ['keterangan', 'catatan_kerusakan', 'foto_kerusakan']
+            as $field
+        ) {
             foreach (array_keys($request->input($field, [])) as $id) {
                 if (!in_array((string) $id, $selectedIds, true)) {
                     throw ValidationException::withMessages([
                         $field . '.' . $id =>
-                            'Data kerusakan harus sesuai dengan bagian yang dipilih.',
+                            'Data harus sesuai dengan bagian yang dipilih.',
                     ]);
                 }
             }
 
-            foreach (array_keys($request->allFiles()[$field] ?? []) as $id) {
+            foreach (
+                array_keys($request->allFiles()[$field] ?? [])
+                as $id
+            ) {
                 if (!in_array((string) $id, $selectedIds, true)) {
                     throw ValidationException::withMessages([
                         $field . '.' . $id =>
-                            'Foto harus sesuai dengan bagian kerusakan yang dipilih.',
+                            'Foto harus sesuai dengan bagian yang dipilih.',
                     ]);
                 }
             }
@@ -282,10 +383,16 @@ class PemeriksaanKendaraanController extends Controller
         Request $request
     ): void {
         $ids = array_values(array_unique(
-            array_map('intval', $request->input('kerusakan', []))
+            array_map(
+                'intval',
+                $request->input('kerusakan', [])
+            )
         ));
 
-        $existing = $pemeriksaan->kerusakan()->get()->keyBy('id');
+        $existing = $pemeriksaan->kerusakan()
+            ->get()
+            ->keyBy('id');
+
         $pivot = [];
 
         foreach ($ids as $id) {
@@ -294,6 +401,7 @@ class PemeriksaanKendaraanController extends Controller
             $newPhoto = $request->file("foto_kerusakan.{$id}");
             $photoPath = $oldPhoto;
 
+            // Foto lama tetap digunakan jika tidak memilih foto baru.
             if ($newPhoto) {
                 $photoPath = $newPhoto->store(
                     'pemeriksaan/kerusakan',
@@ -306,16 +414,22 @@ class PemeriksaanKendaraanController extends Controller
             }
 
             $pivot[$id] = [
-                'keterangan' => $request->input("keterangan.{$id}"),
-                'catatan' => $request->input("catatan_kerusakan.{$id}"),
+                'keterangan' => $request->input(
+                    "keterangan.{$id}"
+                ),
+                'catatan' => $request->input(
+                    "catatan_kerusakan.{$id}"
+                ),
                 'foto_bukti' => $photoPath,
             ];
         }
 
-        // Hapus foto milik bagian kerusakan yang tidak lagi dipilih.
+        // Hapus foto bagian yang tidak lagi dipilih.
         foreach ($existing as $id => $kerusakan) {
-            if (!in_array((int) $id, $ids, true)
-                && $kerusakan->pivot->foto_bukti) {
+            if (
+                !in_array((int) $id, $ids, true)
+                && $kerusakan->pivot->foto_bukti
+            ) {
                 Storage::disk('public')->delete(
                     $kerusakan->pivot->foto_bukti
                 );
