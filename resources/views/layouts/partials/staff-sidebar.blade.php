@@ -84,35 +84,35 @@
                 <div class="section-label" data-section-label="master">Kendaraan</div>
                 <ul class="nav-list" role="list">
                     <li class="nav-item">
-                        <a href="{{ route('brands.index') }}"
-                            class="nav-link {{ request()->routeIs('brands*') ? 'active' : '' }}"
-                            aria-current="{{ request()->routeIs('brands*') ? 'page' : 'false' }}">
-                            <i class="bi bi-tags nav-icon" aria-hidden="true"></i>
-                            <span class="nav-text">Merek</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('tipe_mobils.index') }}"
-                            class="nav-link {{ request()->routeIs('tipe_mobils*') ? 'active' : '' }}"
-                            aria-current="{{ request()->routeIs('tipe_mobils*') ? 'page' : 'false' }}">
-                            <i class="bi bi-list-check nav-icon" aria-hidden="true"></i>
-                            <span class="nav-text">Tipe Mobil</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('fasilitas.index') }}"
-                            class="nav-link {{ request()->routeIs('fasilitas*') ? 'active' : '' }}"
-                            aria-current="{{ request()->routeIs('fasilitas*') ? 'page' : 'false' }}">
-                            <i class="bi bi-stars nav-icon" aria-hidden="true"></i>
-                            <span class="nav-text">Fasilitas</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a href="{{ route('servis_mobils.index') }}"
                             class="nav-link {{ request()->routeIs('servis_mobils*') ? 'active' : '' }}"
                             aria-current="{{ request()->routeIs('servis_mobils*') ? 'page' : 'false' }}">
                             <i class="bi bi-tools nav-icon" aria-hidden="true"></i>
                             <span class="nav-text">Servis Mobil</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('kerusakan_mobils.index') }}"
+                            class="nav-link {{ request()->routeIs('kerusakan_mobils*') ? 'active' : '' }}"
+                            aria-current="{{ request()->routeIs('kerusakan_mobils*') ? 'page' : 'false' }}">
+                            <i class="bi bi-exclamation-diamond nav-icon" aria-hidden="true"></i>
+                            <span class="nav-text">Kerusakan Mobil</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('foto_mobils.index') }}"
+                            class="nav-link {{ request()->routeIs('foto_mobils*') ? 'active' : '' }}"
+                            aria-current="{{ request()->routeIs('foto_mobils*') ? 'page' : 'false' }}">
+                            <i class="bi bi-images nav-icon" aria-hidden="true"></i>
+                            <span class="nav-text">Foto Mobil</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('dokumen_mobils.index') }}"
+                            class="nav-link {{ request()->routeIs('dokumen_mobils*') ? 'active' : '' }}"
+                            aria-current="{{ request()->routeIs('dokumen_mobils*') ? 'page' : 'false' }}">
+                            <i class="bi bi-file-earmark-text nav-icon" aria-hidden="true"></i>
+                            <span class="nav-text">Dokumen Mobil</span>
                         </a>
                     </li>
                 </ul>
@@ -185,44 +185,6 @@
                             aria-current="{{ request()->routeIs('kompensasis*') ? 'page' : 'false' }}">
                             <i class="bi bi-cash-coin nav-icon" aria-hidden="true"></i>
                             <span class="nav-text">Kompensasi</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            {{-- Pengguna & Akses --}}
-            <div class="sidebar-section" data-section="users">
-                <div class="section-label" data-section-label="users">Pengguna</div>
-                <ul class="nav-list" role="list">
-                    <li class="nav-item">
-                        <a href="{{ route('users.index') }}"
-                            class="nav-link {{ request()->routeIs('users*') ? 'active' : '' }}"
-                            aria-current="{{ request()->routeIs('users*') ? 'page' : 'false' }}">
-                            <i class="bi bi-people nav-icon" aria-hidden="true"></i>
-                            <span class="nav-text">Pengguna</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            {{-- Promo & Konten --}}
-            <div class="sidebar-section" data-section="content">
-                <div class="section-label" data-section-label="content">Promo & Konten</div>
-                <ul class="nav-list" role="list">
-                    <li class="nav-item">
-                        <a href="{{ route('kupons.index') }}"
-                            class="nav-link {{ request()->routeIs('kupons*') ? 'active' : '' }}"
-                            aria-current="{{ request()->routeIs('kupons*') ? 'page' : 'false' }}">
-                            <i class="bi bi-ticket-perforated nav-icon" aria-hidden="true"></i>
-                            <span class="nav-text">Promo & Kupon</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('banners.index') }}"
-                            class="nav-link {{ request()->routeIs('banners*') ? 'active' : '' }}"
-                            aria-current="{{ request()->routeIs('banners*') ? 'page' : 'false' }}">
-                            <i class="bi bi-images nav-icon" aria-hidden="true"></i>
-                            <span class="nav-text">Banner</span>
                         </a>
                     </li>
                 </ul>

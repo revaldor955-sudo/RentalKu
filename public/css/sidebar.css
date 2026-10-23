@@ -142,7 +142,9 @@
     }
 
     .sidebar-section {
-        flex: 1 0 auto;
+        /* Jangan biarkan grup menu melar: sisa tinggi sidebar harus
+           menumpuk di bawah menu, bukan jadi celah di tiap grup. */
+        flex: 0 0 auto;
         display: flex;
         flex-direction: column;
         margin-bottom: 8px;

@@ -36,7 +36,7 @@ class RatingController extends Controller
                 })
                     ->orWhereHas('booking.mobil', function ($mobil) use ($search) {
                         $mobil->where(
-                            'nama_mobil',
+                            'name',
                             'like',
                             "%{$search}%"
                         );
@@ -83,7 +83,7 @@ class RatingController extends Controller
                 'id' => $r->id,
                 'customer_name' => $r->customer?->name ?? 'Anonim',
                 'customer_email' => $r->customer?->email ?? '',
-                'mobil_name' => $r->booking?->mobil?->nama_mobil ?? '-',
+                'mobil_name' => $r->booking?->mobil?->name ?? '-',
                 'booking_id' => $r->booking_id,
                 'rating' => $r->rating,
                 'komentar' => $r->komentar,

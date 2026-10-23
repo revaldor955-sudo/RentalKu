@@ -656,12 +656,25 @@
     // FOTO SUPIR
     // ============================================================
 
+    // Sebagian data lama menyimpan URL absolut (ui-avatars), jangan
+    // ditempel lagi ke PHOTO_URL agar tidak menjadi .../https://...
+    function supirPhotoUrl(image) {
+
+        if (/^https?:\/\//i.test(image)) {
+
+            return image;
+        }
+
+        return PHOTO_URL.replace('__PHOTO__', image);
+    }
+
+
     function supirPhoto(image) {
 
         if (image) {
 
             return '<img src="' +
-                PHOTO_URL.replace('__PHOTO__', image) +
+                supirPhotoUrl(image) +
                 '" class="supir-photo" alt="Foto supir">';
 
         }
@@ -1128,10 +1141,7 @@
             $('#editFotoPreview')
                 .attr(
                     'src',
-                    PHOTO_URL.replace(
-                        '__PHOTO__',
-                        data.image
-                    )
+                    supirPhotoUrl(data.image)
                 )
                 .show();
 
