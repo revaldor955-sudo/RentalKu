@@ -52,9 +52,9 @@ Route::middleware('admin')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('roles/data', [RoleController::class, 'data'])->name('roles.data');
+    // Route::get('roles/data', [RoleController::class, 'data'])->name('roles.data');
 
-    Route::resource('roles', RoleController::class)->except(['create', 'edit', 'show']);
+    // Route::resource('roles', RoleController::class)->except(['create', 'edit', 'show']);
 
     /*
     |--------------------------------------------------------------------------
