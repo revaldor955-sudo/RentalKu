@@ -200,14 +200,14 @@
                             <span class="nav-text">Pengguna</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="{{ route('roles.index') }}"
                             class="nav-link {{ request()->routeIs('roles*') ? 'active' : '' }}"
                             aria-current="{{ request()->routeIs('roles*') ? 'page' : 'false' }}">
                             <i class="bi bi-shield-lock nav-icon" aria-hidden="true"></i>
                             <span class="nav-text">Role</span>
                         </a>
-                    </li>
+                    </li> --}}
                 </ul>
             </div>
 
