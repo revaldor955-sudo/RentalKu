@@ -45,14 +45,14 @@
         @csrf @method('PUT')
 
         <ul class="nav nav-pills mb-4 gap-2 bg-white p-2 rounded-4 shadow-sm border border-light" id="landingTabs" role="tablist">
-            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#hero" type="button">Hero</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#about" type="button">About</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#stats" type="button">Stats</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#brand" type="button">Brand</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#promo" type="button">Promo</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#steps" type="button">Steps</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#testimonial" type="button">Testi</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#faq" type="button">FAQ</button></li>
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#hero" type="button">Bagian Utama</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#about" type="button">Tentang Kami</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#stats" type="button">Statistik</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#brand" type="button">Merek</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#promo" type="button">Promosi</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#steps" type="button">Langkah Penyewaan</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#testimonial" type="button">Testimoni</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#faq" type="button">Tanya Jawab</button></li>
         </ul>
 
         <div class="tab-content" id="landingTabsContent">
@@ -86,22 +86,67 @@
                     <div class="mb-0"><label class="form-label">Fitur 4 — Deskripsi</label><textarea name="about_feature_4_desc" class="form-control" rows="2">{{ old('about_feature_4_desc', $settings['about_feature_4_desc'] ?? '') }}</textarea></div>
                 </div>
             </div>
-            <div class="tab-pane fade" id="stats">
-                <div class="page-card">
-                    <p class="text-muted small">Kosongkan angka agar otomatis memakai hitungan database.</p>
-                    <div class="mb-3"><label class="form-label">Mobil — Angka</label><input type="number" min="0" max="9999999" step="1" name="stats_mobil_value" class="form-control" value="{{ old('stats_mobil_value', $settings['stats_mobil_value'] ?? '') }}" placeholder="Otomatis: jumlah mobil Tersedia"></div>
-                    <div class="mb-3"><label class="form-label">Mobil — Label</label><input type="text" name="stats_mobil_label" class="form-control" maxlength="255" value="{{ old('stats_mobil_label', $settings['stats_mobil_label'] ?? '') }}" placeholder="Mobil Tersedia"></div>
-                    <hr>
-                    <div class="mb-3"><label class="form-label">Pelanggan — Angka</label><input type="number" min="0" max="9999999" step="1" name="stats_pelanggan_value" class="form-control" value="{{ old('stats_pelanggan_value', $settings['stats_pelanggan_value'] ?? '') }}" placeholder="Otomatis: rental Selesai + 1200"></div>
-                    <div class="mb-3"><label class="form-label">Pelanggan — Label</label><input type="text" name="stats_pelanggan_label" class="form-control" maxlength="255" value="{{ old('stats_pelanggan_label', $settings['stats_pelanggan_label'] ?? '') }}" placeholder="Pelanggan Puas"></div>
-                    <hr>
-                    <div class="mb-3"><label class="form-label">Support — Angka</label><input type="text" name="stats_support_value" class="form-control" maxlength="50" value="{{ old('stats_support_value', $settings['stats_support_value'] ?? '') }}" placeholder="24/7"></div>
-                    <div class="mb-3"><label class="form-label">Support — Label</label><input type="text" name="stats_support_label" class="form-control" maxlength="255" value="{{ old('stats_support_label', $settings['stats_support_label'] ?? '') }}" placeholder="Layanan Support"></div>
-                    <hr>
-                    <div class="mb-3"><label class="form-label">Rating — Angka</label><input type="number" min="0" max="5" step="0.1" name="stats_rating_value" class="form-control" value="{{ old('stats_rating_value', $settings['stats_rating_value'] ?? '') }}" placeholder="Otomatis: rata-rata rating"></div>
-                    <div class="mb-0"><label class="form-label">Rating — Label</label><input type="text" name="stats_rating_label" class="form-control" maxlength="255" value="{{ old('stats_rating_label', $settings['stats_rating_label'] ?? '') }}" placeholder="Rating Rata-rata"></div>
-                </div>
-            </div>
+           
+<div class="tab-pane fade" id="stats">
+    <div class="page-card">
+        <p class="text-muted small">
+            Kosongkan angka agar otomatis memakai hitungan database.
+        </p>
+
+        <div class="mb-3">
+            <label class="form-label">Mobil — Angka</label>
+            <input type="number" min="0" max="9999999" step="1"
+                name="stats_mobil_value" class="form-control"
+                value="{{ old('stats_mobil_value', $settings['stats_mobil_value'] ?? '') }}"
+                placeholder="Otomatis: jumlah mobil Tersedia">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Mobil — Label</label>
+            <input type="text" name="stats_mobil_label"
+                class="form-control" maxlength="255"
+                value="{{ old('stats_mobil_label', $settings['stats_mobil_label'] ?? '') }}"
+                placeholder="Mobil Tersedia">
+        </div>
+
+        <hr>
+
+        <div class="mb-3">
+            <label class="form-label">Pelanggan — Angka</label>
+            <input type="number" min="0" max="9999999" step="1"
+                name="stats_pelanggan_value" class="form-control"
+                value="{{ old('stats_pelanggan_value', $settings['stats_pelanggan_value'] ?? '') }}"
+                placeholder="Otomatis: rental Selesai + 1200">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Pelanggan — Label</label>
+            <input type="text" name="stats_pelanggan_label"
+                class="form-control" maxlength="255"
+                value="{{ old('stats_pelanggan_label', $settings['stats_pelanggan_label'] ?? '') }}"
+                placeholder="Pelanggan Puas">
+        </div>
+
+        <hr>
+
+        <div class="mb-3">
+            <label class="form-label">Rating — Angka</label>
+            <input type="number" min="0" max="5" step="0.1"
+                name="stats_rating_value" class="form-control"
+                value="{{ old('stats_rating_value', $settings['stats_rating_value'] ?? '') }}"
+                placeholder="Otomatis: rata-rata rating">
+        </div>
+
+        <div class="mb-0">
+            <label class="form-label">Rating — Label</label>
+            <input type="text" name="stats_rating_label"
+                class="form-control" maxlength="255"
+                value="{{ old('stats_rating_label', $settings['stats_rating_label'] ?? '') }}"
+                placeholder="Rating Rata-rata">
+        </div>
+    </div>
+</div>
+
             <div class="tab-pane fade" id="brand">
                 <div class="page-card">
                     <div class="mb-3"><label class="form-label">Brand Badge</label><input type="text" name="brand_badge" class="form-control" maxlength="255" value="{{ old('brand_badge', $settings['brand_badge'] ?? '') }}" placeholder="BRAND PILIHAN"></div>

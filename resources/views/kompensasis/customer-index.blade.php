@@ -1042,6 +1042,79 @@
             </div>
 
         </div>
+        
+<div class="modal fade" id="editKompensasiModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-pencil-square me-2"></i>Edit Klaim Kompensasi
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="formEditKompensasi" method="POST"
+                action="" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+
+                <div class="modal-body">
+                    <div class="alert alert-info small">
+                        Klaim hanya dapat diedit selama statusnya masih Diajukan.
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Jenis Kompensasi</label>
+                        <select name="jenis" id="editJenis" class="form-select" required>
+                            <option value="pengembalian_dana">Pengembalian Dana</option>
+                            <option value="diskon">Diskon Sewa Berikutnya</option>
+                            <option value="gratis_sewa">Gratis Sewa Berikutnya</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3" id="editNominalWrap">
+                        <label class="form-label fw-semibold">Nominal (Rp)</label>
+                        <input type="text" id="editNominalDisplay"
+                            class="form-control rupiah-input"
+                            inputmode="numeric" data-target="editNominal">
+                        <input type="hidden" name="nominal" id="editNominal">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Alasan</label>
+                        <textarea name="alasan" id="editAlasan"
+                            class="form-control" rows="4" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tanggal Kejadian</label>
+                        <input type="date" name="tanggal" id="editTanggal"
+                            class="form-control" max="{{ now()->format('Y-m-d') }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Ganti Bukti Foto (Opsional)</label>
+                        <input type="file" name="bukti[]" class="form-control"
+                            id="editBukti" multiple accept=".jpg,.jpeg,.png">
+                        <small class="text-muted">
+                            Jika ingin mengganti bukti, pilih 2–5 foto JPG, JPEG, atau PNG,
+                            maksimal 2 MB per foto. Kosongkan jika bukti tidak diganti.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-green">
+                        <i class="bi bi-save me-1"></i>Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 
     </div>
 
@@ -1377,13 +1450,31 @@
                         searchable: false,
                         className: 'text-center',
                         width: '140px',
-                        render: function(data, type, row) {
-                            return '<div class="d-flex justify-content-center gap-2">' +
-                                '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
-                                'title="Detail" onclick="openDetail(' + data + ')">' +
-                                '<i class="bi bi-eye"></i></button>' +
-                                '</div>';
-                        },
+                       
+render: function(data, type, row) {
+    let html =
+        '<div class="d-flex justify-content-center gap-2">' +
+        '<button type="button" class="btn p-1 text-primary" ' +
+        'style="border:none;background:none;" title="Detail" ' +
+        'onclick="openDetail(' + data + ')">' +
+        '<i class="bi bi-eye"></i></button>';
+
+    if (row.status === 'diajukan') {
+        html +=
+            '<button type="button" class="btn p-1 text-success" ' +
+            'style="border:none;background:none;" title="Edit" ' +
+            'onclick="openEditKompensasi(' + data + ')">' +
+            '<i class="bi bi-pencil-square"></i></button>' +
+
+            '<button type="button" class="btn p-1 text-danger" ' +
+            'style="border:none;background:none;" title="Hapus" ' +
+            'onclick="hapusKompensasi(' + data + ')">' +
+            '<i class="bi bi-trash"></i></button>';
+    }
+
+    return html + '</div>';
+},
+
                     },
                 ],
                 order: [
@@ -1822,8 +1913,141 @@
                 }
             });
         }
-    </script>
 
+
+        
+function openEditKompensasi(id) {
+    const table = $('#kompensasis-table').DataTable();
+    const data = table.rows().data().toArray().find(r => r.id == id);
+
+    if (!data || data.status !== 'diajukan') {
+        Swal.fire('Tidak bisa diedit', 'Klaim ini sudah diproses.', 'warning');
+        return;
+    }
+
+    $('#formEditKompensasi').attr(
+        'action',
+        "{{ url('/customer/kompensasi') }}/" + id
+    );
+
+    $('#editJenis').val(data.jenis);
+    $('#editNominal').val(
+        data.jenis === 'pengembalian_dana' ? data.nominal : ''
+    );
+    $('#editNominalDisplay').val(
+        data.jenis === 'pengembalian_dana'
+            ? formatRupiahInput(data.nominal)
+            : ''
+    );
+    $('#editAlasan').val(data.alasan || '');
+    $('#editTanggal').val(data.tanggal_iso || '');
+    $('#editBukti').val('');
+
+    $('#editNominalWrap').toggle(
+        data.jenis === 'pengembalian_dana'
+    );
+
+    bootstrap.Modal.getOrCreateInstance(
+        document.getElementById('editKompensasiModal')
+    ).show();
+}
+
+$('#editJenis').on('change', function() {
+    const perluNominal = this.value === 'pengembalian_dana';
+
+    $('#editNominalWrap').toggle(perluNominal);
+
+    if (!perluNominal) {
+        $('#editNominal').val('0');
+        $('#editNominalDisplay').val('');
+    }
+});
+
+$('#formEditKompensasi').on('submit', function(e) {
+    e.preventDefault();
+
+    if ($('#editJenis').val() === 'pengembalian_dana' &&
+        Number($('#editNominal').val()) <= 0) {
+        Swal.fire('Periksa nominal', 'Nominal pengembalian dana harus lebih dari 0.', 'warning');
+        return;
+    }
+
+    const form = this;
+    const formData = new FormData(form);
+
+    $.ajax({
+        url: $(form).attr('action'),
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: {
+            'Accept': 'application/json',
+            'X-HTTP-Method-Override': 'PUT'
+        },
+        success: function(response) {
+            bootstrap.Modal.getOrCreateInstance(
+                document.getElementById('editKompensasiModal')
+            ).hide();
+
+            Swal.fire('Berhasil', response.message, 'success');
+            $('#kompensasis-table').DataTable().ajax.reload(null, false);
+        },
+        error: function(xhr) {
+            const pesan = xhr.responseJSON?.message ||
+                'Klaim gagal diperbarui. Periksa kembali data yang diisi.';
+
+            Swal.fire('Gagal', pesan, 'error');
+        }
+    });
+});
+
+function hapusKompensasi(id) {
+    const data = $('#kompensasis-table').DataTable()
+        .rows().data().toArray().find(r => r.id == id);
+
+    if (!data || data.status !== 'diajukan') {
+        Swal.fire('Tidak bisa dihapus', 'Klaim ini sudah diproses.', 'warning');
+        return;
+    }
+
+    Swal.fire({
+        title: 'Hapus klaim kompensasi?',
+        text: 'Klaim yang dihapus tidak dapat dikembalikan.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, hapus',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#dc3545'
+    }).then(function(result) {
+        if (!result.isConfirmed) return;
+
+        $.ajax({
+            url: "{{ url('/customer/kompensasi') }}/" + id,
+            type: 'POST',
+            data: {
+                _token: CSRF_TOKEN,
+                _method: 'DELETE'
+            },
+            headers: {
+                'Accept': 'application/json'
+            },
+            success: function(response) {
+                Swal.fire('Berhasil', response.message, 'success');
+                $('#kompensasis-table').DataTable().ajax.reload(null, false);
+            },
+            error: function(xhr) {
+                Swal.fire(
+                    'Gagal',
+                    xhr.responseJSON?.message || 'Klaim gagal dihapus.',
+                    'error'
+                );
+            }
+        });
+    });
+}
+
+    </script>
 </body>
 
 </html>

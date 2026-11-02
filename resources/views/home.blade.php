@@ -361,10 +361,12 @@
                 <h2 class="fw-bold display-5 mb-1">{{ !empty($landingSettings['stats_pelanggan_value']) ? $landingSettings['stats_pelanggan_value'] . '+' : $totalPuas . '+' }}</h2>
                 <p class="mb-0 opacity-75">{{ $landingSettings['stats_pelanggan_label'] ?? 'Pelanggan Puas' }}</p>
             </div>
-            <div class="col-6 col-md-3">
-                <h2 class="fw-bold display-5 mb-1">{{ $landingSettings['stats_support_value'] ?? '24/7' }}</h2>
-                <p class="mb-0 opacity-75">{{ $landingSettings['stats_support_label'] ?? 'Layanan Support' }}</p>
-            </div>
+           <div class="col-6 col-md-3">
+    <div class="stat-item text-center">
+        <h2 class="fw-bold">24/7</h2>
+        <p>Layanan Support</p>
+    </div>
+</div>
             <div class="col-6 col-md-3">
                 <h2 class="fw-bold display-5 mb-1">{{ !empty($landingSettings['stats_rating_value']) ? $landingSettings['stats_rating_value'] : ($ratingRata ?: '4.9') }}</h2>
                 <p class="mb-0 opacity-75">{{ $landingSettings['stats_rating_label'] ?? 'Rating Rata-rata' }}</p>
