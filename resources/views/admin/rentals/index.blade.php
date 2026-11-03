@@ -87,8 +87,17 @@
         }
 
         .status-selesai {
-            background: #cff4fc;
-            color: #055160;
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .proof-image {
+            width: 120px;
+            height: 84px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #E5E7EB;
+            cursor: zoom-in;
         }
 
         /* Sidebar layout base styles are in admin-sidebar.blade.php */
@@ -356,6 +365,47 @@
 
                         <div class="col-12">
                             <div class="border rounded-3 p-3">
+                                <small class="text-muted fw-bold text-uppercase">Pembayaran</small>
+
+                                <div id="rd-pembayaran-empty" class="text-muted small mt-2">
+                                    Belum ada pembayaran.
+                                </div>
+
+                                <div id="rd-pembayaran-content" class="d-none">
+                                    <div class="row g-2 mt-1">
+                                        <div class="col-sm-6">
+                                            <small class="text-muted d-block">Metode</small>
+                                            <span class="fw-semibold" id="rd-pembayaran-metode">-</span>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <small class="text-muted d-block">Tanggal Bayar</small>
+                                            <span class="fw-semibold" id="rd-pembayaran-tanggal">-</span>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <small class="text-muted d-block">Jumlah</small>
+                                            <span class="fw-semibold" id="rd-pembayaran-jumlah">-</span>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <small class="text-muted d-block">Status</small>
+                                            <div id="rd-pembayaran-status">-</div>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <small class="text-muted d-block">Bukti Transfer</small>
+                                            <div id="rd-pembayaran-bukti" class="mt-1">
+                                                <span class="text-muted small">Tidak ada</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="border rounded-3 p-3">
                                 <small class="text-muted fw-bold text-uppercase">Catatan</small>
                                 <p class="mb-0" id="rd-catatan">-</p>
                             </div>
@@ -365,6 +415,25 @@
 
                 </div>
 
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="modal fade" id="buktiPembayaranRentalModal" tabindex="-1"
+    aria-labelledby="buktiPembayaranRentalLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            @include('layouts.partials.modal-head', ['title' => 'Bukti Pembayaran', 'icon' => 'bi-image', 'titleId' => 'buktiPembayaranRentalLabel'])
+
+            <div class="modal-body p-3 text-center">
+                <img id="buktiPembayaranRentalImg" src="" class="img-fluid rounded" alt="Bukti pembayaran">
             </div>
 
         </div>
@@ -697,6 +766,9 @@
             $loading.removeClass('d-none');
             $error.addClass('d-none');
             $content.addClass('d-none');
+            $('#rd-pembayaran-empty').removeClass('d-none');
+            $('#rd-pembayaran-content').addClass('d-none');
+            $('#rd-pembayaran-bukti').empty();
 
             $modal.show();
 
@@ -724,6 +796,35 @@
                     $('#rd-total').text(formatRupiah(data.total_harga));
                     $('#rd-status').html(statusBadge(data.status));
                     $('#rd-catatan').text(data.catatan || '-');
+
+                    var pembayaran = data.pembayaran;
+
+                    if (pembayaran) {
+                        $('#rd-pembayaran-empty').addClass('d-none');
+                        $('#rd-pembayaran-content').removeClass('d-none');
+                        $('#rd-pembayaran-metode').text(pembayaran.metode || '-');
+                        $('#rd-pembayaran-tanggal').text(pembayaran.tanggal_bayar || '-');
+                        $('#rd-pembayaran-jumlah').text(formatRupiah(pembayaran.jumlah || 0));
+                        $('#rd-pembayaran-status').html(statusBadge(pembayaran.status));
+
+                        var $bukti = $('#rd-pembayaran-bukti').empty();
+
+                        if (pembayaran.bukti_url) {
+                            $('<img>')
+                                .attr({ src: pembayaran.bukti_url, alt: 'Bukti pembayaran' })
+                                .addClass('proof-image')
+                                .on('click', function() {
+                                    $('#buktiPembayaranRentalImg').attr('src', this.src);
+                                    bootstrap.Modal.getOrCreateInstance($('#buktiPembayaranRentalModal')[0]).show();
+                                })
+                                .appendTo($bukti);
+                        } else {
+                            $bukti.html('<span class="text-muted small">Tidak ada</span>');
+                        }
+                    } else {
+                        $('#rd-pembayaran-empty').removeClass('d-none');
+                        $('#rd-pembayaran-content').addClass('d-none');
+                    }
 
                     $loading.addClass('d-none');
                     $content.removeClass('d-none');
