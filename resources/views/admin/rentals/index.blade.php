@@ -514,7 +514,7 @@
         const confirmColors = {
             'Disetujui': '#198754',
             'Ditolak': '#dc3545',
-            'Selesai': '#0dcaf0',
+            'Selesai': '#198754',
         };
 
         // 1. Ambil detail pesanan dulu
