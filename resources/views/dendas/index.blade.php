@@ -383,11 +383,11 @@
                             Pilih jenis denda untuk melihat tarif.
                         </small>
 
-                        <label class="form-label fw-semibold mt-3">Foto Bukti</label>
+                        <label class="form-label fw-semibold mt-3 d-block">Foto Bukti</label>
                         <input type="file" name="foto_bukti" class="form-control" accept=".jpg,.jpeg,.png">
                         <small class="text-muted">JPG, PNG, JPEG, maksimal 2 MB.</small>
 
-                        <label class="form-label fw-semibold mt-3">Syarat & Ketentuan</label>
+                        <label class="form-label fw-semibold mt-3 d-block">Syarat & Ketentuan</label>
                         <textarea name="syarat_dan_ketentuan" class="form-control" rows="3"
                             placeholder="Syarat dan ketentuan denda..."></textarea>
 
@@ -459,7 +459,7 @@
                         </small>
 
 
-                        <label class="form-label fw-semibold mt-3">Foto Bukti</label>
+                        <label class="form-label fw-semibold mt-3 d-block">Foto Bukti</label>
                         <img id="editFotoBuktiPreview" src="" class="mb-2"
                             style="max-width:200px;display:none;border-radius:8px;" alt="Preview foto bukti">
 
@@ -467,7 +467,7 @@
                             accept=".jpg,.jpeg,.png">
                         <small class="text-muted">Kosongkan jika foto tidak diganti. Maksimal 2 MB.</small>
 
-                        <label class="form-label fw-semibold mt-3">Syarat & Ketentuan</label>
+                        <label class="form-label fw-semibold mt-3 d-block">Syarat & Ketentuan</label>
                         <textarea name="syarat_dan_ketentuan" id="editSyaratDenda" class="form-control" rows="3"
                             placeholder="Syarat dan ketentuan denda..."></textarea>
 
