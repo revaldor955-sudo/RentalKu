@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\KerusakanMobil;
+use App\Models\Mobil;
 use App\Models\PemeriksaanMobil;
-use App\Models\Rental;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -15,16 +15,13 @@ class PemeriksaanKendaraanController extends Controller
 {
     public function index()
     {
-        $rentals = Rental::with(['user', 'mobil'])
-            ->whereIn('status', ['Disetujui', 'Selesai'])
-            ->orderByDesc('created_at')
-            ->get();
+        $mobils = Mobil::orderBy('name')->get();
 
         $kerusakanList = KerusakanMobil::orderBy('jenis_kerusakan')
             ->get();
 
         return view('pemeriksaan_kendaraan.index', compact(
-            'rentals',
+            'mobils',
             'kerusakanList'
         ))->with('pageTitle', 'Pemeriksaan Kendaraan');
     }
@@ -35,27 +32,13 @@ class PemeriksaanKendaraanController extends Controller
 
         $query = PemeriksaanMobil::query()
             ->leftJoin(
-                'rentals',
-                'pemeriksaan_mobils.rental_id',
-                '=',
-                'rentals.id'
-            )
-            ->leftJoin(
-                'users',
-                'rentals.user_id',
-                '=',
-                'users.id'
-            )
-            ->leftJoin(
                 'mobils',
-                'rentals.mobil_id',
+                'pemeriksaan_mobils.mobil_id',
                 '=',
                 'mobils.id'
             )
             ->select(
                 'pemeriksaan_mobils.*',
-                'users.name as user_name',
-                'users.email as user_email',
                 'mobils.name as mobil_name',
                 'mobils.plate_number as mobil_plate'
             );
@@ -64,14 +47,8 @@ class PemeriksaanKendaraanController extends Controller
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->where('users.name', 'like', "%{$search}%")
-                    ->orWhere('users.email', 'like', "%{$search}%")
-                    ->orWhere('mobils.name', 'like', "%{$search}%")
-                    ->orWhere(
-                        'mobils.plate_number',
-                        'like',
-                        "%{$search}%"
-                    )
+                $q->where('mobils.name', 'like', "%{$search}%")
+                    ->orWhere('mobils.plate_number', 'like', "%{$search}%")
                     ->orWhere(
                         'pemeriksaan_mobils.jenis',
                         'like',
@@ -91,6 +68,7 @@ class PemeriksaanKendaraanController extends Controller
 
         $start = max(0, (int) $request->input('start', 0));
         $length = (int) $request->input('length', 10);
+
         $length = $length === -1
             ? 100
             : min(max($length, 1), 100);
@@ -118,10 +96,7 @@ class PemeriksaanKendaraanController extends Controller
 
             return [
                 'id' => $p->id,
-                'rental_id' => $p->rental_id,
-
-                'user_name' => $p->user_name ?? '-',
-                'user_email' => $p->user_email ?? '-',
+                'mobil_id' => $p->mobil_id,
                 'mobil_name' => $p->mobil_name ?? '-',
                 'mobil_plate' => $p->mobil_plate ?? '-',
 
@@ -132,12 +107,10 @@ class PemeriksaanKendaraanController extends Controller
                     ? Carbon::parse($p->tanggal)->format('d/m/Y H:i')
                     : '-',
 
-                // Dibutuhkan oleh form Edit.
                 'tanggal_input' => $p->tanggal
                     ? Carbon::parse($p->tanggal)->format('Y-m-d\TH:i')
                     : '',
 
-                // Nama file dan URL foto bukti umum.
                 'foto_bukti' => $fotoUmum,
                 'foto_bukti_url' => $fotoUmum
                     ? Storage::disk('public')->url($fotoUmum)
@@ -163,9 +136,7 @@ class PemeriksaanKendaraanController extends Controller
                                 'catatan' => $k->pivot->catatan ?? '',
                                 'foto_bukti' => $fotoBagian,
                                 'foto_url' => $fotoBagian
-                                    ? Storage::disk('public')->url(
-                                        $fotoBagian
-                                    )
+                                    ? Storage::disk('public')->url($fotoBagian)
                                     : null,
                             ],
                         ];
@@ -197,8 +168,6 @@ class PemeriksaanKendaraanController extends Controller
         $validated = $this->validatePemeriksaan($request);
 
         DB::transaction(function () use ($request, $validated) {
-            $rental = Rental::findOrFail($validated['rental_id']);
-
             $fotoBukti = $request->hasFile('foto_bukti')
                 ? $request->file('foto_bukti')->store(
                     'pemeriksaan',
@@ -207,8 +176,8 @@ class PemeriksaanKendaraanController extends Controller
                 : null;
 
             $pemeriksaan = PemeriksaanMobil::create([
-                'rental_id' => $rental->id,
-                'mobil_id' => $rental->mobil_id,
+                'mobil_id' => $validated['mobil_id'],
+                'rental_id' => null,
                 'jenis' => $validated['jenis'],
                 'kondisi' => $validated['kondisi'],
                 'tanggal' => $validated['tanggal'],
@@ -235,23 +204,19 @@ class PemeriksaanKendaraanController extends Controller
             $validated,
             $pemeriksaan
         ) {
-            // Ambil ulang data yang akan diperbarui.
             $pemeriksaan = PemeriksaanMobil::whereKey($pemeriksaan->id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $rental = Rental::findOrFail($validated['rental_id']);
-
             $data = [
-                'rental_id' => $rental->id,
-                'mobil_id' => $rental->mobil_id,
+                'mobil_id' => $validated['mobil_id'],
+                'rental_id' => null,
                 'jenis' => $validated['jenis'],
                 'kondisi' => $validated['kondisi'],
                 'tanggal' => $validated['tanggal'],
                 'catatan' => $validated['catatan'] ?? null,
             ];
 
-            // Jika tidak memilih foto baru, foto lama tetap dipertahankan.
             if ($request->hasFile('foto_bukti')) {
                 $oldPhoto = $pemeriksaan->foto_bukti;
 
@@ -310,7 +275,7 @@ class PemeriksaanKendaraanController extends Controller
     private function validatePemeriksaan(Request $request): array
     {
         $validated = $request->validate([
-            'rental_id' => 'required|exists:rentals,id',
+            'mobil_id' => 'required|exists:mobils,id',
             'jenis' => 'required|in:sebelum_sewa,setelah_sewa',
             'kondisi' => 'required|in:baik,rusak',
             'tanggal' => 'required|date',
@@ -330,7 +295,8 @@ class PemeriksaanKendaraanController extends Controller
             'foto_kerusakan' => 'nullable|array',
             'foto_kerusakan.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ], [
-            'rental_id.required' => 'Pilih rental terlebih dahulu.',
+            'mobil_id.required' => 'Pilih nama mobil terlebih dahulu.',
+            'mobil_id.exists' => 'Nama mobil yang dipilih tidak ditemukan.',
             'jenis.required' => 'Jenis pemeriksaan wajib diisi.',
             'kondisi.required' => 'Kondisi wajib diisi.',
             'tanggal.required' => 'Tanggal wajib diisi.',
@@ -401,7 +367,6 @@ class PemeriksaanKendaraanController extends Controller
             $newPhoto = $request->file("foto_kerusakan.{$id}");
             $photoPath = $oldPhoto;
 
-            // Foto lama tetap digunakan jika tidak memilih foto baru.
             if ($newPhoto) {
                 $photoPath = $newPhoto->store(
                     'pemeriksaan/kerusakan',
@@ -424,7 +389,6 @@ class PemeriksaanKendaraanController extends Controller
             ];
         }
 
-        // Hapus foto bagian yang tidak lagi dipilih.
         foreach ($existing as $id => $kerusakan) {
             if (
                 !in_array((int) $id, $ids, true)

@@ -12,14 +12,18 @@
     <link href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 
     <style>
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             background: #f6f8f7;
             font-family: 'Montserrat', sans-serif;
         }
 
-        .page-content { padding: 24px; }
+        .page-content {
+            padding: 24px;
+        }
 
         .page-title {
             font-weight: 800;
@@ -55,7 +59,9 @@
             background: #f8faf9;
         }
 
-        #pemeriksaan-table td { vertical-align: middle; }
+        #pemeriksaan-table td {
+            vertical-align: middle;
+        }
 
         .status {
             display: inline-block;
@@ -134,7 +140,9 @@
             margin-top: 16px;
         }
 
-        #pemeriksaanModal { overflow: hidden !important; }
+        #pemeriksaanModal {
+            overflow: hidden !important;
+        }
 
         #pemeriksaanModal .modal-dialog {
             width: calc(100% - 24px);
@@ -188,7 +196,9 @@
             z-index: 2;
         }
 
-        #pemeriksaanModal .form-label { font-weight: 700; }
+        #pemeriksaanModal .form-label {
+            font-weight: 700;
+        }
 
         #pemeriksaanModal .section-heading {
             color: #1f2937;
@@ -196,7 +206,9 @@
         }
 
         @media (max-width: 768px) {
-            .page-content { padding: 12px; }
+            .page-content {
+                padding: 12px;
+            }
 
             #pemeriksaanModal .modal-dialog {
                 width: calc(100% - 12px);
@@ -243,8 +255,7 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Pelanggan</th>
-                            <th>Mobil</th>
+                            <th>Nama Mobil</th>
                             <th>Jenis</th>
                             <th>Kondisi</th>
                             <th>Tanggal</th>
@@ -270,7 +281,9 @@
                     <button class="btn btn-sm btn-outline-secondary" id="pemeriksaan-prev" type="button">
                         <i class="bi bi-chevron-left"></i>
                     </button>
+
                     <span id="pemeriksaan-page" class="small"></span>
+
                     <button class="btn btn-sm btn-outline-secondary" id="pemeriksaan-next" type="button">
                         <i class="bi bi-chevron-right"></i>
                     </button>
@@ -281,7 +294,6 @@
     </div>
 </div>
 
-<!-- MODAL PEMERIKSAAN -->
 <div class="modal fade" id="pemeriksaanModal" tabindex="-1"
      aria-labelledby="pemeriksaanModalLabel" aria-hidden="true">
 
@@ -293,6 +305,7 @@
                     <i class="bi bi-clipboard-check me-2"></i>
                     Tambah Pemeriksaan
                 </h5>
+
                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Tutup"></button>
             </div>
@@ -304,15 +317,14 @@
                     <input type="hidden" id="pemeriksaanId" name="id">
 
                     <div class="row g-3">
+
                         <div class="col-md-6">
-                            <label for="rentalId" class="form-label">Rental</label>
-                            <select name="rental_id" id="rentalId" class="form-select" required>
-                                <option value="">-- Pilih Rental --</option>
-                                @foreach ($rentals as $rental)
-                                    <option value="{{ $rental->id }}">
-                                        {{ $rental->user->name ?? '-' }} —
-                                        {{ $rental->mobil->name ?? '-' }}
-                                        ({{ $rental->status }})
+                            <label for="mobilId" class="form-label">Nama Mobil</label>
+                            <select name="mobil_id" id="mobilId" class="form-select" required>
+                                <option value="">-- Pilih Nama Mobil --</option>
+                                @foreach ($mobils as $mobil)
+                                    <option value="{{ $mobil->id }}">
+                                        {{ $mobil->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -347,6 +359,7 @@
                                 <h5 class="section-heading mb-0">Detail Bagian Kendaraan</h5>
                                 <span class="badge text-bg-light">Foto maksimal 2 MB per bagian</span>
                             </div>
+
                             <p class="text-muted small mt-2">
                                 Pilih bagian yang diperiksa. Setiap bagian memiliki keterangan,
                                 catatan, dan foto bukti sendiri.
@@ -358,6 +371,7 @@
                                 @foreach ($kerusakanList as $kerusakan)
                                     <div class="col-md-6 col-xl-4">
                                         <div class="damage-card">
+
                                             <div class="form-check">
                                                 <input class="form-check-input kerusakan-check"
                                                        type="checkbox"
@@ -389,7 +403,8 @@
                                                     <textarea
                                                         class="form-control form-control-sm"
                                                         name="catatan_kerusakan[{{ $kerusakan->id }}]"
-                                                        rows="3" maxlength="1000"
+                                                        rows="3"
+                                                        maxlength="1000"
                                                         placeholder="Catatan bagian ini"
                                                         disabled></textarea>
                                                 </div>
@@ -401,6 +416,7 @@
                                                            name="foto_kerusakan[{{ $kerusakan->id }}]"
                                                            accept=".jpg,.jpeg,.png"
                                                            disabled>
+
                                                     <div class="form-text">JPG/PNG, maksimal 2 MB.</div>
 
                                                     <div class="saved-photo d-none"
@@ -423,12 +439,15 @@
 
                         <div class="col-md-6">
                             <label for="fotoBukti" class="form-label">Foto Bukti Umum (opsional)</label>
+
                             <input type="file" name="foto_bukti" id="fotoBukti"
                                    class="form-control" accept=".jpg,.jpeg,.png">
+
                             <div class="form-text">JPG/PNG, maksimal 2 MB.</div>
 
                             <div id="fotoBuktiLama" class="saved-photo d-none">
                                 <div class="small fw-bold mb-2">Foto bukti yang tersimpan</div>
+
                                 <img id="previewFotoBuktiLama"
                                      src=""
                                      alt="Foto bukti pemeriksaan sebelumnya">
@@ -443,10 +462,12 @@
 
                         <div class="col-md-6">
                             <label for="catatan" class="form-label">Catatan Umum</label>
+
                             <textarea name="catatan" id="catatan" class="form-control"
                                       rows="3" maxlength="1000"
                                       placeholder="Catatan keseluruhan pemeriksaan"></textarea>
                         </div>
+
                     </div>
                 </div>
 
@@ -454,6 +475,7 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Batal
                     </button>
+
                     <button type="submit" class="btn btn-green" id="btnSimpanPemeriksaan">
                         <i class="bi bi-save me-1"></i>
                         Simpan Pemeriksaan
@@ -489,15 +511,9 @@ function escapeHtml(value) {
     }[char]));
 }
 
-/*
-|--------------------------------------------------------------------------
-| RESET FORM - PERBAIKAN FOTO BUKTI UMUM
-|--------------------------------------------------------------------------
-| Jangan gunakan $('.saved-photo').empty() secara langsung karena
-| itu menghapus elemen gambar dan tautan foto bukti umum.
-*/
 function resetForm() {
     document.getElementById('formPemeriksaan').reset();
+
     $('#pemeriksaanId').val('');
 
     $('.kerusakan-check').prop('checked', false);
@@ -507,13 +523,10 @@ function resetForm() {
         .find('input, textarea')
         .prop('disabled', true);
 
-    // Reset tampilan foto bukti umum, tetapi jangan hapus HTML-nya.
     $('#previewFotoBuktiLama').attr('src', '');
     $('#linkFotoBuktiLama').attr('href', '');
     $('#fotoBuktiLama').addClass('d-none');
 
-    // Bersihkan foto lama pada bagian kerusakan saja.
-    // Container foto bukti umum dikecualikan.
     $('.saved-photo')
         .not('#fotoBuktiLama')
         .addClass('d-none')
@@ -537,7 +550,10 @@ function openTambahModal() {
 
     setTimeout(() => {
         const body = modalElement.querySelector('.modal-body');
-        if (body) body.scrollTop = 0;
+
+        if (body) {
+            body.scrollTop = 0;
+        }
     }, 100);
 }
 
@@ -601,12 +617,11 @@ function openEditModal(id) {
     resetForm();
 
     $('#pemeriksaanId').val(row.id);
-    $('#rentalId').val(row.rental_id);
+    $('#mobilId').val(row.mobil_id);
     $('#jenis').val(row.jenis);
     $('#kondisi').val(row.kondisi);
     $('#catatan').val(row.catatan || '');
 
-    // Tampilkan kembali foto bukti umum yang tersimpan.
     const fotoLama = row.foto_bukti_url || row.foto_bukti || '';
     const fotoUrl = buatUrlFoto(fotoLama);
 
@@ -615,7 +630,7 @@ function openEditModal(id) {
             .attr('src', fotoUrl)
             .off('error')
             .on('error', function() {
-                $(this).attr('alt', 'Foto tidak dapat dimuat. Periksa lokasi penyimpanan foto.');
+                $(this).attr('alt', 'Foto tidak dapat dimuat.');
             });
 
         $('#linkFotoBuktiLama').attr('href', fotoUrl);
@@ -670,6 +685,7 @@ $(document).on('change', '.kerusakan-check', function() {
     const panel = $('#detail-kerusakan-' + key);
 
     panel.toggleClass('d-none', !this.checked);
+
     panel.find('input, textarea').prop('disabled', !this.checked);
 
     if (!this.checked) {
@@ -697,6 +713,7 @@ function hapusPemeriksaan(id) {
                 'X-CSRF-TOKEN': CSRF_TOKEN,
                 'Accept': 'application/json'
             },
+
             success: function(response) {
                 $('#pemeriksaan-table').DataTable().ajax.reload(null, false);
 
@@ -706,6 +723,7 @@ function hapusPemeriksaan(id) {
                     'success'
                 );
             },
+
             error: function(xhr) {
                 Swal.fire(
                     'Gagal',
@@ -721,6 +739,7 @@ $('#formPemeriksaan').on('submit', function(e) {
     e.preventDefault();
 
     const form = this;
+
     if (!form.reportValidity()) return;
 
     const id = $('#pemeriksaanId').val();
@@ -730,7 +749,9 @@ $('#formPemeriksaan').on('submit', function(e) {
         ? URL_UPDATE.replace('__ID__', id)
         : URL_STORE;
 
-    if (id) formData.append('_method', 'PUT');
+    if (id) {
+        formData.append('_method', 'PUT');
+    }
 
     const button = $('#btnSimpanPemeriksaan');
     const originalHtml = button.html();
@@ -806,17 +827,10 @@ $(document).ready(function() {
                     meta.row + meta.settings._iDisplayStart + 1
             },
             {
-                data: null,
+                data: 'mobil_name',
                 orderable: false,
                 render: (data, type, row) =>
-                    `<strong>${escapeHtml(row.user_name)}</strong><br>
-                     <small class="text-muted">${escapeHtml(row.user_email)}</small>`
-            },
-            {
-                data: null,
-                orderable: false,
-                render: (data, type, row) =>
-                    `<strong>${escapeHtml(row.mobil_name)}</strong><br>
+                    `<strong>${escapeHtml(data)}</strong><br>
                      <small class="text-muted">${escapeHtml(row.mobil_plate)}</small>`
             },
             {
