@@ -88,9 +88,10 @@ $ratings = DB::table('ratings')
             ->orderBy('urutan')
             ->get();
 
-        $totalPuas = DB::table('rentals')->where('status', 'selesai')->count() + 1200;
+        $totalPuas = DB::table('rentals')->where('status', 'Selesai')->distinct()->count('user_id');
         $ratingRata = round(DB::table('ratings')->avg('rating'), 1);
-        $totalMobil = DB::table('mobils')->count();
+        $totalRating = DB::table('ratings')->count();
+        $totalMobil = DB::table('mobils')->where('status', 'Tersedia')->count();
 
         return view('home', compact(
             'banners',
@@ -106,7 +107,8 @@ $ratings = DB::table('ratings')
             'landingSettings',
             'totalPuas',
             'ratingRata',
-            'totalMobil'
+            'totalMobil',
+            'totalRating'
         ));
     }
 
