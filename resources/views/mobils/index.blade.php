@@ -480,7 +480,7 @@
                             </th>
 
                             <th>
-                                Brand
+                                Merek
                             </th>
 
                             <th>
@@ -584,13 +584,13 @@
                             <div class="col-md-4">
 
                                 <label class="form-label">
-                                    Brand
+                                    Merek
                                 </label>
 
                                 <select name="brand_id" class="form-select" required>
 
                                     <option value="">
-                                        Pilih Brand
+                                        Pilih Merek
                                     </option>
 
                                     @foreach($brands as $brand)
@@ -1004,7 +1004,7 @@
                             <div class="col-md-4">
 
                                 <label class="form-label">
-                                    Brand
+                                    Merek
                                 </label>
 
                                 <select name="brand_id"
@@ -1013,7 +1013,7 @@
                                         required>
 
                                     <option value="">
-                                        Pilih Brand
+                                        Pilih Merek
                                     </option>
 
                                     @foreach($brands as $brand)

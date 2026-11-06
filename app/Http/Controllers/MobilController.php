@@ -264,7 +264,7 @@ class MobilController extends Controller
             'fasilitas' => 'nullable|array',
             'fasilitas.*' => 'exists:fasilitas,id',
         ], [
-            'brand_id.required' => 'Brand wajib dipilih.',
+           'brand_id.required' => 'Merek wajib dipilih.',
             'tipe_mobil_id.required' => 'Tipe mobil wajib dipilih.',
             'cabang_id.required' => 'Cabang wajib dipilih.',
             'name.required' => 'Nama mobil wajib diisi.',
