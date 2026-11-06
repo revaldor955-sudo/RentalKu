@@ -103,11 +103,8 @@ class DendaController extends Controller
                 'pelanggan' => $item->rental?->user?->name ?? '-',
                 'jenis' => $item->jenis,
                 'nominal' => (float) $item->nominal,
-                'deskripsi' => $item->deskripsi
-                    ?? $item->syarat_dan_ketentuan
-                    ?? '-',
+                'deskripsi' => $item->deskripsi ?? '-',
                 'foto_bukti' => $item->foto_bukti,
-                'syarat_dan_ketentuan' => $item->syarat_dan_ketentuan,
                 'status' => $item->status,
                 'bukti_bayar_url' => $item->bukti_bayar
                     ? asset('storage/' . $item->bukti_bayar)
@@ -135,7 +132,6 @@ class DendaController extends Controller
             'rental_id' => 'required|exists:rentals,id',
             'jenis' => 'required|in:keterlambatan,kerusakan,kehilangan',
             'foto_bukti' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'syarat_dan_ketentuan' => 'nullable|string',
             'status' => 'required|in:belum bayar',
             'deskripsi' => 'required|string|max:2000',
         ], [
@@ -201,7 +197,6 @@ class DendaController extends Controller
             'rental_id' => 'required|exists:rentals,id',
             'jenis' => 'required|in:keterlambatan,kerusakan,kehilangan',
             'foto_bukti' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'syarat_dan_ketentuan' => 'nullable|string',
             'status' => 'required|in:belum bayar,menunggu verifikasi',
             'deskripsi' => 'required|string|max:2000',
         ], [

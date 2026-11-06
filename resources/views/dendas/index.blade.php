@@ -387,10 +387,6 @@
                         <input type="file" name="foto_bukti" class="form-control" accept=".jpg,.jpeg,.png">
                         <small class="text-muted">JPG, PNG, JPEG, maksimal 2 MB.</small>
 
-                        <label class="form-label fw-semibold mt-3 d-block">Syarat & Ketentuan</label>
-                        <textarea name="syarat_dan_ketentuan" class="form-control" rows="3"
-                            placeholder="Syarat dan ketentuan denda..."></textarea>
-
                         <label class="form-label fw-semibold mt-3">Status</label>
                         <select name="status" class="form-select" required>
                             <option value="belum bayar">Belum Bayar</option>
@@ -467,10 +463,7 @@
                             accept=".jpg,.jpeg,.png">
                         <small class="text-muted">Kosongkan jika foto tidak diganti. Maksimal 2 MB.</small>
 
-                        <label class="form-label fw-semibold mt-3 d-block">Syarat & Ketentuan</label>
-                        <textarea name="syarat_dan_ketentuan" id="editSyaratDenda" class="form-control" rows="3"
-                            placeholder="Syarat dan ketentuan denda..."></textarea>
-
+                        
                         <label class="form-label fw-semibold mt-3">Status</label>
                         <select name="status" id="editStatusDenda" class="form-select" required>
                             <option value="belum bayar">Belum Bayar</option>
@@ -622,9 +615,8 @@
                     {
                         data: 'deskripsi',
                         orderable: false,
-                        render: function(data, type, row) {
-                            const deskripsi = data || row.syarat_dan_ketentuan || '-';
-                            return '<div class="description-cell">' + escapeHtml(deskripsi) +
+                        render: function(data) {
+                            return '<div class="description-cell">' + escapeHtml(data || '-') +
                                 '</div>';
                         }
                     },
@@ -877,11 +869,10 @@
 
             $('#editRentalIdDenda').val(data.rental_id);
             $('#editJenisDenda').val(data.jenis);
-            $('#editDeskripsiDenda').val(data.deskripsi || data.syarat_dan_ketentuan || '');
+            $('#editDeskripsiDenda').val(data.deskripsi || '');
             $('#editNominalDendaDisplay').val(formatRupiahInput(data.nominal));
             $('#editNominalDenda').val(getRawRupiah(data.nominal));
             $('#editStatusDenda').val(data.status);
-            $('#editSyaratDenda').val(data.syarat_dan_ketentuan || '');
 
             if (data.foto_bukti) {
                 const url = "{{ asset('__PHOTO__') }}".replace('__PHOTO__', data.foto_bukti);
