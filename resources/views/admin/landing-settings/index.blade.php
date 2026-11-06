@@ -101,8 +101,6 @@
                             type="button">Bagian Pembuka</button></li>
                     <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#about"
                             type="button">Tentang Kami</button></li>
-                    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#promo"
-                            type="button">Promosi</button></li>
                     <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#steps"
                             type="button">Langkah Penyewaan</button></li>
                     <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#faq"
@@ -185,32 +183,6 @@
                             </div>
                             <div class="form-text text-muted">Urutan kartu: 1 kiri atas, 2 kanan atas, 3 kiri bawah, 4
                                 kanan bawah. Ikon kartu sudah otomatis.</div>
-                        </div>
-                    </div>
-
-                    <div class="tab-pane fade" id="promo">
-                        <div class="page-card">
-                            <p class="text-muted small mb-3">Banner promosi di halaman utama, termasuk tombol ajakan.
-                            </p>
-                            <div class="mb-3"><label class="form-label">Judul Promosi</label><input type="text"
-                                    name="promo_title" class="form-control" maxlength="255"
-                                    value="{{ old('promo_title', $settings['promo_title'] ?? '') }}"
-                                    placeholder="🔥 PROMO SPESIAL"></div>
-                            <div class="mb-3"><label class="form-label">Deskripsi Promosi</label>
-                                <textarea name="promo_description" class="form-control" rows="3"
-                                    placeholder="Diskon hingga 20% untuk rental mingguan Berakhir dalam:">{{ old('promo_description', $settings['promo_description'] ?? '') }}</textarea>
-                            </div>
-                            <div class="mb-3"><label class="form-label">Teks Tombol</label><input type="text"
-                                    name="promo_button_label" class="form-control" maxlength="100"
-                                    value="{{ old('promo_button_label', $settings['promo_button_label'] ?? '') }}"
-                                    placeholder="Klaim Sekarang →"></div>
-                            <div class="mb-0"><label class="form-label">Tujuan Tombol</label><input type="text"
-                                    name="promo_button_url" class="form-control" maxlength="255"
-                                    value="{{ old('promo_button_url', $settings['promo_button_url'] ?? '') }}"
-                                    placeholder="#mobil">
-                                <div class="form-text text-muted">Bisa berupa anchor seperti #mobil atau alamat
-                                    lengkap.</div>
-                            </div>
                         </div>
                     </div>
                     <div class="tab-pane fade" id="steps">
