@@ -34,7 +34,6 @@ class DendaKeterlambatan
                     'jenis' => 'keterlambatan',
                     'nominal' => $nominal,
                     'deskripsi' => $deskripsi,
-                    'syarat_dan_ketentuan' => $deskripsi,
                     'status' => 'belum bayar',
                 ]);
                 return 'dibuat';
@@ -46,7 +45,6 @@ class DendaKeterlambatan
             $denda->update([
                 'nominal' => $nominal,
                 'deskripsi' => $deskripsi,
-                'syarat_dan_ketentuan' => $deskripsi,
             ]);
 
             return 'diperbarui';
