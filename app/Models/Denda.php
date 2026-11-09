@@ -12,7 +12,6 @@ class Denda extends Model
         'nominal',
         'deskripsi',
         'foto_bukti',
-        'syarat_dan_ketentuan',
         'status',
         'bukti_bayar',
         'tanggal_bayar',

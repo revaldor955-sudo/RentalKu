@@ -504,12 +504,8 @@
 
             <div>
                 <h2 class="page-title mb-1">
-                    Klaim Kompensasi Saya
+                    Management Kompensasi
                 </h2>
-
-                <p class="text-muted mb-0">
-                    Lihat dan ajukan klaim kompensasi untuk rental yang sudah selesai.
-                </p>
 
             </div>
 
@@ -564,12 +560,8 @@
                             <div>
 
                                 <h5 class="fw-bold mb-1">
-                                    Ajukan Klaim
+                                    Daftar Klaim Kompensasi
                                 </h5>
-
-                                <small class="text-muted">
-                                    Ajukan klaim baru dan pantau riwayat klaim Anda.
-                                </small>
 
                             </div>
 
@@ -579,7 +571,7 @@
                                     data-bs-target="#ajukanKompensasiModal">
 
                                     <i class="bi bi-plus-circle me-1"></i>
-                                    Ajukan Klaim
+                                    Buat Kompensasi
 
                                 </button>
 
@@ -967,7 +959,7 @@
                                 <button type="submit" class="btn btn-green d-none" id="btnKlaimSubmit">
 
                                     <i class="bi bi-send me-1"></i>
-                                    Ajukan
+                                    Tambah Kompensasi
 
                                 </button>
 

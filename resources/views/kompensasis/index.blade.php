@@ -90,7 +90,6 @@
         .jenis-diskon { background: #d1e7dd; color: #0f5132; }
         .jenis-gratis-sewa { background: #fff3cd; color: #997404; }
 
-        .status-diajukan { background: #fff3cd; color: #997404; }
         .status-disetujui { background: #d1e7dd; color: #0f5132; }
         .status-ditolak { background: #f8d7da; color: #b02a37; }
         .status-selesai { background: #e7f1ff; color: #0d6efd; }
