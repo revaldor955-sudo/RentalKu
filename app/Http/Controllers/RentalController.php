@@ -1063,11 +1063,11 @@ public function detail(Rental $rental)
 
         // Transisi legal mengikuti tombol di UI: Menunggu -> Disetujui/Ditolak,
         // Disetujui -> Selesai. Status final tidak bisa diubah lagi.
-        $transisi = [
-            'Menunggu' => ['Disetujui', 'Ditolak'],
-            'Disetujui' => ['Selesai'],
-            'Berjalan' => ['Selesai'],
-        ];
+       $transisi = [
+    'Menunggu' => ['Disetujui', 'Ditolak'],
+    'Disetujui' => ['Berjalan', 'Selesai'],
+    'Berjalan' => ['Selesai'],
+];
 
         if ($rental->status !== $status
             && ! in_array($status, $transisi[$rental->status] ?? [], true)) {

@@ -25,6 +25,7 @@ use App\Http\Controllers\MobilController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\PemeriksaanKendaraanController;
 use App\Http\Controllers\PengembalianController;
+use App\Http\Controllers\PelacakanGPSController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\RoleController;
@@ -473,7 +474,28 @@ Route::middleware('customer')->group(function () {
 
     Route::post('/customer/dendas/{denda}/bayar', [DendaController::class, 'customerBayar'])->name('customer.dendas.bayar');
 });
+Route::middleware('adminstaff')->group(function () {
+    Route::get('/pelacakan-gps', [PelacakanGPSController::class, 'index'])
+        ->name('pelacakan-gps.index');
 
+        Route::get('/pelacakan-gps/data', [PelacakanGPSController::class, 'data'])
+    ->name('pelacakan-gps.data');
+    Route::delete('/pelacakan-gps/{rentalId}/hapus', [PelacakanGPSController::class, 'hapusData'])
+    ->name('pelacakan-gps.hapus');
+    Route::get('/pelacakan-gps/{rental}/riwayat', [PelacakanGPSController::class, 'riwayat'])
+        ->name('pelacakan-gps.riwayat');
+
+    Route::post('/pelacakan-gps/{rental}/lokasi', [PelacakanGPSController::class, 'store'])
+        ->name('pelacakan-gps.lokasi.store');
+});
+
+Route::middleware('customer')->group(function () {
+    Route::get('/customer/gps/{rental}', [PelacakanGPSController::class, 'pengirim'])
+        ->name('customer.gps.pengirim');
+
+    Route::post('/customer/gps/{rental}/lokasi', [PelacakanGPSController::class, 'terimaLokasi'])
+        ->name('customer.gps.terima-lokasi');
+});
 /*
 |--------------------------------------------------------------------------
 | RENTAL & PEMBAYARAN

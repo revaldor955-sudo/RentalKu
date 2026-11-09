@@ -186,6 +186,14 @@
                             <span class="nav-text">Pemeriksaan</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+    <a href="{{ route('pelacakan-gps.index') }}"
+        class="nav-link {{ request()->routeIs('pelacakan-gps.*') ? 'active' : '' }}"
+        aria-current="{{ request()->routeIs('pelacakan-gps.*') ? 'page' : 'false' }}">
+        <i class="bi bi-geo-alt-fill nav-icon" aria-hidden="true"></i>
+        <span class="nav-text">Pelacakan GPS</span>
+    </a>
+</li>
                 </ul>
             </div>
 
@@ -396,9 +404,10 @@
         @include('layouts.partials.admin-navbar')
 
         <main class="page-content" role="main">
-        </main>
+    @yield('content')
+</main>
     </div>
-</div>
+    
 
 <script src="{{ asset('js/sidebar.js') }}" defer></script>
 </div>
