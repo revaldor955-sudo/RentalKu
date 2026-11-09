@@ -140,6 +140,15 @@
                     <small>Pengajuan ditolak.</small>
                 </div>
 
+@elseif($rental->status === 'Berjalan')
+
+    <a
+        href="{{ route('customer.gps.pengirim', $rental->id) }}"
+        class="btn btn-success w-100"
+    >
+        <i class="bi bi-geo-alt-fill me-1"></i>
+        Bagikan Lokasi GPS
+    </a>
             {{-- STATUS SELESAI --}}
             @elseif($rental->status === 'Selesai')
 

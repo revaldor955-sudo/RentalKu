@@ -61,8 +61,11 @@ class DashboardController extends Controller
             ->get();
 
         // Tab: Aktivitas (Menunggu/Disetujui) vs Riwayat (Selesai/Ditolak).
-        $rentalsAktif = $rentals->whereIn('status', ['Menunggu', 'Disetujui']);
-        $rentalsRiwayat = $rentals->whereIn('status', ['Selesai', 'Ditolak']);
+$rentalsAktif = $rentals->whereIn('status', [
+    'Menunggu',
+    'Disetujui',
+    'Berjalan'
+]);        $rentalsRiwayat = $rentals->whereIn('status', ['Selesai', 'Ditolak']);
 
         // Grid aktivitas ala landing: tampil sebagian + tombol muat lagi.
         $jumlahRental = max(4, (int) request()->input('jumlah_rental', 4));

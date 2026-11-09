@@ -99,7 +99,10 @@
             border: 1px solid #E5E7EB;
             cursor: zoom-in;
         }
-
+.status-berjalan {
+    background: #cfe2ff;
+    color: #084298;
+}
         /* Sidebar layout base styles are in admin-sidebar.blade.php */
 
         .pager-bar{background:#fff;border:1px solid #edf0ee;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.05);padding:12px 16px;font-size:14px}
@@ -472,6 +475,7 @@
         const pesan = {
             'Disetujui': 'Pastikan data di bawah sudah benar sebelum <b>menyetujui</b> pengajuan ini.',
             'Ditolak': 'Periksa data di bawah sebelum <b>menolak</b> pengajuan ini.',
+            'Berjalan': 'Pastikan mobil sudah diserahkan kepada pelanggan sebelum <b>memulai rental</b>.',
             'Selesai': 'Periksa data di bawah sebelum <b>menyelesaikan</b> rental ini.',
         }[status] || 'Periksa data pengajuan berikut.';
 
@@ -506,16 +510,19 @@
     }
 
     function updateRentalStatus(id, status) {
-        const titles = {
-            'Disetujui': 'Setujui Pengajuan Rental?',
-            'Ditolak': 'Tolak Pengajuan Rental?',
-            'Selesai': 'Selesaikan Rental?',
-        };
-        const confirmColors = {
-            'Disetujui': '#198754',
-            'Ditolak': '#dc3545',
-            'Selesai': '#198754',
-        };
+      const titles = {
+    'Disetujui': 'Setujui Pengajuan Rental?',
+    'Ditolak': 'Tolak Pengajuan Rental?',
+    'Berjalan': 'Mulai Rental?',
+    'Selesai': 'Selesaikan Rental?',
+};
+
+const confirmColors = {
+    'Disetujui': '#198754',
+    'Ditolak': '#dc3545',
+    'Berjalan': '#0d6efd',
+    'Selesai': '#0dcaf0',
+};
 
         // 1. Ambil detail pesanan dulu
         Swal.fire({
@@ -537,8 +544,12 @@
                     icon: status === 'Ditolak' ? 'warning' : 'question',
                     width: 520,
                     showCancelButton: true,
-                    confirmButtonText: 'Ya, ' + (status === 'Disetujui' ? 'Setujui' : status === 'Ditolak' ? 'Tolak' : 'Selesaikan'),
-                    cancelButtonText: 'Batal',
+confirmButtonText: 'Ya, ' + ({
+    'Disetujui': 'Setujui',
+    'Ditolak': 'Tolak',
+    'Berjalan': 'Mulai Rental',
+    'Selesai': 'Selesaikan',
+}[status] || 'Ubah Status'),                    cancelButtonText: 'Batal',
                     confirmButtonColor: confirmColors[status] || '#198754',
                     reverseButtons: true,
                 }).then(function(result) {
@@ -586,42 +597,49 @@
             return 'Rp ' + Number(value).toLocaleString('id-ID');
         }
 
-        function statusBadge(status) {
-            const map = {
-                'Menunggu': 'status-menunggu',
-                'Disetujui': 'status-disetujui',
-                'Ditolak': 'status-ditolak',
-                'Selesai': 'status-selesai',
-            };
+       function statusBadge(status) {
+    const map = {
+        'Menunggu': 'status-menunggu',
+        'Disetujui': 'status-disetujui',
+        'Berjalan': 'status-berjalan',
+        'Ditolak': 'status-ditolak',
+        'Selesai': 'status-selesai',
+    };
 
-            const cls = map[status] || 'bg-secondary text-white';
+    const cls = map[status] || 'bg-secondary text-white';
 
-            return '<span class="status ' + cls + '">' + status + '</span>';
-        }
+    return '<span class="status ' + cls + '">' + status + '</span>';
+}
+       function rentalActions(data) {
+    let html = '<div class="d-flex gap-2 justify-content-end">';
 
-        function rentalActions(data) {
-            let html = '<div class="d-flex gap-2 justify-content-end">';
+    html += '<button class="btn p-1 text-primary" style="border:none;background:none;" title="Detail" ' +
+        'onclick="openRentalDetail(' + data.id + ')">' +
+        '<i class="bi bi-eye"></i></button>';
 
-            html += '<button class="btn p-1 text-primary" style="border:none;background:none;" title="Detail" ' +
-                'onclick="openRentalDetail(' + data.id + ')">' +
-                '<i class="bi bi-eye"></i></button>';
+    if (data.status === 'Menunggu') {
+        html += '<button type="button" class="btn p-1 text-success" style="border:none;background:none;" title="Setujui" ' +
+            'onclick="updateRentalStatus(' + data.id + ', \'Disetujui\')">' +
+            '<i class="bi bi-check-circle"></i></button>';
 
-            if (data.status === 'Menunggu') {
-                html += '<button type="button" class="btn p-1 text-success" style="border:none;background:none;" title="Setujui" ' +
-                    'onclick="updateRentalStatus(' + data.id + ', \'Disetujui\')">' +
-                    '<i class="bi bi-check-circle"></i></button>';
-                html += '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" title="Tolak" ' +
-                    'onclick="updateRentalStatus(' + data.id + ', \'Ditolak\')">' +
-                    '<i class="bi bi-x-circle"></i></button>';
-            } else if (data.status === 'Disetujui') {
-                html += '<button type="button" class="btn p-1 text-info" style="border:none;background:none;" title="Selesaikan" ' +
-                    'onclick="updateRentalStatus(' + data.id + ', \'Selesai\')">' +
-                    '<i class="bi bi-check-circle"></i></button>';
-            }
+        html += '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" title="Tolak" ' +
+            'onclick="updateRentalStatus(' + data.id + ', \'Ditolak\')">' +
+            '<i class="bi bi-x-circle"></i></button>';
 
-            html += '</div>';
-            return html;
-        }
+    } else if (data.status === 'Disetujui') {
+        html += '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" title="Mulai Rental" ' +
+            'onclick="updateRentalStatus(' + data.id + ', \'Berjalan\')">' +
+            '<i class="bi bi-play-circle-fill"></i></button>';
+
+    } else if (data.status === 'Berjalan') {
+        html += '<button type="button" class="btn p-1 text-success" style="border:none;background:none;" title="Selesaikan Rental" ' +
+            'onclick="updateRentalStatus(' + data.id + ', \'Selesai\')">' +
+            '<i class="bi bi-check-circle-fill"></i></button>';
+    }
+
+    html += '</div>';
+    return html;
+}
 
         $(document).ready(function() {
 
