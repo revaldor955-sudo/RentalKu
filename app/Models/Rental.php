@@ -83,4 +83,5 @@ public function dendas()
             ->withPivot('tarif_perhari', 'sub_total')
             ->withTimestamps();
     }
+    
 }

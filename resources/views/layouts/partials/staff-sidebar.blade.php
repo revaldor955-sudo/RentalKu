@@ -164,6 +164,14 @@
                         </a>
                     </li>
                     <li class="nav-item">
+    <a href="{{ route('pelacakan-gps.index') }}"
+        class="nav-link {{ request()->routeIs('pelacakan-gps.*') ? 'active' : '' }}"
+        aria-current="{{ request()->routeIs('pelacakan-gps.*') ? 'page' : 'false' }}">
+        <i class="bi bi-geo-alt-fill nav-icon" aria-hidden="true"></i>
+        <span class="nav-text">Pelacakan GPS</span>
+    </a>
+</li>
+                    <li class="nav-item">
                         <a href="{{ route('pengembalian.index') }}"
                             class="nav-link {{ request()->routeIs('pengembalian*') ? 'active' : '' }}"
                             aria-current="{{ request()->routeIs('pengembalian*') ? 'page' : 'false' }}">
@@ -263,9 +271,9 @@
         @include('layouts.partials.staff-navbar')
 
         {{-- Page Content --}}
-        <main class="page-content" role="main">
-            {{-- Content injected by page --}}
-        </main>
+      <main class="page-content" role="main">
+    @yield('content')
+</main>
     </div>
 </div>
 
