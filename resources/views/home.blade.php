@@ -354,23 +354,44 @@
         <div class="container">
             <div class="row text-center g-4">
             <div class="col-6 col-md-3">
-                <h2 class="fw-bold display-5 mb-1">{{ !empty($landingSettings['stats_mobil_value']) ? $landingSettings['stats_mobil_value'] . '+' : $totalMobil . '+' }}</h2>
+                <h2 class="fw-bold display-5 mb-1">{{ is_numeric($landingSettings['stats_mobil_value'] ?? null) ? $landingSettings['stats_mobil_value'] . '+' : $totalMobil . '+' }}</h2>
                 <p class="mb-0 opacity-75">{{ $landingSettings['stats_mobil_label'] ?? 'Mobil Tersedia' }}</p>
             </div>
             <div class="col-6 col-md-3">
-                <h2 class="fw-bold display-5 mb-1">{{ !empty($landingSettings['stats_pelanggan_value']) ? $landingSettings['stats_pelanggan_value'] . '+' : $totalPuas . '+' }}</h2>
+                <h2 class="fw-bold display-5 mb-1">{{ is_numeric($landingSettings['stats_pelanggan_value'] ?? null) ? $landingSettings['stats_pelanggan_value'] . '+' : $totalPuas . '+' }}</h2>
                 <p class="mb-0 opacity-75">{{ $landingSettings['stats_pelanggan_label'] ?? 'Pelanggan Puas' }}</p>
             </div>
            <div class="col-6 col-md-3">
     <div class="stat-item text-center">
-        <h2 class="fw-bold">24/7</h2>
+        <h2 class="fw-bold display-5 mb-1">24/7</h2>
         <p>Layanan Support</p>
     </div>
 </div>
-            <div class="col-6 col-md-3">
-                <h2 class="fw-bold display-5 mb-1">{{ !empty($landingSettings['stats_rating_value']) ? $landingSettings['stats_rating_value'] : ($ratingRata ?: '4.9') }}</h2>
-                <p class="mb-0 opacity-75">{{ $landingSettings['stats_rating_label'] ?? 'Rating Rata-rata' }}</p>
+          <div class="col-6 col-md-3">
+            @php
+                $nilaiTampil = (float) $ratingRata;
+            @endphp
+            @if ($totalRating > 0)
+                <h2 class="fw-bold display-5 mb-1">{{ number_format($nilaiTampil, 1, ',', '.') }}</h2>
+                <div class="rating-avg" role="img" aria-label="Rating {{ number_format($nilaiTampil, 1, ',', '.') }} dari 5">
+                    <span class="rating-avg-bg">
+                    @for ($i = 0; $i < 5; $i++)<i class="bi bi-star-fill"></i>@endfor
+                    </span>
+                    <span class="rating-avg-fg" style="width: {{ ($nilaiTampil / 5) * 100 }}%;">
+                    @for ($i = 0; $i < 5; $i++)<i class="bi bi-star-fill"></i>@endfor
+                    </span>
+                </div>
+                <p class="mb-0 opacity-75 mt-1">Berdasarkan {{ $totalRating }} Ulasan</p>
+            @else
+            <h2 class="fw-bold display-5 mb-1">-</h2>
+            <div class="rating-avg" role="img" aria-label="Belum ada Ulasan">
+                <span class="rating-avg-bg">
+                    @for ($i = 0; $i < 5; $i++)<i class="bi bi-star-fill"></i>@endfor
+                </span>
             </div>
+            <p class="mb-0 opacity-75 mt-1">Belum ada Ulasan</p>
+            @endif
+          </div>
             </div>
         </div>
     </section>
@@ -559,7 +580,7 @@
                                 </div>
 
                                 <div class="rating-text">
-                                    "{{ $rating->ulasan ?? 'Pelayanan sangat baik.' }}"
+                                    "{{ $rating->komentar }}"
                                 </div>
 
                                 <div class="user-info">
@@ -855,6 +876,26 @@
         }
         .cta {
             margin-bottom: 40px;
+        }
+
+        .rating-avg {
+            position: relative;
+            display: inline-block;
+            line-height: 1;
+            font-size: 1rem;
+        }
+        .rating-avg-bg {
+            color: rgba(255, 255, 255, 0.35);
+        }
+        .rating-avg-fg {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            color :#ffc107;
+        }
+        .rating-avg i {
+            margin-right: 2px;
         }
     </style>
 
