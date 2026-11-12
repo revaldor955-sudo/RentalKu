@@ -98,12 +98,18 @@ class AuditFindingsTest extends TestCase
             'nominal' => 50000,
             'alasan' => 'Mobil mogok',
             'tanggal' => now()->toDateString(),
+            'bukti' => [
+                UploadedFile::fake()->image('bukti1.jpg'),
+                UploadedFile::fake()->image('bukti2.jpg'),
+            ],
         ], $extra);
     }
 
     // U-02: admin/staff bisa buatkan klaim untuk customer yang valid.
     public function test_admin_buat_klaim_untuk_customer_ok(): void
     {
+        Storage::fake('public');
+
         $rental = $this->buatRental($this->customer);
 
         $this->actingAs($this->admin)
@@ -117,15 +123,33 @@ class AuditFindingsTest extends TestCase
         ]);
     }
 
-    public function test_staff_buat_klaim_untuk_customer_ok(): void
+    public function test_admin_halaman_kompensasi_ok(): void
+    {
+        $this->actingAs($this->admin)
+            ->get('/kompensasis')
+            ->assertOk()
+            ->assertSee('Buat Klaim');
+    }
+
+    public function test_admin_rentals_for_customer(): void
+    {
+        $rental = $this->buatRental($this->customer);
+
+        $this->actingAs($this->admin)
+            ->getJson('/kompensasis/rentals?customer_id='.$this->customer->id)
+            ->assertOk()
+            ->assertJsonFragment(['id' => $rental->id]);
+    }
+
+    public function test_staff_ditolak_buat_klaim(): void
     {
         $rental = $this->buatRental($this->customer);
 
         $this->actingAs($this->staff)
             ->post('/kompensasis', $this->klaimPayload($rental, ['customer_id' => $this->customer->id]))
-            ->assertRedirect(route('kompensasis.index'));
+            ->assertForbidden();
 
-        $this->assertDatabaseHas('kompensasis', [
+        $this->assertDatabaseMissing('kompensasis', [
             'rental_id' => $rental->id,
             'customer_id' => $this->customer->id,
         ]);
@@ -142,47 +166,34 @@ class AuditFindingsTest extends TestCase
         $this->assertDatabaseMissing('kompensasis', ['rental_id' => $rental->id]);
     }
 
-    public function test_customer_ditolak_klaim_milik_orang(): void
+    
+    // Bukti wajib 2-5 file untuk semua jalur, termasuk admin.
+    public function test_admin_tanpa_bukti_ditolak(): void
     {
         $rental = $this->buatRental($this->customer);
+        $payload = $this->klaimPayload($rental, ['customer_id' => $this->customer->id]);
+        unset($payload['bukti']);
 
-        $this->actingAs($this->customerB)
-            ->post('/customer/kompensasi', $this->klaimPayload($rental))
-            ->assertForbidden();
-
-        $this->assertDatabaseMissing('kompensasis', ['rental_id' => $rental->id]);
-    }
-
-    // Bukti: customer wajib min 2, petugas boleh tanpa bukti.
-    public function test_customer_tanpa_bukti_ditolak(): void
-    {
-        $rental = $this->buatRental($this->customer);
-
-        $this->actingAs($this->customer)
-            ->postJson('/customer/kompensasi', $this->klaimPayload($rental))
+        $this->actingAs($this->admin)
+            ->postJson('/kompensasis', $payload)
             ->assertStatus(422)
             ->assertJsonValidationErrors('bukti');
 
         $this->assertDatabaseMissing('kompensasis', ['rental_id' => $rental->id]);
     }
 
-    public function test_customer_dengan_dua_bukti_sukses(): void
+    public function test_customer_tidak_bisa_buat_klaim(): void
     {
-        Storage::fake('public');
         $rental = $this->buatRental($this->customer);
 
         $this->actingAs($this->customer)
-            ->post('/customer/kompensasi', array_merge($this->klaimPayload($rental), [
-                'bukti' => [
-                    UploadedFile::fake()->image('bukti1.jpg'),
-                    UploadedFile::fake()->image('bukti2.jpg'),
-                ],
-            ]))
-            ->assertRedirect(route('customer.kompensasi.index'));
+            ->postJson('/customer/kompensasi', $this->klaimPayload($rental))
+            ->assertStatus(405);
 
-        $kompensasi = Kompensasi::where('rental_id', $rental->id)->firstOrFail();
-        $this->assertSame(2, $kompensasi->buktis()->count());
+        $this->assertDatabaseMissing('kompensasis', ['rental_id' => $rental->id]);
     }
+
+    
 
     public function test_admin_ditolak_rental_belum_selesai(): void
     {
@@ -256,11 +267,13 @@ class AuditFindingsTest extends TestCase
     // U-04: nominal non-dana dipaksa 0; dana negatif/tanpa nominal ditolak.
     public function test_nominal_diskon_disimpan_nol(): void
     {
+        Storage::fake('public');
+
         $rental = $this->buatRental($this->customer);
 
-        $this->actingAs($this->customer)->post('/customer/kompensasi', $this->klaimPayload($rental, [
-            'jenis' => 'diskon', 'nominal' => 99999,
-        ]))->assertRedirect();
+        $this->actingAs($this->admin)->post('/kompensasis', $this->klaimPayload($rental, [
+            'customer_id' => $this->customer->id, 'jenis' => 'diskon', 'nominal' => 99999,
+        ]))->assertRedirect(route('kompensasis.index'));
 
         $this->assertEquals(0, Kompensasi::where('rental_id', $rental->id)->value('nominal'));
     }
@@ -269,18 +282,18 @@ class AuditFindingsTest extends TestCase
     {
         $rental = $this->buatRental($this->customer);
 
-        $this->actingAs($this->customer)->postJson('/customer/kompensasi', $this->klaimPayload($rental, [
-            'nominal' => -1000,
+        $this->actingAs($this->admin)->postJson('/kompensasis', $this->klaimPayload($rental, [
+            'customer_id' => $this->customer->id, 'nominal' => -1000,
         ]))->assertStatus(422);
     }
 
     public function test_dana_tanpa_nominal_ditolak(): void
     {
         $rental = $this->buatRental($this->customer);
-        $payload = $this->klaimPayload($rental);
+        $payload = $this->klaimPayload($rental, ['customer_id' => $this->customer->id]);
         unset($payload['nominal']);
 
-        $this->actingAs($this->customer)->postJson('/customer/kompensasi', $payload)->assertStatus(422);
+        $this->actingAs($this->admin)->postJson('/kompensasis', $payload)->assertStatus(422);
     }
 
     // U-06: endpoint publik tetap untuk modal tamu, tanpa data sensitif.
@@ -316,13 +329,13 @@ class AuditFindingsTest extends TestCase
         $this->assertEquals($this->cabang->id, $rental->cabang_ambil_id);
     }
 
-    public function test_kompensasi_abaikan_customer_id_palsu(): void
+    public function test_admin_tolak_customer_id_bukan_customer(): void
     {
         $rental = $this->buatRental($this->customer);
 
-        $this->actingAs($this->customerB)->post('/customer/kompensasi', $this->klaimPayload($rental, [
-            'customer_id' => $this->customerB->id,
-        ]))->assertForbidden();
+        $this->actingAs($this->admin)->postJson('/kompensasis', $this->klaimPayload($rental, [
+            'customer_id' => $this->admin->id,
+        ]))->assertStatus(422)->assertJsonValidationErrors('customer_id');
     }
 
     public function test_pembayaran_abaikan_jumlah_dan_status_bawaan_request(): void

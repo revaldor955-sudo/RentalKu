@@ -391,39 +391,6 @@
     </div>
 
 
-    <div class="col-md-6 col-xl-3">
-
-        <div class="stat-card">
-
-            <div class="d-flex justify-content-between">
-
-                <div>
-
-                    <div class="text-muted">
-                        Klaim Diajukan
-                    </div>
-
-                    <div class="stat-number text-primary">
-                        {{ $claimedKompensasisCount ?? 0 }}
-                    </div>
-
-                </div>
-
-                <div class="stat-icon">
-
-                    <i class="bi bi-cash-coin"></i>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    </div>
-
-
 
 <section class="mb-5">
 

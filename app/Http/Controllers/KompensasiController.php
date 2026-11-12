@@ -14,7 +14,9 @@ class KompensasiController extends Controller
 {
     public function index()
     {
-        return view('kompensasis.index')->with('pageTitle', 'Kompensasi');
+        $customers = User::where('roles_id', 3)->orderBy('name')->get(['id', 'name', 'email']);
+
+        return view('kompensasis.index', compact('customers'))->with('pageTitle', 'Kompensasi');
     }
 
     public function data(Request $request)
@@ -103,37 +105,51 @@ class KompensasiController extends Controller
         ]);
     }
 
+    public function rentalsForCustomer(Request $request)
+    {
+        $validated = $request->validate([
+            'customer_id' => ['required', Rule::exists('users', 'id')->where('roles_id', 3)],
+        ], [
+            'customer_id.required' => 'Customer wajib dipilih',
+            'customer_id.exists' => 'Customer tidak valid.',
+        ]);
+
+        $rentals = Rental::with('mobil')
+            ->where('user_id', $validated['customer_id'])
+            ->where('status', 'Selesai')
+            ->whereNotExists(function ($query) {
+                $query->selectRaw('1')
+                    ->from('kompensasis')
+                    ->whereColumn('kompensasis.rental_id', 'rentals.id')
+                    ->whereIn('kompensasis.status', ['diajukan', 'disetujui', 'selesai']);
+            })
+            ->orderByDesc('tanggal_selesai')
+            ->get()
+            ->map(fn ($rental) => [
+                'id' => $rental->id,
+                'mobil_id' => $rental->mobil_id,
+                'mobil_name' => $rental->mobil->name ?? '-',
+                'plate_number' => $rental->mobil->plate_number ?? '-',
+                'tanggal_mulai' => $rental->tanggal_mulai?->format('d/m/Y'),
+                'tanggal_selesai' => $rental->tanggal_selesai?->format('d/m/Y'),
+            ]);
+
+        return response()->json($rentals);
+    }
+
     public function store(Request $request)
     {
-        // Jalur admin/staff (POST /kompensasis): customer_id wajib dari input
-        // terverifikasi; jalur customer (POST /customer/kompensasi): milik sendiri.
-        $isPetugas = auth()->user()->roles_id !== 3;
-
-        // Cek kepemilikan didahulukan agar rental milik orang lain tetap 403
-        // walau customer_id input lolos/gagal validasi peran.
-        if ($isPetugas && $request->filled(['rental_id', 'customer_id'])) {
-            $rentalCek = Rental::find($request->input('rental_id'));
-            if ($rentalCek
-                && User::where('id', $request->input('customer_id'))->exists()
-                && (int) $rentalCek->user_id !== (int) $request->input('customer_id')) {
-                abort(403, 'Rental ini bukan milik customer tersebut.');
-            }
-        }
-
         $rules = [
+            'customer_id' => ['required', Rule::exists('users', 'id')->where('roles_id', 3)],
             'mobil_id' => 'nullable|exists:mobils,id',
             'rental_id' => 'required|exists:rentals,id',
             'jenis' => 'required|in:pengembalian_dana,diskon,gratis_sewa',
             'nominal' => 'nullable|required_if:jenis,pengembalian_dana|numeric|min:0',
             'alasan' => 'required|string',
             'tanggal' => 'required|date|before_or_equal:today',
-            'bukti' => $isPetugas ? 'nullable|array|min:2|max:5' : 'required|array|min:2|max:5',
-            'bukti.*' => $isPetugas ? 'image|mimes:jpg,jpeg,png|max:2048' : 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'bukti' => 'required|array|min:2|max:5',
+            'bukti.*' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ];
-
-        if ($isPetugas) {
-            $rules['customer_id'] = ['required', Rule::exists('users', 'id')->where('roles_id', 3)];
-        }
 
         $validated = $request->validate($rules, [
             'rental_id.required' => 'Rental wajib dipilih',
@@ -154,27 +170,15 @@ class KompensasiController extends Controller
             'bukti.*.max' => 'Ukuran setiap bukti maksimal 2MB.',
         ]);
 
-        if ($isPetugas) {
-            // Klaim dibuatkan untuk customer: rental harus milik customer tersebut.
-            $rental = Rental::where('id', $validated['rental_id'])
-                ->where('user_id', $validated['customer_id'])
-                ->first();
-            if (! $rental) {
-                abort(403, 'Rental ini bukan milik customer tersebut.');
-            }
-
-            $validated['customer_id'] = $rental->user_id;
-        } else {
-            $validated['customer_id'] = auth()->id();
-
-            // Klaim hanya boleh atas rental milik sendiri; mobil mengikuti rental.
-            $rental = Rental::where('id', $validated['rental_id'])
-                ->where('user_id', auth()->id())
-                ->first();
-            if (! $rental) {
-                abort(403, 'Rental ini bukan milik Anda.');
-            }
+        // Klaim dibuatkan untuk customer: rental harus milik customer tersebut.
+        $rental = Rental::where('id', $validated['rental_id'])
+            ->where('user_id', $validated['customer_id'])
+            ->first();
+        if (! $rental) {
+            abort(403, 'Rental ini bukan milik customer tersebut.');
         }
+
+        $validated['customer_id'] = $rental->user_id;
 
         // Klaim hanya boleh dibuat untuk rental yang sudah selesai.
         if ($rental->status !== 'Selesai') {
@@ -248,13 +252,8 @@ class KompensasiController extends Controller
             ]);
         }
 
-        if ($isPetugas) {
-            return redirect()->route('kompensasis.index')
-                ->with('success', 'Klaim kompensasi berhasil dibuat.');
-        }
-
-        return redirect()->route('customer.kompensasi.index')
-            ->with('success', 'Klaim kompensasi berhasil diajukan.');
+        return redirect()->route('kompensasis.index')
+            ->with('success', 'Klaim kompensasi berhasil dibuat.');
     }
 
     public function update(Request $request, Kompensasi $kompensasi)
@@ -330,18 +329,7 @@ class KompensasiController extends Controller
 
     public function customerIndex()
     {
-        $rentals = Rental::with('mobil')
-            ->where('user_id', auth()->id())
-            ->where('status', 'Selesai')
-            ->whereNotExists(function ($query) {
-                $query->selectRaw('1')
-                    ->from('kompensasis')
-                    ->whereColumn('kompensasis.rental_id', 'rentals.id')
-                    ->whereIn('kompensasis.status', ['diajukan', 'disetujui', 'selesai']);
-            })
-            ->get();
-
-        return view('kompensasis.customer-index', compact('rentals'));
+        return view('kompensasis.customer-index');
     }
 
     public function customerData(Request $request)
@@ -421,14 +409,5 @@ class KompensasiController extends Controller
             'recordsFiltered' => $recordsFiltered,
             'data' => $data,
         ]);
-    }
-
-    /**
-     * Customer create claim page — retired: single flow via index popup.
-     * Kept as redirect for old links/bookmarks.
-     */
-    public function customerCreate()
-    {
-        return redirect()->route('customer.kompensasi.index', ['baru' => 1]);
     }
 }
