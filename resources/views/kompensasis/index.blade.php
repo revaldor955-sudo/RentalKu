@@ -217,6 +217,10 @@
             <h2 class="page-title mb-1">Management Kompensasi</h2>
             <p class="text-muted mb-0">Kelola klaim kompensasi pelanggan (pengembalian dana, diskon, gratis sewa).</p>
         </div>
+        <button type="button" class="btn btn-green" data-bs-toggle="modal" data-bs-target="#createKompensasiModal">
+            <i class="bi bi-plus-circle me-1"></i>
+            Buat Klaim
+        </button>
     </div>
 
     @if(session('success'))
@@ -354,6 +358,78 @@
 </div>
 </div>
 
+<div class="modal fade" id="createKompensasiModal" tabindex="-1" aria-labelledby="createKompensasiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            @include('layouts.partials.modal-head', ['title' => 'Buat Klaim Kompensasi', 'icon' => 'bi-plus-circle', 'titleId' => 'createKompensasiModalLabel'])
+            <form action="{{ route('kompensasis.store') }}" method="POST" id="formCreateKompensasi" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="createCustomerId">Customer</label>
+                            <select name="customer_id" id="createCustomerId" class="form-select" required>
+                                <option value="">Pilih customer</option>
+                                @foreach($customers as $customer)
+                                    <option value="{{ $customer->id }}">{{ $customer->name }} ({{ $customer->email }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="createRentalId">Rental Selesai</label>
+                            <select name="rental_id" id="createRentalId" class="form-select" required disabled>
+                                <option value="">Pilih customer terlebih dahulu</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="createJenis">Jenis Kompensasi</label>
+                            <select name="jenis" id="createJenis" class="form-select" required>
+                                <option value="">Pilih jenis</option>
+                                <option value="pengembalian_dana">Pengembalian Dana</option>
+                                <option value="diskon">Diskon</option>
+                                <option value="gratis_sewa">Gratis Sewa</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 d-none" id="createNominalWrap">
+                            <label class="form-label fw-semibold" for="createNominalDisplay">Nominal (Rp)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="text" id="createNominalDisplay" class="form-control rupiah-input"
+                                    placeholder="50.000" inputmode="numeric" autocomplete="off"
+                                    data-target="createNominal">
+                                <input type="hidden" name="nominal" id="createNominal">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold" for="createAlasan">Alasan</label>
+                            <textarea name="alasan" id="createAlasan" class="form-control" rows="3" required placeholder="Alasan klaim kompensasi..."></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="createTanggal">Tanggal Kejadian</label>
+                            <input type="date" name="tanggal" id="createTanggal" class="form-control" value="{{ now()->format('Y-m-d') }}" max="{{ now()->format('Y-m-d') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" for="createBukti">Bukti Foto</label>
+                            <input type="file" name="bukti[]" id="createBukti" class="form-control" accept="image/jpeg,image/png" multiple required>
+                            <div class="form-text">Wajib 2–5 foto, maksimal 2MB per file (jpg/jpeg/png).</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Batal
+                    </button>
+                    <button type="submit" class="btn btn-green">
+                        <i class="bi bi-save me-1"></i>
+                        Simpan Klaim
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="editKompensasiModal" tabindex="-1" aria-labelledby="editKompensasiModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -449,6 +525,23 @@
     function esc(s) {
         return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
+
+    function formatRupiahInput(value) {
+        let angka = String(value || '').replace(/\D/g, '');
+        if (!angka) return '';
+        return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function getRawRupiah(value) {
+        return String(value || '').replace(/\D/g, '');
+    }
+
+    $(document).on('input', '.rupiah-input', function() {
+        const input = this;
+        const rawValue = getRawRupiah(input.value);
+        input.value = formatRupiahInput(rawValue);
+        $('#' + $(input).data('target')).val(rawValue);
+    });
 
     function jenisBadge(jenis) {
         const map = {
@@ -833,6 +926,126 @@
                     text: msg,
                 });
             }
+        });
+    });
+
+    function resetCreateKompensasi() {
+        var form = document.getElementById('formCreateKompensasi');
+        if (form) form.reset();
+        $('#createRentalId').html('<option value="">Pilih customer terlebih dahulu</option>').prop('disabled', true);
+        $('#createNominalWrap').addClass('d-none');
+        $('#createNominalDisplay').val('');
+        $('#createNominal').val('');
+        $('#createTanggal').val('{{ now()->format('Y-m-d') }}');
+    }
+
+    $('#createCustomerId').on('change', function() {
+        var customerId = $(this).val();
+        var $rental = $('#createRentalId');
+
+        if (!customerId) {
+            $rental.html('<option value="">Pilih customer terlebih dahulu</option>').prop('disabled', true);
+            return;
+        }
+
+        $rental.html('<option value="">Memuat rental...</option>').prop('disabled', true);
+
+        $.getJSON('{{ route('kompensasis.rentals') }}', { customer_id: customerId })
+            .done(function(rows) {
+                if (!rows.length) {
+                    $rental.html('<option value="">Tidak ada rental Selesai tanpa klaim aktif</option>');
+                    return;
+                }
+
+                var html = '<option value="">Pilih rental</option>';
+                rows.forEach(function(row) {
+                    html += '<option value="' + row.id + '">' +
+                        esc(row.mobil_name + ' (' + row.plate_number + ') — ' + row.tanggal_mulai + ' s/d ' + row.tanggal_selesai) +
+                        '</option>';
+                });
+                $rental.html(html).prop('disabled', false);
+            })
+            .fail(function() {
+                $rental.html('<option value="">Gagal memuat rental</option>');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Tidak bisa memuat daftar rental customer.',
+                });
+            });
+    });
+
+    $('#createJenis').on('change', function() {
+        var isDana = $(this).val() === 'pengembalian_dana';
+        $('#createNominalWrap').toggleClass('d-none', !isDana);
+        if (!isDana) {
+            $('#createNominalDisplay').val('');
+            $('#createNominal').val('');
+        }
+    });
+
+    $(document).on('hidden.bs.modal', '#createKompensasiModal', resetCreateKompensasi);
+
+    $(document).on('submit', '#formCreateKompensasi', function(e) {
+        e.preventDefault();
+
+        var files = document.getElementById('createBukti').files;
+        if (files.length < 2 || files.length > 5) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Bukti tidak valid',
+                text: 'Unggah 2 sampai 5 foto bukti.',
+            });
+            return;
+        }
+
+        for (var i = 0; i < files.length; i++) {
+            if (files[i].size > 2 * 1024 * 1024) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File terlalu besar',
+                    text: 'Setiap bukti maksimal 2MB.',
+                });
+                return;
+            }
+        }
+
+        var formData = new FormData(this);
+
+        $.ajax({
+            url: '{{ route('kompensasis.store') }}',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            success: function(result) {
+                bootstrap.Modal.getOrCreateInstance($('#createKompensasiModal')[0]).hide();
+                $('#kompensasis-table').DataTable().ajax.reload();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: result.message || 'Klaim kompensasi berhasil dibuat.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+            },
+            error: function(xhr) {
+                var r = xhr.responseJSON || {};
+                var msg = r.errors ? Object.values(r.errors)[0][0] :
+                    (r.message || 'Terjadi kesalahan saat membuat klaim.');
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: msg,
+                });
+            },
         });
     });
 

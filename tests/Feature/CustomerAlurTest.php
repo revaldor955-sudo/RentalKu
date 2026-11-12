@@ -24,6 +24,8 @@ class CustomerAlurTest extends TestCase
 
     private User $customer;
 
+    private User $admin;
+
     private Cabang $cabangA;
 
     private Cabang $cabangB;
@@ -37,6 +39,7 @@ class CustomerAlurTest extends TestCase
         $this->seed([RoleSeeder::class, UserSeeder::class]);
 
         $this->customer = User::where('email', 'customer@rentalku.test')->firstOrFail();
+        $this->admin = User::where('email', 'admin@rentalku.test')->firstOrFail();
         $this->cabangA = Cabang::create(['name' => 'A', 'address' => 'Jl A', 'phone' => '081']);
         $this->cabangB = Cabang::create(['name' => 'B', 'address' => 'Jl B', 'phone' => '082']);
 
@@ -113,8 +116,9 @@ class CustomerAlurTest extends TestCase
             'status' => 'diajukan',
         ]);
 
-        $res = $this->actingAs($this->customer)
-            ->postJson('/customer/kompensasi', [
+        $res = $this->actingAs($this->admin)
+            ->postJson('/kompensasis', [
+                'customer_id' => $this->customer->id,
                 'rental_id' => $rental->id,
                 'mobil_id' => $this->mobil->id,
                 'jenis' => 'pengembalian_dana',
