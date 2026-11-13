@@ -37,102 +37,61 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| MASTER DATA
-|--------------------------------------------------------------------------
-| Admin saja — data referensi (role, brand, tipe, cabang, fasilitas,
-| metode, supir, kupon) hanya boleh diubah Admin; Staff memakai lewat dropdown.
-|--------------------------------------------------------------------------
-*/
+// MASTER DATA
+// Admin saja — data referensi (role, brand, tipe, cabang, fasilitas,
+// metode, supir, kupon) hanya boleh diubah Admin; Staff memakai lewat dropdown.
 
 Route::middleware('admin')->group(function () {
-    /*
-    |--------------------------------------------------------------------------
-    | Roles
-    |--------------------------------------------------------------------------
-    */
+    // Roles
 
     // Route::get('roles/data', [RoleController::class, 'data'])->name('roles.data');
 
     // Route::resource('roles', RoleController::class)->except(['create', 'edit', 'show']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Brands
-    |--------------------------------------------------------------------------
-    */
+    // Brands
 
     Route::get('brands/data', [BrandController::class, 'data'])->name('brands.data');
 
     Route::resource('brands', BrandController::class)->except(['create', 'edit']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Tipe Mobil
-    |--------------------------------------------------------------------------
-    */
+    // Tipe Mobil
 
     Route::get('tipe_mobils/data', [TipeMobilController::class, 'data'])->name('tipe_mobils.data');
 
     Route::resource('tipe_mobils', TipeMobilController::class)->except(['create', 'edit', 'show']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Cabang
-    |--------------------------------------------------------------------------
-    */
+    // Cabang
 
     Route::get('cabangs/data', [CabangController::class, 'data'])->name('cabangs.data');
 
     Route::resource('cabangs', CabangController::class)->except(['create', 'edit', 'show']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Fasilitas
-    |--------------------------------------------------------------------------
-    */
+    // Fasilitas
 
     Route::get('/fasilitas/data', [FasilitasController::class, 'data'])->name('fasilitas.data');
 
     Route::resource('fasilitas', FasilitasController::class)->except(['create', 'edit', 'show']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Metode Pembayaran
-    |--------------------------------------------------------------------------
-    */
+    // Metode Pembayaran
 
     Route::get('metode_pembayarans/data', [MetodePembayaranController::class, 'data'])->name('metode_pembayarans.data');
 
     Route::resource('metode_pembayarans', MetodePembayaranController::class)->except(['create', 'edit', 'show']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Supir
-    |--------------------------------------------------------------------------
-    */
+    // Supir
 
     Route::get('supirs/data', [SupirController::class, 'data'])->name('supirs.data');
 
     Route::resource('supirs', SupirController::class)->except(['create', 'edit', 'show']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Kupon
-    |--------------------------------------------------------------------------
-    */
+    // Kupon
 
     Route::get('/kupons/data', [KuponController::class, 'data'])->name('kupons.data');
 
     Route::resource('kupons', KuponController::class)->except(['create', 'edit', 'show']);
 });
 
-/*
-|--------------------------------------------------------------------------
-| MANAGEMENT MOBIL - ADMIN
-|--------------------------------------------------------------------------
-*/
+// MANAGEMENT MOBIL - ADMIN
 
 Route::resource('mobils', MobilController::class)
     ->except(['create', 'edit', 'show', 'update', 'destroy'])
@@ -150,53 +109,31 @@ Route::middleware('admin')->group(function () {
     Route::delete('/mobils/{mobil}', [MobilController::class, 'destroy'])->name('mobils.destroy');
 });
 
-/*
-|--------------------------------------------------------------------------
-| MASTER PENUNJANG MOBIL
-|--------------------------------------------------------------------------
-| Admin dan Staff
-|--------------------------------------------------------------------------
-*/
+// MASTER PENUNJANG MOBIL
+// Admin dan Staff
 
 Route::middleware('adminstaff')->group(function () {
-    /*
-    |--------------------------------------------------------------------------
-    | Kerusakan Mobil
-    |--------------------------------------------------------------------------
-    */
+    // Kerusakan Mobil
 
     Route::get('kerusakan_mobils/data', [KerusakanMobilController::class, 'data'])->name('kerusakan_mobils.data');
 
     Route::resource('kerusakan_mobils', KerusakanMobilController::class)->except(['create', 'edit', 'show']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Foto Mobil
-    |--------------------------------------------------------------------------
-    */
+    // Foto Mobil
 
     Route::get('foto_mobils/data', [FotoMobilController::class, 'data'])->name('foto_mobils.data');
 
     Route::resource('foto_mobils', FotoMobilController::class)->except(['create', 'edit', 'show']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Dokumen Mobil
-    |--------------------------------------------------------------------------
-    */
+    // Dokumen Mobil
 
     Route::get('dokumen_mobils/data', [DokumenMobilController::class, 'data'])->name('dokumen_mobils.data');
 
     Route::resource('dokumen_mobils', DokumenMobilController::class)->except(['create', 'edit', 'show']);
 });
 
-/*
-|--------------------------------------------------------------------------
-| DENDA
-|--------------------------------------------------------------------------
-| Admin dan Staff
-|--------------------------------------------------------------------------
-*/
+// DENDA
+// Admin dan Staff
 
 Route::get('dendas/data', [DendaController::class, 'data'])
     ->name('dendas.data')
@@ -210,29 +147,23 @@ Route::middleware('adminstaff')->group(function () {
     Route::put('/dendas/{denda}/status', [DendaController::class, 'updateStatus'])->name('dendas.updateStatus');
 });
 
-/*
-|--------------------------------------------------------------------------
-| KOMPENSASI
-|--------------------------------------------------------------------------
-| Admin dan Staff
-|--------------------------------------------------------------------------
-*/
+// KOMPENSASI
+// Admin saja — klaim dibuat Admin atas nama customer; Staff tanpa akses.
 
 Route::get('kompensasis/data', [KompensasiController::class, 'data'])
     ->name('kompensasis.data')
-    ->middleware('adminstaff');
+    ->middleware('admin');
+
+Route::get('kompensasis/rentals', [KompensasiController::class, 'rentalsForCustomer'])
+    ->name('kompensasis.rentals')
+    ->middleware('admin');
 
 Route::resource('kompensasis', KompensasiController::class)
     ->except(['create', 'edit', 'show'])
-    ->middleware('adminstaff');
+    ->middleware('admin');
 
-/*
-|--------------------------------------------------------------------------
-| SERVIS MOBIL
-|--------------------------------------------------------------------------
-| Admin dan Staff
-|--------------------------------------------------------------------------
-*/
+// SERVIS MOBIL
+// Admin dan Staff
 
 Route::get('servis_mobils/data', [ServisMobilController::class, 'data'])
     ->name('servis_mobils.data')
@@ -242,42 +173,25 @@ Route::resource('servis_mobils', ServisMobilController::class)
     ->except(['create', 'edit', 'show'])
     ->middleware('adminstaff');
 
-/*
-|--------------------------------------------------------------------------
-| MASTER KONTEN
-|--------------------------------------------------------------------------
-| Admin saja — konten landing (banner, FAQ) dikelola bersama
-| landing-settings yang sudah admin-only; Staff fokus operasional rental.
-|--------------------------------------------------------------------------
-*/
+// MASTER KONTEN
+// Admin saja — konten landing (banner, FAQ) dikelola bersama
+// landing-settings yang sudah admin-only; Staff fokus operasional rental.
 
 Route::middleware('admin')->group(function () {
-    /*
-    |--------------------------------------------------------------------------
-    | BANNER
-    |--------------------------------------------------------------------------
-    */
+    // BANNER
 
     Route::get('banners/data', [BannerController::class, 'data'])->name('banners.data');
 
     Route::resource('banners', BannerController::class)->except(['create', 'edit']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | FAQ
-    |--------------------------------------------------------------------------
-    */
+    // FAQ
 
     Route::get('faqs/data', [FaqController::class, 'data'])->name('faqs.data');
 
     Route::resource('faqs', FaqController::class)->except(['create', 'edit', 'show']);
 });
 
-/*
-|--------------------------------------------------------------------------
-| LANDING PAGE
-|--------------------------------------------------------------------------
-*/
+// LANDING PAGE
 
 Route::get('/', [HomeController::class, 'index'])
     ->middleware('guest')
@@ -291,21 +205,12 @@ Route::get('/katalog/data', [HomeController::class, 'katalogData'])
     ->middleware('guest')
     ->name('katalog.data');
 
-/*
-|--------------------------------------------------------------------------
-| CONTACT
-|--------------------------------------------------------------------------
-*/
+// CONTACT
 
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
-/*
-|--------------------------------------------------------------------------
-| MANAGEMENT CONTACT / HUBUNGI KAMI
-|--------------------------------------------------------------------------
-| Admin saja
-|--------------------------------------------------------------------------
-*/
+// MANAGEMENT CONTACT / HUBUNGI KAMI
+// Admin saja
 
 Route::middleware('admin')->group(function () {
     Route::get('/admin/contacts', [ContactController::class, 'index'])->name('contacts.index');
@@ -321,11 +226,7 @@ Route::middleware('admin')->group(function () {
     Route::delete('/admin/contacts/{contact}', [ContactController::class, 'destroy'])->name('contacts.destroy');
 });
 
-/*
-|--------------------------------------------------------------------------
-| DASHBOARD REDIRECT
-|--------------------------------------------------------------------------
-*/
+// DASHBOARD REDIRECT
 
 Route::get('/dashboard', function () {
     return match (Auth::user()->roles_id) {
@@ -339,11 +240,7 @@ Route::get('/dashboard', function () {
     ->middleware('auth')
     ->name('dashboard');
 
-/*
-|--------------------------------------------------------------------------
-| PROFILE
-|--------------------------------------------------------------------------
-*/
+// PROFILE
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -357,31 +254,19 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-/*
-|--------------------------------------------------------------------------
-| ADMIN DASHBOARD
-|--------------------------------------------------------------------------
-*/
+// ADMIN DASHBOARD
 
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
     ->middleware('admin')
     ->name('admin.dashboard');
 
-/*
-|--------------------------------------------------------------------------
-| STAFF DASHBOARD
-|--------------------------------------------------------------------------
-*/
+// STAFF DASHBOARD
 
 Route::get('/staff/dashboard', [StaffDashboardController::class, 'index'])
     ->middleware('staff')
     ->name('staff.dashboard');
 
-/*
-|--------------------------------------------------------------------------
-| STAFF MANAGEMENT MOBIL
-|--------------------------------------------------------------------------
-*/
+// STAFF MANAGEMENT MOBIL
 
 Route::middleware('staff')->group(function () {
     Route::get('/staff/mobils', [MobilController::class, 'index'])->name('staff.mobils.index');
@@ -393,11 +278,7 @@ Route::middleware('staff')->group(function () {
     Route::delete('/staff/mobils/{mobil}', [MobilController::class, 'destroy'])->name('staff.mobils.destroy');
 });
 
-/*
-|--------------------------------------------------------------------------
-| CUSTOMER DASHBOARD
-|--------------------------------------------------------------------------
-*/
+// CUSTOMER DASHBOARD
 
 Route::get('/customer/dashboard', [CustomerDashboardController::class, 'index'])
     ->middleware('customer')
@@ -407,26 +288,14 @@ Route::get('/customer/riwayat', [CustomerDashboardController::class, 'riwayat'])
     ->middleware('customer')
     ->name('customer.riwayat');
 
-/*
-|--------------------------------------------------------------------------
-| CUSTOMER
-|--------------------------------------------------------------------------
-*/
+// CUSTOMER
 
 Route::middleware('customer')->group(function () {
-    /*
-    |--------------------------------------------------------------------------
-    | Pencarian Mobil
-    |--------------------------------------------------------------------------
-    */
+    // Pencarian Mobil
 
     Route::get('/customer/mobils/search', [CustomerDashboardController::class, 'search'])->name('customer.mobils.search');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Checkout
-    |--------------------------------------------------------------------------
-    */
+    // Checkout
 
     Route::get('/customer/checkout/{mobil}', [RentalController::class, 'showCheckout'])->name('rentals.checkout.show');
 
@@ -434,43 +303,23 @@ Route::middleware('customer')->group(function () {
 
     Route::post('/customer/checkout/confirm/{mobil}', [RentalController::class, 'confirmCheckout'])->name('rentals.checkout.confirm');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Rental
-    |--------------------------------------------------------------------------
-    */
+    // Rental
 
     Route::post('/customer/rental/{mobil}', [RentalController::class, 'store'])->name('rentals.store');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Pembayaran
-    |--------------------------------------------------------------------------
-    */
+    // Pembayaran
 
     Route::get('/customer/pembayaran/{rental}', [PembayaranController::class, 'create'])->name('pembayaran.create');
 
     Route::post('/customer/pembayaran/{rental}', [PembayaranController::class, 'store'])->name('pembayaran.store');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Kompensasi Customer
-    |--------------------------------------------------------------------------
-    */
+    // Kompensasi Customer (read-only)
 
     Route::get('/customer/kompensasi', [KompensasiController::class, 'customerIndex'])->name('customer.kompensasi.index');
 
     Route::get('/customer/kompensasi/data', [KompensasiController::class, 'customerData'])->name('customer.kompensasi.data');
 
-    Route::get('/customer/kompensasi/create', [KompensasiController::class, 'customerCreate'])->name('customer.kompensasi.create');
-
-    Route::post('/customer/kompensasi', [KompensasiController::class, 'store'])->name('customer.kompensasi.store');
-
-    /*
-    |--------------------------------------------------------------------------
-    | Bayar Denda
-    |--------------------------------------------------------------------------
-    */
+    // Bayar Denda
 
     Route::post('/customer/dendas/{denda}/bayar', [DendaController::class, 'customerBayar'])->name('customer.dendas.bayar');
 });
@@ -496,20 +345,11 @@ Route::middleware('customer')->group(function () {
     Route::post('/customer/gps/{rental}/lokasi', [PelacakanGPSController::class, 'terimaLokasi'])
         ->name('customer.gps.terima-lokasi');
 });
-/*
-|--------------------------------------------------------------------------
-| RENTAL & PEMBAYARAN
-|--------------------------------------------------------------------------
-| Admin dan Staff
-|--------------------------------------------------------------------------
-*/
+// RENTAL & PEMBAYARAN
+// Admin dan Staff
 
 Route::middleware('adminstaff')->group(function () {
-    /*
-    |--------------------------------------------------------------------------
-    | Rental
-    |--------------------------------------------------------------------------
-    */
+    // Rental
 
     Route::get('/rentals', [RentalController::class, 'index'])->name('rentals.index');
 
@@ -519,11 +359,7 @@ Route::middleware('adminstaff')->group(function () {
 
     Route::put('/rentals/{rental}/status', [RentalController::class, 'updateStatus'])->name('rentals.updateStatus');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Pembayaran
-    |--------------------------------------------------------------------------
-    */
+    // Pembayaran
 
     Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayarans.index');
 
@@ -534,13 +370,8 @@ Route::middleware('adminstaff')->group(function () {
     Route::put('/pembayaran/{pembayaran}/status', [PembayaranController::class, 'updateStatus'])->name('pembayarans.updateStatus');
 });
 
-/*
-|--------------------------------------------------------------------------
-| USERS
-|--------------------------------------------------------------------------
-| Admin saja — kelola identitas dan role; satu-satunya jalur eskalasi hak.
-|--------------------------------------------------------------------------
-*/
+// USERS
+// Admin saja — kelola identitas dan role; satu-satunya jalur eskalasi hak.
 
 Route::resource('users', UserController::class)
     ->except(['create', 'edit', 'show'])
@@ -552,13 +383,8 @@ Route::middleware('admin')->group(function () {
     Route::get('/users/{user}/detail', [UserController::class, 'detail'])->name('users.detail');
 });
 
-/*
-|--------------------------------------------------------------------------
-| PENGEMBALIAN & PEMERIKSAAN
-|--------------------------------------------------------------------------
-| Admin dan Staff
-|--------------------------------------------------------------------------
-*/
+// PENGEMBALIAN & PEMERIKSAAN
+// Admin dan Staff
 
 Route::middleware('adminstaff')->group(function () {
    Route::middleware('adminstaff')->group(function () {
@@ -588,50 +414,29 @@ Route::middleware('adminstaff')->group(function () {
     Route::delete('/pemeriksaan-kendaraan/{pemeriksaan}', [PemeriksaanKendaraanController::class, 'destroy'])->name('pemeriksaan-kendaraan.destroy');
 });
 
-/*
-|--------------------------------------------------------------------------
-| LAPORAN
-|--------------------------------------------------------------------------
-| Admin dan Staff
-|--------------------------------------------------------------------------
-*/
+// LAPORAN
+// Admin dan Staff
 
 Route::middleware('adminstaff')->group(function () {
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
 });
 
-/*
-|--------------------------------------------------------------------------
-| CUSTOMER RATING
-|--------------------------------------------------------------------------
-*/
+// CUSTOMER RATING
 
 Route::middleware(['auth', 'customer'])->group(function () {
     Route::post('/customer/ratings/{rental}', [CustomerRatingController::class, 'store'])->name('customer.ratings.store');
 });
 
-/*
-|--------------------------------------------------------------------------
-| ADMIN SETTINGS & RATING
-|--------------------------------------------------------------------------
-*/
+// ADMIN SETTINGS & RATING
 
 Route::middleware('admin')->group(function () {
-    /*
-    |--------------------------------------------------------------------------
-    | Landing Settings
-    |--------------------------------------------------------------------------
-    */
+    // Landing Settings
 
     Route::get('/admin/landing-settings', [LandingSettingController::class, 'index'])->name('admin.landing-settings.index');
 
     Route::put('/admin/landing-settings', [LandingSettingController::class, 'update'])->name('admin.landing-settings.update');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Rating
-    |--------------------------------------------------------------------------
-    */
+    // Rating
 
     Route::get('/admin/ratings', [AdminRatingController::class, 'index'])->name('admin.ratings.index');
 
@@ -652,10 +457,6 @@ Route::middleware('auth')->group(function () {
         ->name('otp.resend');
 });
 
-/*
-|--------------------------------------------------------------------------
-| AUTH
-|--------------------------------------------------------------------------
-*/
+// AUTH
 
 require __DIR__ . '/auth.php';

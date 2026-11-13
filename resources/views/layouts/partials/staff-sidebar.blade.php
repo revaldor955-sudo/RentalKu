@@ -187,14 +187,6 @@
                             <span class="nav-text">Denda</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="{{ route('kompensasis.index') }}"
-                            class="nav-link {{ request()->routeIs('kompensasis*') ? 'active' : '' }}"
-                            aria-current="{{ request()->routeIs('kompensasis*') ? 'page' : 'false' }}">
-                            <i class="bi bi-cash-coin nav-icon" aria-hidden="true"></i>
-                            <span class="nav-text">Kompensasi</span>
-                        </a>
-                    </li>
                 </ul>
             </div>
 

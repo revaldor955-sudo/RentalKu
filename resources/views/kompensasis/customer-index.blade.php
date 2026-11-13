@@ -188,31 +188,34 @@
             font-weight: 600;
             text-decoration: none;
             position: relative;
+            transition: color 0.2s ease;
         }
 
         .nav-btn-back::after {
             content: '';
             position: absolute;
             left: 50%;
-            bottom: 4px;
+            bottom: 0;
             width: 0;
             height: 2px;
             border-radius: 1px;
-            background: #198754;
-            transform: translateX(-50%);
-            transition: width 0.25s ease-out;
+            background-color: #2c666e;
+            transition: width 0.2s ease, left 0.2s ease;
         }
 
-        .nav-btn-back:hover {
-            color: #198754;
+        .nav-btn-back:hover,
+        .nav-btn-back:focus {
+            color: #2c666e;
         }
 
         .nav-btn-back:hover::after,
-        .nav-btn-back:focus-visible::after {
+        .nav-btn-back:focus::after {
+            left: 12px;
             width: calc(100% - 24px);
         }
 
         @media (prefers-reduced-motion: reduce) {
+            .nav-btn-back,
             .nav-btn-back::after {
                 transition: none;
             }
@@ -315,58 +318,6 @@
             color: #fff
         }
 
-        .bukti-preview-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px
-        }
-
-        .bukti-preview-grid img {
-            width: 72px;
-            height: 72px;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 1px solid #e9ecef;
-            cursor: zoom-in
-        }
-
-        .bukti-preview-item {
-            position: relative;
-            width: 72px;
-            height: 72px
-        }
-
-        .bukti-preview-item img {
-            display: block
-        }
-
-        .bukti-del {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            border: none;
-            background: #dc3545;
-            color: #fff;
-            font-size: 12px;
-            line-height: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0
-        }
-
-        .bukti-del:hover {
-            background: #b02a37;
-            color: #fff
-        }
-
-        #buktiCount {
-            font-size: 12px
-        }
-
         #buktiLightboxImg {
             max-width: 100%;
             max-height: 85vh;
@@ -443,52 +394,6 @@
             color: #146c43;
             text-decoration: underline
         }
-
-        .klaim-step {
-            display: none
-        }
-
-        .klaim-step.active {
-            display: block
-        }
-
-        .klaim-progress-label {
-            font-size: 13px;
-            font-weight: 700;
-            color: #198754
-        }
-
-        .klaim-progress-wrap .progress {
-            height: 8px;
-            background: #e9ecef;
-            border-radius: 99px
-        }
-
-        .klaim-progress-wrap .progress-bar {
-            background: #198754;
-            border-radius: 99px;
-            transition: width .25s ease-out
-        }
-
-        .klaim-ringkas-thumb {
-            width: 56px;
-            height: 56px;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 1px solid #e9ecef
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-
-            .bukti-thumb,
-            .bukti-grid img {
-                transition: none
-            }
-
-            .klaim-progress-wrap .progress-bar {
-                transition: none
-            }
-        }
     </style>
 
     @include('layouts.partials.modal-head-style')
@@ -504,7 +409,7 @@
 
             <div>
                 <h2 class="page-title mb-1">
-                    Management Kompensasi
+                    Riwayat Kompensasi
                 </h2>
 
             </div>
@@ -519,32 +424,6 @@
             </div>
 
         </div>
-
-
-        @if (session('success'))
-            <span id="flashSuccess" class="d-none">{{ session('success') }}</span>
-        @endif
-
-
-        @if ($errors->any())
-
-            <div class="alert alert-danger">
-
-                <strong>
-                    Terdapat kesalahan:
-                </strong>
-
-                <ul class="mb-0 mt-2">
-
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-
-                </ul>
-
-            </div>
-
-        @endif
 
 
         <div class="row g-4">
@@ -565,17 +444,6 @@
 
                             </div>
 
-                            <div class="d-flex gap-2">
-
-                                <button type="button" class="btn btn-green" data-bs-toggle="modal"
-                                    data-bs-target="#ajukanKompensasiModal">
-
-                                    <i class="bi bi-plus-circle me-1"></i>
-                                    Buat Kompensasi
-
-                                </button>
-
-                            </div>
 
                         </div>
 
@@ -758,223 +626,6 @@
         </div>
 
 
-        <div class="modal fade" id="ajukanKompensasiModal" tabindex="-1">
-
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-
-                <div class="modal-content">
-
-                    @include('layouts.partials.modal-head', [
-                        'title' => 'Ajukan Klaim Kompensasi',
-                        'icon' => 'bi-plus-circle',
-                    ])
-
-                    <form action="{{ route('customer.kompensasi.store') }}" method="POST" id="formAjukanKompensasi"
-                        enctype="multipart/form-data">
-
-                        @csrf
-
-                        <div class="modal-body">
-
-                            <div class="klaim-progress-wrap mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="klaim-progress-label" id="klaimStepLabel">Langkah 1 dari 5</span>
-                                    <small class="text-muted" id="klaimStepName">Rental &amp; Mobil</small>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar" id="klaimProgressBar" role="progressbar"
-                                        style="width: 20%" aria-valuenow="1" aria-valuemin="1" aria-valuemax="5">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="klaim-step active" data-step="1">
-
-                                <label class="form-label fw-semibold" for="ajuanRentalId">
-                                    Rental (Status Selesai)
-                                </label>
-
-                                <select name="rental_id" id="ajuanRentalId" class="form-select">
-                                    <option value="">-- Pilih Rental --</option>
-                                    @foreach ($rentals as $rental)
-                                        <option value="{{ $rental->id }}" data-mobil="{{ $rental->mobil->id }}"
-                                            data-mobil-name="{{ $rental->mobil->name }}"
-                                            data-plate="{{ $rental->mobil->plate_number }}"
-                                            data-image="{{ $rental->mobil->image ? asset($rental->mobil->image) : '' }}"
-                                            data-mulai="{{ $rental->tanggal_mulai->format('d/m/Y') }}"
-                                            data-selesai="{{ $rental->tanggal_selesai->format('d/m/Y') }}">
-                                            {{ $rental->mobil->name ?? '-' }}
-                                            ({{ $rental->mobil->plate_number ?? '-' }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <div class="invalid-feedback" id="fb-ajuanRentalId">Pilih rental terlebih dahulu.
-                                </div>
-
-                                <label class="form-label fw-semibold mt-3" for="ajuanMobilId">
-                                    Mobil
-                                </label>
-
-                                <input type="hidden" name="mobil_id" id="ajuanMobilId">
-
-                                <div id="mobilEmpty" class="text-muted small border rounded-3 p-3">
-                                    Pilih rental dulu untuk melihat mobil.
-                                </div>
-
-                                <div id="mobilCard" class="d-none border rounded-3 p-3" style="background: #f5f8f6;">
-
-                                    <div class="d-flex gap-3 align-items-center">
-
-                                        <img id="mobilCardImg" src="" alt="Foto mobil"
-                                            style="width: 96px; height: 72px; object-fit: cover; border-radius: 10px;">
-
-                                        <div>
-
-                                            <div id="mobilCardName" class="fw-bold"></div>
-
-                                            <small id="mobilCardPlate" class="text-muted d-block"></small>
-
-                                            <small id="mobilCardPeriod" class="text-muted d-block"></small>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-                                <div class="invalid-feedback" id="fb-ajuanMobilId">Mobil belum terisi. Pilih ulang
-                                    rental.</div>
-
-                            </div>
-
-                            <div class="klaim-step" data-step="2">
-
-                                <label class="form-label fw-semibold" for="ajuanJenis">
-                                    Jenis Kompensasi
-                                </label>
-
-                                <select name="jenis" id="ajuanJenis" class="form-select">
-                                    <option value="">-- Pilih Jenis --</option>
-                                    <option value="pengembalian_dana">Pengembalian Dana</option>
-                                    <option value="diskon">Diskon Sewa Berikutnya</option>
-                                    <option value="gratis_sewa">Gratis Sewa Berikutnya</option>
-                                </select>
-                                <div class="invalid-feedback" id="fb-ajuanJenis">Pilih jenis kompensasi.</div>
-
-                                <div id="nominalWrap" style="display: none;">
-                                    <label class="form-label fw-semibold mt-3" for="ajuanNominalDisplay">
-                                        Nominal (Rp)
-                                    </label>
-
-                                    <div class="input-group">
-                                        <span class="input-group-text">Rp</span>
-                                        <input type="text" name="nominal_display" id="ajuanNominalDisplay"
-                                            class="form-control rupiah-input" placeholder="50.000"
-                                            inputmode="numeric" autocomplete="off" data-target="nominal">
-                                        <input type="hidden" name="nominal" id="nominal">
-                                    </div>
-                                    <div class="invalid-feedback" id="fb-ajuanNominalDisplay">Nominal wajib diisi
-                                        lebih dari 0 untuk Pengembalian Dana.</div>
-
-                                    <small class="text-muted d-block" id="nominalHint">Wajib diisi untuk jenis
-                                        "Pengembalian Dana"</small>
-                                </div>
-
-                            </div>
-
-                            <div class="klaim-step" data-step="3">
-
-                                <label class="form-label fw-semibold" for="ajuanAlasan">
-                                    Alasan
-                                </label>
-
-                                <textarea name="alasan" id="ajuanAlasan" class="form-control" rows="3"
-                                    placeholder="Jelaskan alasan klaim kompensasi..."></textarea>
-                                <div class="invalid-feedback" id="fb-ajuanAlasan">Alasan wajib diisi.</div>
-
-                                <label class="form-label fw-semibold mt-3" for="ajuanTanggal">
-                                    Tanggal Kejadian
-                                </label>
-
-                                <input type="date" name="tanggal" id="ajuanTanggal" class="form-control"
-                                    value="{{ now()->format('Y-m-d') }}" max="{{ now()->format('Y-m-d') }}">
-                                <div class="invalid-feedback" id="fb-ajuanTanggal">Tanggal wajib diisi dan tidak boleh
-                                    melebihi hari ini.</div>
-
-                            </div>
-
-                            <div class="klaim-step" data-step="4">
-
-                                <label class="form-label fw-semibold" for="ajuanBukti">
-                                    Bukti Foto
-                                </label>
-
-                                <input type="file" name="bukti[]" id="ajuanBukti" class="form-control" multiple
-                                    accept=".jpg,.jpeg,.png">
-
-                                <div class="form-text">
-                                    Minimal 2, maksimal 5 foto. Format JPG, JPEG, atau PNG, masing-masing maksimal 2 MB.
-                                </div>
-                                <div class="invalid-feedback" id="fb-ajuanBukti">Pilih 2 sampai 5 foto (JPG/JPEG/PNG,
-                                    masing-masing maksimal 2 MB).</div>
-
-                                <div class="d-flex align-items-center gap-2 mt-2">
-                                    <small id="buktiCount" class="fw-semibold text-muted">0/5 foto dipilih</small>
-                                    <button type="button" id="buktiReset" class="bukti-link d-none">Pilih
-                                        ulang</button>
-                                </div>
-
-                                <div id="buktiPreview" class="bukti-preview-grid mt-2"></div>
-
-                            </div>
-
-                            <div class="klaim-step" data-step="5">
-
-                                <p class="text-muted small mb-3">Periksa kembali data klaim sebelum dikirim. Klaim yang
-                                    dikirim tidak bisa diubah.</p>
-
-                                <div id="klaimRingkasan"></div>
-
-                            </div>
-
-                        </div>
-
-                        <div class="modal-footer justify-content-between">
-
-                            <button type="button" class="btn btn-secondary invisible" id="btnKlaimBack">
-
-                                <i class="bi bi-arrow-left me-1"></i>
-                                Kembali
-
-                            </button>
-
-                            <div class="d-flex gap-2">
-
-                                <button type="button" class="btn btn-green" id="btnKlaimNext">
-
-                                    Lanjut
-                                    <i class="bi bi-arrow-right ms-1"></i>
-
-                                </button>
-
-                                <button type="submit" class="btn btn-green d-none" id="btnKlaimSubmit">
-
-                                    <i class="bi bi-send me-1"></i>
-                                    Tambah Kompensasi
-
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </form>
-
-                </div>
-
-            </div>
-
-        </div>
-
         <div class="modal fade" id="buktiZoomModal" tabindex="-1" aria-labelledby="buktiZoomTitle"
             aria-hidden="true">
 
@@ -1035,77 +686,7 @@
 
         </div>
         
-<div class="modal fade" id="editKompensasiModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">
-                    <i class="bi bi-pencil-square me-2"></i>Edit Klaim Kompensasi
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
 
-            <form id="formEditKompensasi" method="POST"
-                action="" enctype="multipart/form-data">
-                @csrf
-                @method('PUT')
-
-                <div class="modal-body">
-                    <div class="alert alert-info small">
-                        Klaim hanya dapat diedit selama statusnya masih Diajukan.
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Jenis Kompensasi</label>
-                        <select name="jenis" id="editJenis" class="form-select" required>
-                            <option value="pengembalian_dana">Pengembalian Dana</option>
-                            <option value="diskon">Diskon Sewa Berikutnya</option>
-                            <option value="gratis_sewa">Gratis Sewa Berikutnya</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3" id="editNominalWrap">
-                        <label class="form-label fw-semibold">Nominal (Rp)</label>
-                        <input type="text" id="editNominalDisplay"
-                            class="form-control rupiah-input"
-                            inputmode="numeric" data-target="editNominal">
-                        <input type="hidden" name="nominal" id="editNominal">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Alasan</label>
-                        <textarea name="alasan" id="editAlasan"
-                            class="form-control" rows="4" required></textarea>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Tanggal Kejadian</label>
-                        <input type="date" name="tanggal" id="editTanggal"
-                            class="form-control" max="{{ now()->format('Y-m-d') }}" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Ganti Bukti Foto (Opsional)</label>
-                        <input type="file" name="bukti[]" class="form-control"
-                            id="editBukti" multiple accept=".jpg,.jpeg,.png">
-                        <small class="text-muted">
-                            Jika ingin mengganti bukti, pilih 2–5 foto JPG, JPEG, atau PNG,
-                            maksimal 2 MB per foto. Kosongkan jika bukti tidak diganti.
-                        </small>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary"
-                        data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-green">
-                        <i class="bi bi-save me-1"></i>Simpan Perubahan
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 
     </div>
@@ -1124,18 +705,6 @@
 
     <script>
         var CSRF_TOKEN = '{{ csrf_token() }}';
-
-        var $flashSuccess = $('#flashSuccess');
-
-        if ($flashSuccess.length) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil',
-                text: $flashSuccess.text(),
-                timer: 1800,
-                showConfirmButton: false,
-            });
-        }
 
         function jenisBadge(jenis) {
             const map = {
@@ -1180,22 +749,6 @@
             return 'Rp ' + Number(value).toLocaleString('id-ID');
         }
 
-        function formatRupiahInput(value) {
-            let angka = String(value || '').replace(/\D/g, '');
-            if (!angka) return '';
-            return angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        }
-
-        function getRawRupiah(value) {
-            return String(value || '').replace(/\D/g, '');
-        }
-
-        $(document).on('input', '.rupiah-input', function() {
-            const input = this;
-            const rawValue = getRawRupiah(input.value);
-            input.value = formatRupiahInput(rawValue);
-            $('#' + $(input).data('target')).val(rawValue);
-        });
 
         function buktiSrc(path) {
             if (!path) return '';
@@ -1314,53 +867,6 @@
 
         $(document).ready(function() {
 
-            $('#ajuanRentalId').on('change', function() {
-                const opt = $(this).find('option:selected');
-                const mobilId = opt.data('mobil');
-
-                if (mobilId) {
-                    $('#ajuanMobilId').val(mobilId);
-                    $('#mobilCardName').text(opt.data('mobil-name'));
-                    $('#mobilCardPlate').text(opt.data('plate'));
-                    $('#mobilCardPeriod').text('Disewa ' + opt.data('mulai') + ' - ' + opt.data('selesai'));
-
-                    const img = opt.data('image');
-                    if (img) {
-                        $('#mobilCardImg').attr('src', img).attr('alt', opt.data('mobil-name')).show();
-                    } else {
-                        $('#mobilCardImg').hide();
-                    }
-
-                    $('#mobilCard').removeClass('d-none');
-                    $('#mobilEmpty').addClass('d-none');
-                } else {
-                    $('#ajuanMobilId').val('');
-                    $('#mobilCard').addClass('d-none');
-                    $('#mobilEmpty').removeClass('d-none');
-                }
-            });
-
-            $('#ajuanJenis').on('change', function() {
-                const jenis = $(this).val();
-                if (jenis === 'pengembalian_dana') {
-                    $('#nominalWrap').show();
-                    $('#ajuanNominalDisplay').prop('disabled', false);
-                    $('#nominalHint').text('Wajib diisi untuk jenis "Pengembalian Dana"');
-                } else {
-                    $('#nominalWrap').hide();
-                    $('#ajuanNominalDisplay').prop('disabled', true).val('')
-                        .removeClass('is-invalid');
-                    $('#nominal').val('');
-                    $('#nominalHint').text('Tidak diisi untuk Diskon/Gratis Sewa (nominal = 0)');
-                }
-            });
-            $('#nominalWrap').hide();
-
-            $(document).on('hidden.bs.modal', '#ajukanKompensasiModal', function() {
-                klaimRevokeRingkasanUrls();
-                klaimGoToStep(1);
-            });
-
             $('#kompensasis-table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -1443,28 +949,12 @@
                         className: 'text-center',
                         width: '140px',
                        
-render: function(data, type, row) {
-    let html =
-        '<div class="d-flex justify-content-center gap-2">' +
+render: function(data) {
+    return '<div class="d-flex justify-content-center gap-2">' +
         '<button type="button" class="btn p-1 text-primary" ' +
         'style="border:none;background:none;" title="Detail" ' +
         'onclick="openDetail(' + data + ')">' +
-        '<i class="bi bi-eye"></i></button>';
-
-    if (row.status === 'diajukan') {
-        html +=
-            '<button type="button" class="btn p-1 text-success" ' +
-            'style="border:none;background:none;" title="Edit" ' +
-            'onclick="openEditKompensasi(' + data + ')">' +
-            '<i class="bi bi-pencil-square"></i></button>' +
-
-            '<button type="button" class="btn p-1 text-danger" ' +
-            'style="border:none;background:none;" title="Hapus" ' +
-            'onclick="hapusKompensasi(' + data + ')">' +
-            '<i class="bi bi-trash"></i></button>';
-    }
-
-    return html + '</div>';
+        '<i class="bi bi-eye"></i></button></div>';
 },
 
                     },
@@ -1540,14 +1030,6 @@ render: function(data, type, row) {
                 kompensasiTable.page.len(n).draw();
             });
 
-            @if (request('baru'))
-                @if (request('rental') && $rentals->contains('id', (int) request('rental')))
-                    $('#ajuanRentalId').val('{{ (int) request('rental') }}');
-                @endif
-                bootstrap.Modal.getOrCreateInstance($('#ajukanKompensasiModal')[0]).show();
-                $('#ajuanRentalId').trigger('change');
-                klaimGoToStep(1);
-            @endif
         });
 
         function openDetail(id) {
@@ -1587,457 +1069,11 @@ render: function(data, type, row) {
             bootstrap.Modal.getOrCreateInstance($('#detailKompensasiModal')[0]).show();
         }
 
-        var klaimPreviewToken = 0;
-
-        function renderBuktiPreview(input) {
-            const files = input.files ? Array.prototype.slice.call(input.files) : [];
-            const myToken = ++klaimPreviewToken;
-            const $grid = $('#buktiPreview');
-            const $count = $('#buktiCount');
-            $grid.empty();
-            $count.text(files.length + '/5 foto dipilih');
-            $count.toggleClass('text-danger', files.length > 5);
-            $count.toggleClass('text-muted', files.length <= 5);
-            $('#buktiReset').toggleClass('d-none', !files.length);
-            files.forEach(function(file, idx) {
-                if (!file.type || !/^image\//.test(file.type)) return;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    if (myToken !== klaimPreviewToken) return;
-                    const url = e.target.result;
-                    const $wrap = $('<div class="bukti-preview-item"></div>');
-                    const $img = $('<img>').attr({
-                        src: url,
-                        alt: 'Preview bukti ' + (idx + 1)
-                    }).on('click', function() {
-                        openBuktiLightbox(url);
-                    });
-                    const $del = $('<button type="button" class="bukti-del" aria-label="Hapus foto ' + (idx +
-                        1) + '"><i class="bi bi-x"></i></button>').on('click', function(ev) {
-                        ev.stopPropagation();
-                        hapusBuktiPilihan(idx);
-                    });
-                    $wrap.append($img).append($del);
-                    $grid.append($wrap);
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function hapusBuktiPilihan(idx) {
-            const input = $('#ajuanBukti')[0];
-            const sisa = new DataTransfer();
-            Array.prototype.forEach.call(input.files, function(file, i) {
-                if (i !== idx) sisa.items.add(file);
-            });
-            input.files = sisa.files;
-            renderBuktiPreview(input);
-            klaimSetInvalid($('#ajuanBukti'), 'fb-ajuanBukti', klaimBuktiInvalid());
-        }
-
-        $(document).on('change', '#ajuanBukti', function() {
-            renderBuktiPreview(this);
-            klaimSetInvalid($('#ajuanBukti'), 'fb-ajuanBukti', klaimBuktiInvalid());
-            const pesan = klaimBuktiError();
-            if (pesan) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal',
-                    text: pesan
-                });
-            }
-        });
-
-        $(document).on('click', '#buktiReset', function() {
-            $('#ajuanBukti').val('');
-            renderBuktiPreview($('#ajuanBukti')[0]);
-            klaimSetInvalid($('#ajuanBukti'), 'fb-ajuanBukti', klaimBuktiInvalid());
-        });
-
-        var klaimStep = 1;
-        var klaimStepNames = {
-            1: 'Rental & Mobil',
-            2: 'Jenis & Nominal',
-            3: 'Alasan & Tanggal',
-            4: 'Bukti Foto',
-            5: 'Konfirmasi'
-        };
-
         function klaimEsc(s) {
             return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g,
                 '&quot;');
         }
 
-        function klaimSetInvalid($el, fbId, bad) {
-            $el.toggleClass('is-invalid', !!bad);
-            $('#' + fbId).toggleClass('d-block', !!bad);
-            return !bad;
-        }
-
-        function klaimBuktiError() {
-            const files = $('#ajuanBukti')[0].files;
-            if (files.length > 5) return 'Maksimal 5 foto bukti yang bisa diunggah.';
-            for (let i = 0; i < files.length; i++) {
-                if (files[i].size > 2 * 1024 * 1024) return 'Foto ke-' + (i + 1) + ' melebihi 2 MB.';
-                if (!/^image\//.test(files[i].type || '') && !/\.(jpe?g|png)$/i.test(files[i].name || ''))
-                return 'Foto ke-' + (i + 1) + ' harus JPG/JPEG/PNG.';
-            }
-            return null;
-        }
-
-        function klaimBuktiInvalid() {
-            const files = $('#ajuanBukti')[0].files;
-            if (files.length < 2 || files.length > 5) return true;
-            for (let i = 0; i < files.length; i++) {
-                if (files[i].size > 2 * 1024 * 1024) return true;
-                if (!/^image\//.test(files[i].type || '') && !/\.(jpe?g|png)$/i.test(files[i].name || '')) return true;
-            }
-            return false;
-        }
-
-        function klaimValidateStep(step) {
-            let ok = true;
-            if (step === 1) {
-                if (!klaimSetInvalid($('#ajuanRentalId'), 'fb-ajuanRentalId', !$('#ajuanRentalId').val())) ok = false;
-                if (!klaimSetInvalid($('#ajuanMobilId'), 'fb-ajuanMobilId', !$('#ajuanMobilId').val())) ok = false;
-            } else if (step === 2) {
-                const jenis = $('#ajuanJenis').val();
-                if (!klaimSetInvalid($('#ajuanJenis'), 'fb-ajuanJenis', !jenis)) ok = false;
-                const nominalBad = jenis === 'pengembalian_dana' && !(Number($('#nominal').val() || 0) > 0);
-                if (!klaimSetInvalid($('#ajuanNominalDisplay'), 'fb-ajuanNominalDisplay', nominalBad)) ok = false;
-            } else if (step === 3) {
-                if (!klaimSetInvalid($('#ajuanAlasan'), 'fb-ajuanAlasan', !$('#ajuanAlasan').val().trim())) ok = false;
-                const tgl = $('#ajuanTanggal').val();
-                const today = new Date().toISOString().slice(0, 10);
-                if (!klaimSetInvalid($('#ajuanTanggal'), 'fb-ajuanTanggal', !tgl || tgl > today)) ok = false;
-            } else if (step === 4) {
-                if (!klaimSetInvalid($('#ajuanBukti'), 'fb-ajuanBukti', klaimBuktiInvalid())) ok = false;
-            }
-            return ok;
-        }
-
-        function klaimGoToStep(n) {
-            klaimStep = Math.min(5, Math.max(1, n));
-            $('#formAjukanKompensasi .klaim-step').removeClass('active')
-                .filter('[data-step="' + klaimStep + '"]').addClass('active');
-            $('#klaimStepLabel').text('Langkah ' + klaimStep + ' dari 5');
-            $('#klaimStepName').text(klaimStepNames[klaimStep]);
-            const bar = $('#klaimProgressBar');
-            bar.css('width', (klaimStep * 20) + '%').attr('aria-valuenow', klaimStep);
-            $('#btnKlaimBack').toggleClass('invisible', klaimStep === 1);
-            $('#btnKlaimNext').toggleClass('d-none', klaimStep === 5);
-            $('#btnKlaimSubmit').toggleClass('d-none', klaimStep !== 5);
-            if (klaimStep === 5) renderKlaimRingkasan();
-        }
-
-        var klaimRingkasanUrls = [];
-
-        function klaimRevokeRingkasanUrls() {
-            klaimRingkasanUrls.forEach(function(u) {
-                try {
-                    URL.revokeObjectURL(u);
-                } catch (e) { /* abaikan */ }
-            });
-            klaimRingkasanUrls = [];
-        }
-
-        function renderKlaimRingkasan() {
-            klaimRevokeRingkasanUrls();
-            const opt = $('#ajuanRentalId option:selected');
-            const jenisLabels = {
-                pengembalian_dana: 'Pengembalian Dana',
-                diskon: 'Diskon Sewa Berikutnya',
-                gratis_sewa: 'Gratis Sewa Berikutnya'
-            };
-            const jenis = $('#ajuanJenis').val();
-            const nominalRaw = Number($('#nominal').val() || 0);
-            const files = $('#ajuanBukti')[0].files ? Array.prototype.slice.call($('#ajuanBukti')[0].files) : [];
-            const mobilImg = opt.data('image') || $('#mobilCardImg').attr('src') || '';
-            const mobilFoto = mobilImg ? '<div class="mb-3 text-center"><img src="' + klaimEsc(mobilImg) +
-                '" alt="Foto mobil" class="img-fluid rounded" style="max-height:180px;object-fit:cover"></div>' : '';
-            let thumbs = '';
-            files.forEach(function(f) {
-                try {
-                    const u = URL.createObjectURL(f);
-                    klaimRingkasanUrls.push(u);
-                    thumbs += '<img src="' + klaimEsc(u) + '" alt="Bukti" class="klaim-ringkas-thumb">';
-                } catch (e) {
-                    /* abaikan */ }
-            });
-            $('#klaimRingkasan').html(
-                mobilFoto +
-                '<dl class="row mb-0 small">' +
-                '<dt class="col-4 text-muted">Rental</dt><dd class="col-8 fw-semibold">' + klaimEsc(opt.text().trim() ||
-                    '-') + '</dd>' +
-                '<dt class="col-4 text-muted">Mobil</dt><dd class="col-8 fw-semibold">' + klaimEsc($('#mobilCardName')
-                    .text() || opt.data('mobil-name') || '-') + ' (' + klaimEsc($('#mobilCardPlate').text() || opt.data(
-                    'plate') || '-') + ')</dd>' +
-                '<dt class="col-4 text-muted">Jenis</dt><dd class="col-8 fw-semibold">' + klaimEsc(jenisLabels[jenis] ||
-                    '-') + '</dd>' +
-                '<dt class="col-4 text-muted">Nominal</dt><dd class="col-8 fw-semibold">' + (jenis ===
-                    'pengembalian_dana' ? klaimEsc(formatRupiah(nominalRaw)) : 'Rp 0 (non-tunai)') + '</dd>' +
-                '<dt class="col-4 text-muted">Alasan</dt><dd class="col-8">' + klaimEsc($('#ajuanAlasan').val()
-            .trim()) + '</dd>' +
-                '<dt class="col-4 text-muted">Tanggal</dt><dd class="col-8">' + klaimEsc($('#ajuanTanggal').val()) +
-                '</dd>' +
-                '<dt class="col-4 text-muted">Bukti</dt><dd class="col-8">' + files.length +
-                ' foto<div class="d-flex flex-wrap gap-2 mt-2">' + thumbs + '</div></dd>' +
-                '</dl>'
-            );
-        }
-
-        $(document).on('click', '#btnKlaimNext', function() {
-            if (klaimValidateStep(klaimStep)) klaimGoToStep(klaimStep + 1);
-        });
-
-        $(document).on('click', '#btnKlaimBack', function() {
-            if (klaimStep > 1) klaimGoToStep(klaimStep - 1);
-        });
-
-        $(document).on('input change', '#formAjukanKompensasi .is-invalid', function() {
-            $(this).removeClass('is-invalid');
-            $(this).closest('.klaim-step').find('.invalid-feedback.d-block').removeClass('d-block');
-        });
-
-        $(document).on('submit', '#formAjukanKompensasi', function(e) {
-            e.preventDefault();
-
-            const form = this;
-
-            if (klaimStep < 5) {
-                if (klaimValidateStep(klaimStep)) klaimGoToStep(klaimStep + 1);
-                return;
-            }
-
-            const files = $('#ajuanBukti')[0].files;
-
-            if (files.length < 2) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal',
-                    text: 'Minimal 2 foto bukti wajib diunggah.',
-                });
-                return;
-            }
-
-            if (files.length > 5) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal',
-                    text: 'Maksimal 5 foto bukti yang bisa diunggah.',
-                });
-                return;
-            }
-
-            for (let i = 0; i < files.length; i++) {
-                if (files[i].size > 2 * 1024 * 1024) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal',
-                        text: 'Foto ke-' + (i + 1) + ' melebihi 2 MB.',
-                    });
-                    return;
-                }
-            }
-
-            const rentalText = $('#ajuanRentalId option:selected').text().trim();
-            const jenisText = $('#ajuanJenis option:selected').text().trim();
-
-            Swal.fire({
-                title: 'Ajukan klaim ini?',
-                html: 'Klaim <strong>' + klaimEsc(jenisText) + '</strong> untuk <strong>' + klaimEsc(rentalText) +
-                    '</strong> akan dikirim dan tidak bisa diubah.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, ajukan',
-                cancelButtonText: 'Periksa lagi',
-            }).then(function(result) {
-                if (result.isConfirmed) kirimKlaim(form);
-            });
-        });
-
-        function kirimKlaim(form) {
-            const formData = new FormData(form);
-
-            $.ajax({
-                url: $(form).attr('action'),
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: {
-                    'X-CSRF-TOKEN': CSRF_TOKEN,
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                success: function(result) {
-                    klaimRevokeRingkasanUrls();
-                    bootstrap.Modal.getInstance($('#ajukanKompensasiModal')[0]).hide();
-                    $('#formAjukanKompensasi')[0].reset();
-                    $('#formAjukanKompensasi .is-invalid').removeClass('is-invalid');
-                    $('#formAjukanKompensasi .invalid-feedback.d-block').removeClass('d-block');
-                    $('#buktiPreview').empty();
-                    $('#buktiCount').text('0/5 foto dipilih').removeClass('text-danger').addClass('text-muted');
-                    $('#buktiReset').addClass('d-none');
-                    $('#mobilCard').addClass('d-none');
-                    $('#mobilEmpty').removeClass('d-none');
-                    klaimGoToStep(1);
-                    $('#kompensasis-table').DataTable().ajax.reload();
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil',
-                        text: result.message || 'Klaim kompensasi berhasil diajukan.',
-                        timer: 1500,
-                        showConfirmButton: false,
-                    });
-                },
-                error: function(xhr) {
-                    const r = xhr.responseJSON || {};
-                    const msg = r.errors ? Object.values(r.errors)[0][0] :
-                        (r.message || 'Terjadi kesalahan saat mengajukan klaim.');
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal',
-                        text: msg,
-                    });
-                }
-            });
-        }
-
-
-        
-function openEditKompensasi(id) {
-    const table = $('#kompensasis-table').DataTable();
-    const data = table.rows().data().toArray().find(r => r.id == id);
-
-    if (!data || data.status !== 'diajukan') {
-        Swal.fire('Tidak bisa diedit', 'Klaim ini sudah diproses.', 'warning');
-        return;
-    }
-
-    $('#formEditKompensasi').attr(
-        'action',
-        "{{ url('/customer/kompensasi') }}/" + id
-    );
-
-    $('#editJenis').val(data.jenis);
-    $('#editNominal').val(
-        data.jenis === 'pengembalian_dana' ? data.nominal : ''
-    );
-    $('#editNominalDisplay').val(
-        data.jenis === 'pengembalian_dana'
-            ? formatRupiahInput(data.nominal)
-            : ''
-    );
-    $('#editAlasan').val(data.alasan || '');
-    $('#editTanggal').val(data.tanggal_iso || '');
-    $('#editBukti').val('');
-
-    $('#editNominalWrap').toggle(
-        data.jenis === 'pengembalian_dana'
-    );
-
-    bootstrap.Modal.getOrCreateInstance(
-        document.getElementById('editKompensasiModal')
-    ).show();
-}
-
-$('#editJenis').on('change', function() {
-    const perluNominal = this.value === 'pengembalian_dana';
-
-    $('#editNominalWrap').toggle(perluNominal);
-
-    if (!perluNominal) {
-        $('#editNominal').val('0');
-        $('#editNominalDisplay').val('');
-    }
-});
-
-$('#formEditKompensasi').on('submit', function(e) {
-    e.preventDefault();
-
-    if ($('#editJenis').val() === 'pengembalian_dana' &&
-        Number($('#editNominal').val()) <= 0) {
-        Swal.fire('Periksa nominal', 'Nominal pengembalian dana harus lebih dari 0.', 'warning');
-        return;
-    }
-
-    const form = this;
-    const formData = new FormData(form);
-
-    $.ajax({
-        url: $(form).attr('action'),
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        headers: {
-            'Accept': 'application/json',
-            'X-HTTP-Method-Override': 'PUT'
-        },
-        success: function(response) {
-            bootstrap.Modal.getOrCreateInstance(
-                document.getElementById('editKompensasiModal')
-            ).hide();
-
-            Swal.fire('Berhasil', response.message, 'success');
-            $('#kompensasis-table').DataTable().ajax.reload(null, false);
-        },
-        error: function(xhr) {
-            const pesan = xhr.responseJSON?.message ||
-                'Klaim gagal diperbarui. Periksa kembali data yang diisi.';
-
-            Swal.fire('Gagal', pesan, 'error');
-        }
-    });
-});
-
-function hapusKompensasi(id) {
-    const data = $('#kompensasis-table').DataTable()
-        .rows().data().toArray().find(r => r.id == id);
-
-    if (!data || data.status !== 'diajukan') {
-        Swal.fire('Tidak bisa dihapus', 'Klaim ini sudah diproses.', 'warning');
-        return;
-    }
-
-    Swal.fire({
-        title: 'Hapus klaim kompensasi?',
-        text: 'Klaim yang dihapus tidak dapat dikembalikan.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Ya, hapus',
-        cancelButtonText: 'Batal',
-        confirmButtonColor: '#dc3545'
-    }).then(function(result) {
-        if (!result.isConfirmed) return;
-
-        $.ajax({
-            url: "{{ url('/customer/kompensasi') }}/" + id,
-            type: 'POST',
-            data: {
-                _token: CSRF_TOKEN,
-                _method: 'DELETE'
-            },
-            headers: {
-                'Accept': 'application/json'
-            },
-            success: function(response) {
-                Swal.fire('Berhasil', response.message, 'success');
-                $('#kompensasis-table').DataTable().ajax.reload(null, false);
-            },
-            error: function(xhr) {
-                Swal.fire(
-                    'Gagal',
-                    xhr.responseJSON?.message || 'Klaim gagal dihapus.',
-                    'error'
-                );
-            }
-        });
-    });
-}
 
     </script>
 </body>
