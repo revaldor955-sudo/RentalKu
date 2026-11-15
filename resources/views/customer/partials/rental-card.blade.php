@@ -424,77 +424,126 @@
 
                             @endif
 
-                            {{-- FORM PEMBAYARAN DENDA --}}
-                            @if(($d->status ?? 'belum bayar') === 'belum bayar')
+                          
+{{-- TOMBOL PEMBAYARAN DENDA --}}
+@if(($d->status ?? 'belum bayar') === 'belum bayar')
 
-                                <form
-                                    method="POST"
-                                    action="{{ route('customer.dendas.bayar', $d->id) }}"
-                                    enctype="multipart/form-data"
-                                    class="mt-2 denda-bayar-form"
-                                >
-                                    @csrf
+    <button
+        type="button"
+        class="btn btn-warning btn-sm w-100 mt-2"
+        data-bs-toggle="modal"
+        data-bs-target="#dendaBayarModal{{ $d->id }}"
+    >
+        <i class="bi bi-credit-card me-1"></i>
+        Pembayaran Denda
+    </button>
 
-                                    <div class="row g-1">
+    {{-- POPUP PEMBAYARAN DENDA --}}
+    <div
+        class="modal fade"
+        id="dendaBayarModal{{ $d->id }}"
+        tabindex="-1"
+        aria-labelledby="dendaBayarTitle{{ $d->id }}"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
 
-                                        <div class="col-12">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"
+                        id="dendaBayarTitle{{ $d->id }}">
+                        <i class="bi bi-wallet2 text-warning me-2"></i>
+                        Pembayaran Denda
+                    </h5>
 
-                                            <input
-                                                type="file"
-                                                name="bukti_bayar"
-                                                class="form-control form-control-sm @error('bukti_bayar') is-invalid @enderror"
-                                                accept=".jpg,.jpeg,.png"
-                                                required
-                                            >
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Tutup"
+                    ></button>
+                </div>
 
-                                            <div class="form-text small">
-                                                Format JPG, JPEG, atau PNG. Maksimal 2 MB.
-                                            </div>
+                <form
+                    method="POST"
+                    action="{{ route('customer.dendas.bayar', $d->id) }}"
+                    enctype="multipart/form-data"
+                    class="denda-bayar-form"
+                >
+                    @csrf
 
-                                            @error('bukti_bayar')
-                                                <div class="invalid-feedback d-block">
-                                                    {{ $message }}
-                                                </div>
-                                            @enderror
+                    <div class="modal-body">
 
-                                        </div>
+                        <div class="alert alert-warning">
+                            <small class="text-muted">
+                                Nominal Denda
+                            </small>
 
-                                        <div class="col-12">
+                            <h4 class="fw-bold mb-0">
+                                Rp {{ number_format($d->nominal ?? 0, 0, ',', '.') }}
+                            </h4>
+                        </div>
 
-                                            <input
-                                                type="date"
-                                                name="tanggal_bayar"
-                                                class="form-control form-control-sm @error('tanggal_bayar') is-invalid @enderror"
-                                                value="{{ old('tanggal_bayar', date('Y-m-d')) }}"
-                                                max="{{ date('Y-m-d') }}"
-                                                required
-                                            >
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Bukti Pembayaran
+                            </label>
 
-                                            @error('tanggal_bayar')
-                                                <div class="invalid-feedback d-block">
-                                                    {{ $message }}
-                                                </div>
-                                            @enderror
+                            <input
+                                type="file"
+                                name="bukti_bayar"
+                                class="form-control"
+                                accept=".jpg,.jpeg,.png"
+                                required
+                            >
 
-                                        </div>
+                            <small class="text-muted">
+                                Format JPG, JPEG, PNG. Maksimal 2 MB.
+                            </small>
+                        </div>
 
-                                        <div class="col-12">
+                        <div class="mb-2">
+                            <label class="form-label fw-semibold">
+                                Tanggal Pembayaran
+                            </label>
 
-                                            <button
-                                                type="submit"
-                                                class="btn btn-warning btn-sm w-100"
-                                            >
-                                                <i class="bi bi-cash-coin me-1"></i>
-                                                Bayar
-                                            </button>
+                            <input
+                                type="date"
+                                name="tanggal_bayar"
+                                class="form-control"
+                                value="{{ date('Y-m-d') }}"
+                                max="{{ date('Y-m-d') }}"
+                                required
+                            >
+                        </div>
 
-                                        </div>
+                    </div>
 
-                                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Batal
+                        </button>
 
-                                </form>
+                        <button
+                            type="submit"
+                            class="btn btn-warning"
+                        >
+                            <i class="bi bi-send me-1"></i>
+                            Kirim Pembayaran
+                        </button>
+                    </div>
 
-                            @endif
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+@endif
 
                         </div>
 
@@ -651,6 +700,7 @@ body.rating-modal-open {
     .rating-modal-custom .modal-footer {
         padding: 12px 18px 16px;
     }
+    
 }
 </style>
 
@@ -661,6 +711,18 @@ body.rating-modal-open {
 
 <script>
 (function () {
+    // Memindahkan modal pembayaran denda ke luar kartu rental
+document.addEventListener('show.bs.modal', function (event) {
+    const modal = event.target;
+
+    if (
+        modal &&
+        modal.id &&
+        modal.id.startsWith('dendaBayarModal')
+    ) {
+        document.body.appendChild(modal);
+    }
+});
     /*
      * Mencegah event handler terpasang berkali-kali
      * apabila file Blade ini dimuat ulang secara dinamis.
