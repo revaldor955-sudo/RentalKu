@@ -468,11 +468,22 @@
 
 @push('scripts')
 <script>
-    $(document).on('click', '.car-card[data-mobil-id], button[data-mobil-id]', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        window.location.href = '/mobils/' + $(this).data('mobil-id') + '?from=katalog';
-    });
+   $(document).on('click', '.car-card[data-mobil-id], button[data-mobil-id]', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const mobilId = $(this).data('mobil-id');
+    const params = new URLSearchParams(window.location.search);
+    const kodePromo = params.get('kode_promo');
+
+    let tujuan = '/mobils/' + encodeURIComponent(mobilId) + '?from=katalog';
+
+    if (kodePromo) {
+        tujuan += '&kode_promo=' + encodeURIComponent(kodePromo);
+    }
+
+    window.location.href = tujuan;
+});
 
     function formatRupiah(v){ return 'Rp ' + Number(v).toLocaleString('id-ID'); }
 
@@ -486,20 +497,23 @@
     var katalogQTimer = null;
 
     function katalogParams(page) {
-        var perPage = $('#katalog-perpage').val();
-        if (perPage === 'custom') {
-            perPage = $('#katalog-custom').val();
-        }
-        return {
-            q: $('#q').val(),
-            cabang: $('#cabang').val(),
-            transmisi: $('#transmisi').val(),
-            status: $('#status').val(),
-            sort: $('#sort').val(),
-            per_page: perPage,
-            page: page || 1
-        };
+    var perPage = $('#katalog-perpage').val();
+
+    if (perPage === 'custom') {
+        perPage = $('#katalog-custom').val();
     }
+
+    return {
+        q: $('#q').val(),
+        cabang: $('#cabang').val(),
+        transmisi: $('#transmisi').val(),
+        status: $('#status').val(),
+        sort: $('#sort').val(),
+        per_page: perPage,
+        page: page || 1,
+        kode_promo: new URLSearchParams(window.location.search).get('kode_promo') || ''
+    };
+}
 
     function katalogSkeleton() {
         var html = '';

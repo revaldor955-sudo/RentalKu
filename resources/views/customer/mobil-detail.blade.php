@@ -631,12 +631,17 @@
                                         Sewa Sekarang
                                     </button>
                                 @else
-                                    <a
-                                        href="{{ route('login') }}"
-                                        class="btn btn-rental d-flex align-items-center justify-content-center text-decoration-none">
-                                        <i class="bi bi-box-arrow-in-right me-2"></i>
-                                        Masuk untuk Sewa
-                                    </a>
+                                   <a
+    href="{{ route('login', [
+        'redirect' => request()->getPathInfo() . '?' . http_build_query(array_merge(
+            request()->query(),
+            ['open_sewa' => 1]
+        ))
+    ]) }}"
+    class="btn btn-rental d-flex align-items-center justify-content-center text-decoration-none">
+    <i class="bi bi-box-arrow-in-right me-2"></i>
+    Masuk untuk Sewa
+</a>
                                 @endauth
                             @else
                                 <button
@@ -849,6 +854,27 @@
 
             <div class="col-12">
 
+    <label class="form-label fw-semibold">
+        Kode Promo
+    </label>
+
+   <input
+    type="text"
+    name="kode_promo"
+    class="form-control"
+    placeholder="Masukkan kode promo"
+    maxlength="50"
+    value="{{ old('kode_promo', $kodePromo ?? request()->query('kode_promo', '')) }}"
+>
+
+    <div class="form-text">
+        Kode promo akan diperiksa saat pengajuan sewa.
+    </div>
+
+</div>
+
+            <div class="col-12">
+
                 <label class="form-label fw-semibold">
                     Catatan
                 </label>
@@ -910,6 +936,8 @@
             });
             return;
         }
+        // Otomatis membuka popup sewa setelah Customer berhasil login.
+
 
         Swal.fire({
             title: 'Sewa {{ $mobil->name }}',
@@ -1000,7 +1028,23 @@
             }
         });
     }
+// Otomatis membuka popup setelah Customer berhasil login.
+(function () {
+    const params = new URLSearchParams(window.location.search);
 
+    if (params.get('open_sewa') !== '1') {
+        return;
+    }
+
+    params.delete('open_sewa');
+
+    const query = params.toString();
+    const cleanUrl = window.location.pathname + (query ? '?' + query : '');
+
+    window.history.replaceState({}, '', cleanUrl);
+
+    openSewaPopup();
+})();
 </script>
 
 {{-- GoodUI #13/#28/#33: client-side convenience untuk form sewa (validasi server tetap sumber kebenaran).

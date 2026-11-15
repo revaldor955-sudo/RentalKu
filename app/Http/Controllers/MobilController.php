@@ -338,26 +338,31 @@ class MobilController extends Controller
     /**
      * Menampilkan detail mobil.
      */
-    public function show(Mobil $mobil)
-    {
-        $mobil->load([
-            'brand',
-            'tipeMobil',
-            'cabang',
-            'fasilitas',
-        ]);
+    /**
+ * Menampilkan detail mobil.
+ */
+public function show(Mobil $mobil)
+{
+    $mobil->load([
+        'brand',
+        'tipeMobil',
+        'cabang',
+        'fasilitas',
+    ]);
 
-        $cabangs = Cabang::orderBy('name')->get();
+    $cabangs = Cabang::orderBy('name')->get();
 
-        $supirs = Supir::where('status', 'tersedia')
-            ->orderBy('name')
-            ->get();
+    $supirs = Supir::where('status', 'tersedia')
+        ->orderBy('name')
+        ->get();
 
-        return view(
-            'customer.mobil-detail',
-            compact('mobil', 'cabangs', 'supirs')
-        );
-    }
+    $kodePromo = request()->query('kode_promo', '');
+
+    return view(
+        'customer.mobil-detail',
+        compact('mobil', 'cabangs', 'supirs', 'kodePromo')
+    );
+}
 
     /**
      * Memperbarui data mobil.

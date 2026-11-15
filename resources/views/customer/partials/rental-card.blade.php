@@ -61,12 +61,50 @@
                 <span>{{ $rental->jumlah_hari }} Hari</span>
             </div>
 
-            <div class="rental-data-item">
-                <i class="bi bi-wallet2"></i>
+      
+<div class="rental-data-item align-items-start">
+    <i class="bi bi-wallet2 mt-1"></i>
+
+    <div class="w-100">
+
+        <div class="d-flex justify-content-between mb-1">
+            <span class="text-muted">Subtotal Rental</span>
+            <span>
+                Rp {{ number_format($rental->subtotal, 0, ',', '.') }}
+            </span>
+        </div>
+
+        @if(($rental->diskon ?? 0) > 0)
+            <div class="d-flex justify-content-between mb-1">
+                <span class="text-success">
+                    Diskon ({{ $rental->kode_promo }})
+                </span>
+
                 <span class="text-success fw-bold">
-                    Rp {{ number_format($rental->total_harga, 0, ',', '.') }}
+                    − Rp {{ number_format($rental->diskon, 0, ',', '.') }}
                 </span>
             </div>
+        @endif
+
+        <div class="d-flex justify-content-between mb-1">
+            <span class="text-muted">Deposit</span>
+            <span>
+                Rp {{ number_format($rental->deposit, 0, ',', '.') }}
+            </span>
+        </div>
+
+        <hr class="my-2">
+
+        <div class="d-flex justify-content-between">
+            <span class="fw-bold">Total Pembayaran</span>
+
+            <span class="text-success fw-bold">
+                Rp {{ number_format($rental->total_harga, 0, ',', '.') }}
+            </span>
+        </div>
+
+    </div>
+</div>
 
         </div>
 

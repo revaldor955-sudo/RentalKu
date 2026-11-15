@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cabang;
 use App\Models\LandingSetting;
 use App\Models\Mobil;
+use App\Models\Kupon;
 use App\Models\Rental;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -78,6 +79,21 @@ $ratings = DB::table('ratings')
     ->limit(6)
     ->get();
         $landingSettings = LandingSetting::pluck('value', 'key')->toArray();
+        $kuponAktif = Kupon::query()
+    ->where(function ($query) {
+        $query->whereNull('active_at')
+            ->orWhere('active_at', '<=', now());
+    })
+    ->where(function ($query) {
+        $query->whereNull('expired_at')
+            ->orWhere('expired_at', '>=', now());
+    })
+    ->where(function ($query) {
+        $query->whereNull('kuota')
+            ->orWhereColumn('terpakai', '<', 'kuota');
+    })
+    ->latest('id')
+    ->first();
         $selectedFaqIds = json_decode($landingSettings['selected_faq_ids'] ?? 'null', true);
 
         $faqs = DB::table('faqs')
@@ -100,6 +116,7 @@ $ratings = DB::table('ratings')
             'ratings',
             'faqs',
             'cabangs',
+            'kuponAktif',
             'cabangAktif',
             'statusInput',
             'statusMobil',
