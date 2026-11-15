@@ -318,17 +318,31 @@
 
                     <div class="row g-3">
 
-                        <div class="col-md-6">
-                            <label for="mobilId" class="form-label">Nama Mobil</label>
-                            <select name="mobil_id" id="mobilId" class="form-select" required>
-                                <option value="">-- Pilih Nama Mobil --</option>
-                                @foreach ($mobils as $mobil)
-                                    <option value="{{ $mobil->id }}">
-                                        {{ $mobil->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                      <div class="col-md-6">
+    <label for="mobilId" class="form-label">Nama Mobil</label>
+    <select name="mobil_id" id="mobilId" class="form-select" required>
+        <option value="">-- Pilih Nama Mobil --</option>
+        @foreach ($mobils as $mobil)
+            <option
+                value="{{ $mobil->id }}"
+                data-kode="{{ $mobil->kode_unit }}"
+            >
+                {{ $mobil->name }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
+<div class="col-md-6">
+    <label for="kodeUnit" class="form-label">Kode Unit Mobil</label>
+    <input
+        type="text"
+        id="kodeUnit"
+        class="form-control"
+        placeholder="Kode unit otomatis muncul"
+        readonly
+    >
+</div>
 
                         <div class="col-md-6">
                             <label for="tanggal" class="form-label">Tanggal Pemeriksaan</label>
@@ -493,6 +507,7 @@
 <script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/js/dataTables.bootstrap5.min.js"></script>
 
+
 <script>
 const CSRF_TOKEN = @json(csrf_token());
 const URL_DATA = @json(route('pemeriksaan-kendaraan.data'));
@@ -515,6 +530,7 @@ function resetForm() {
     document.getElementById('formPemeriksaan').reset();
 
     $('#pemeriksaanId').val('');
+    $('#kodeUnit').val('');
 
     $('.kerusakan-check').prop('checked', false);
 
@@ -532,6 +548,12 @@ function resetForm() {
         .addClass('d-none')
         .empty();
 }
+
+// Mengisi kode unit otomatis ketika nama mobil dipilih
+$('#mobilId').on('change', function () {
+    const kodeUnit = $(this).find(':selected').data('kode') || '';
+    $('#kodeUnit').val(kodeUnit);
+});
 
 function openTambahModal() {
     resetForm();
@@ -617,7 +639,7 @@ function openEditModal(id) {
     resetForm();
 
     $('#pemeriksaanId').val(row.id);
-    $('#mobilId').val(row.mobil_id);
+    $('#mobilId').val(row.mobil_id).trigger('change');
     $('#jenis').val(row.jenis);
     $('#kondisi').val(row.kondisi);
     $('#catatan').val(row.catatan || '');
@@ -925,6 +947,7 @@ $(document).ready(function() {
     });
 });
 </script>
+
 
 </body>
 </html>
