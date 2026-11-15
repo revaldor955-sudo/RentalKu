@@ -418,9 +418,15 @@
                     </div>
                 </div>
                 <div class="col-auto">
-                    <a href="{{ $landingSettings['promo_button_url'] ?? '#mobil' }}" class="btn btn-sm fw-bold" style="background-color: var(--primary); color: white; border-radius: 20px;">
-                        {{ $landingSettings['promo_button_label'] ?? 'Klaim Sekarang →' }}
-                    </a>
+                    <a href="{{ $kuponAktif
+    ? route('katalog.index', ['kode_promo' => $kuponAktif->code])
+    : ($landingSettings['promo_button_url'] ?? '#mobil') }}"
+   class="btn btn-sm fw-bold"
+   style="background-color: var(--primary); color: white; border-radius: 20px;">
+
+    {{ $kuponAktif ? 'Gunakan Promo →' : ($landingSettings['promo_button_label'] ?? 'Klaim Sekarang →') }}
+
+</a>
                 </div>
             </div>
         </div>
@@ -1345,11 +1351,22 @@
         });
 
         // Klik kartu mobil langsung ke halaman detail.
-        $(document).on('click', '.car-card[data-mobil-id], button[data-mobil-id]', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            window.location.href = '/mobils/' + $(this).data('mobil-id');
-        });
+       $(document).on('click', '.car-card[data-mobil-id], button[data-mobil-id]', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const mobilId = $(this).data('mobil-id');
+    const params = new URLSearchParams(window.location.search);
+    const kodePromo = params.get('kode_promo');
+
+    const tujuan = '/mobils/' + encodeURIComponent(mobilId);
+
+    if (kodePromo) {
+        window.location.href = tujuan + '?kode_promo=' + encodeURIComponent(kodePromo);
+    } else {
+        window.location.href = tujuan;
+    }
+});
     </script>
 
 @endsection

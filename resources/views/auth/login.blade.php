@@ -314,6 +314,9 @@
         <form method="POST" action="{{ route('login') }}" id="loginForm" novalidate
             data-auth-error="{{ $errors->has('email') ? '1' : '0' }}">
             @csrf
+            @if(request()->filled('redirect'))
+    <input type="hidden" name="redirect" value="{{ request('redirect') }}">
+@endif
 
             <div class="auth-field" data-field="email">
                 <label for="email" class="auth-label">Email</label>
