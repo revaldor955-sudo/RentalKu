@@ -333,9 +333,8 @@ Route::middleware('adminstaff')->group(function () {
     ->name('pelacakan-gps.hapus');
     Route::get('/pelacakan-gps/{rental}/riwayat', [PelacakanGPSController::class, 'riwayat'])
         ->name('pelacakan-gps.riwayat');
-
-    Route::post('/pelacakan-gps/{rental}/lokasi', [PelacakanGPSController::class, 'store'])
-        ->name('pelacakan-gps.lokasi.store');
+    Route::get('/pelacakan-gps/{rental}/riwayat/data', [PelacakanGPSController::class, 'riwayatData'])
+        ->name('pelacakan-gps.riwayat.data');
 });
 
 Route::middleware('customer')->group(function () {
@@ -343,6 +342,7 @@ Route::middleware('customer')->group(function () {
         ->name('customer.gps.pengirim');
 
     Route::post('/customer/gps/{rental}/lokasi', [PelacakanGPSController::class, 'terimaLokasi'])
+        ->middleware('throttle:30,1')
         ->name('customer.gps.terima-lokasi');
 });
 // RENTAL & PEMBAYARAN
