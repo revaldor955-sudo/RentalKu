@@ -7,6 +7,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
@@ -16,24 +17,28 @@
 
         body {
             background: #f4f7f8;
-            color: #263b3d;
+            color: #000;
         }
 
-        .main-content {
-            margin-left: 260px;
-            padding: 30px;
-            min-height: 100vh;
+        .page-content {
+            padding: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
+            }
         }
 
         .page-title {
             font-size: 24px;
             font-weight: 800;
-            color: #24575c;
+            color: #000;
         }
 
         .page-subtitle {
             font-size: 12px;
-            color: #829194;
+            color: #000;
         }
 
         .content-card {
@@ -53,19 +58,19 @@
 
         .info-label {
             font-size: 11px;
-            color: #89999b;
+            color: #000;
             margin-bottom: 7px;
         }
 
         .info-value {
             font-size: 14px;
             font-weight: 700;
-            color: #24575c;
+            color: #000;
         }
 
         .table thead th {
             background: #f1f7f5;
-            color: #496466;
+            color: #000;
             font-size: 11px;
             font-weight: 700;
             padding: 14px;
@@ -76,7 +81,7 @@
             font-size: 12px;
             padding: 14px;
             vertical-align: middle;
-            color: #52696a;
+            color: #000;
         }
 
         .btn-main {
@@ -97,37 +102,83 @@
 
         .coordinate-badge {
             background: #e6f2ef;
-            color: #24776c;
+            color: #000;
             padding: 7px 10px;
             border-radius: 7px;
             font-size: 11px;
             font-weight: 600;
         }
 
-        .empty-state {
+        .pager-bar {
+            background: #fff;
+            border: 1px solid #edf0ee;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .05);
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+
+        .pager-select {
+            width: auto;
+            border-radius: 10px;
+            font-size: 13px;
+            height: 34px;
+            padding: 6px 28px 6px 10px;
+        }
+
+        .pager-jump {
+            width: 72px;
+            border-radius: 10px;
             text-align: center;
-            padding: 45px 15px;
-            color: #89999b;
+            font-size: 13px;
+            height: 34px;
+            padding: 6px 8px;
         }
 
-        .empty-state i {
-            font-size: 40px;
-            color: #b5c9c6;
+        .pager-btn {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            color: #1f2937;
+            font-weight: 600;
+            background: #fff;
+            font-size: 13px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
         }
 
-        @media (max-width: 991px) {
-            .main-content {
-                margin-left: 0;
-                padding: 20px 14px;
-            }
+        .pager-btn:hover {
+            border-color: #198754;
+            color: #198754;
+            background: #f5f7f6;
         }
+
+        .pager-btn.disabled {
+            opacity: .4;
+            pointer-events: none;
+        }
+
+        .pager-next {
+            background: #198754;
+            border-color: #198754;
+            color: #fff;
+        }
+
+        .pager-next:hover {
+            background: #146c43;
+            border-color: #146c43;
+            color: #fff;
+        }
+
     </style>
 </head>
 <body>
 
 @include('layouts.partials.sidebar')
 
-<div class="main-content">
+<div class="page-content">
+<div class="container-fluid px-4">
 
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
@@ -174,16 +225,16 @@
     <div class="content-card">
 
         <div class="mb-4">
-            <h6 class="fw-bold mb-1" style="color:#24575c">
+            <h6 class="fw-bold mb-1" style="color:#000">
                 Daftar Riwayat Koordinat
             </h6>
             <p class="page-subtitle mb-0">
-                Jumlah catatan lokasi: {{ $riwayats->count() }}
+                Jumlah catatan lokasi: {{ $totalRiwayat }}
             </p>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table id="riwayat-table" class="table table-hover align-middle mb-0">
                 <thead>
                     <tr>
                         <th>No</th>
@@ -196,61 +247,203 @@
                 </thead>
 
                 <tbody>
-                    @forelse ($riwayats as $riwayat)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-
-                            <td>
-                                <span class="coordinate-badge">
-                                    {{ $riwayat->latitude }}
-                                </span>
-                            </td>
-
-                            <td>
-                                <span class="coordinate-badge">
-                                    {{ $riwayat->longitude }}
-                                </span>
-                            </td>
-
-                            <td>
-                                {{ $riwayat->created_at->format('d-m-Y') }}
-                            </td>
-
-                            <td>
-                                {{ $riwayat->created_at->format('H:i:s') }}
-                            </td>
-
-                            <td>
-                                <a href="https://www.google.com/maps?q={{ $riwayat->latitude }},{{ $riwayat->longitude }}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="btn-main">
-                                    <i class="bi bi-geo-alt"></i> Lihat Peta
-                                </a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6">
-                                <div class="empty-state">
-                                    <i class="bi bi-geo"></i>
-                                    <h6 class="fw-bold mt-3">Belum Ada Riwayat Lokasi</h6>
-                                    <p class="small mb-0">
-                                        Riwayat akan muncul setelah koordinat mobil disimpan.
-                                    </p>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse
+                    {{-- Diisi oleh DataTables (server-side) --}}
                 </tbody>
             </table>
+        </div>
+
+        <div class="pager-bar mt-3 d-flex flex-wrap align-items-center justify-content-between gap-3"
+            id="riwayat-pager">
+
+            <div class="text-secondary small" id="riwayat-info">
+                Menampilkan 0–0 dari 0 data
+            </div>
+
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <select id="riwayat-len"
+                    class="form-select form-select-sm pager-select"
+                    aria-label="Jumlah per halaman">
+                    <option value="10">10 / halaman</option>
+                    <option value="20">20 / halaman</option>
+                    <option value="50">50 / halaman</option>
+                    <option value="100">100 / halaman</option>
+                    <option value="custom">Custom</option>
+                </select>
+
+                <input type="number" id="riwayat-custom"
+                    class="form-control form-control-sm pager-jump"
+                    min="1" max="500" value="10"
+                    aria-label="Jumlah custom per halaman">
+
+                <span class="text-secondary" id="riwayat-page">
+                    Halaman 1 / 1
+                </span>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-sm pager-btn"
+                    id="riwayat-first">First</button>
+
+                <button type="button" class="btn btn-sm pager-btn"
+                    id="riwayat-prev" aria-label="Halaman sebelumnya">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+
+                <button type="button" class="btn btn-sm pager-btn pager-next"
+                    id="riwayat-next" aria-label="Halaman berikutnya">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+
+                <button type="button" class="btn btn-sm pager-btn"
+                    id="riwayat-last">Last</button>
+            </div>
         </div>
 
     </div>
 
 </div>
+</div>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+$(function () {
+    const riwayatTable = $('#riwayat-table').DataTable({
+        processing: true,
+        serverSide: true,
+        paging: true,
+        pageLength: 10,
+        lengthChange: false,
+        info: false,
+        dom: 'frt',
+        ajax: {
+            url: '{{ route('pelacakan-gps.riwayat.data', $rental->id) }}',
+            type: 'GET',
+        },
+        columns: [{
+                data: null,
+                orderable: false,
+                searchable: false,
+                width: '60px',
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                },
+            },
+            {
+                data: 'latitude',
+                render: function (data) {
+                    return '<span class="coordinate-badge">' + data + '</span>';
+                },
+            },
+            {
+                data: 'longitude',
+                render: function (data) {
+                    return '<span class="coordinate-badge">' + data + '</span>';
+                },
+            },
+            {
+                data: 'tanggal',
+            },
+            {
+                data: 'waktu',
+            },
+            {
+                data: 'maps_url',
+                orderable: false,
+                searchable: false,
+                render: function (data) {
+                    return '<a href="' + data + '" target="_blank" rel="noopener noreferrer" class="btn-main">' +
+                        '<i class="bi bi-geo-alt"></i> Lihat Peta</a>';
+                },
+            },
+        ],
+        order: [
+            [3, 'desc']
+        ],
+        language: {
+            processing: 'Memproses...',
+            search: 'Cari:',
+            loadingRecords: 'Memuat...',
+            zeroRecords: 'Tidak ditemukan data yang cocok',
+            emptyTable: 'Belum ada riwayat lokasi',
+        },
+    });
+
+    function renderRiwayatPager() {
+        const info = riwayatTable.page.info();
+
+        const total = info.recordsDisplay;
+        const start = total ? info.start + 1 : 0;
+        const end = total ? info.end : 0;
+        const pages = info.pages || 1;
+        const page = total ? info.page + 1 : 0;
+
+        $('#riwayat-info').text(
+            'Menampilkan ' + start + '–' + end + ' dari ' + total + ' data'
+        );
+
+        $('#riwayat-page').text(
+            'Halaman ' + page + ' / ' + pages
+        );
+
+        $('#riwayat-first, #riwayat-prev')
+            .toggleClass('disabled', info.page <= 0);
+
+        $('#riwayat-next, #riwayat-last')
+            .toggleClass('disabled', info.page >= pages - 1 || total === 0);
+    }
+
+    riwayatTable.on('draw.dt', renderRiwayatPager);
+
+    $('#riwayat-first').on('click', function () {
+        riwayatTable.page('first').draw('page');
+    });
+
+    $('#riwayat-prev').on('click', function () {
+        riwayatTable.page('previous').draw('page');
+    });
+
+    $('#riwayat-next').on('click', function () {
+        riwayatTable.page('next').draw('page');
+    });
+
+    $('#riwayat-last').on('click', function () {
+        riwayatTable.page('last').draw('page');
+    });
+
+    $('#riwayat-len').on('change', function () {
+        if ($(this).val() === 'custom') {
+            $('#riwayat-custom').focus();
+            return;
+        }
+
+        const jumlah = Number($(this).val());
+
+        $('#riwayat-custom').val(jumlah);
+        riwayatTable.page.len(jumlah).draw();
+    });
+
+    $('#riwayat-custom').on('change', function () {
+        let jumlah = parseInt($(this).val(), 10) || 1;
+        jumlah = Math.min(Math.max(jumlah, 1), 500);
+
+        $(this).val(jumlah);
+
+        if (['10', '20', '50', '100'].includes(String(jumlah))) {
+            $('#riwayat-len').val(String(jumlah));
+        } else {
+            $('#riwayat-len').val('custom');
+        }
+
+        riwayatTable.page.len(jumlah).draw();
+    });
+
+    renderRiwayatPager();
+});
+</script>
 
 </body>
 </html>

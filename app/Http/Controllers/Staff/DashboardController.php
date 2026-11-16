@@ -46,7 +46,7 @@ class DashboardController extends Controller
         $pendingPaymentsCount = Pembayaran::where('status', 'Menunggu')->count();
 
         $returnDueRentals = Rental::with(['user', 'mobil'])
-            ->where('status', 'Disetujui')
+            ->whereIn('status', ['Disetujui', 'Berjalan'])
             ->whereDate('tanggal_selesai', '<=', today())
             ->latest('tanggal_selesai')
             ->get();
