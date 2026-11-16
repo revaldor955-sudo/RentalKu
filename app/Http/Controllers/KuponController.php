@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kupon;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class KuponController extends Controller
 {
+    // Form admin memakai jam lokal WIB, sedangkan DB menyimpan UTC (config app timezone).
+    private const ZONA_ADMIN = 'Asia/Jakarta';
+
     public function index()
     {
         return view('kupons.index')->with('pageTitle', 'Kupon');
@@ -53,6 +57,8 @@ class KuponController extends Controller
             (string) $request->input('order.0.dir', 'desc')
         ) === 'asc' ? 'asc' : 'desc';
 
+        $now = now();
+
         /*
          * Jika tidak ada kolom yang dipilih untuk pengurutan,
          * tampilkan promo terbaru berdasarkan created_at.
@@ -68,11 +74,12 @@ class KuponController extends Controller
             // Pengurutan berdasarkan status promo.
             $query->orderByRaw(
                 "CASE
-                    WHEN NOW() < kupons.active_at THEN 2
-                    WHEN NOW() > kupons.expired_at
+                    WHEN ? < kupons.active_at THEN 2
+                    WHEN ? > kupons.expired_at
                          OR kupons.terpakai >= kupons.kuota THEN 3
                     ELSE 1
-                END {$orderDirection}"
+                END {$orderDirection}",
+                [$now->toDateTimeString(), $now->toDateTimeString()]
             )
                 ->orderByDesc('kupons.created_at')
                 ->orderByDesc('kupons.id');
@@ -101,8 +108,6 @@ class KuponController extends Controller
             ->limit($length)
             ->get();
 
-        $now = now();
-
         $data = $kupons->map(function ($kupon) use ($now) {
             if ($kupon->active_at && $now->lt($kupon->active_at)) {
                 $status = 'waiting';
@@ -127,10 +132,10 @@ class KuponController extends Controller
                 'terpakai' => $kupon->terpakai,
                 'minimal_pembelian' => $kupon->minimal_pembelian,
                 'active_at' => $kupon->active_at
-                    ? $kupon->active_at->format('Y-m-d\TH:i')
+                    ? $kupon->active_at->copy()->setTimezone(self::ZONA_ADMIN)->format('Y-m-d\TH:i')
                     : null,
                 'expired_at' => $kupon->expired_at
-                    ? $kupon->expired_at->format('Y-m-d\TH:i')
+                    ? $kupon->expired_at->copy()->setTimezone(self::ZONA_ADMIN)->format('Y-m-d\TH:i')
                     : null,
                 'status' => $status,
                 'status_text' => $statusText,
@@ -170,6 +175,10 @@ class KuponController extends Controller
             'expired_at.after_or_equal' =>
                 'Tanggal berakhir harus setelah tanggal mulai.',
         ]);
+
+        // Input datetime-local berisi jam WIB; simpan UTC agar konsisten dengan now().
+        $validated['active_at'] = Carbon::parse($validated['active_at'], self::ZONA_ADMIN)->utc();
+        $validated['expired_at'] = Carbon::parse($validated['expired_at'], self::ZONA_ADMIN)->utc();
 
         $validated['code'] = strtoupper(trim($validated['code']));
         $validated['terpakai'] = 0;
@@ -212,6 +221,10 @@ class KuponController extends Controller
             'expired_at.after_or_equal' =>
                 'Tanggal berakhir harus setelah tanggal mulai.',
         ]);
+
+        // Input datetime-local berisi jam WIB; simpan UTC agar konsisten dengan now().
+        $validated['active_at'] = Carbon::parse($validated['active_at'], self::ZONA_ADMIN)->utc();
+        $validated['expired_at'] = Carbon::parse($validated['expired_at'], self::ZONA_ADMIN)->utc();
 
         // Jumlah promo yang telah digunakan tidak boleh diubah dari form.
         $terpakaiAktual = (int) $kupon->terpakai;
