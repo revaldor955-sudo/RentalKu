@@ -157,7 +157,18 @@ class RentalController extends Controller
             $promoResult = $this->calculatePromo($kodePromo, $subtotalSewa);
 
             if (!$promoResult['success']) {
-                return $this->errorResponse($request, $promoResult['message']);
+                if ($request->expectsJson()) {
+                    return response()->json(
+                        [
+                            'success' => false,
+                            'message' => $promoResult['message'],
+                            'errors' => ['kode_promo' => [$promoResult['message']]],
+                        ],
+                        422,
+                    );
+                }
+
+                return back()->withErrors(['kode_promo' => $promoResult['message']])->withInput();
             }
 
             $kupon = $promoResult['kupon'];
@@ -218,6 +229,50 @@ class RentalController extends Controller
         }
 
         return redirect()->route('customer.dashboard')->with('success', 'Pengajuan sewa mobil berhasil dibuat.');
+    }
+
+    /**
+     * Periksa kode promo untuk validasi inline pada form sewa.
+     * Minimal pembelian tidak dicek di sini karena subtotal belum diketahui.
+     */
+    public function checkPromo(Request $request)
+    {
+        $validated = $request->validate(
+            [
+                'kode_promo' => ['required', 'string', 'max:50'],
+            ],
+            [
+                'kode_promo.required' => 'Kode Promo Tidak Valid.',
+                'kode_promo.max' => 'Kode Promo Tidak Valid.',
+            ],
+        );
+
+        $kodePromo = strtoupper(trim($validated['kode_promo']));
+
+        $kupon = Kupon::whereRaw('UPPER(code) = ?', [$kodePromo])->first();
+
+        if (!$kupon) {
+            return $this->promoErrorResponse('Kode Promo Tidak Valid.');
+        }
+
+        $sekarang = Carbon::now();
+
+        if ($kupon->active_at && $sekarang->lt($kupon->active_at)) {
+            return $this->promoErrorResponse('Kode promo belum aktif.');
+        }
+
+        if ($kupon->expired_at && $sekarang->gt($kupon->expired_at)) {
+            return $this->promoErrorResponse('Kode promo sudah kedaluwarsa.');
+        }
+
+        if ($kupon->kuota !== null && $kupon->terpakai >= $kupon->kuota) {
+            return $this->promoErrorResponse('Kuota promo sudah habis.');
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kode promo tersedia.',
+        ]);
     }
 
     /**
@@ -834,7 +889,7 @@ class RentalController extends Controller
         if (!$kupon) {
             return [
                 'success' => false,
-                'message' => 'Kode promo tidak ditemukan.',
+                'message' => 'Kode Promo Tidak Valid.',
             ];
         }
 
@@ -901,5 +956,20 @@ class RentalController extends Controller
         }
 
         return back()->with('error', $message);
+    }
+
+    /**
+     * Response error khusus validasi promo (inline di field kode_promo)
+     */
+    private function promoErrorResponse(string $message)
+    {
+        return response()->json(
+            [
+                'success' => false,
+                'message' => $message,
+                'errors' => ['kode_promo' => [$message]],
+            ],
+            422,
+        );
     }
 }
