@@ -503,8 +503,9 @@ class RentalController extends Controller
     | Filter status
     |--------------------------------------------------------------------------
     */
-        if ($request->filled('status')) {
-            $query->where('rentals.status', $request->input('status'));
+        $statusFilter = array_values(array_filter(array_map('trim', explode(',', (string) $request->input('status')))));
+        if ($statusFilter !== []) {
+            $query->whereIn('rentals.status', $statusFilter);
         }
 
         /*
@@ -512,9 +513,7 @@ class RentalController extends Controller
     | Total data sebelum pencarian
     |--------------------------------------------------------------------------
     */
-        $recordsTotal = Rental::when($request->filled('status'), function ($q) use ($request) {
-            $q->where('status', $request->input('status'));
-        })->count();
+        $recordsTotal = Rental::when($statusFilter !== [], fn ($q) => $q->whereIn('status', $statusFilter))->count();
 
         /*
     |--------------------------------------------------------------------------

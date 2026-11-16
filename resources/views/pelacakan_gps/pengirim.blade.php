@@ -533,6 +533,25 @@
                     </div>
                 </div>
 
+                <div class="col-12">
+                    <div class="vehicle-box">
+                        <div class="info-icon">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <div class="info-label">Lokasi Terakhir</div>
+                        <div class="info-value">
+                            @if ($lokasi)
+                                {{ $lokasi->latitude }}, {{ $lokasi->longitude }}
+                                <div class="small text-muted mt-1 fw-normal">
+                                    {{ $lokasi->updated_at->locale('id')->diffForHumans() }}
+                                </div>
+                            @else
+                                Belum ada koordinat tersimpan
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <div class="status-card">

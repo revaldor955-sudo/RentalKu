@@ -251,10 +251,10 @@ public function detail(Pembayaran $pembayaran)
             abort(403);
         }
 
-        if ($rental->status !== 'Disetujui') {
+        if (!in_array($rental->status, ['Disetujui', 'Berjalan'], true)) {
             return redirect()
                 ->route('customer.dashboard')
-                ->with('error', 'Rental belum disetujui.');
+                ->with('error', 'Pembayaran hanya tersedia untuk rental yang disetujui atau sedang berjalan.');
         }
 
         $metodePembayarans = $this->metodeUntukCabang(
@@ -276,17 +276,17 @@ public function detail(Pembayaran $pembayaran)
             abort(403);
         }
 
-        // Pembayaran hanya untuk rental yang disetujui.
-        if ($rental->status !== 'Disetujui') {
+        // Pembayaran hanya untuk rental yang disetujui atau sedang berjalan.
+        if (!in_array($rental->status, ['Disetujui', 'Berjalan'], true)) {
             if ($request->wantsJson()) {
                 return response()->json([
-                    'message' => 'Rental belum disetujui.',
+                    'message' => 'Pembayaran hanya tersedia untuk rental yang disetujui atau sedang berjalan.',
                 ], 422);
             }
 
             return redirect()
                 ->route('customer.dashboard')
-                ->with('error', 'Rental belum disetujui.');
+                ->with('error', 'Pembayaran hanya tersedia untuk rental yang disetujui atau sedang berjalan.');
         }
 
         // Satu pembayaran aktif per rental.

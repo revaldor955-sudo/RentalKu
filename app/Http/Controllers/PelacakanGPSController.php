@@ -12,15 +12,10 @@ class PelacakanGPSController extends Controller
 {
     public function index()
     {
-        $today = now()->toDateString();
-
-        $rentalIds = LokasiMobil::select('rental_id');
+        $pageTitle = 'Pelacakan GPS';
 
         $rentals = Rental::with(['mobil', 'user'])
             ->where('status', 'Berjalan')
-            ->whereDate('tanggal_mulai', '<=', $today)
-            ->whereDate('tanggal_selesai', '>=', $today)
-            ->whereIn('id', $rentalIds)
             ->latest()
             ->get();
 
@@ -28,67 +23,89 @@ class PelacakanGPSController extends Controller
             ->whereIn('rental_id', $rentals->pluck('id'))
             ->get();
 
-        return view('pelacakan_gps.index', compact('rentals', 'lokasis'));
-    }
-
-    public function store(Request $request, Rental $rental)
-    {
-        $today = now()->toDateString();
-
-        if (
-            $rental->status !== 'Berjalan' ||
-            $rental->tanggal_mulai->toDateString() > $today ||
-            $rental->tanggal_selesai->toDateString() < $today
-        ) {
-            return redirect()->route('pelacakan-gps.index')
-                ->with('error', 'Mobil tidak sedang dalam masa rental.');
-        }
-
-        $validated = $request->validate([
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
-        ]);
-
-        LokasiMobil::updateOrCreate(
-            ['rental_id' => $rental->id],
-            [
-                'mobil_id' => $rental->mobil_id,
-                'latitude' => $validated['latitude'],
-                'longitude' => $validated['longitude'],
-            ]
-        );
-
-        RiwayatLokasiMobil::create([
-            'rental_id' => $rental->id,
-            'mobil_id' => $rental->mobil_id,
-            'latitude' => $validated['latitude'],
-            'longitude' => $validated['longitude'],
-        ]);
-
-        return redirect()->route('pelacakan-gps.index')
-            ->with('success', 'Koordinat berhasil disimpan.');
+        return view('pelacakan_gps.index', compact('rentals', 'lokasis', 'pageTitle'));
     }
 
     public function riwayat(Rental $rental)
     {
+        $pageTitle = 'Riwayat Lokasi Mobil';
+
         $rental->load(['mobil', 'user']);
 
-        $riwayats = RiwayatLokasiMobil::where('rental_id', $rental->id)
-            ->latest()
-            ->get();
+        $totalRiwayat = RiwayatLokasiMobil::where('rental_id', $rental->id)->count();
 
-        return view('pelacakan_gps.riwayat', compact('rental', 'riwayats'));
+        return view('pelacakan_gps.riwayat', compact('rental', 'totalRiwayat', 'pageTitle'));
+    }
+
+    public function riwayatData(Request $request, Rental $rental)
+    {
+        $query = RiwayatLokasiMobil::where('rental_id', $rental->id);
+
+        $recordsTotal = (clone $query)->count();
+
+        $search = trim((string) $request->input('search.value', ''));
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('latitude', 'like', "%{$search}%")
+                    ->orWhere('longitude', 'like', "%{$search}%")
+                    ->orWhere('created_at', 'like', "%{$search}%");
+            });
+        }
+
+        $recordsFiltered = (clone $query)->count();
+
+        // Kolom tabel: 0 No, 1 Latitude, 2 Longitude, 3 Tanggal, 4 Waktu, 5 Peta.
+        $kolomUrut = [
+            1 => 'latitude',
+            2 => 'longitude',
+            3 => 'created_at',
+            4 => 'created_at',
+        ];
+
+        $kolom = (int) $request->input('order.0.column', 3);
+        $arah = strtolower((string) $request->input('order.0.dir', 'desc')) === 'asc'
+            ? 'asc'
+            : 'desc';
+
+        $query->orderBy($kolomUrut[$kolom] ?? 'created_at', $arah);
+
+        $start = max(0, (int) $request->input('start', 0));
+        $length = (int) $request->input('length', 10);
+
+        if ($length === -1) {
+            $length = 500;
+        }
+
+        $length = max(1, min($length, 500));
+
+        $data = $query->skip($start)->take($length)->get()
+            ->map(function ($riwayat) {
+                return [
+                    'latitude' => $riwayat->latitude,
+                    'longitude' => $riwayat->longitude,
+                    'tanggal' => $riwayat->created_at->format('d-m-Y'),
+                    'waktu' => $riwayat->created_at->format('H:i:s'),
+                    'maps_url' => 'https://www.google.com/maps?q='
+                        . $riwayat->latitude . ',' . $riwayat->longitude,
+                ];
+            });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw', 0),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
     }
 
     public function terimaLokasi(Request $request, Rental $rental)
     {
-        $today = now()->toDateString();
-
+        // Status Berjalan tetap dihitung meski jadwal rental sudah terlewati,
+        // asalkan pemilik rental sudah memulai pelacakan.
         if (
             (int) $rental->user_id !== (int) auth()->id() ||
-            $rental->status !== 'Berjalan' ||
-            $rental->tanggal_mulai->toDateString() > $today ||
-            $rental->tanggal_selesai->toDateString() < $today
+            $rental->status !== 'Berjalan'
         ) {
             return response()->json([
                 'success' => false,
@@ -125,32 +142,26 @@ class PelacakanGPSController extends Controller
 
     public function pengirim(Rental $rental)
     {
-        $today = now()->toDateString();
-
         if (
             (int) $rental->user_id !== (int) auth()->id() ||
-            $rental->status !== 'Berjalan' ||
-            $rental->tanggal_mulai->toDateString() > $today ||
-            $rental->tanggal_selesai->toDateString() < $today
+            $rental->status !== 'Berjalan'
         ) {
             abort(403, 'Rental tidak aktif atau bukan milik Anda.');
         }
 
         $rental->load(['mobil', 'user']);
 
-        return view('pelacakan_gps.pengirim', compact('rental'));
+        $lokasi = LokasiMobil::where('rental_id', $rental->id)->first();
+
+        return view('pelacakan_gps.pengirim', compact('rental', 'lokasi'));
     }
 
     public function data()
     {
-        $today = now()->toDateString();
         $sekarang = now();
 
         $rentals = Rental::with(['mobil', 'user'])
             ->where('status', 'Berjalan')
-            ->whereDate('tanggal_mulai', '<=', $today)
-            ->whereDate('tanggal_selesai', '>=', $today)
-            ->whereIn('id', LokasiMobil::select('rental_id'))
             ->latest()
             ->get();
 
