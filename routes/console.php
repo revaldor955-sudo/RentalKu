@@ -11,3 +11,8 @@ Artisan::command('inspire', function () {
 
 // Membuat atau memperbarui denda keterlambatan setiap hari pukul 00.05
 Schedule::command('dendas:generate-late')->dailyAt('00:05');
+
+// Pangkas riwayat GPS lebih dari 90 hari agar tabel tidak tumbuh tanpa batas
+Schedule::call(function () {
+    \App\Models\RiwayatLokasiMobil::where('created_at', '<', now()->subDays(90))->delete();
+})->daily()->description('Pangkas riwayat GPS > 90 hari');
