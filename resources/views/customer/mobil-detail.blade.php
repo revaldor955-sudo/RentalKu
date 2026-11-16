@@ -867,9 +867,8 @@
     value="{{ old('kode_promo', $kodePromo ?? request()->query('kode_promo', '')) }}"
 >
 
-    <div class="form-text">
-        Kode promo akan diperiksa saat pengajuan sewa.
-    </div>
+    <div class="invalid-feedback kode-promo-error"></div>
+    <div class="valid-feedback kode-promo-success"></div>
 
 </div>
 
@@ -947,14 +946,88 @@
             didOpen: function() {
                 var $form = $('#swal2-html-container form');
 
+                var promoCheckTimer = null;
+                var promoCheckXhr = null;
+
+                function checkPromoCode($input) {
+                    var value = $.trim($input.val());
+
+                    if (!value) {
+                        $input.removeClass('is-invalid is-valid');
+                        $form.find('.kode-promo-error, .kode-promo-success').text('');
+                        return;
+                    }
+
+                    // Batalkan pemeriksaan sebelumnya agar respons lama tidak menimpa yang terbaru.
+                    if (promoCheckXhr) {
+                        promoCheckXhr.abort();
+                    }
+
+                    promoCheckXhr = $.ajax({
+                        url: '{{ route('rentals.promo.check') }}',
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        data: {
+                            _token: $form.find('input[name="_token"]').val(),
+                            kode_promo: value
+                        }
+                    })
+                    .done(function(res) {
+                        $input.removeClass('is-invalid').addClass('is-valid');
+                        $form.find('.kode-promo-error').text('');
+                        $form.find('.kode-promo-success').text((res && res.message) || 'Kode promo valid.');
+                    })
+                    .fail(function(xhr) {
+                        if (!xhr || xhr.status === 0 || xhr.statusText === 'abort') {
+                            return;
+                        }
+
+                        var message = (xhr.responseJSON && xhr.responseJSON.message) || 'Kode Promo Tidak Valid.';
+                        $input.removeClass('is-valid').addClass('is-invalid');
+                        $form.find('.kode-promo-success').text('');
+                        $form.find('.kode-promo-error').text(message);
+                    });
+                }
+
+                $form.on('input', 'input[name="kode_promo"]', function() {
+                    var $input = $(this);
+
+                    clearTimeout(promoCheckTimer);
+
+                    $input.removeClass('is-invalid is-valid');
+                    $form.find('.kode-promo-error, .kode-promo-success').text('');
+
+                    if (!$.trim($input.val())) {
+                        return;
+                    }
+
+                    promoCheckTimer = setTimeout(function() {
+                        checkPromoCode($input);
+                    }, 500);
+                });
+
+                $form.on('blur', 'input[name="kode_promo"]', function() {
+                    var $input = $(this);
+
+                    clearTimeout(promoCheckTimer);
+
+                    if ($.trim($input.val())) {
+                        checkPromoCode($input);
+                    }
+                });
+
                 $form.on('submit', function(event) {
                     event.preventDefault();
 
                     var formData = new FormData($form[0]);
                     var $submit = $form.find('button[type="submit"]');
                     var submitHtml = $submit.html();
-                    $form.find('.is-invalid').removeClass('is-invalid');
-                    $form.find('.invalid-feedback').remove();
+                    $form.find('.is-invalid, .is-valid').removeClass('is-invalid is-valid');
+                    $form.find('.invalid-feedback.d-block').remove();
+                    $form.find('.kode-promo-error, .kode-promo-success').text('');
                     $submit.prop('disabled', true);
                     $submit.html('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Mengirim...');
                     Swal.showLoading();
@@ -1011,13 +1084,25 @@
                         $submit.html(submitHtml);
                         var r = (xhr && xhr.responseJSON) || {};
                         var errs = r.errors || {};
+                        var promoMessage = errs.kode_promo ? errs.kode_promo[0] : null;
+                        $form.find('.invalid-feedback.d-block').remove();
                         Object.keys(errs).forEach(function(key) {
+                            if (key === 'kode_promo') {
+                                return;
+                            }
                             var $input = $form.find('[name="' + key + '"]');
                             if ($input.length) {
                                 $input.addClass('is-invalid');
                                 $input.after('<div class="invalid-feedback d-block">' + errs[key][0] + '</div>');
                             }
                         });
+                        if (promoMessage) {
+                            var $promoInput = $form.find('input[name="kode_promo"]');
+                            $promoInput.removeClass('is-valid').addClass('is-invalid');
+                            $form.find('.kode-promo-success').text('');
+                            $form.find('.kode-promo-error').text(promoMessage);
+                            return;
+                        }
                         Swal.fire({
                             icon: 'error',
                             title: 'Gagal',

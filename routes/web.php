@@ -304,6 +304,12 @@ Route::middleware('customer')->group(function () {
 
     Route::post('/customer/rental/{mobil}', [RentalController::class, 'store'])->name('rentals.store');
 
+    // Pemeriksaan promo
+
+    Route::post('/customer/promo/check', [RentalController::class, 'checkPromo'])
+        ->middleware('throttle:60,1')
+        ->name('rentals.promo.check');
+
     // Pembayaran
 
     Route::get('/customer/pembayaran/{rental}', [PembayaranController::class, 'create'])->name('pembayaran.create');
