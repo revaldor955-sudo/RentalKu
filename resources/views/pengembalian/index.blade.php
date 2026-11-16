@@ -664,7 +664,7 @@
                 url: "{{ route('rentals.data') }}",
                 type: 'GET',
                 data: function(d) {
-                    d.status = 'Disetujui';
+                    d.status = 'Disetujui,Berjalan';
                 }
             },
 
