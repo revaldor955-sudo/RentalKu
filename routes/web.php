@@ -194,17 +194,14 @@ Route::middleware('admin')->group(function () {
 // LANDING PAGE
 
 Route::get('/', [HomeController::class, 'index'])
-    ->middleware('guest')
     ->name('home');
 
 Route::get('/katalog', [HomeController::class, 'katalog'])
-    ->middleware('guest')
     ->name('katalog.index');
 
 Route::get('/katalog/data', [HomeController::class, 'katalogData'])
-    ->middleware('guest')
     ->name('katalog.data');
-
+    
 // CONTACT
 
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');

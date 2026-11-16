@@ -7,8 +7,8 @@ use Illuminate\Support\Str;
 
 class Mobil extends Model
 {
-
     protected $fillable = [
+        'kode_unit',
         'brand_id',
         'tipe_mobil_id',
         'cabang_id',
@@ -36,27 +36,63 @@ class Mobil extends Model
         parent::boot();
 
         static::creating(function (Mobil $mobil) {
+            if (empty($mobil->kode_unit)) {
+                $mobil->kode_unit = static::generateUniqueKodeUnit();
+            }
+
             if (empty($mobil->slug)) {
-                $mobil->slug = static::generateUniqueSlug($mobil->name, $mobil->plate_number);
+                $mobil->slug = static::generateUniqueSlug(
+                    $mobil->name,
+                    $mobil->plate_number
+                );
             }
         });
 
         static::updating(function (Mobil $mobil) {
-            if ($mobil->isDirty('name') || $mobil->isDirty('plate_number') || empty($mobil->slug)) {
-                $mobil->slug = static::generateUniqueSlug($mobil->name, $mobil->plate_number, $mobil->id);
+            if (
+                $mobil->isDirty('name') ||
+                $mobil->isDirty('plate_number') ||
+                empty($mobil->slug)
+            ) {
+                $mobil->slug = static::generateUniqueSlug(
+                    $mobil->name,
+                    $mobil->plate_number,
+                    $mobil->id
+                );
             }
         });
     }
 
-    protected static function generateUniqueSlug(?string $name, ?string $plateNumber, ?int $excludeId = null): string
+    protected static function generateUniqueKodeUnit(): string
     {
+        $nomor = 1;
+
+        do {
+            $kode = 'UNIT' . str_pad($nomor, 3, '0', STR_PAD_LEFT);
+            $nomor++;
+        } while (static::where('kode_unit', $kode)->exists());
+
+        return $kode;
+    }
+
+    protected static function generateUniqueSlug(
+        ?string $name,
+        ?string $plateNumber,
+        ?int $excludeId = null
+    ): string {
         $base = Str::slug(($name ?? '') . '-' . ($plateNumber ?? ''));
         $candidate = $base;
         $i = 2;
-        while (static::where('slug', $candidate)->when($excludeId, fn ($q) => $q->where('id', '!=', $excludeId))->exists()) {
+
+        while (
+            static::where('slug', $candidate)
+                ->when($excludeId, fn ($q) => $q->where('id', '!=', $excludeId))
+                ->exists()
+        ) {
             $candidate = $base . '-' . $i;
             $i++;
         }
+
         return $candidate;
     }
 

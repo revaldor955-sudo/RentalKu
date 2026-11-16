@@ -32,8 +32,9 @@ class DashboardController extends Controller
 
         $rentalCount = Rental::where('user_id', $userId)->count();
 
-        $totalTransaksi = Rental::where('user_id', $userId)->sum('total_harga');
-
+$totalTransaksi = Rental::where('user_id', $userId)
+    ->whereIn('status', ['Disetujui', 'Berjalan', 'Selesai'])
+    ->sum('total_harga');
         $filters = request()->only(['q', 'cabang', 'transmisi']);
 
         $mobils = Mobil::with(['brand', 'tipeMobil', 'cabang', 'fasilitas'])

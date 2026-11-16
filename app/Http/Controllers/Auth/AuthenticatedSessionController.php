@@ -22,25 +22,39 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
-    {
-        $request->authenticate();
+   public function store(LoginRequest $request): RedirectResponse
+{
+    $request->authenticate();
 
-        $request->session()->regenerate();
+    $request->session()->regenerate();
 
-        if (Auth::user()->roles_id == 3 && ! Auth::user()->email_verified_at) {
-            return redirect()->route('otp.show');
-        }
-
-        $route = match (Auth::user()->roles_id) {
-            1 => 'admin.dashboard',
-            2 => 'staff.dashboard',
-            default => 'customer.dashboard',
-        };
-
-        return redirect()->intended(route($route, absolute: false));
+    if (Auth::user()->roles_id == 3 && ! Auth::user()->email_verified_at) {
+        return redirect()->route('otp.show');
     }
 
+    // Jika Customer login dari halaman detail mobil, kembali ke halaman tersebut.
+    if (Auth::user()->roles_id == 3) {
+        $redirect = $request->input('redirect');
+
+        if (
+            is_string($redirect) &&
+            str_starts_with($redirect, '/') &&
+            ! str_starts_with($redirect, '//') &&
+            ! str_contains($redirect, '\\')
+        ) {
+            return redirect()->to($redirect);
+        }
+    }
+
+    // Admin dan Staff tetap diarahkan ke dashboard masing-masing.
+    $route = match (Auth::user()->roles_id) {
+        1 => 'admin.dashboard',
+        2 => 'staff.dashboard',
+        default => 'customer.dashboard',
+    };
+
+    return redirect()->intended(route($route, absolute: false));
+}
     /**
      * Destroy an authenticated session.
      */
