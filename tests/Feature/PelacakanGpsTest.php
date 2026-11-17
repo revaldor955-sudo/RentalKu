@@ -305,4 +305,60 @@ class PelacakanGpsTest extends TestCase
             ->get('/customer/pembayaran/' . $rental->id)
             ->assertOk();
     }
+
+    public function test_riwayat_data_menampilkan_waktu_wib(): void
+    {
+        $rental = $this->buatRental('Berjalan');
+
+        $riwayat = RiwayatLokasiMobil::create([
+            'rental_id' => $rental->id,
+            'mobil_id' => $this->mobil->id,
+            'latitude' => -0.0263,
+            'longitude' => 109.3425,
+        ]);
+
+        $riwayat->forceFill([
+            'created_at' => \Carbon\Carbon::parse('2026-11-17 05:57:00', 'UTC'),
+        ])->save();
+
+        $this->actingAs($this->admin)
+            ->getJson('/pelacakan-gps/' . $rental->id . '/riwayat/data?draw=1&start=0&length=10')
+            ->assertOk()
+            ->assertJsonPath('data.0.waktu', '12:57:00')
+            ->assertJsonPath('data.0.tanggal', '17-11-2026');
+    }
+
+    public function test_pencarian_riwayat_memakai_waktu_wib(): void
+    {
+        $rental = $this->buatRental('Berjalan');
+
+        $riwayat = RiwayatLokasiMobil::create([
+            'rental_id' => $rental->id,
+            'mobil_id' => $this->mobil->id,
+            'latitude' => -0.0263,
+            'longitude' => 109.3425,
+        ]);
+
+        $riwayat->forceFill([
+            'created_at' => \Carbon\Carbon::parse('2026-11-17 05:57:00', 'UTC'),
+        ])->save();
+
+        $this->actingAs($this->admin)
+            ->getJson('/pelacakan-gps/' . $rental->id . '/riwayat/data?draw=1&start=0&length=10&search[value]=17-11-2026')
+            ->assertOk()
+            ->assertJsonPath('recordsFiltered', 1)
+            ->assertJsonCount(1, 'data');
+
+        $this->actingAs($this->admin)
+            ->getJson('/pelacakan-gps/' . $rental->id . '/riwayat/data?draw=1&start=0&length=10&search[value]=12:57')
+            ->assertOk()
+            ->assertJsonPath('recordsFiltered', 1)
+            ->assertJsonCount(1, 'data');
+
+        $this->actingAs($this->admin)
+            ->getJson('/pelacakan-gps/' . $rental->id . '/riwayat/data?draw=1&start=0&length=10&search[value]=05:57')
+            ->assertOk()
+            ->assertJsonPath('recordsFiltered', 0)
+            ->assertJsonCount(0, 'data');
+    }
 }
