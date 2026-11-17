@@ -640,6 +640,10 @@
         <span id="flashError" class="d-none">{{ session('error') }}</span>
     @endif
 
+    @if ($errors->any())
+        <span id="flashValidation" class="d-none">{{ $errors->first() }}</span>
+    @endif
+
 <section class="hero">
 
     <div class="row align-items-center">
@@ -1526,7 +1530,14 @@
             });
         }
         var err = document.getElementById('flashError');
-        if (err) {
+        var validation = document.getElementById('flashValidation');
+        if (validation) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: validation.textContent,
+            });
+        } else if (err) {
             Swal.fire({
                 icon: 'error',
                 title: 'Gagal',
