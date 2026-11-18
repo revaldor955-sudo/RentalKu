@@ -118,6 +118,11 @@
             font-size: 14px;
         }
 
+        .pager-bar .text-secondary {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
         .pager-select {
             width: auto;
             border-radius: 10px;

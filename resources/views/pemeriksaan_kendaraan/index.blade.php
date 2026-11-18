@@ -35,7 +35,7 @@
             border: 0;
             border-radius: 18px;
             box-shadow: 0 8px 30px rgba(0,0,0,.05);
-            padding: 18px;
+            overflow: hidden;
         }
 
         .btn-green {
@@ -132,12 +132,70 @@
         }
 
         .pager-bar {
-            display: flex;
+            background: #fff;
+            border: 1px solid #edf0ee;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .05);
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+
+        .pager-bar .text-secondary {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .pager-select {
+            width: auto;
+            border-radius: 10px;
+            font-size: 13px;
+            height: 34px;
+            padding: 6px 28px 6px 10px;
+        }
+
+        .pager-jump {
+            width: 72px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 13px;
+            height: 34px;
+            padding: 6px 8px;
+        }
+
+        .pager-btn {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            color: #1f2937;
+            font-weight: 600;
+            background: #fff;
+            font-size: 13px;
+            height: 34px;
+            display: inline-flex;
             align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 16px;
+            padding: 6px 12px;
+        }
+
+        .pager-btn:hover {
+            border-color: #198754;
+            color: #198754;
+            background: #f5f7f6;
+        }
+
+        .pager-btn.disabled {
+            opacity: .4;
+            pointer-events: none;
+        }
+
+        .pager-next {
+            background: #198754;
+            border-color: #198754;
+            color: #fff;
+        }
+
+        .pager-next:hover {
+            background: #146c43;
+            border-color: #146c43;
+            color: #fff;
         }
 
         #pemeriksaanModal {
@@ -251,42 +309,66 @@
 
         <div class="card-custom">
             <div class="table-responsive">
-                <table class="table table-hover align-middle" id="pemeriksaan-table">
+                <table class="table table-hover align-middle mb-0" id="pemeriksaan-table">
                     <thead>
                         <tr>
-                            <th>No</th>
+                            <th class="px-3 py-3">No</th>
                             <th>Nama Mobil</th>
                             <th>Jenis</th>
                             <th>Kondisi</th>
                             <th>Tanggal</th>
                             <th>Kerusakan</th>
-                            <th class="text-end">Aksi</th>
+                            <th class="text-end pe-4">Aksi</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
             </div>
 
-            <div class="pager-bar">
-                <div class="small text-muted" id="pemeriksaan-info"></div>
+            <div class="pager-bar mt-3 d-flex flex-wrap align-items-center justify-content-between gap-3"
+                id="pemeriksaan-pager">
+
+                <div class="text-secondary small" id="pemeriksaan-info">
+                    Menampilkan 0–0 dari 0 data
+                </div>
 
                 <div class="d-flex flex-wrap align-items-center gap-2">
-                    <select id="pemeriksaan-len" class="form-select form-select-sm" style="width:auto">
+                    <select id="pemeriksaan-len"
+                        class="form-select form-select-sm pager-select"
+                        aria-label="Jumlah per halaman">
                         <option value="10">10 / halaman</option>
                         <option value="20">20 / halaman</option>
                         <option value="50">50 / halaman</option>
                         <option value="100">100 / halaman</option>
+                        <option value="custom">Custom</option>
                     </select>
 
-                    <button class="btn btn-sm btn-outline-secondary" id="pemeriksaan-prev" type="button">
+                    <input type="number" id="pemeriksaan-custom"
+                        class="form-control form-control-sm pager-jump"
+                        min="1" max="500" value="10"
+                        aria-label="Jumlah custom per halaman">
+
+                    <span class="text-secondary" id="pemeriksaan-page">
+                        Halaman 1 / 1
+                    </span>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-sm pager-btn"
+                        id="pemeriksaan-first">First</button>
+
+                    <button type="button" class="btn btn-sm pager-btn"
+                        id="pemeriksaan-prev" aria-label="Halaman sebelumnya">
                         <i class="bi bi-chevron-left"></i>
                     </button>
 
-                    <span id="pemeriksaan-page" class="small"></span>
-
-                    <button class="btn btn-sm btn-outline-secondary" id="pemeriksaan-next" type="button">
+                    <button type="button" class="btn btn-sm pager-btn pager-next"
+                        id="pemeriksaan-next" aria-label="Halaman berikutnya">
                         <i class="bi bi-chevron-right"></i>
                     </button>
+
+                    <button type="button" class="btn btn-sm pager-btn"
+                        id="pemeriksaan-last">Last</button>
                 </div>
             </div>
         </div>
@@ -833,6 +915,7 @@ $(document).ready(function() {
         lengthChange: false,
         searching: true,
         info: false,
+        dom: 'frt',
         order: [],
 
         ajax: {
@@ -915,27 +998,34 @@ $(document).ready(function() {
         }
     });
 
-    function updatePager() {
+    function renderPemeriksaanPager() {
         const info = table.page.info();
-        const start = info.recordsDisplay ? info.start + 1 : 0;
+
+        const total = info.recordsDisplay;
+        const start = total ? info.start + 1 : 0;
+        const end = total ? info.end : 0;
+        const pages = info.pages || 1;
+        const page = total ? info.page + 1 : 0;
 
         $('#pemeriksaan-info').text(
-            `Menampilkan ${start}–${info.end} dari ${info.recordsDisplay} data`
+            'Menampilkan ' + start + '–' + end + ' dari ' + total + ' data'
         );
 
         $('#pemeriksaan-page').text(
-            `Halaman ${info.pages ? info.page + 1 : 0} / ${info.pages}`
+            'Halaman ' + page + ' / ' + pages
         );
 
-        $('#pemeriksaan-prev').prop('disabled', info.page <= 0);
-        $('#pemeriksaan-next').prop('disabled', info.page >= info.pages - 1);
+        $('#pemeriksaan-first, #pemeriksaan-prev')
+            .toggleClass('disabled', info.page <= 0);
+
+        $('#pemeriksaan-next, #pemeriksaan-last')
+            .toggleClass('disabled', info.page >= pages - 1 || total === 0);
     }
 
-    table.on('draw', updatePager);
-    updatePager();
+    table.on('draw.dt', renderPemeriksaanPager);
 
-    $('#pemeriksaan-len').on('change', function() {
-        table.page.len(Number(this.value)).draw();
+    $('#pemeriksaan-first').on('click', function() {
+        table.page('first').draw('page');
     });
 
     $('#pemeriksaan-prev').on('click', function() {
@@ -945,6 +1035,39 @@ $(document).ready(function() {
     $('#pemeriksaan-next').on('click', function() {
         table.page('next').draw('page');
     });
+
+    $('#pemeriksaan-last').on('click', function() {
+        table.page('last').draw('page');
+    });
+
+    $('#pemeriksaan-len').on('change', function() {
+        if ($(this).val() === 'custom') {
+            $('#pemeriksaan-custom').focus();
+            return;
+        }
+
+        const jumlah = Number($(this).val());
+
+        $('#pemeriksaan-custom').val(jumlah);
+        table.page.len(jumlah).draw();
+    });
+
+    $('#pemeriksaan-custom').on('change', function() {
+        let jumlah = parseInt($(this).val(), 10) || 1;
+        jumlah = Math.min(Math.max(jumlah, 1), 500);
+
+        $(this).val(jumlah);
+
+        if (['10', '20', '50', '100'].includes(String(jumlah))) {
+            $('#pemeriksaan-len').val(String(jumlah));
+        } else {
+            $('#pemeriksaan-len').val('custom');
+        }
+
+        table.page.len(jumlah).draw();
+    });
+
+    renderPemeriksaanPager();
 });
 </script>
 
