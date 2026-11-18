@@ -207,26 +207,6 @@
 
             <div class="page-card">
 
-                <div class="p-4 border-bottom">
-
-                    <div class="d-flex justify-content-between align-items-center">
-
-                        <div>
-
-                            <h5 class="fw-bold mb-1">
-                                Daftar Servis Mobil
-                            </h5>
-
-                            <small class="text-muted">
-                                Riwayat servis kendaraan (rutin & perbaikan).
-                            </small>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
                 <div class="table-responsive">
 
                     <table class="table align-middle mb-0" id="servisMobils-table">
