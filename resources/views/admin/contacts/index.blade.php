@@ -123,12 +123,6 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>
         <div class="table-card">
-            <div class="table-header">
-                <div>
-                    <h2 class="table-title">Daftar Pesan</h2>
-                    <p class="table-subtitle">Pesan yang dikirim melalui halaman Hubungi Kami.</p>
-                </div>
-            </div>
             <div class="table-responsive">
                 <table class="table align-middle" id="contacts-table">
                     <caption class="visually-hidden">Daftar pesan dari pengunjung</caption>

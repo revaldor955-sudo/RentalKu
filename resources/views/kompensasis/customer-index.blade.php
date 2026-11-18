@@ -432,23 +432,6 @@
 
                 <div class="page-card">
 
-                    <div class="p-4 border-bottom">
-
-                        <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center">
-
-                            <div>
-
-                                <h5 class="fw-bold mb-1">
-                                    Daftar Klaim Kompensasi
-                                </h5>
-
-                            </div>
-
-
-                        </div>
-
-                    </div>
-
                     <div class="table-responsive">
 
                         <table class="table align-middle mb-0" id="kompensasis-table">

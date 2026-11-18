@@ -180,13 +180,65 @@
 
 @elseif($rental->status === 'Berjalan')
 
-    <a
-        href="{{ route('customer.gps.pengirim', $rental->id) }}"
-        class="btn btn-success w-100"
-    >
-        <i class="bi bi-geo-alt-fill me-1"></i>
-        Bagikan Lokasi GPS
-    </a>
+    <div class="d-flex flex-column gap-2">
+
+        @if(!$rental->pembayaran)
+
+            <button
+                type="button"
+                class="btn btn-success w-100 btn-bayar"
+                data-action="{{ route('pembayaran.store', $rental->id) }}"
+                data-title="Bayar Sekarang"
+                data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
+                data-rental="{{ $rental->id }}"
+                data-cabang="{{ $rental->cabang_ambil_id }}"
+                data-total="{{ $rental->total_harga }}"
+            >
+                <i class="bi bi-credit-card me-1"></i>
+                Bayar Sekarang
+            </button>
+
+        @elseif($rental->pembayaran->status === 'Menunggu')
+
+            <div class="alert alert-info mb-0 py-2 px-3">
+                <i class="bi bi-clock-history me-1"></i>
+                <small>Bukti pembayaran sedang diverifikasi.</small>
+            </div>
+
+        @elseif($rental->pembayaran->status === 'Disetujui')
+
+            <div class="alert alert-success mb-0 py-2 px-3">
+                <i class="bi bi-check-circle-fill me-1"></i>
+                <small>Pembayaran terverifikasi.</small>
+            </div>
+
+        @elseif($rental->pembayaran->status === 'Ditolak')
+
+            <button
+                type="button"
+                class="btn btn-danger w-100 btn-bayar"
+                data-action="{{ route('pembayaran.store', $rental->id) }}"
+                data-title="Upload Ulang Pembayaran"
+                data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
+                data-rental="{{ $rental->id }}"
+                data-cabang="{{ $rental->cabang_ambil_id }}"
+                data-total="{{ $rental->total_harga }}"
+            >
+                <i class="bi bi-arrow-repeat me-1"></i>
+                Upload Ulang
+            </button>
+
+        @endif
+
+        <a
+            href="{{ route('customer.gps.pengirim', $rental->id) }}"
+            class="btn btn-success w-100"
+        >
+            <i class="bi bi-geo-alt-fill me-1"></i>
+            Bagikan Lokasi GPS
+        </a>
+
+    </div>
             {{-- STATUS SELESAI --}}
             @elseif($rental->status === 'Selesai')
 
@@ -449,20 +501,12 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
 
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold"
-                        id="dendaBayarTitle{{ $d->id }}">
-                        <i class="bi bi-wallet2 text-warning me-2"></i>
-                        Pembayaran Denda
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Tutup"
-                    ></button>
-                </div>
+                @include('layouts.partials.modal-head', [
+                    'title' => 'Pembayaran Denda',
+                    'icon' => 'bi-wallet2',
+                    'titleId' => 'dendaBayarTitle'.$d->id,
+                    'subtitle' => 'Unggah bukti transfer denda.',
+                ])
 
                 <form
                     method="POST"
@@ -500,6 +544,10 @@
                             <small class="text-muted">
                                 Format JPG, JPEG, PNG. Maksimal 2 MB.
                             </small>
+
+                            @error('bukti_bayar')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="mb-2">
@@ -511,10 +559,14 @@
                                 type="date"
                                 name="tanggal_bayar"
                                 class="form-control"
-                                value="{{ date('Y-m-d') }}"
+                                value="{{ old('tanggal_bayar', date('Y-m-d')) }}"
                                 max="{{ date('Y-m-d') }}"
                                 required
                             >
+
+                            @error('tanggal_bayar')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
 
                     </div>
@@ -712,17 +764,21 @@ body.rating-modal-open {
 <script>
 (function () {
     // Memindahkan modal pembayaran denda ke luar kartu rental
-document.addEventListener('show.bs.modal', function (event) {
-    const modal = event.target;
+    if (!window.dendaModalRelocatorBound) {
+        window.dendaModalRelocatorBound = true;
 
-    if (
-        modal &&
-        modal.id &&
-        modal.id.startsWith('dendaBayarModal')
-    ) {
-        document.body.appendChild(modal);
+        document.addEventListener('show.bs.modal', function (event) {
+            const modal = event.target;
+
+            if (
+                modal &&
+                modal.id &&
+                modal.id.startsWith('dendaBayarModal')
+            ) {
+                document.body.appendChild(modal);
+            }
+        });
     }
-});
     /*
      * Mencegah event handler terpasang berkali-kali
      * apabila file Blade ini dimuat ulang secara dinamis.

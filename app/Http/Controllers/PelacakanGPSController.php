@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 
 class PelacakanGPSController extends Controller
 {
+    public const ZONA_WIB = 'Asia/Jakarta';
+
     public function index()
     {
         $pageTitle = 'Pelacakan GPS';
@@ -46,10 +48,12 @@ class PelacakanGPSController extends Controller
         $search = trim((string) $request->input('search.value', ''));
 
         if ($search !== '') {
-            $query->where(function ($q) use ($search) {
+            [$ekspresiWib, $bindingWib] = $this->ekspresiCariWib($search);
+
+            $query->where(function ($q) use ($search, $ekspresiWib, $bindingWib) {
                 $q->where('latitude', 'like', "%{$search}%")
                     ->orWhere('longitude', 'like', "%{$search}%")
-                    ->orWhere('created_at', 'like', "%{$search}%");
+                    ->orWhereRaw($ekspresiWib, $bindingWib);
             });
         }
 
@@ -84,8 +88,8 @@ class PelacakanGPSController extends Controller
                 return [
                     'latitude' => $riwayat->latitude,
                     'longitude' => $riwayat->longitude,
-                    'tanggal' => $riwayat->created_at->format('d-m-Y'),
-                    'waktu' => $riwayat->created_at->format('H:i:s'),
+                    'tanggal' => $riwayat->created_at->copy()->setTimezone(self::ZONA_WIB)->format('d-m-Y'),
+                    'waktu' => $riwayat->created_at->copy()->setTimezone(self::ZONA_WIB)->format('H:i:s'),
                     'maps_url' => 'https://www.google.com/maps?q='
                         . $riwayat->latitude . ',' . $riwayat->longitude,
                 ];
@@ -97,6 +101,35 @@ class PelacakanGPSController extends Controller
             'recordsFiltered' => $recordsFiltered,
             'data' => $data,
         ]);
+    }
+
+    /**
+     * Pencarian teks pada kolom tanggal harus memakai WIB, karena created_at
+     * tersimpan UTC sementara tabel menampilkan waktu Asia/Jakarta.
+     *
+     * @return array{0: string, 1: array<int, string>}
+     */
+    private function ekspresiCariWib(string $search): array
+    {
+        $pola = '%' . $search . '%';
+        $offset = now(self::ZONA_WIB)->format('P');
+        $driver = DB::connection()->getDriverName();
+
+        if ($driver === 'mysql' || $driver === 'mariadb') {
+            return [
+                "DATE_FORMAT(CONVERT_TZ(created_at, '+00:00', ?), '%d-%m-%Y %H:%i:%s') LIKE ?",
+                [$offset, $pola],
+            ];
+        }
+
+        if ($driver === 'sqlite') {
+            return [
+                "strftime('%d-%m-%Y %H:%M:%S', created_at, ?) LIKE ?",
+                [$offset, $pola],
+            ];
+        }
+
+        return ['created_at LIKE ?', [$pola]];
     }
 
     public function terimaLokasi(Request $request, Rental $rental)

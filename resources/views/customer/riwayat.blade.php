@@ -483,6 +483,13 @@
             </a>
             <h1 class="page-title">Riwayat Rental</h1>
         </div>
+
+        @if($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ $errors->first() }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+            </div>
+        @endif
     </div>
 
     @if($rentals->count())
