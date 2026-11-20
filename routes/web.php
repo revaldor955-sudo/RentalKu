@@ -324,7 +324,15 @@ Route::middleware('customer')->group(function () {
 
     // Bayar Denda
 
-    Route::post('/customer/dendas/{denda}/bayar', [DendaController::class, 'customerBayar'])->name('customer.dendas.bayar');
+    Route::post('/customer/dendas/{denda}/bayar', [DendaController::class, 'customerBayar'])
+        ->name('customer.dendas.bayar')
+        ->missing(function () {
+            if (request()->wantsJson()) {
+                return response()->json(['message' => 'Denda tidak ditemukan. Mungkin sudah dihapus.'], 404);
+            }
+
+            return redirect()->route('customer.dashboard')->with('error', 'Denda tidak ditemukan. Mungkin sudah dihapus.');
+        });
 });
 Route::middleware('adminstaff')->group(function () {
     Route::get('/pelacakan-gps', [PelacakanGPSController::class, 'index'])
