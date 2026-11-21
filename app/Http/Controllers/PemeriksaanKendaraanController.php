@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\KerusakanMobil;
 use App\Models\Mobil;
 use App\Models\PemeriksaanMobil;
+use App\Models\Rental;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -15,13 +16,22 @@ class PemeriksaanKendaraanController extends Controller
 {
     public function index()
     {
-        $mobils = Mobil::orderBy('name')->get();
+        $mobils = Mobil::whereHas('rentals', fn ($q) => $q
+            ->whereIn('status', ['Disetujui', 'Selesai']))
+            ->orderBy('name')
+            ->get();
+
+        $rentals = Rental::with(['mobil', 'user'])
+            ->whereIn('status', ['Disetujui', 'Selesai'])
+            ->orderByDesc('tanggal_mulai')
+            ->get();
 
         $kerusakanList = KerusakanMobil::orderBy('jenis_kerusakan')
             ->get();
 
         return view('pemeriksaan_kendaraan.index', compact(
             'mobils',
+            'rentals',
             'kerusakanList'
         ))->with('pageTitle', 'Pemeriksaan Kendaraan');
     }
@@ -37,10 +47,25 @@ class PemeriksaanKendaraanController extends Controller
                 '=',
                 'mobils.id'
             )
+            ->leftJoin(
+                'rentals',
+                'pemeriksaan_mobils.rental_id',
+                '=',
+                'rentals.id'
+            )
+            ->leftJoin(
+                'users',
+                'rentals.user_id',
+                '=',
+                'users.id'
+            )
             ->select(
                 'pemeriksaan_mobils.*',
                 'mobils.name as mobil_name',
-                'mobils.plate_number as mobil_plate'
+                'mobils.plate_number as mobil_plate',
+                'mobils.kode_unit as mobil_kode',
+                'rentals.status as rental_status',
+                'users.name as rental_user_name'
             );
 
         $search = trim((string) $request->input('search.value', ''));
@@ -49,6 +74,8 @@ class PemeriksaanKendaraanController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('mobils.name', 'like', "%{$search}%")
                     ->orWhere('mobils.plate_number', 'like', "%{$search}%")
+                    ->orWhere('rentals.id', 'like', "%{$search}%")
+                    ->orWhere('users.name', 'like', "%{$search}%")
                     ->orWhere(
                         'pemeriksaan_mobils.jenis',
                         'like',
@@ -99,6 +126,11 @@ class PemeriksaanKendaraanController extends Controller
                 'mobil_id' => $p->mobil_id,
                 'mobil_name' => $p->mobil_name ?? '-',
                 'mobil_plate' => $p->mobil_plate ?? '-',
+                'mobil_kode' => $p->mobil_kode ?? '-',
+
+                'rental_id' => $p->rental_id,
+                'rental_status' => $p->rental_status ?? '-',
+                'rental_user_name' => $p->rental_user_name ?? '-',
 
                 'jenis' => $p->jenis,
                 'kondisi' => $p->kondisi,
@@ -177,7 +209,7 @@ class PemeriksaanKendaraanController extends Controller
 
             $pemeriksaan = PemeriksaanMobil::create([
                 'mobil_id' => $validated['mobil_id'],
-                'rental_id' => null,
+                'rental_id' => $validated['rental_id'],
                 'jenis' => $validated['jenis'],
                 'kondisi' => $validated['kondisi'],
                 'tanggal' => $validated['tanggal'],
@@ -210,7 +242,7 @@ class PemeriksaanKendaraanController extends Controller
 
             $data = [
                 'mobil_id' => $validated['mobil_id'],
-                'rental_id' => null,
+                'rental_id' => $validated['rental_id'],
                 'jenis' => $validated['jenis'],
                 'kondisi' => $validated['kondisi'],
                 'tanggal' => $validated['tanggal'],
@@ -275,6 +307,7 @@ class PemeriksaanKendaraanController extends Controller
     private function validatePemeriksaan(Request $request): array
     {
         $validated = $request->validate([
+            'rental_id' => 'required|exists:rentals,id',
             'mobil_id' => 'required|exists:mobils,id',
             'jenis' => 'required|in:sebelum_sewa,setelah_sewa',
             'kondisi' => 'required|in:baik,rusak',
@@ -295,6 +328,8 @@ class PemeriksaanKendaraanController extends Controller
             'foto_kerusakan' => 'nullable|array',
             'foto_kerusakan.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ], [
+            'rental_id.required' => 'Pilih rental terlebih dahulu.',
+            'rental_id.exists' => 'Rental yang dipilih tidak ditemukan.',
             'mobil_id.required' => 'Pilih nama mobil terlebih dahulu.',
             'mobil_id.exists' => 'Nama mobil yang dipilih tidak ditemukan.',
             'jenis.required' => 'Jenis pemeriksaan wajib diisi.',
@@ -309,6 +344,24 @@ class PemeriksaanKendaraanController extends Controller
             'foto_kerusakan.*.mimes' => 'Foto setiap bagian harus berformat JPG, JPEG, atau PNG.',
             'foto_kerusakan.*.max' => 'Ukuran setiap foto maksimal 2 MB.',
         ]);
+
+        $rental = Rental::findOrFail($validated['rental_id']);
+
+        if (!in_array($rental->status, ['Disetujui', 'Selesai'], true)) {
+            throw ValidationException::withMessages([
+                'rental_id' =>
+                    'Rental yang dipilih harus berstatus Disetujui atau Selesai.',
+            ]);
+        }
+
+        if ((int) $rental->mobil_id !== (int) $validated['mobil_id']) {
+            throw ValidationException::withMessages([
+                'mobil_id' =>
+                    'Nama mobil tidak sesuai dengan rental yang dipilih.',
+            ]);
+        }
+
+        $validated['mobil_id'] = $rental->mobil_id;
 
         $selectedIds = array_map(
             'strval',
