@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cabang;
-use App\Models\Denda;
 use App\Models\Kompensasi;
 use App\Models\MetodePembayaran;
 use App\Models\Mobil;
@@ -82,12 +81,6 @@ $rentalsAktif = $rentals->whereIn('status', [
             ->latest()
             ->get();
 
-        $dendasBelumBayar = Denda::with(['rental.mobil'])
-            ->where('status', 'belum bayar')
-            ->whereHas('rental', fn ($q) => $q->where('user_id', $userId))
-            ->latest()
-            ->get();
-
         // GoodUI #4 (social proof): 3 mobil paling sering disewa.
         $populerIds = Rental::selectRaw('mobil_id, COUNT(*) as c')->groupBy('mobil_id')->orderByDesc('c')->limit(3)->pluck('mobil_id')->all();
         $populerIds = array_map('intval', $populerIds);
@@ -103,7 +96,6 @@ $rentalsAktif = $rentals->whereIn('status', [
             'cabangs',
             'filters',
             'klaimUpdates',
-            'dendasBelumBayar',
             'metodePembayarans',
             'jumlahRental',
             'totalRentals',
