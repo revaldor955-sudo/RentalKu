@@ -398,33 +398,43 @@
                 <div class="modal-body">
                     <input type="hidden" id="pemeriksaanId" name="id">
 
+                    @if ($rentals->isEmpty())
+                        <div class="alert alert-warning mb-3">
+                            Belum ada rental berstatus Disetujui atau Selesai. Setujui rental terlebih dahulu.
+                        </div>
+                    @endif
+
                     <div class="row g-3">
 
-                      <div class="col-md-6">
-    <label for="mobilId" class="form-label">Nama Mobil</label>
-    <select name="mobil_id" id="mobilId" class="form-select" required>
-        <option value="">-- Pilih Nama Mobil --</option>
-        @foreach ($mobils as $mobil)
-            <option
-                value="{{ $mobil->id }}"
-                data-kode="{{ $mobil->kode_unit }}"
-            >
-                {{ $mobil->name }}
-            </option>
-        @endforeach
-    </select>
-</div>
+                        <div class="col-md-6">
+                            <label for="mobilId" class="form-label">Nama Mobil</label>
+                            <select name="mobil_id" id="mobilId" class="form-select" required>
+                                <option value="">-- Pilih Nama Mobil --</option>
+                                @foreach ($mobils as $mobil)
+                                    <option value="{{ $mobil->id }}"
+                                            data-kode="{{ $mobil->kode_unit }}">
+                                        {{ $mobil->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-<div class="col-md-6">
-    <label for="kodeUnit" class="form-label">Kode Unit Mobil</label>
-    <input
-        type="text"
-        id="kodeUnit"
-        class="form-control"
-        placeholder="Kode unit otomatis muncul"
-        readonly
-    >
-</div>
+                        <div class="col-md-6">
+                            <label for="rentalId" class="form-label">Rental</label>
+                            <select name="rental_id" id="rentalId" class="form-select"
+                                    required disabled>
+                                <option value="">-- Pilih Nama Mobil Dahulu --</option>
+                            </select>
+                            <div class="form-text" id="rentalHelp">
+                                Hanya rental berstatus Disetujui atau Selesai.
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="kodeUnit" class="form-label">Kode Unit Mobil</label>
+                            <input type="text" id="kodeUnit" class="form-control"
+                                   placeholder="Kode unit otomatis muncul" readonly>
+                        </div>
 
                         <div class="col-md-6">
                             <label for="tanggal" class="form-label">Tanggal Pemeriksaan</label>
@@ -589,6 +599,20 @@
 <script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@2.3.8/js/dataTables.bootstrap5.min.js"></script>
 
+@php
+    $rentalOptions = $rentals->map(function ($rental) {
+        return [
+            'id' => $rental->id,
+            'mobil_id' => $rental->mobil_id,
+            'kode' => $rental->mobil?->kode_unit ?? '',
+            'label' => 'Rental #' . $rental->id
+                . ' — ' . ($rental->user?->name ?? '-')
+                . ' — ' . $rental->status
+                . ' — ' . ($rental->tanggal_mulai?->format('d/m/Y') ?? '-')
+                . ' s/d ' . ($rental->tanggal_selesai?->format('d/m/Y') ?? '-'),
+        ];
+    })->values();
+@endphp
 
 <script>
 const CSRF_TOKEN = @json(csrf_token());
@@ -597,6 +621,8 @@ const URL_STORE = @json(route('pemeriksaan-kendaraan.store'));
 const URL_UPDATE = @json(route('pemeriksaan-kendaraan.update', '__ID__'));
 const URL_DESTROY = @json(route('pemeriksaan-kendaraan.destroy', '__ID__'));
 const STORAGE_URL = @json(asset('storage'));
+
+const RENTALS = {!! json_encode($rentalOptions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!};
 
 function escapeHtml(value) {
     return String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -608,10 +634,59 @@ function escapeHtml(value) {
     }[char]));
 }
 
+function isiKodeUnit() {
+    const rentalId = $('#rentalId').val();
+    const rental = RENTALS.find(item => String(item.id) === String(rentalId));
+
+    $('#kodeUnit').val(
+        rental
+            ? rental.kode
+            : ($('#mobilId').find(':selected').data('kode') || '')
+    );
+}
+
+function isiPilihanRental(mobilId, selectedId = '') {
+    const select = $('#rentalId');
+    const options = RENTALS.filter(
+        item => String(item.mobil_id) === String(mobilId)
+    );
+
+    select.empty().append(new Option('-- Pilih Rental --', ''));
+
+    options.forEach(item => select.append(new Option(item.label, item.id)));
+
+    if (selectedId && !options.some(item => String(item.id) === String(selectedId))) {
+        select.append(
+            new Option('Rental #' + selectedId + ' (tidak tersedia)', selectedId)
+        );
+    }
+
+    select.prop('disabled', !mobilId || options.length === 0);
+
+    if (selectedId) {
+        select.val(String(selectedId));
+    } else if (options.length === 1) {
+        select.val(String(options[0].id));
+    }
+
+    if (mobilId && options.length === 0) {
+        $('#rentalHelp')
+            .text('Belum ada rental Disetujui/Selesai untuk mobil ini.')
+            .addClass('text-danger');
+    } else {
+        $('#rentalHelp')
+            .text('Hanya rental berstatus Disetujui atau Selesai.')
+            .removeClass('text-danger');
+    }
+
+    isiKodeUnit();
+}
+
 function resetForm() {
     document.getElementById('formPemeriksaan').reset();
 
     $('#pemeriksaanId').val('');
+    isiPilihanRental('');
     $('#kodeUnit').val('');
 
     $('.kerusakan-check').prop('checked', false);
@@ -631,11 +706,11 @@ function resetForm() {
         .empty();
 }
 
-// Mengisi kode unit otomatis ketika nama mobil dipilih
 $('#mobilId').on('change', function () {
-    const kodeUnit = $(this).find(':selected').data('kode') || '';
-    $('#kodeUnit').val(kodeUnit);
+    isiPilihanRental(this.value);
 });
+
+$('#rentalId').on('change', isiKodeUnit);
 
 function openTambahModal() {
     resetForm();
@@ -721,7 +796,13 @@ function openEditModal(id) {
     resetForm();
 
     $('#pemeriksaanId').val(row.id);
-    $('#mobilId').val(row.mobil_id).trigger('change');
+    $('#mobilId').val(row.mobil_id);
+    isiPilihanRental(row.mobil_id, row.rental_id);
+
+    if (!$('#kodeUnit').val()) {
+        $('#kodeUnit').val(row.mobil_kode || '');
+    }
+
     $('#jenis').val(row.jenis);
     $('#kondisi').val(row.kondisi);
     $('#catatan').val(row.catatan || '');
@@ -846,6 +927,15 @@ $('#formPemeriksaan').on('submit', function(e) {
 
     if (!form.reportValidity()) return;
 
+    if (!$('#rentalId').val()) {
+        Swal.fire(
+            'Rental belum dipilih',
+            'Pilih rental yang sesuai dengan nama mobil.',
+            'warning'
+        );
+        return;
+    }
+
     const id = $('#pemeriksaanId').val();
     const formData = new FormData(form);
 
@@ -934,9 +1024,15 @@ $(document).ready(function() {
             {
                 data: 'mobil_name',
                 orderable: false,
-                render: (data, type, row) =>
-                    `<strong>${escapeHtml(data)}</strong><br>
-                     <small class="text-muted">${escapeHtml(row.mobil_plate)}</small>`
+                render: (data, type, row) => {
+                    const rental = row.rental_id
+                        ? `Rental #${Number(row.rental_id)} · ${escapeHtml(row.rental_user_name || '-')}`
+                        : 'Tanpa rental';
+
+                    return `<strong>${escapeHtml(data)}</strong><br>
+                        <small class="text-muted">${escapeHtml(row.mobil_plate)}</small><br>
+                        <small class="text-muted">${rental}</small>`;
+                }
             },
             {
                 data: 'jenis',

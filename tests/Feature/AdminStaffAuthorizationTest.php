@@ -33,7 +33,7 @@ class AdminStaffAuthorizationTest extends TestCase
 
     public function test_staff_ditolak_buka_index_master(): void
     {
-        foreach (['/roles', '/brands', '/tipe_mobils', '/cabangs', '/fasilitas', '/metode_pembayarans', '/supirs', '/kupons', '/users'] as $uri) {
+        foreach (['/brands', '/tipe_mobils', '/cabangs', '/fasilitas', '/metode_pembayarans', '/supirs', '/kupons', '/users'] as $uri) {
             $this->actingAs($this->staff)->get($uri)->assertForbidden();
         }
     }

@@ -317,10 +317,25 @@ class DendaController extends Controller
             !$denda->rental ||
             (int) $denda->rental->user_id !== (int) auth()->id()
         ) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Anda tidak memiliki akses ke denda ini.',
+                ], 403);
+            }
+
             abort(403, 'Anda tidak memiliki akses ke denda ini.');
         }
 
         if ($denda->status !== 'belum bayar') {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Denda sudah dibayar atau sedang diverifikasi.',
+                    'errors' => [
+                        'denda' => ['Denda sudah dibayar atau sedang diverifikasi.'],
+                    ],
+                ], 422);
+            }
+
             return back()->withErrors([
                 'denda' => 'Denda sudah dibayar atau sedang diverifikasi.',
             ]);
@@ -347,6 +362,14 @@ class DendaController extends Controller
             'tanggal_bayar' => $validated['tanggal_bayar'],
             'status' => 'menunggu verifikasi',
         ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Bukti pembayaran denda berhasil dikirim.',
+                'status' => 'menunggu verifikasi',
+            ]);
+        }
 
         return redirect()->route('customer.dashboard')
             ->with('success', 'Bukti pembayaran denda berhasil dikirim.');

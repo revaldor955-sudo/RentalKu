@@ -158,6 +158,88 @@ class CustomerAlurTest extends TestCase
         $this->assertNotNull($denda->fresh()->bukti_bayar);
     }
 
+    public function test_bayar_denda_json_sukses(): void
+    {
+        Storage::fake('public');
+
+        $denda = Denda::create([
+            'rental_id' => $this->buatRentalSelesai()->id,
+            'jenis' => 'keterlambatan',
+            'nominal' => 150000,
+            'status' => 'belum bayar',
+        ]);
+
+        $res = $this->actingAs($this->customer)->post(
+            "/customer/dendas/{$denda->id}/bayar",
+            [
+                'bukti_bayar' => UploadedFile::fake()->image('bukti.jpg'),
+                'tanggal_bayar' => now()->toDateString(),
+            ],
+            ['Accept' => 'application/json']
+        );
+
+        $res->assertOk()->assertJson([
+            'success' => true,
+            'status' => 'menunggu verifikasi',
+        ]);
+
+        $denda->refresh();
+        $this->assertSame('menunggu verifikasi', $denda->status);
+        $this->assertNotNull($denda->bukti_bayar);
+        Storage::disk('public')->assertExists($denda->bukti_bayar);
+    }
+
+    public function test_bayar_denda_json_404(): void
+    {
+        $this->actingAs($this->customer)
+            ->postJson('/customer/dendas/999999/bayar')
+            ->assertNotFound()
+            ->assertJsonPath('message', 'Denda tidak ditemukan. Mungkin sudah dihapus.');
+    }
+
+    public function test_bayar_denda_plain_404_redirect(): void
+    {
+        $this->actingAs($this->customer)
+            ->post('/customer/dendas/999999/bayar')
+            ->assertRedirect('/customer/dashboard')
+            ->assertSessionHas('error', 'Denda tidak ditemukan. Mungkin sudah dihapus.');
+    }
+
+    public function test_bayar_denda_bukan_pemilik_ditolak(): void
+    {
+        $lain = User::factory()->create([
+            'roles_id' => $this->customer->roles_id,
+        ]);
+
+        $denda = Denda::create([
+            'rental_id' => $this->buatRentalSelesai()->id,
+            'jenis' => 'kerusakan',
+            'nominal' => 300000,
+            'status' => 'belum bayar',
+        ]);
+
+        $this->actingAs($lain)
+            ->postJson("/customer/dendas/{$denda->id}/bayar")
+            ->assertForbidden()
+            ->assertJsonPath('message', 'Anda tidak memiliki akses ke denda ini.');
+    }
+
+    public function test_bayar_denda_status_bukan_belum_bayar_ditolak(): void
+    {
+        $denda = Denda::create([
+            'rental_id' => $this->buatRentalSelesai()->id,
+            'jenis' => 'kehilangan',
+            'nominal' => 500000,
+            'status' => 'lunas',
+        ]);
+
+        $this->actingAs($this->customer)
+            ->postJson("/customer/dendas/{$denda->id}/bayar")
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Denda sudah dibayar atau sedang diverifikasi.')
+            ->assertJsonPath('errors.denda.0', 'Denda sudah dibayar atau sedang diverifikasi.');
+    }
+
     public function test_metode_cabang_lain_ditolak(): void
     {
         Storage::fake('public');
