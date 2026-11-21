@@ -365,7 +365,7 @@
                                 <div class="car-detail mt-2" id="gps-time-{{ $rental->id }}">
                                     @if ($lokasi)
                                         Terakhir diperbarui:
-                                        {{ $lokasi->updated_at->format('d/m/Y H:i:s') }}
+                                        {{ $lokasi->updated_at->copy()->setTimezone(\App\Http\Controllers\PelacakanGPSController::ZONA_WIB)->format('d/m/Y H:i:s') }}
                                     @else
                                         Belum ada waktu pembaruan
                                     @endif

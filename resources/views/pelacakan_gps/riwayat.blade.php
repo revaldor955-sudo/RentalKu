@@ -17,7 +17,7 @@
 
         body {
             background: #f4f7f8;
-            color: #000;
+            color: #1f2937;
         }
 
         .page-content {
@@ -43,9 +43,10 @@
 
         .content-card {
             background: #fff;
-            border: 1px solid #e8eeee;
-            border-radius: 15px;
-            padding: 24px;
+            border: 1px solid #edf0ee;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .05);
+            overflow: hidden;
         }
 
         .info-card {
@@ -69,19 +70,21 @@
         }
 
         .table thead th {
-            background: #f1f7f5;
-            color: #000;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 14px;
+            background: #f8faf9;
+            color: #6c757d;
+            font-size: 12px;
+            text-transform: uppercase;
             white-space: nowrap;
+            border-bottom: 1px solid #e9ecef;
+            padding: 12px 16px;
         }
 
         .table tbody td {
-            font-size: 12px;
-            padding: 14px;
             vertical-align: middle;
-            color: #000;
+        }
+
+        #riwayat-table thead .dt-column-order {
+            display: none !important;
         }
 
         .btn-main {
@@ -116,6 +119,11 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, .05);
             padding: 12px 16px;
             font-size: 14px;
+        }
+
+        .pager-bar .text-secondary {
+            font-size: 14px;
+            font-weight: 500;
         }
 
         .pager-select {
@@ -224,17 +232,14 @@
 
     <div class="content-card">
 
-        <div class="mb-4">
-            <h6 class="fw-bold mb-1" style="color:#000">
-                Daftar Riwayat Koordinat
-            </h6>
+        <div class="px-4 pt-4 pb-2">
             <p class="page-subtitle mb-0">
                 Jumlah catatan lokasi: {{ $totalRiwayat }}
             </p>
         </div>
 
         <div class="table-responsive">
-            <table id="riwayat-table" class="table table-hover align-middle mb-0">
+            <table id="riwayat-table" class="table align-middle mb-0">
                 <thead>
                     <tr>
                         <th>No</th>

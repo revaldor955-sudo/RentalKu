@@ -201,19 +201,7 @@
 
                     <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center">
 
-                        <div>
-
-                            <h5 class="fw-bold mb-1">
-                                Daftar Metode Pembayaran
-                            </h5>
-
-                            <small class="text-muted">
-                                Seluruh metode pembayaran yang terdaftar di RentalKu.
-                            </small>
-
-                        </div>
-
-                        <div class="d-flex gap-2 align-items-center">
+                        <div class="ms-auto d-flex gap-2 align-items-center">
 
                             <label class="text-muted small mb-0" for="filterCabang">
                                 Cabang
