@@ -198,6 +198,133 @@
             color: #fff;
         }
 
+        .rental-search-wrapper {
+            position: relative;
+        }
+
+        .rental-search-box {
+            position: relative;
+        }
+
+        .rental-search-box .form-control {
+            padding-right: 42px;
+        }
+
+        .rental-search-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            pointer-events: none;
+        }
+
+        .rental-search-results {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            right: 0;
+            z-index: 1060;
+            max-height: 260px;
+            overflow-y: auto;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,.12);
+            display: none;
+        }
+
+        .rental-search-results.show {
+            display: block;
+        }
+
+        .rental-search-item {
+            padding: 12px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: .15s;
+        }
+
+        .rental-search-item:last-child {
+            border-bottom: none;
+        }
+
+        .rental-search-item:hover {
+            background: #f0fdf4;
+        }
+
+        .rental-search-item.active {
+            background: #e8f5ee;
+        }
+
+        .rental-search-item .rental-main {
+            font-weight: 700;
+            color: #1f2937;
+            font-size: 13px;
+        }
+
+        .rental-search-item .rental-sub {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .rental-search-empty {
+            padding: 16px;
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .rental-selected-card {
+            display: none;
+            margin-top: 10px;
+            padding: 12px;
+            border: 1px solid #198754;
+            background: #f0fdf4;
+            border-radius: 12px;
+        }
+
+        .rental-selected-card.show {
+            display: block;
+        }
+
+        .rental-selected-card .selected-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #166534;
+            margin-bottom: 5px;
+        }
+
+        .rental-selected-card .selected-main {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .rental-selected-card .selected-detail {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .btn-remove-rental {
+            border: 0;
+            background: #fee2e2;
+            color: #dc2626;
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .btn-remove-rental:hover {
+            background: #fecaca;
+        }
+
         #pemeriksaanModal {
             overflow: hidden !important;
         }
@@ -397,6 +524,7 @@
 
                 <div class="modal-body">
                     <input type="hidden" id="pemeriksaanId" name="id">
+                    <input type="hidden" id="rentalId" name="rental_id">
 
                     @if ($rentals->isEmpty())
                         <div class="alert alert-warning mb-3">
@@ -420,13 +548,46 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label for="rentalId" class="form-label">Rental</label>
-                            <select name="rental_id" id="rentalId" class="form-select"
-                                    required disabled>
-                                <option value="">-- Pilih Nama Mobil Dahulu --</option>
-                            </select>
+                            <label for="rentalSearch" class="form-label">Rental</label>
+
+                            <div class="rental-search-wrapper">
+                                <div class="rental-search-box">
+                                    <input type="text"
+                                           id="rentalSearch"
+                                           class="form-control"
+                                           placeholder="Cari nama pelanggan, mobil, plat, atau rental..."
+                                           autocomplete="off"
+                                           disabled>
+
+                                    <i class="bi bi-search rental-search-icon"></i>
+                                </div>
+
+                                <div id="rentalSearchResults" class="rental-search-results"></div>
+                            </div>
+
+                            <div id="rentalSelectedCard" class="rental-selected-card">
+                                <div class="d-flex align-items-start justify-content-between gap-2">
+                                    <div class="flex-grow-1">
+                                        <div class="selected-title">
+                                            <i class="bi bi-check-circle-fill me-1"></i>
+                                            Rental Terpilih
+                                        </div>
+
+                                        <div class="selected-main" id="rentalSelectedMain"></div>
+                                        <div class="selected-detail" id="rentalSelectedDetail"></div>
+                                    </div>
+
+                                    <button type="button"
+                                            class="btn-remove-rental"
+                                            id="btnRemoveRental"
+                                            title="Hapus pilihan rental">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+
                             <div class="form-text" id="rentalHelp">
-                                Hanya rental berstatus Disetujui atau Selesai.
+                                Pilih nama mobil terlebih dahulu untuk mencari rental.
                             </div>
                         </div>
 
@@ -605,8 +766,15 @@
             'id' => $rental->id,
             'mobil_id' => $rental->mobil_id,
             'kode' => $rental->mobil?->kode_unit ?? '',
+            'mobil' => $rental->mobil?->name ?? '-',
+            'plat' => $rental->mobil?->plat_nomor ?? $rental->mobil?->nomor_plat ?? $rental->mobil?->plate_number ?? '',
+            'pelanggan' => $rental->user?->name ?? '-',
+            'status' => $rental->status,
+            'mulai' => $rental->tanggal_mulai?->format('d/m/Y') ?? '-',
+            'selesai' => $rental->tanggal_selesai?->format('d/m/Y') ?? '-',
             'label' => 'Rental #' . $rental->id
                 . ' — ' . ($rental->user?->name ?? '-')
+                . ' — ' . ($rental->mobil?->name ?? '-')
                 . ' — ' . $rental->status
                 . ' — ' . ($rental->tanggal_mulai?->format('d/m/Y') ?? '-')
                 . ' s/d ' . ($rental->tanggal_selesai?->format('d/m/Y') ?? '-'),
@@ -624,6 +792,8 @@ const STORAGE_URL = @json(asset('storage'));
 
 const RENTALS = {!! json_encode($rentalOptions, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!};
 
+let selectedRental = null;
+
 function escapeHtml(value) {
     return String(value ?? '').replace(/[&<>"']/g, char => ({
         '&': '&amp;',
@@ -634,58 +804,230 @@ function escapeHtml(value) {
     }[char]));
 }
 
+function getRentalById(id) {
+    return RENTALS.find(item => String(item.id) === String(id));
+}
+
+function getRentalListByMobil(mobilId) {
+    return RENTALS.filter(item => String(item.mobil_id) === String(mobilId));
+}
+
 function isiKodeUnit() {
-    const rentalId = $('#rentalId').val();
-    const rental = RENTALS.find(item => String(item.id) === String(rentalId));
+    if (selectedRental) {
+        $('#kodeUnit').val(selectedRental.kode || '');
+        return;
+    }
 
     $('#kodeUnit').val(
-        rental
-            ? rental.kode
-            : ($('#mobilId').find(':selected').data('kode') || '')
+        $('#mobilId').find(':selected').data('kode') || ''
     );
 }
 
-function isiPilihanRental(mobilId, selectedId = '') {
-    const select = $('#rentalId');
-    const options = RENTALS.filter(
-        item => String(item.mobil_id) === String(mobilId)
+function renderRentalSelected(rental) {
+    selectedRental = rental || null;
+
+    $('#rentalId').val(rental ? rental.id : '');
+
+    if (!rental) {
+        $('#rentalSelectedCard').removeClass('show');
+        $('#rentalSelectedMain').text('');
+        $('#rentalSelectedDetail').text('');
+        isiKodeUnit();
+        return;
+    }
+
+    $('#rentalSelectedMain').text(
+        'Rental #' + rental.id + ' — ' + rental.pelanggan
     );
 
-    select.empty().append(new Option('-- Pilih Rental --', ''));
+    $('#rentalSelectedDetail').text(
+        rental.mobil + ' • ' +
+        (rental.plat || 'Plat belum tersedia') + ' • ' +
+        rental.status + ' • ' +
+        rental.mulai + ' s/d ' + rental.selesai
+    );
 
-    options.forEach(item => select.append(new Option(item.label, item.id)));
+    $('#rentalSelectedCard').addClass('show');
+    $('#rentalSearch').val('');
+    $('#rentalSearchResults').removeClass('show').empty();
 
-    if (selectedId && !options.some(item => String(item.id) === String(selectedId))) {
-        select.append(
-            new Option('Rental #' + selectedId + ' (tidak tersedia)', selectedId)
-        );
+    isiKodeUnit();
+}
+
+function renderRentalSearchResults(keyword = '') {
+    const mobilId = $('#mobilId').val();
+    const resultContainer = $('#rentalSearchResults');
+
+    if (!mobilId) {
+        resultContainer.removeClass('show').empty();
+        return;
     }
 
-    select.prop('disabled', !mobilId || options.length === 0);
+    const normalizedKeyword = keyword.toLowerCase().trim();
+
+    const rentals = getRentalListByMobil(mobilId).filter(item => {
+        const searchable = [
+            item.id,
+            item.pelanggan,
+            item.mobil,
+            item.plat,
+            item.status,
+            item.mulai,
+            item.selesai,
+            item.label
+        ].join(' ').toLowerCase();
+
+        return searchable.includes(normalizedKeyword);
+    });
+
+    if (!rentals.length) {
+        resultContainer.html(
+            '<div class="rental-search-empty">' +
+            '<i class="bi bi-search me-1"></i>' +
+            'Rental tidak ditemukan.' +
+            '</div>'
+        ).addClass('show');
+
+        return;
+    }
+
+    const html = rentals.map(item => {
+        const active = selectedRental &&
+            String(selectedRental.id) === String(item.id);
+
+        return `
+            <div class="rental-search-item ${active ? 'active' : ''}"
+                 data-rental-id="${Number(item.id)}">
+
+                <div class="rental-main">
+                    Rental #${Number(item.id)} — ${escapeHtml(item.pelanggan)}
+                </div>
+
+                <div class="rental-sub">
+                    ${escapeHtml(item.mobil)}
+                    ${item.plat ? ' • ' + escapeHtml(item.plat) : ''}
+                    • ${escapeHtml(item.status)}
+                </div>
+
+                <div class="rental-sub">
+                    ${escapeHtml(item.mulai)} s/d ${escapeHtml(item.selesai)}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    resultContainer.html(html).addClass('show');
+}
+
+function isiPilihanRental(mobilId, selectedId = '') {
+    const searchInput = $('#rentalSearch');
+    const help = $('#rentalHelp');
+
+    renderRentalSelected(null);
+
+    searchInput.val('');
+    $('#rentalSearchResults').removeClass('show').empty();
+
+    if (!mobilId) {
+        searchInput.prop('disabled', true);
+        searchInput.attr('placeholder', 'Pilih nama mobil dahulu');
+        help.text('Pilih nama mobil terlebih dahulu untuk mencari rental.')
+            .removeClass('text-danger');
+
+        isiKodeUnit();
+        return;
+    }
+
+    const options = getRentalListByMobil(mobilId);
+
+    searchInput.prop('disabled', options.length === 0);
+    searchInput.attr(
+        'placeholder',
+        options.length
+            ? 'Cari nama pelanggan, mobil, plat, atau rental...'
+            : 'Tidak ada rental untuk mobil ini'
+    );
+
+    if (options.length === 0) {
+        help.text('Belum ada rental Disetujui/Selesai untuk mobil ini.')
+            .addClass('text-danger');
+
+        isiKodeUnit();
+        return;
+    }
+
+    help.text('Cari dan pilih rental yang sesuai dengan mobil.')
+        .removeClass('text-danger');
 
     if (selectedId) {
-        select.val(String(selectedId));
-    } else if (options.length === 1) {
-        select.val(String(options[0].id));
-    }
+        const rental = getRentalById(selectedId);
 
-    if (mobilId && options.length === 0) {
-        $('#rentalHelp')
-            .text('Belum ada rental Disetujui/Selesai untuk mobil ini.')
-            .addClass('text-danger');
-    } else {
-        $('#rentalHelp')
-            .text('Hanya rental berstatus Disetujui atau Selesai.')
-            .removeClass('text-danger');
+        if (rental && String(rental.mobil_id) === String(mobilId)) {
+            renderRentalSelected(rental);
+        } else {
+            renderRentalSelected({
+                id: selectedId,
+                mobil_id: mobilId,
+                kode: $('#mobilId').find(':selected').data('kode') || '',
+                mobil: $('#mobilId').find(':selected').text().trim(),
+                plat: '',
+                pelanggan: 'Rental tidak tersedia',
+                status: 'Tidak tersedia',
+                mulai: '-',
+                selesai: '-'
+            });
+        }
     }
 
     isiKodeUnit();
 }
 
+$('#mobilId').on('change', function() {
+    isiPilihanRental(this.value);
+});
+
+$('#rentalSearch').on('focus', function() {
+    if (!selectedRental && $('#mobilId').val()) {
+        renderRentalSearchResults($(this).val());
+    }
+});
+
+$('#rentalSearch').on('input', function() {
+    if (selectedRental) {
+        renderRentalSelected(null);
+    }
+
+    renderRentalSearchResults(this.value);
+});
+
+$(document).on('click', '.rental-search-item', function() {
+    const id = $(this).data('rental-id');
+    const rental = getRentalById(id);
+
+    if (rental) {
+        renderRentalSelected(rental);
+    }
+});
+
+$('#btnRemoveRental').on('click', function() {
+    renderRentalSelected(null);
+    $('#rentalSearch').prop('disabled', false).val('').focus();
+    renderRentalSearchResults('');
+});
+
+$(document).on('click', function(e) {
+    if (!$(e.target).closest('.rental-search-wrapper').length) {
+        $('#rentalSearchResults').removeClass('show');
+    }
+});
+
 function resetForm() {
     document.getElementById('formPemeriksaan').reset();
 
     $('#pemeriksaanId').val('');
+    $('#rentalId').val('');
+    selectedRental = null;
+
     isiPilihanRental('');
     $('#kodeUnit').val('');
 
@@ -705,12 +1047,6 @@ function resetForm() {
         .addClass('d-none')
         .empty();
 }
-
-$('#mobilId').on('change', function () {
-    isiPilihanRental(this.value);
-});
-
-$('#rentalId').on('change', isiKodeUnit);
 
 function openTambahModal() {
     resetForm();
@@ -930,7 +1266,7 @@ $('#formPemeriksaan').on('submit', function(e) {
     if (!$('#rentalId').val()) {
         Swal.fire(
             'Rental belum dipilih',
-            'Pilih rental yang sesuai dengan nama mobil.',
+            'Cari dan pilih rental yang sesuai dengan nama mobil.',
             'warning'
         );
         return;
@@ -1166,7 +1502,6 @@ $(document).ready(function() {
     renderPemeriksaanPager();
 });
 </script>
-
 
 </body>
 </html>
