@@ -442,99 +442,108 @@ class RentalController extends Controller
             ]);
         }
 
-        return view('customer.checkout', compact('mobil', 'supir', 'jumlahHari', 'subtotalMobil', 'subtotalSupir', 'deposit', 'diskon', 'totalHarga'));
-    }
+return redirect()->route('rentals.checkout.show', [
+    'mobil' => $mobil->id,
+]);    }
 
     /**
      * Menampilkan halaman checkout rental
      */
     public function showCheckout(Mobil $mobil)
-    {
-        $checkout = session('checkout_rental');
+{
+    $checkout = session('checkout_rental');
 
-        if (!$checkout) {
-            return redirect()->route('customer.dashboard')->with('error', 'Data checkout tidak ditemukan. Silakan ulangi proses booking.');
-        }
-
-        if ((int) ($checkout['mobil_id'] ?? 0) !== (int) $mobil->id) {
-            return redirect()->route('home')->with('error', 'Data checkout tidak sesuai dengan mobil.');
-        }
-
-        $supir = null;
-
-        if (!empty($checkout['supir_id'])) {
-            $supir = Supir::find($checkout['supir_id']);
-        }
-
-        return view('customer.checkout', [
-            'mobil' => $mobil,
-            'checkout' => $checkout,
-            'supir' => $supir,
-            'jumlahHari' => $checkout['jumlah_hari'] ?? 0,
-            'subtotalMobil' => $checkout['subtotal_mobil'] ?? 0,
-            'subtotalSupir' => $checkout['subtotal_supir'] ?? 0,
-            'deposit' => $checkout['deposit'] ?? 0,
-            'diskon' => $checkout['diskon'] ?? 0,
-            'totalHarga' => $checkout['total_harga'] ?? 0,
-        ]);
+    if (!$checkout) {
+        return redirect()->route('customer.dashboard')
+            ->with('error', 'Data checkout tidak ditemukan. Silakan ulangi proses booking.');
     }
+
+    if ((int) ($checkout['mobil_id'] ?? 0) !== (int) $mobil->id) {
+        return redirect()->route('home')
+            ->with('error', 'Data checkout tidak sesuai dengan mobil.');
+    }
+
+    $supir = null;
+
+    if (!empty($checkout['supir_id'])) {
+        $supir = Supir::find($checkout['supir_id']);
+    }
+
+    $cabangAmbil = \App\Models\Cabang::find($checkout['cabang_ambil_id'] ?? null);
+    $cabangKembali = \App\Models\Cabang::find($checkout['cabang_kembali_id'] ?? null);
+
+    return view('customer.checkout', [
+        'mobil' => $mobil,
+        'checkout' => $checkout,
+        'supir' => $supir,
+        'cabangAmbil' => $cabangAmbil,
+        'cabangKembali' => $cabangKembali,
+        'jumlahHari' => $checkout['jumlah_hari'] ?? 0,
+        'subtotalMobil' => $checkout['subtotal_mobil'] ?? 0,
+        'subtotalSupir' => $checkout['subtotal_supir'] ?? 0,
+        'deposit' => $checkout['deposit'] ?? 0,
+        'diskon' => $checkout['diskon'] ?? 0,
+        'totalHarga' => $checkout['total_harga'] ?? 0,
+    ]);
+}
 
     /**
      * Konfirmasi checkout dan simpan rental
      */
-    public function confirmCheckout(Request $request, Mobil $mobil)
-    {
-        $checkout = session('checkout_rental');
-
-        if (!$checkout) {
-            return redirect()->route('customer.dashboard')->with('error', 'Data checkout tidak ditemukan.');
-        }
-
-        if ((int) ($checkout['mobil_id'] ?? 0) !== (int) $mobil->id) {
-            session()->forget('checkout_rental');
-
-            return redirect()->route('home')->with('error', 'Data checkout tidak sesuai dengan mobil.');
-        }
-
-        /*
-    |--------------------------------------------------------------
-    | Ambil kode promo dari input checkout
-    |--------------------------------------------------------------
-    */
-
-        $kodePromo = $request->input('kode_promo', $checkout['kode_promo'] ?? null);
-
-        $request->merge([
-            'tanggal_mulai' => $checkout['tanggal_mulai'],
-
-            'tanggal_selesai' => $checkout['tanggal_selesai'],
-
-            'supir_id' => $checkout['supir_id'] ?? null,
-
-            'kode_promo' => $kodePromo,
-
-            'catatan' => $checkout['catatan'] ?? null,
-
-            'cabang_ambil_id' => $checkout['cabang_ambil_id'] ?? null,
-
-            'cabang_kembali_id' => $checkout['cabang_kembali_id'] ?? null,
-        ]);
-
-        $response = $this->store($request, $mobil);
-
-        if ($response instanceof \Illuminate\Http\RedirectResponse) {
-            session()->forget('checkout_rental');
-        }
-
-        return $response;
+   /**
+ * Konfirmasi checkout dan simpan rental
+ */
+public function confirmCheckout(Request $request, $mobil)
+{
+    $mobil = Mobil::findOrFail($mobil);
+    if (!auth()->check()) {
+        return redirect()->route('login')
+            ->with('error', 'Silakan login terlebih dahulu.');
     }
-    /**
-     * Menampilkan halaman rental admin/staff
-     */
-    public function index()
-    {
-        return view('admin.rentals.index')->with('pageTitle', 'Transaksi Rental');
+
+    $checkout = session('checkout_rental');
+
+    if (!$checkout) {
+        return redirect()->route('customer.dashboard')
+            ->with('error', 'Data checkout tidak ditemukan. Silakan ulangi proses booking.');
     }
+
+    if ((int) ($checkout['mobil_id'] ?? 0) !== (int) $mobil->id) {
+        session()->forget('checkout_rental');
+
+        return redirect()->route('customer.dashboard')
+            ->with('error', 'Data checkout tidak sesuai dengan mobil.');
+    }
+
+    $request->merge([
+        'tanggal_mulai' => $checkout['tanggal_mulai'],
+        'tanggal_selesai' => $checkout['tanggal_selesai'],
+        'supir_id' => $checkout['supir_id'] ?? null,
+        'kode_promo' => $request->input('kode_promo', $checkout['kode_promo'] ?? null),
+        'catatan' => $checkout['catatan'] ?? null,
+        'cabang_ambil_id' => $checkout['cabang_ambil_id'] ?? null,
+        'cabang_kembali_id' => $checkout['cabang_kembali_id'] ?? null,
+    ]);
+
+    $response = $this->store($request, $mobil);
+
+    if (
+        $response instanceof \Illuminate\Http\RedirectResponse &&
+        $response->getTargetUrl() === route('customer.dashboard')
+    ) {
+        session()->forget('checkout_rental');
+    }
+
+    return $response;
+}
+
+/**
+ * Menampilkan halaman rental admin/staff
+ */
+public function index()
+{
+    return view('admin.rentals.index')->with('pageTitle', 'Transaksi Rental');
+}
 
     /**
      * DataTables rental
