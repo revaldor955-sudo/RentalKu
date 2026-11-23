@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Kompensasi;
 use App\Models\Rental;
 use App\Models\User;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -90,6 +91,18 @@ class KompensasiController extends Controller
                 'staff_name' => $item->staff->name ?? '-',
                 'catatan' => $item->catatan,
                 'created_at' => $item->created_at?->format('d/m/Y H:i'),
+
+                'rental' => [
+                    'id' => $item->rental?->id,
+                    'tanggal_mulai' => $item->rental?->tanggal_mulai?->format('d/m/Y'),
+                    'tanggal_selesai' => $item->rental?->tanggal_selesai?->format('d/m/Y'),
+                    'jumlah_hari' => (int) ($item->rental?->jumlah_hari ?? 0),
+                    'harga_perhari' => (float) ($item->rental?->harga_perhari ?? 0),
+                    'deposit' => (float) ($item->rental?->deposit ?? 0),
+                    'diskon' => (float) ($item->rental?->diskon ?? 0),
+                    'total_harga' => (float) ($item->rental?->total_harga ?? 0),
+                ],
+
                 'bukti_urls' => $item->buktis->map(fn($b) => asset('storage/' . $b->path))->values()->all(),
             ];
         });
@@ -148,7 +161,6 @@ class KompensasiController extends Controller
     {
         $rules = [
             'customer_id' => ['required', Rule::exists('users', 'id')->where('roles_id', 3)],
-            'mobil_id' => 'nullable|exists:mobils,id',
             'rental_id' => 'required|exists:rentals,id',
             'jenis' => 'required|in:pengembalian_dana,diskon,gratis_sewa',
             'nominal' => 'nullable|required_if:jenis,pengembalian_dana|numeric|min:0',
@@ -183,8 +195,6 @@ class KompensasiController extends Controller
         if (!$rental) {
             abort(403, 'Rental ini bukan milik customer tersebut.');
         }
-
-        $validated['customer_id'] = $rental->user_id;
 
         // Kompensasi hanya boleh dibuat untuk rental yang sudah selesai.
         if ($rental->status !== 'Selesai') {
@@ -250,6 +260,24 @@ class KompensasiController extends Controller
                     $kompensasi->buktis()->create($bukti);
                 }
             });
+        } catch (UniqueConstraintViolationException $e) {
+            // Dua submit bersamaan lolos pengecekan di atas; unique index rental_id yang menahan.
+            Storage::disk('public')->delete(array_column($paths, 'path'));
+
+            $pesan = 'Rental ini sudah memiliki kompensasi.';
+            if ($request->wantsJson()) {
+                return response()->json(
+                    [
+                        'message' => $pesan,
+                        'errors' => ['rental_id' => [$pesan]],
+                    ],
+                    422,
+                );
+            }
+
+            return back()
+                ->withErrors(['rental_id' => $pesan])
+                ->withInput();
         } catch (\Throwable $e) {
             Storage::disk('public')->delete(array_column($paths, 'path'));
 
@@ -352,6 +380,18 @@ class KompensasiController extends Controller
                 'staff_name' => $item->staff->name ?? '-',
                 'catatan' => $item->catatan,
                 'created_at' => $item->created_at?->format('d/m/Y H:i'),
+
+                'rental' => [
+                    'id' => $item->rental?->id,
+                    'tanggal_mulai' => $item->rental?->tanggal_mulai?->format('d/m/Y'),
+                    'tanggal_selesai' => $item->rental?->tanggal_selesai?->format('d/m/Y'),
+                    'jumlah_hari' => (int) ($item->rental?->jumlah_hari ?? 0),
+                    'harga_perhari' => (float) ($item->rental?->harga_perhari ?? 0),
+                    'deposit' => (float) ($item->rental?->deposit ?? 0),
+                    'diskon' => (float) ($item->rental?->diskon ?? 0),
+                    'total_harga' => (float) ($item->rental?->total_harga ?? 0),
+                ],
+
                 'bukti_urls' => $item->buktis->map(fn($b) => asset('storage/' . $b->path))->values()->all(),
             ];
         });

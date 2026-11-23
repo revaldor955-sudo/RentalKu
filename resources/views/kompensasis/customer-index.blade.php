@@ -374,6 +374,34 @@
             color: #146c43;
             text-decoration: underline
         }
+
+        .rc-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #198754;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        .rc-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+            background: #E5E7EB;
+            color: #374151;
+        }
+
+        .rc-badge.status-selesai {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
     </style>
 
     @include('layouts.partials.modal-head-style')
@@ -386,79 +414,37 @@
     <div class="container py-5">
 
         <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center mb-4">
-
             <div>
-                <h2 class="page-title mb-1">
-                    Riwayat Kompensasi
-                </h2>
-
+                <h2 class="page-title mb-1">Riwayat Kompensasi</h2>
             </div>
 
             <div class="d-flex gap-2">
-
                 <a href="{{ route('customer.dashboard') }}" class="nav-btn-back">
                     <i class="bi bi-arrow-left"></i>
                     Kembali ke Dashboard
                 </a>
-
             </div>
-
         </div>
 
 
         <div class="row g-4">
-
             <div class="col-lg-12">
-
                 <div class="page-card">
-
                     <div class="table-responsive">
-
                         <table class="table align-middle mb-0" id="kompensasis-table">
-
                             <thead>
-
                                 <tr>
-
-                                    <th class="px-3 py-3">
-                                        No
-                                    </th>
-
-                                    <th>
-                                        Tanggal
-                                    </th>
-
-                                    <th>
-                                        Jenis
-                                    </th>
-
-                                    <th>
-                                        Mobil
-                                    </th>
-
-                                    <th>
-                                        Nominal
-                                    </th>
-
-                                    <th>
-                                        Staff
-                                    </th>
-
-                                    <th>
-                                        Bukti
-                                    </th>
-
-                                    <th class="text-center">
-                                        Aksi
-                                    </th>
-
+                                    <th class="px-3 py-3">No</th>
+                                    <th>Tanggal</th>
+                                    <th>Jenis</th>
+                                    <th>Mobil</th>
+                                    <th>Nominal</th>
+                                    <th>Staff</th>
+                                    <th>Bukti</th>
+                                    <th class="text-center">Aksi</th>
                                 </tr>
-
                             </thead>
-
-                            <tbody>
-                            </tbody>
-
+                            <tbody></tbody>
                         </table>
 
                         <div class="pager-bar mt-3 d-flex flex-wrap align-items-center justify-content-between gap-3"
@@ -476,12 +462,13 @@
                                     <option value="custom">Custom</option>
                                 </select>
                                 <input type="number" id="kompensasi-custom"
-                                    class="form-control form-control-sm pager-jump" min="1" max="500"
+                                    class="form-control form-control-sm pager-jump" min="1" max="100"
                                     value="10" aria-label="Jumlah custom per halaman">
                                 <span class="text-secondary" id="kompensasi-page">Halaman 1 / 1</span>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <button type="button" class="btn btn-sm pager-btn" id="kompensasi-first" aria-label="Halaman pertama">First</button>
+                                <button type="button" class="btn btn-sm pager-btn" id="kompensasi-first"
+                                    aria-label="Halaman pertama">First</button>
                                 <button type="button" class="btn btn-sm pager-btn" id="kompensasi-prev"
                                     aria-label="Halaman sebelumnya">
                                     <i class="bi bi-chevron-left"></i>
@@ -490,103 +477,141 @@
                                     aria-label="Halaman berikutnya">
                                     <i class="bi bi-chevron-right"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm pager-btn" id="kompensasi-last" aria-label="Halaman terakhir">Last</button>
+                                <button type="button" class="btn btn-sm pager-btn" id="kompensasi-last"
+                                    aria-label="Halaman terakhir">Last</button>
                             </div>
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
 
 
-        <div class="modal fade" id="detailKompensasiModal" tabindex="-1">
-
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-
+        <div class="modal fade" id="detailKompensasiModal" tabindex="-1" aria-labelledby="detailKompensasiModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
-
                     @include('layouts.partials.modal-head', [
                         'title' => 'Detail Kompensasi',
                         'icon' => 'bi-eye',
+                        'titleId' => 'detailKompensasiModalLabel',
                     ])
 
                     <div class="modal-body">
-
-                        <div class="row g-3">
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold" for="detailTanggal">Tanggal</label>
-                                <input type="text" id="detailTanggal" class="form-control" readonly>
+                        <div class="border rounded-4 p-3 mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="fw-bold mb-0">Informasi Kompensasi</h6>
+                                <span class="rc-badge status-selesai">Tercatat</span>
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold" for="detailJenis">Jenis</label>
-                                <input type="text" id="detailJenis" class="form-control" readonly>
-                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <small class="text-muted d-block mb-1">Tanggal</small>
+                                    <div class="fw-semibold" id="detailTanggal">-</div>
+                                </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold" for="detailMobil">Mobil</label>
-                                <input type="text" id="detailMobil" class="form-control" readonly>
-                            </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted d-block mb-1">Jenis Kompensasi</small>
+                                    <div class="fw-semibold" id="detailJenis">-</div>
+                                </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold" for="detailNominal">Nominal</label>
-                                <input type="text" id="detailNominal" class="form-control" readonly>
+                                <div class="col-12">
+                                    <div class="bg-light rounded-3 p-3">
+                                        <small class="text-muted d-block mb-1">Nominal Kompensasi</small>
+                                        <h3 class="fw-bold text-success mb-0" id="detailNominal">-</h3>
+                                    </div>
+                                </div>
                             </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold" for="detailStaff">Staff</label>
-                                <input type="text" id="detailStaff" class="form-control" readonly>
-                            </div>
-
-                            <div class="col-12">
-                                <label class="form-label fw-semibold" for="detailAlasan">Alasan</label>
-                                <textarea id="detailAlasan" class="form-control" rows="3" readonly></textarea>
-                            </div>
-
-                            <div class="col-12">
-                                <label class="form-label fw-semibold" for="detailCatatan">Catatan</label>
-                                <textarea id="detailCatatan" class="form-control" rows="3" readonly></textarea>
-                            </div>
-
-                            <div class="col-12">
-                                <label class="form-label fw-semibold" for="detailBuktiGrid">Bukti</label>
-                                <div id="detailBuktiGrid" class="bukti-grid"></div>
-                            </div>
-
                         </div>
 
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Informasi Rental</h6>
+
+                            <div class="border rounded-4 p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <small class="text-muted d-block">ID Rental</small>
+                                        <span class="fw-bold" id="detailRentalId">-</span>
+                                    </div>
+
+                                    <span class="rc-badge status-selesai">Selesai</span>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div class="rc-avatar"><i class="bi bi-car-front-fill"></i></div>
+
+                                    <div class="overflow-hidden">
+                                        <div class="fw-bold" id="detailMobil">-</div>
+                                        <small class="text-muted" id="detailPeriodeRental">-</small>
+                                    </div>
+                                </div>
+
+                                <hr class="border-secondary-subtle">
+
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Petugas</small>
+                                        <span class="fw-semibold" id="detailStaff">-</span>
+                                    </div>
+
+                                    <div class="col-6" id="detailDiskonWrap">
+                                        <small class="text-muted d-block">Diskon</small>
+                                        <span class="fw-semibold" id="detailDiskon">-</span>
+                                    </div>
+
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Harga / Hari</small>
+                                        <span class="fw-semibold small" id="detailHargaPerhari">-</span>
+                                    </div>
+
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Total Rental</small>
+                                        <span class="fw-semibold small" id="detailTotalHarga">-</span>
+                                    </div>
+
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Deposit</small>
+                                        <span class="fw-semibold small" id="detailDeposit">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Keterangan Kompensasi</h6>
+
+                            <div class="border rounded-4 p-3 mb-3">
+                                <small class="text-muted d-block mb-2">Alasan</small>
+                                <p class="mb-0" id="detailAlasan">-</p>
+                            </div>
+
+                            <div class="border rounded-4 p-3">
+                                <small class="text-muted d-block mb-2">Catatan Tambahan</small>
+                                <p class="mb-0" id="detailCatatan">-</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h6 class="fw-bold mb-3">Bukti Dokumentasi</h6>
+                            <div id="detailBuktiGrid" class="bukti-grid"></div>
+                        </div>
                     </div>
 
                     <div class="modal-footer">
-
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-
                             <i class="bi bi-x-circle me-1"></i>
                             Tutup
-
                         </button>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
 
 
         <div class="modal fade" id="buktiZoomModal" tabindex="-1" aria-labelledby="buktiZoomTitle"
             aria-hidden="true">
-
             <div class="modal-dialog modal-dialog-centered">
-
                 <div class="modal-content">
-
                     @include('layouts.partials.modal-head', [
                         'title' => 'Bukti Foto Kompensasi',
                         'icon' => 'bi-image',
@@ -594,54 +619,33 @@
                     ])
 
                     <div class="modal-body">
-
                         <div id="buktiZoomGrid" class="bukti-grid"></div>
-
                     </div>
 
                     <div class="modal-footer">
-
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-
                             <i class="bi bi-x-circle me-1"></i>
                             Tutup
-
                         </button>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
 
-        <div class="modal fade" id="buktiLightbox" tabindex="-1" aria-label="Bukti foto"
-            aria-hidden="true">
-
+        <div class="modal fade" id="buktiLightbox" tabindex="-1" aria-label="Bukti foto" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
-
                 <div class="modal-content">
-
                     <div class="modal-body text-center p-2">
-
                         <div class="bukti-zoom-wrap rounded" id="buktiZoomWrap">
                             <img id="buktiLightboxImg" src="" alt="Bukti foto" class="img-fluid rounded"
                                 draggable="false">
                         </div>
                         <small class="text-muted d-block mt-2">Scroll untuk zoom, geser untuk pan, klik backdrop untuk
                             tutup</small>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-        
-
-
 
     </div>
 
@@ -802,12 +806,12 @@
             $('#kompensasis-table').DataTable({
                 processing: true,
                 serverSide: true,
-                paging: false,
+                paging: true,
+                pageLength: 10,
                 info: false,
                 dom: 'frt',
                 ajax: {
                     url: '{{ route('customer.kompensasi.data') }}',
-                    type: 'GET',
                 },
                 columns: [{
                         data: null,
@@ -845,8 +849,10 @@
                         data: 'nominal',
                         orderable: true,
                         searchable: false,
-                        render: function(data) {
-                            if (data === null || data === undefined || data === '') return '<span class="text-muted">-</span>';
+                        render: function(data, type, row) {
+                            if (row.jenis !== 'pengembalian_dana') {
+                                return '<span class="text-muted">-</span>';
+                            }
                             return '<span class="fw-semibold">' + klaimEsc(formatRupiah(data)) + '</span>';
                         },
                     },
@@ -871,16 +877,12 @@
                         orderable: false,
                         searchable: false,
                         className: 'text-center',
-                        width: '140px',
-                       
-render: function(data) {
-    return '<div class="d-flex justify-content-center gap-2">' +
-        '<button type="button" class="btn p-1 text-primary" ' +
-        'style="border:none;background:none;" title="Detail" ' +
-        'onclick="openDetail(' + data + ')">' +
-        '<i class="bi bi-eye"></i></button></div>';
-},
-
+                        width: '70px',
+                        render: function(data) {
+                            return '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
+                                'title="Detail" onclick="openDetail(' + data + ')">' +
+                                '<i class="bi bi-eye"></i></button>';
+                        },
                     },
                 ],
                 order: [
@@ -944,7 +946,7 @@ render: function(data) {
             });
             $('#kompensasi-custom').on('change', function() {
                 var n = parseInt($(this).val(), 10) || 1;
-                n = Math.min(Math.max(n, 1), 500);
+                n = Math.min(Math.max(n, 1), 100);
                 $(this).val(n);
                 if (['10', '20', '50', '100'].indexOf(String(n)) !== -1) {
                     $('#kompensasi-len').val(String(n));
@@ -969,18 +971,35 @@ render: function(data) {
                 return;
             }
 
-            $('#detailTanggal').val(data.tanggal);
-            var jenisLabels = {
+            const rental = data.rental || {};
+            const jenisLabels = {
                 pengembalian_dana: 'Pengembalian Dana',
                 diskon: 'Diskon',
                 gratis_sewa: 'Gratis Sewa'
             };
-            $('#detailJenis').val(jenisLabels[data.jenis] || data.jenis || '-');
-            $('#detailMobil').val((data.mobil_name ?? '-') + ' (' + (data.mobil_plate ?? '-') + ')');
-            $('#detailNominal').val(formatRupiah(data.nominal));
-            $('#detailStaff').val(data.staff_name ?? '-');
-            $('#detailAlasan').val(data.alasan);
-            $('#detailCatatan').val(data.catatan || '-');
+
+            $('#detailTanggal').text(data.tanggal || '-');
+            $('#detailJenis').text(jenisLabels[data.jenis] || data.jenis || '-');
+            $('#detailNominal').text(data.jenis === 'pengembalian_dana' ? formatRupiah(data.nominal) : '-');
+            $('#detailRentalId').text(rental.id ? '#' + rental.id : '-');
+            $('#detailMobil').text(
+                data.mobil_name && data.mobil_name !== '-' ?
+                data.mobil_name + ' (' + (data.mobil_plate || '-') + ')' :
+                '-'
+            );
+            $('#detailPeriodeRental').text(
+                rental.tanggal_mulai && rental.tanggal_selesai ?
+                rental.tanggal_mulai + ' - ' + rental.tanggal_selesai + ' (' + (rental.jumlah_hari || 0) + ' hari)' :
+                '-'
+            );
+            $('#detailStaff').text(data.staff_name || '-');
+            $('#detailDiskon').text(formatRupiah(rental.diskon));
+            $('#detailHargaPerhari').text(formatRupiah(rental.harga_perhari));
+            $('#detailTotalHarga').text(formatRupiah(rental.total_harga));
+            $('#detailDeposit').text(formatRupiah(rental.deposit));
+            $('#detailDiskonWrap').toggle(Number(rental.diskon || 0) > 0);
+            $('#detailAlasan').text(data.alasan || '-');
+            $('#detailCatatan').text(data.catatan || '-');
             renderBuktiGrid($('#detailBuktiGrid'), buktiList(data));
 
             bootstrap.Modal.getOrCreateInstance($('#detailKompensasiModal')[0]).show();
@@ -990,8 +1009,6 @@ render: function(data) {
             return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g,
                 '&quot;');
         }
-
-
     </script>
 </body>
 
