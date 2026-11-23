@@ -285,9 +285,6 @@
                             aria-current="{{ request()->routeIs('kompensasis*') ? 'page' : 'false' }}">
                             <i class="bi bi-cash-stack nav-icon" aria-hidden="true"></i>
                             <span class="nav-text">Kompensasi</span>
-                            @if (($pendingKompensasisCount ?? 0) > 0)
-                                <span class="nav-badge">{{ $pendingKompensasisCount }}</span>
-                            @endif
                         </a>
                     </li>
                     <li class="nav-item">

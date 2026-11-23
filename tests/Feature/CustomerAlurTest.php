@@ -113,7 +113,6 @@ class CustomerAlurTest extends TestCase
             'nominal' => 100000,
             'alasan' => 'Coba.',
             'tanggal' => now()->toDateString(),
-            'status' => 'diajukan',
         ]);
 
         $res = $this->actingAs($this->admin)
@@ -132,7 +131,7 @@ class CustomerAlurTest extends TestCase
             ]);
 
         $res->assertStatus(422);
-        $res->assertJsonPath('message', 'Rental ini sudah memiliki klaim aktif.');
+        $res->assertJsonPath('message', 'Rental ini sudah memiliki kompensasi.');
         $this->assertSame(1, Kompensasi::where('rental_id', $rental->id)->count());
     }
 

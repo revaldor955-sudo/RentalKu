@@ -74,7 +74,7 @@
             vertical-align: middle;
         }
 
-        /* Sort DataTables disembunyikan: server-side diurut via kolom Status (order) */
+        /* Sort DataTables disembunyikan: server-side diurut via kolom Tanggal (order) */
         #kompensasis-table thead .dt-column-order {
             display: none !important;
         }
@@ -89,10 +89,6 @@
         .jenis-pengembalian-dana { background: #e7f1ff; color: #0d6efd; }
         .jenis-diskon { background: #d1e7dd; color: #0f5132; }
         .jenis-gratis-sewa { background: #fff3cd; color: #997404; }
-
-        .status-disetujui { background: #d1e7dd; color: #0f5132; }
-        .status-ditolak { background: #f8d7da; color: #b02a37; }
-        .status-selesai { background: #e7f1ff; color: #0d6efd; }
 
         .modal-footer .btn {
             padding: 6px 14px;
@@ -215,11 +211,11 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="page-title mb-1">Management Kompensasi</h2>
-            <p class="text-muted mb-0">Kelola klaim kompensasi pelanggan (pengembalian dana, diskon, gratis sewa).</p>
+            <p class="text-muted mb-0">Kelola kompensasi pelanggan (pengembalian dana, diskon, gratis sewa).</p>
         </div>
         <button type="button" class="btn btn-green" data-bs-toggle="modal" data-bs-target="#createKompensasiModal">
             <i class="bi bi-plus-circle me-1"></i>
-            Buat Klaim
+            Tambah Kompensasi
         </button>
     </div>
 
@@ -251,7 +247,6 @@
                                 <th>Pelanggan</th>
                                 <th>Mobil</th>
                                 <th>Nominal</th>
-                                <th>Status</th>
                                 <th>Staff</th>
                                 <th>Bukti</th>
                                 <th class="text-center">Aksi</th>
@@ -323,8 +318,8 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold" for="detailStatus">Status</label>
-                                <input type="text" id="detailStatus" class="form-control" readonly>
+                                <label class="form-label fw-semibold" for="detailStaff">Staff</label>
+                                <input type="text" id="detailStaff" class="form-control" readonly>
                             </div>
 
                             <div class="col-12">
@@ -333,12 +328,12 @@
                             </div>
 
                             <div class="col-12">
-                                <label class="form-label fw-semibold" for="detailCatatan">Catatan Staff</label>
+                                <label class="form-label fw-semibold" for="detailCatatan">Catatan</label>
                                 <textarea id="detailCatatan" class="form-control" rows="3" readonly></textarea>
                             </div>
 
                             <div class="col-12">
-                                <label class="form-label fw-semibold" for="detailBuktiGrid">Bukti Foto</label>
+                                <label class="form-label fw-semibold" for="detailBuktiGrid">Bukti</label>
                                 <div id="detailBuktiGrid" class="bukti-grid"></div>
                             </div>
 
@@ -361,7 +356,7 @@
 <div class="modal fade" id="createKompensasiModal" tabindex="-1" aria-labelledby="createKompensasiModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            @include('layouts.partials.modal-head', ['title' => 'Buat Klaim Kompensasi', 'icon' => 'bi-plus-circle', 'titleId' => 'createKompensasiModalLabel'])
+            @include('layouts.partials.modal-head', ['title' => 'Tambah Kompensasi', 'icon' => 'bi-plus-circle', 'titleId' => 'createKompensasiModalLabel'])
             <form action="{{ route('kompensasis.store') }}" method="POST" id="formCreateKompensasi" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
@@ -402,7 +397,11 @@
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-semibold" for="createAlasan">Alasan</label>
-                            <textarea name="alasan" id="createAlasan" class="form-control" rows="3" required placeholder="Alasan klaim kompensasi..."></textarea>
+                            <textarea name="alasan" id="createAlasan" class="form-control" rows="3" required placeholder="Alasan kompensasi..."></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold" for="createCatatan">Catatan (opsional)</label>
+                            <textarea name="catatan" id="createCatatan" class="form-control" rows="2" placeholder="Catatan tambahan..."></textarea>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold" for="createTanggal">Tanggal Kejadian</label>
@@ -422,43 +421,7 @@
                     </button>
                     <button type="submit" class="btn btn-green">
                         <i class="bi bi-save me-1"></i>
-                        Simpan Klaim
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="editKompensasiModal" tabindex="-1" aria-labelledby="editKompensasiModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            @include('layouts.partials.modal-head', ['title' => 'Edit Status Kompensasi', 'icon' => 'bi-pencil-square', 'titleId' => 'editKompensasiModalLabel'])
-            <form action="" method="POST" id="formUpdateKompensasi">
-                @csrf
-                @method('PUT')
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold" for="editStatusKompensasi">Status</label>
-                        <select name="status" id="editStatusKompensasi" class="form-select" required>
-                            <option value="disetujui">Disetujui</option>
-                            <option value="ditolak">Ditolak</option>
-                            <option value="selesai">Selesai</option>
-                        </select>
-                    </div>
-                    <div class="mb-0">
-                        <label class="form-label fw-semibold" for="editCatatanKompensasi">Catatan Staff</label>
-                        <textarea name="catatan" id="editCatatanKompensasi" class="form-control" rows="3" placeholder="Catatan staff..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="bi bi-x-circle me-1"></i>
-                        Batal
-                    </button>
-                    <button type="submit" class="btn btn-green">
-                        <i class="bi bi-save me-1"></i>
-                        Simpan Perubahan
+                        Simpan Kompensasi
                     </button>
                 </div>
             </form>
@@ -469,7 +432,7 @@
 <div class="modal fade" id="buktiZoomModal" tabindex="-1" aria-labelledby="buktiZoomTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            @include('layouts.partials.modal-head', ['title' => 'Bukti Foto Klaim', 'icon' => 'bi-image', 'titleId' => 'buktiZoomTitle'])
+            @include('layouts.partials.modal-head', ['title' => 'Bukti Foto Kompensasi', 'icon' => 'bi-image', 'titleId' => 'buktiZoomTitle'])
             <div class="modal-body">
                 <div id="buktiZoomGrid" class="bukti-grid"></div>
             </div>
@@ -553,28 +516,6 @@
         return '<span class="jenis-badge ' + item[0] + '">' + esc(item[1]) + '</span>';
     }
 
-    function statusBadge(status) {
-        if (status === null || status === undefined || status === '') {
-            return '<span class="text-muted">-</span>';
-        }
-        const map = {
-            'diajukan': 'status-diajukan',
-            'disetujui': 'status-disetujui',
-            'ditolak': 'status-ditolak',
-            'selesai': 'status-selesai',
-        };
-
-        const cls = map[status] || 'bg-secondary text-white';
-        const labels = {
-            'diajukan': 'Diajukan',
-            'disetujui': 'Disetujui',
-            'ditolak': 'Ditolak',
-            'selesai': 'Selesai',
-        };
-
-        return '<span class="jenis-badge ' + cls + '">' + esc(labels[status] || '-') + '</span>';
-    }
-
     function formatRupiah(value) {
         return 'Rp ' + Number(value).toLocaleString('id-ID');
     }
@@ -597,7 +538,7 @@
         if (!urls.length) return '<span class="text-muted">-</span>';
         let html = '<div class="d-flex align-items-center gap-1">';
         urls.slice(0, 2).forEach(function(src) {
-            html += '<img src="' + esc(src) + '" alt="Bukti klaim" class="bukti-thumb" onclick="openBuktiGaleri(\'' + row.id + '\')">';
+            html += '<img src="' + esc(src) + '" alt="Bukti kompensasi" class="bukti-thumb" onclick="openBuktiGaleri(\'' + row.id + '\')">';
         });
         html += '</div><div class="mt-1"><span class="bukti-count">' + urls.length + ' foto</span> ';
         html += '<button type="button" class="bukti-link" onclick="openBuktiGaleri(\'' + row.id + '\')">Lihat semua</button></div>';
@@ -650,7 +591,7 @@
             return;
         }
         urls.forEach(function(src) {
-            $grid.append($('<img>').attr({ src: src, alt: 'Bukti foto klaim' }).on('click', function() {
+            $grid.append($('<img>').attr({ src: src, alt: 'Bukti foto kompensasi' }).on('click', function() {
                 openBuktiLightbox(src);
             }));
         });
@@ -726,14 +667,6 @@
                     },
                 },
                 {
-                    data: 'status',
-                    orderable: true,
-                    searchable: true,
-                    render: function(data) {
-                        return statusBadge(data);
-                    },
-                },
-                {
                     data: 'staff_name',
                     orderable: false,
                     searchable: true,
@@ -754,21 +687,16 @@
                     orderable: false,
                     searchable: false,
                     className: 'text-center',
-                    width: '140px',
+                    width: '70px',
                     render: function(data, type, row) {
-                        return '<div class="d-flex justify-content-center gap-2">' +
-                            '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
+                        return '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
                             'title="Detail" onclick="openDetail(' + data + ')">' +
-                            '<i class="bi bi-eye"></i></button>' +
-                            '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" ' +
-                            'title="Edit" onclick="openEditKompensasi(' + data + ')">' +
-                            '<i class="bi bi-pencil-square"></i></button>' +
-                            '</div>';
+                            '<i class="bi bi-eye"></i></button>';
                     },
                 },
             ],
             order: [
-                [6, 'desc']
+                [1, 'desc']
             ],
             language: {
                 processing: 'Memproses...',
@@ -777,7 +705,7 @@
                 infoFiltered: '(difilter dari _MAX_ total data)',
                 loadingRecords: 'Memuat...',
                 zeroRecords: 'Tidak ditemukan data yang cocok',
-                emptyTable: 'Belum ada klaim kompensasi',
+                emptyTable: 'Belum ada kompensasi',
                 aria: {
                     sortAscending: ': aktifkan untuk urut naik',
                     sortDescending: ': aktifkan untuk urut turun',
@@ -845,89 +773,17 @@
 
         $('#detailTanggal').val(data.tanggal);
         var jenisLabels = { 'pengembalian_dana': 'Pengembalian Dana', 'diskon': 'Diskon', 'gratis_sewa': 'Gratis Sewa' };
-        var statusLabels = { 'diajukan': 'Diajukan', 'disetujui': 'Disetujui', 'ditolak': 'Ditolak', 'selesai': 'Selesai' };
         $('#detailJenis').val(jenisLabels[data.jenis] || data.jenis || '-');
         $('#detailPelanggan').val((data.customer_name ?? '-') + ' (' + (data.customer_email ?? '-') + ')');
         $('#detailMobil').val((data.mobil_name ?? '-') + ' (' + (data.mobil_plate ?? '-') + ')');
         $('#detailNominal').val(formatRupiah(data.nominal));
-        $('#detailStatus').val(statusLabels[data.status] || data.status || '-');
+        $('#detailStaff').val(data.staff_name ?? '-');
         $('#detailAlasan').val(data.alasan);
-        $('#detailCatatan').val(data.catatan || '');
+        $('#detailCatatan').val(data.catatan || '-');
         renderBuktiGrid($('#detailBuktiGrid'), buktiList(data));
 
         bootstrap.Modal.getOrCreateInstance($('#detailKompensasiModal')[0]).show();
     }
-
-    function openEditKompensasi(id) {
-        const data = $('#kompensasis-table').DataTable().rows().data().toArray()
-            .find(r => r.id == id);
-
-        if (!data) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal',
-                text: 'Data kompensasi tidak ditemukan.',
-            });
-            return;
-        }
-
-        const $status = $('#editStatusKompensasi');
-        $status.find('option[data-saat-ini]').remove();
-
-        if (data.status === 'diajukan') {
-            $status.prepend('<option value="" selected disabled data-saat-ini>Saat ini: Diajukan — pilih keputusan</option>');
-        } else {
-            $status.val(data.status);
-        }
-        $('#editCatatanKompensasi').val(data.catatan || '');
-
-        $('#formUpdateKompensasi').attr('action',
-            "{{ route('kompensasis.update', '__ID__') }}".replace('__ID__', id));
-
-        bootstrap.Modal.getOrCreateInstance($('#editKompensasiModal')[0]).show();
-    }
-
-    $(document).on('submit', '#formUpdateKompensasi', function(e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-
-        $.ajax({
-            url: $(this).attr('action'),
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            headers: {
-                'X-CSRF-TOKEN': CSRF_TOKEN,
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            success: function(result) {
-                bootstrap.Modal.getInstance($('#editKompensasiModal')[0]).hide();
-                $('#kompensasis-table').DataTable().ajax.reload();
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: result.message || 'Kompensasi berhasil diperbarui.',
-                    timer: 1500,
-                    showConfirmButton: false,
-                });
-            },
-            error: function(xhr) {
-                const r = xhr.responseJSON || {};
-                const msg = r.errors ? Object.values(r.errors)[0][0] :
-                    (r.message || 'Terjadi kesalahan saat memperbarui kompensasi.');
-
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal',
-                    text: msg,
-                });
-            }
-        });
-    });
 
     function resetCreateKompensasi() {
         var form = document.getElementById('formCreateKompensasi');
@@ -953,7 +809,7 @@
         $.getJSON('{{ route('kompensasis.rentals') }}', { customer_id: customerId })
             .done(function(rows) {
                 if (!rows.length) {
-                    $rental.html('<option value="">Tidak ada rental Selesai tanpa klaim aktif</option>');
+                    $rental.html('<option value="">Tidak ada rental Selesai tanpa kompensasi</option>');
                     return;
                 }
 
@@ -1030,7 +886,7 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil',
-                    text: result.message || 'Klaim kompensasi berhasil dibuat.',
+                    text: result.message || 'Kompensasi berhasil dibuat.',
                     timer: 1500,
                     showConfirmButton: false,
                 });
@@ -1038,7 +894,7 @@
             error: function(xhr) {
                 var r = xhr.responseJSON || {};
                 var msg = r.errors ? Object.values(r.errors)[0][0] :
-                    (r.message || 'Terjadi kesalahan saat membuat klaim.');
+                    (r.message || 'Terjadi kesalahan saat membuat kompensasi.');
 
                 Swal.fire({
                     icon: 'error',
