@@ -113,13 +113,17 @@ class AuditFindingsTest extends TestCase
         $rental = $this->buatRental($this->customer);
 
         $this->actingAs($this->admin)
-            ->post('/kompensasis', $this->klaimPayload($rental, ['customer_id' => $this->customer->id]))
+            ->post('/kompensasis', $this->klaimPayload($rental, [
+                'customer_id' => $this->customer->id,
+                'catatan' => 'Catatan uji',
+            ]))
             ->assertRedirect(route('kompensasis.index'));
 
         $this->assertDatabaseHas('kompensasis', [
             'rental_id' => $rental->id,
             'customer_id' => $this->customer->id,
-            'status' => 'diajukan',
+            'staff_id' => $this->admin->id,
+            'catatan' => 'Catatan uji',
         ]);
     }
 
@@ -128,7 +132,7 @@ class AuditFindingsTest extends TestCase
         $this->actingAs($this->admin)
             ->get('/kompensasis')
             ->assertOk()
-            ->assertSee('Buat Klaim');
+            ->assertSee('Tambah Kompensasi');
     }
 
     public function test_admin_rentals_for_customer(): void
@@ -202,7 +206,7 @@ class AuditFindingsTest extends TestCase
         $this->actingAs($this->admin)
             ->postJson('/kompensasis', $this->klaimPayload($rental, ['customer_id' => $this->customer->id]))
             ->assertStatus(422)
-            ->assertJsonPath('errors.rental_id.0', 'Klaim hanya bisa dibuat untuk rental yang sudah selesai.');
+            ->assertJsonPath('errors.rental_id.0', 'Kompensasi hanya bisa dibuat untuk rental yang sudah selesai.');
 
         $this->assertDatabaseMissing('kompensasis', ['rental_id' => $rental->id]);
     }

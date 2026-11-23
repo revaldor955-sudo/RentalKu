@@ -833,7 +833,7 @@
 
         <div class="d-flex align-items-center gap-2 mb-2">
             <i class="bi bi-bell-fill"></i>
-            <strong>Kabar Klaim Kompensasi</strong>
+            <strong>Kabar Kompensasi</strong>
         </div>
 
         @foreach($klaimUpdates as $klaim)
@@ -841,12 +841,10 @@
             <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center py-1">
 
                 <span>
-                    Klaim {{ $klaim->jenis === 'pengembalian_dana' ? 'Pengembalian Dana' : ($klaim->jenis === 'diskon' ? 'Diskon' : 'Gratis Sewa') }}
+                    Kompensasi {{ $klaim->jenis === 'pengembalian_dana' ? 'Pengembalian Dana' : ($klaim->jenis === 'diskon' ? 'Diskon' : 'Gratis Sewa') }}
                     untuk {{ $klaim->mobil->name ?? 'mobil' }}
-                    telah
-                    <span class="badge {{ $klaim->status === 'ditolak' ? 'bg-danger' : 'bg-success' }}">
-                        {{ $klaim->status === 'disetujui' ? 'Disetujui' : ($klaim->status === 'ditolak' ? 'Ditolak' : 'Selesai') }}
-                    </span>
+                    telah diberikan.
+                    <span class="badge bg-success">Baru</span>
                 </span>
 
                 <a href="{{ route('customer.kompensasi.index') }}" class="btn btn-sm btn-info">

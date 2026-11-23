@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Klaim Kompensasi Saya - RentalKu</title>
+    <title>Kompensasi Saya - RentalKu</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -149,26 +149,6 @@
         .jenis-gratis-sewa {
             background: #fff3cd;
             color: #997404;
-        }
-
-        .status-diajukan {
-            background: #fff3cd;
-            color: #997404;
-        }
-
-        .status-disetujui {
-            background: #d1e7dd;
-            color: #0f5132;
-        }
-
-        .status-ditolak {
-            background: #f8d7da;
-            color: #b02a37;
-        }
-
-        .status-selesai {
-            background: #e7f1ff;
-            color: #0d6efd;
         }
 
         .modal-footer .btn {
@@ -461,10 +441,6 @@
                                     </th>
 
                                     <th>
-                                        Status
-                                    </th>
-
-                                    <th>
                                         Staff
                                     </th>
 
@@ -534,7 +510,7 @@
                 <div class="modal-content">
 
                     @include('layouts.partials.modal-head', [
-                        'title' => 'Detail Klaim Kompensasi',
+                        'title' => 'Detail Kompensasi',
                         'icon' => 'bi-eye',
                     ])
 
@@ -563,11 +539,6 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold" for="detailStatus">Status</label>
-                                <input type="text" id="detailStatus" class="form-control" readonly>
-                            </div>
-
-                            <div class="col-md-6">
                                 <label class="form-label fw-semibold" for="detailStaff">Staff</label>
                                 <input type="text" id="detailStaff" class="form-control" readonly>
                             </div>
@@ -578,12 +549,12 @@
                             </div>
 
                             <div class="col-12">
-                                <label class="form-label fw-semibold" for="detailCatatan">Catatan Staff</label>
+                                <label class="form-label fw-semibold" for="detailCatatan">Catatan</label>
                                 <textarea id="detailCatatan" class="form-control" rows="3" readonly></textarea>
                             </div>
 
                             <div class="col-12">
-                                <label class="form-label fw-semibold" for="detailBuktiGrid">Bukti Foto</label>
+                                <label class="form-label fw-semibold" for="detailBuktiGrid">Bukti</label>
                                 <div id="detailBuktiGrid" class="bukti-grid"></div>
                             </div>
 
@@ -617,7 +588,7 @@
                 <div class="modal-content">
 
                     @include('layouts.partials.modal-head', [
-                        'title' => 'Bukti Foto Klaim',
+                        'title' => 'Bukti Foto Kompensasi',
                         'icon' => 'bi-image',
                         'titleId' => 'buktiZoomTitle',
                     ])
@@ -706,28 +677,6 @@
             return '<span class="jenis-badge ' + cls + '">' + klaimEsc(labels[jenis] || '-') + '</span>';
         }
 
-        function statusBadge(status) {
-            if (status === null || status === undefined || status === '') {
-                return '<span class="text-muted">-</span>';
-            }
-            const map = {
-                'diajukan': 'status-diajukan',
-                'disetujui': 'status-disetujui',
-                'ditolak': 'status-ditolak',
-                'selesai': 'status-selesai',
-            };
-
-            const cls = map[status] || 'bg-secondary text-white';
-            const labels = {
-                'diajukan': 'Diajukan',
-                'disetujui': 'Disetujui',
-                'ditolak': 'Ditolak',
-                'selesai': 'Selesai',
-            };
-
-            return '<span class="jenis-badge ' + cls + '">' + klaimEsc(labels[status] || '-') + '</span>';
-        }
-
         function formatRupiah(value) {
             return 'Rp ' + Number(value).toLocaleString('id-ID');
         }
@@ -753,7 +702,7 @@
             if (!urls.length) return '<span class="text-muted">-</span>';
             let html = '<div class="d-flex align-items-center gap-1">';
             urls.slice(0, 2).forEach(function(src) {
-                html += '<img src="' + klaimEsc(src) + '" alt="Bukti klaim" class="bukti-thumb" onclick="openBuktiGaleri(\'' +
+                html += '<img src="' + klaimEsc(src) + '" alt="Bukti kompensasi" class="bukti-thumb" onclick="openBuktiGaleri(\'' +
                     row.id + '\')">';
             });
             html += '</div><div class="mt-1"><span class="bukti-count">' + urls.length + ' foto</span> ';
@@ -833,7 +782,7 @@
             urls.forEach(function(src) {
                 $grid.append($('<img>').attr({
                     src: src,
-                    alt: 'Bukti foto klaim'
+                    alt: 'Bukti foto kompensasi'
                 }).on('click', function() {
                     openBuktiLightbox(src);
                 }));
@@ -902,14 +851,6 @@
                         },
                     },
                     {
-                        data: 'status',
-                        orderable: true,
-                        searchable: true,
-                        render: function(data) {
-                            return statusBadge(data);
-                        },
-                    },
-                    {
                         data: 'staff_name',
                         orderable: false,
                         searchable: true,
@@ -943,7 +884,7 @@ render: function(data) {
                     },
                 ],
                 order: [
-                    [5, 'desc']
+                    [1, 'desc']
                 ],
                 language: {
                     processing: 'Memproses...',
@@ -952,7 +893,7 @@ render: function(data) {
                     infoFiltered: '(difilter dari _MAX_ total data)',
                     loadingRecords: 'Memuat...',
                     zeroRecords: 'Tidak ditemukan data yang cocok',
-                    emptyTable: 'Belum ada klaim kompensasi',
+                    emptyTable: 'Belum ada kompensasi',
                     aria: {
                         sortAscending: ': aktifkan untuk urut naik',
                         sortDescending: ': aktifkan untuk urut turun',
@@ -1034,16 +975,9 @@ render: function(data) {
                 diskon: 'Diskon',
                 gratis_sewa: 'Gratis Sewa'
             };
-            var statusLabels = {
-                diajukan: 'Diajukan',
-                disetujui: 'Disetujui',
-                ditolak: 'Ditolak',
-                selesai: 'Selesai'
-            };
             $('#detailJenis').val(jenisLabels[data.jenis] || data.jenis || '-');
             $('#detailMobil').val((data.mobil_name ?? '-') + ' (' + (data.mobil_plate ?? '-') + ')');
             $('#detailNominal').val(formatRupiah(data.nominal));
-            $('#detailStatus').val(statusLabels[data.status] || data.status || '-');
             $('#detailStaff').val(data.staff_name ?? '-');
             $('#detailAlasan').val(data.alasan);
             $('#detailCatatan').val(data.catatan || '-');
