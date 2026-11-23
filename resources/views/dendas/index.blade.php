@@ -486,16 +486,77 @@
     </div>
 
     {{-- MODAL FOTO --}}
-    <div class="modal fade" id="fotoDendaModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                @include('layouts.partials.modal-head', ['title' => 'Bukti Foto Denda'])
-                <div class="modal-body p-3 text-center">
-                    <img id="fotoDendaPreview" src="" class="img-fluid rounded" alt="Bukti denda">
+    {{-- MODAL ZOOM FOTO DENDA --}}
+<div class="modal fade" id="fotoDendaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+
+            @include('layouts.partials.modal-head', [
+                'title' => 'Bukti Foto Denda',
+                'icon' => 'bi-image'
+            ])
+
+            <div class="modal-body p-3">
+
+                {{-- KONTROL ZOOM --}}
+                <div class="d-flex justify-content-center gap-2 mb-3">
+
+                    <button type="button"
+                        class="btn btn-outline-secondary btn-sm"
+                        id="fotoZoomOut"
+                        title="Perkecil">
+                        <i class="bi bi-zoom-out"></i>
+                    </button>
+
+                    <button type="button"
+                        class="btn btn-outline-secondary btn-sm"
+                        id="fotoZoomReset">
+                        Reset
+                    </button>
+
+                    <button type="button"
+                        class="btn btn-outline-secondary btn-sm"
+                        id="fotoZoomIn"
+                        title="Perbesar">
+                        <i class="bi bi-zoom-in"></i>
+                    </button>
+
                 </div>
+
+                {{-- AREA FOTO --}}
+                <div id="fotoDendaZoomArea"
+                    class="text-center overflow-auto rounded"
+                    style="
+                        height: 70vh;
+                        background: #f5f5f5;
+                    ">
+
+                    <img
+                        id="fotoDendaPreview"
+                        src=""
+                        class="rounded"
+                        alt="Bukti denda"
+                        style="
+                            max-width: 100%;
+                            max-height: 65vh;
+                            object-fit: contain;
+                            transform: scale(1);
+                            transform-origin: center center;
+                            transition: transform 0.2s ease;
+                        "
+                    >
+
+                </div>
+
+                <small class="text-muted d-block text-center mt-2">
+                    Gunakan tombol zoom atau scroll mouse untuk memperbesar foto.
+                </small>
+
             </div>
+
         </div>
     </div>
+</div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
@@ -529,13 +590,30 @@
             $('#' + $(this).data('target')).val(rawValue);
         });
 
-        function openFotoDenda(url) {
-            if (!url) return;
-            $('#fotoDendaPreview').attr('src', url);
-            bootstrap.Modal.getOrCreateInstance(
-                document.getElementById('fotoDendaModal')
-            ).show();
-        }
+      let fotoDendaZoom = 1;
+
+function updateFotoDendaZoom() {
+    $('#fotoDendaPreview').css(
+        'transform',
+        'scale(' + fotoDendaZoom + ')'
+    );
+}
+
+function openFotoDenda(url) {
+    if (!url) return;
+
+    fotoDendaZoom = 1;
+
+    $('#fotoDendaPreview')
+        .attr('src', url)
+        .css('transform', 'scale(1)');
+
+    $('#fotoDendaZoomArea').scrollTop(0).scrollLeft(0);
+
+    bootstrap.Modal.getOrCreateInstance(
+        document.getElementById('fotoDendaModal')
+    ).show();
+}
 
         function statusBadge(status) {
             const map = {
@@ -764,6 +842,36 @@
                 event.preventDefault();
                 openFotoDenda($(this).data('url'));
             });
+            // ZOOM FOTO BUKTI DENDA
+$('#fotoZoomIn').on('click', function() {
+    fotoDendaZoom = Math.min(fotoDendaZoom + 0.25, 4);
+    updateFotoDendaZoom();
+});
+
+$('#fotoZoomOut').on('click', function() {
+    fotoDendaZoom = Math.max(fotoDendaZoom - 0.25, 0.5);
+    updateFotoDendaZoom();
+});
+
+$('#fotoZoomReset').on('click', function() {
+    fotoDendaZoom = 1;
+    updateFotoDendaZoom();
+
+    $('#fotoDendaZoomArea').scrollTop(0).scrollLeft(0);
+});
+
+// Zoom menggunakan scroll mouse
+$('#fotoDendaPreview').on('wheel', function(event) {
+    event.preventDefault();
+
+    if (event.originalEvent.deltaY < 0) {
+        fotoDendaZoom = Math.min(fotoDendaZoom + 0.15, 4);
+    } else {
+        fotoDendaZoom = Math.max(fotoDendaZoom - 0.15, 0.5);
+    }
+
+    updateFotoDendaZoom();
+});
         });
 
         function deleteDenda(id) {
@@ -819,8 +927,24 @@
                     'Bukti pembayaran disetujui dan denda menjadi lunas.' :
                     'Denda dikembalikan menjadi belum bayar agar pelanggan dapat mengunggah ulang.',
                 imageUrl: row?.bukti_bayar_url || undefined,
-                imageWidth: 320,
-                icon: isLunas ? 'question' : 'warning',
+               imageWidth: 320,
+imageAlt: 'Bukti pembayaran denda',
+
+didOpen: function() {
+    const image = Swal.getImage();
+
+    if (image && row?.bukti_bayar_url) {
+        image.style.cursor = 'zoom-in';
+        image.title = 'Klik untuk memperbesar foto';
+
+        image.addEventListener('click', function() {
+            Swal.close();
+            openFotoDenda(row.bukti_bayar_url);
+        });
+    }
+},
+
+icon: isLunas ? 'question' : 'warning',
                 showCancelButton: true,
                 confirmButtonText: isLunas ? 'Ya, Lunaskan' : 'Ya, Tolak',
                 cancelButtonText: 'Batal'
