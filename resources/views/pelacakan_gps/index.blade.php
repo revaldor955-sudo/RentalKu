@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -25,12 +24,6 @@
 
         .page-content {
             padding: 24px;
-        }
-
-        @media (max-width: 1024px) {
-            .page-content {
-                padding: 16px;
-            }
         }
 
         .gps-content {
@@ -82,10 +75,9 @@
 
         .content-card {
             background: #fff;
-            border-radius: 15px;
+            border-radius: 18px;
             border: 1px solid #e8eeee;
             padding: 22px;
-            height: 100%;
         }
 
         .section-title {
@@ -96,52 +88,114 @@
 
         .section-description {
             font-size: 12px;
-            color: #000;
+            color: #6c757d;
         }
 
         #map {
-            height: 430px;
+            height: 480px;
             width: 100%;
-            border-radius: 12px;
+            border-radius: 14px;
             z-index: 1;
         }
 
         .rental-item {
+            background: #fff;
             border: 1px solid #e9eeee;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 13px;
+            border-radius: 16px;
+            padding: 18px;
+            height: 100%;
+            transition: 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .rental-item:hover {
+            border-color: #c5e0da;
+            box-shadow: 0 5px 15px rgba(36, 119, 108, 0.07);
+            transform: translateY(-2px);
+        }
+
+        .rental-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 14px;
         }
 
         .car-icon {
             width: 43px;
             height: 43px;
-            border-radius: 10px;
+            min-width: 43px;
+            border-radius: 11px;
             background: #e6f2ef;
             color: #24776c;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 21px;
-            flex-shrink: 0;
+        }
+
+        .rental-header-content {
+            flex: 1;
+            min-width: 0;
         }
 
         .car-name {
             font-size: 14px;
-            font-weight: 700;
+            font-weight: 800;
             color: #000;
+            line-height: 1.5;
+            word-break: break-word;
+            margin-bottom: 7px;
+        }
+
+        .badge-running {
+            display: inline-block;
+            background: #e3f4e9;
+            color: #23834b;
+            font-size: 10px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
         }
 
         .car-detail {
             font-size: 11px;
-            color: #000;
+            color: #333;
+            margin-top: 8px;
+            line-height: 1.6;
+            word-break: break-word;
         }
 
         .coordinate-text {
             font-size: 11px;
-            color: #000;
+            color: #333;
             margin-top: 8px;
+            line-height: 1.6;
             word-break: break-word;
+        }
+
+        .gps-status {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 6px 9px;
+            border-radius: 20px;
+        }
+
+        .gps-time {
+            font-size: 11px;
+            color: #6c757d;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+
+        .rental-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 9px;
+            margin-top: 14px;
         }
 
         .btn-map {
@@ -149,9 +203,14 @@
             color: #24776c;
             border: none;
             border-radius: 8px;
-            padding: 8px 12px;
+            padding: 9px 12px;
             font-size: 11px;
             font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.2s;
         }
 
         .btn-map:hover {
@@ -159,23 +218,21 @@
             color: #205e58;
         }
 
-        .badge-running {
-            background: #e3f4e9;
-            color: #23834b;
-            font-size: 10px;
-            padding: 6px 9px;
-            border-radius: 20px;
-            white-space: nowrap;
+        .btn-delete-gps {
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 9px 12px;
         }
 
         .empty-state {
             text-align: center;
-            padding: 35px 15px;
-            color: #000;
+            padding: 45px 15px;
+            color: #6c757d;
         }
 
         .empty-state i {
-            font-size: 38px;
+            font-size: 42px;
             color: #b5c9c6;
         }
 
@@ -192,7 +249,7 @@
             align-items: center;
             gap: 6px;
             font-size: 11px;
-            color: #000;
+            color: #333;
         }
 
         .legend-dot {
@@ -231,9 +288,15 @@
             transition: none;
         }
 
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
+            }
+        }
+
         @media (max-width: 991px) {
             #map {
-                height: 350px;
+                height: 380px;
             }
         }
 
@@ -251,7 +314,11 @@
             }
 
             .rental-item {
-                padding: 12px;
+                padding: 15px;
+            }
+
+            #map {
+                height: 330px;
             }
         }
     </style>
@@ -340,7 +407,7 @@
 
             <div class="row g-4">
 
-                <div class="col-lg-8">
+                <div class="col-12">
                     <div class="content-card">
 
                         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
@@ -385,47 +452,56 @@
                     </div>
                 </div>
 
-                <div class="col-lg-4">
+                <div class="col-12">
                     <div class="content-card">
 
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <h6 class="section-title mb-1">Daftar Mobil Rental</h6>
                             <p class="section-description mb-0">
                                 Mobil dengan status rental berjalan.
                             </p>
                         </div>
 
-                        @forelse ($rentals as $rental)
+                        <div class="row g-3">
 
-                            @php
-                                $lokasi = $lokasis->firstWhere('rental_id', $rental->id);
-                            @endphp
+                            @forelse ($rentals as $rental)
 
-                            <div class="rental-item">
-                                <div class="d-flex align-items-start gap-3">
+                                @php
+                                    $lokasi = $lokasis->firstWhere('rental_id', $rental->id);
+                                @endphp
 
-                                    <div class="car-icon">
-                                        <i class="bi bi-car-front-fill"></i>
-                                    </div>
+                                <div class="col-xl-4 col-lg-6 col-md-6 col-12">
 
-                                    <div class="flex-grow-1">
+                                    <div class="rental-item">
 
-                                        <div class="d-flex justify-content-between gap-2 flex-wrap">
-                                            <div class="car-name">
-                                                {{ $rental->mobil->name ?? 'Mobil tidak tersedia' }}
+                                        <div class="rental-header">
+
+                                            <div class="car-icon">
+                                                <i class="bi bi-car-front-fill"></i>
                                             </div>
 
-                                            <span class="badge-running">Sedang Dirental</span>
-                                        </div>
+                                            <div class="rental-header-content">
 
-                                        <div class="car-detail mt-1">
-                                            <i class="bi bi-person"></i>
-                                            {{ $rental->user->name ?? '-' }}
-                                        </div>
+                                                <div class="car-name">
+                                                    {{ $rental->mobil->name ?? 'Mobil tidak tersedia' }}
+                                                </div>
 
-                                        <div class="car-detail mt-1">
-                                            <i class="bi bi-card-text"></i>
-                                            {{ $rental->mobil->plate_number ?? '-' }}
+                                                <span class="badge-running">
+                                                    Sedang Dirental
+                                                </span>
+
+                                                <div class="car-detail">
+                                                    <i class="bi bi-person"></i>
+                                                    {{ $rental->user->name ?? '-' }}
+                                                </div>
+
+                                                <div class="car-detail">
+                                                    <i class="bi bi-card-text"></i>
+                                                    {{ $rental->mobil->plate_number ?? '-' }}
+                                                </div>
+
+                                            </div>
+
                                         </div>
 
                                         @if ($lokasi)
@@ -440,10 +516,10 @@
                                             </div>
                                         @endif
 
-                                        <div class="mt-2">
+                                        <div>
                                             <span
                                                 id="gps-status-{{ $rental->id }}"
-                                                class="badge rounded-pill
+                                                class="gps-status
                                                 @if (!$lokasi)
                                                     text-bg-warning
                                                 @elseif ($lokasi->updated_at && $lokasi->updated_at->gte(now()->subSeconds(30)))
@@ -462,30 +538,32 @@
                                             </span>
                                         </div>
 
-                                        <div class="car-detail mt-2" id="gps-time-{{ $rental->id }}">
+                                        <div class="gps-time" id="gps-time-{{ $rental->id }}">
                                             @if ($lokasi)
                                                 Terakhir diperbarui:
-                                                {{ $lokasi->updated_at->copy()->setTimezone(\App\Http\Controllers\PelacakanGPSController::ZONA_WIB)->format('d/m/Y H:i:s') }}
+                                                {{ $lokasi->updated_at->copy()->setTimezone(\App\Http\Controllers\PelacakanGPSController::ZONA_WIB)->format('d/m/Y, H:i:s') }}
                                             @else
                                                 Belum ada waktu pembaruan
                                             @endif
                                         </div>
 
-                                        <div class="d-flex flex-wrap gap-2 mt-3">
+                                        <div class="rental-actions">
 
                                             @if ($lokasi)
                                                 <button
                                                     type="button"
                                                     class="btn-map"
                                                     onclick="lihatLokasi({{ (float) $lokasi->latitude }}, {{ (float) $lokasi->longitude }}, {{ $rental->id }})">
-                                                    <i class="bi bi-map"></i> Lihat Lokasi
+                                                    <i class="bi bi-map"></i>
+                                                    Lihat Lokasi
                                                 </button>
                                             @endif
 
                                             <a
                                                 href="{{ route('pelacakan-gps.riwayat', $rental->id) }}"
-                                                class="btn-map text-decoration-none">
-                                                <i class="bi bi-clock-history"></i> Riwayat Lokasi
+                                                class="btn-map">
+                                                <i class="bi bi-clock-history"></i>
+                                                Riwayat Lokasi
                                             </a>
 
                                             <form
@@ -497,29 +575,33 @@
 
                                                 <button
                                                     type="submit"
-                                                    class="btn btn-danger btn-sm"
-                                                    style="border-radius:8px;font-size:11px;font-weight:600;padding:8px 12px;">
-                                                    <i class="bi bi-trash3"></i> Hapus
+                                                    class="btn btn-danger btn-delete-gps">
+                                                    <i class="bi bi-trash3"></i>
+                                                    Hapus
                                                 </button>
                                             </form>
 
                                         </div>
 
                                     </div>
+
                                 </div>
-                            </div>
 
-                        @empty
+                            @empty
 
-                            <div class="empty-state">
-                                <i class="bi bi-car-front"></i>
-                                <h6 class="mt-3 fw-bold">Belum Ada Mobil Dirental</h6>
-                                <p class="small mb-0">
-                                    Mobil dengan status Berjalan akan muncul di sini.
-                                </p>
-                            </div>
+                                <div class="col-12">
+                                    <div class="empty-state">
+                                        <i class="bi bi-car-front"></i>
+                                        <h6 class="mt-3 fw-bold">Belum Ada Mobil Dirental</h6>
+                                        <p class="small mb-0">
+                                            Mobil dengan status Berjalan akan muncul di sini.
+                                        </p>
+                                    </div>
+                                </div>
 
-                        @endforelse
+                            @endforelse
+
+                        </div>
 
                     </div>
                 </div>
@@ -623,16 +705,16 @@ function perbaruiStatus(lokasi) {
 
     if (statusElement) {
         if (lokasi.gps_status === 'aktif') {
-            statusElement.className = 'badge rounded-pill text-bg-success';
+            statusElement.className = 'gps-status text-bg-success';
             statusElement.textContent = 'GPS Aktif';
         } else if (
             lokasi.latitude !== null &&
             lokasi.longitude !== null
         ) {
-            statusElement.className = 'badge rounded-pill text-bg-secondary';
+            statusElement.className = 'gps-status text-bg-secondary';
             statusElement.textContent = 'Tidak Ada Pembaruan';
         } else {
-            statusElement.className = 'badge rounded-pill text-bg-warning';
+            statusElement.className = 'gps-status text-bg-warning';
             statusElement.textContent = 'Belum Ada Lokasi';
         }
     }
