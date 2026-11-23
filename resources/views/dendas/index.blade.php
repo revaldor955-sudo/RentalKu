@@ -210,10 +210,263 @@
             overflow-wrap: anywhere;
         }
 
+        .rental-search-wrapper {
+            position: relative;
+        }
+
+        .rental-search-box {
+            position: relative;
+        }
+
+        .rental-search-box .form-control {
+            padding-right: 42px;
+        }
+
+        .rental-search-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6B7280;
+            pointer-events: none;
+        }
+
+        .rental-search-results {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            right: 0;
+            z-index: 1060;
+            max-height: 260px;
+            overflow-y: auto;
+            background: #fff;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .12);
+            display: none;
+        }
+
+        .rental-search-results.show {
+            display: block;
+        }
+
+        .rental-search-item {
+            padding: 12px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #F3F4F6;
+            transition: .15s;
+        }
+
+        .rental-search-item:last-child {
+            border-bottom: none;
+        }
+
+        .rental-search-item:hover,
+        .rental-search-item.active {
+            background: #e9f7ef;
+        }
+
+        .rental-item-main,
+        .rental-main {
+            font-weight: 700;
+            color: #1F2937;
+            font-size: 13px;
+        }
+
+        .rental-sub {
+            font-size: 11px;
+            color: #6B7280;
+            margin-top: 4px;
+        }
+
+        .rental-search-empty {
+            padding: 16px;
+            text-align: center;
+            font-size: 13px;
+            color: #6B7280;
+        }
+
+        .rental-selected-card {
+            display: none;
+            margin-top: 10px;
+            padding: 12px;
+            border: 1px solid #198754;
+            background: #e9f7ef;
+            border-radius: 12px;
+        }
+
+        .rental-selected-card.show {
+            display: block;
+        }
+
+        .selected-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #146c43;
+            margin-bottom: 5px;
+        }
+
+        .selected-main {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1F2937;
+        }
+
+        .selected-detail {
+            font-size: 11px;
+            color: #6B7280;
+            margin-top: 4px;
+            line-height: 1.6;
+        }
+
+        .btn-remove-rental {
+            border: 0;
+            background: #f8d7da;
+            color: #dc3545;
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .btn-remove-rental:hover {
+            background: #f5c2c7;
+        }
+
+        .rental-selected-card {
+            box-shadow: 0 4px 14px rgba(25, 135, 84, .12);
+        }
+
+        .rc-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rc-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #198754;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        .rc-name {
+            font-size: 14px;
+            font-weight: 800;
+            color: #1F2937;
+            line-height: 1.2;
+        }
+
+        .rc-id {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6B7280;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .rc-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 10px;
+            font-weight: 700;
+            background: #E5E7EB;
+            color: #374151;
+        }
+
+        .rc-badge.status-selesai {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .rc-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(25, 135, 84, .35);
+        }
+
+        .rc-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .rc-meta-row i {
+            color: #198754;
+            font-size: 14px;
+            width: 16px;
+            text-align: center;
+        }
+
+        .rc-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .rc-stat {
+            background: #fff;
+            border: 1px solid #E5E7EB;
+            border-radius: 10px;
+            padding: 8px 10px;
+            min-width: 0;
+        }
+
+        .rc-stat-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+        }
+
+        .rc-stat-value {
+            font-size: 12px;
+            font-weight: 800;
+            color: #1F2937;
+            margin-top: 2px;
+            overflow-wrap: anywhere;
+        }
+
+        .rc-stat.total .rc-stat-value {
+            color: #146c43;
+        }
+
+        @media (max-width: 575.98px) {
+            .rc-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 1024px) {
             .page-content {
                 padding: 16px;
             }
+        }
+
+        .status-selesai {
+            background: #d1e7dd;
+            color: #0f5132;
         }
     </style>
 
@@ -349,16 +602,31 @@
 
                     <div class="modal-body">
                         <label class="form-label fw-semibold">Rental</label>
-                        <select name="rental_id" class="form-select" required>
-                            <option value="">-- Pilih Rental --</option>
-                            @foreach ($rentals as $rental)
-                                <option value="{{ $rental->id }}">
-                                    {{ $rental->user->name ?? '-' }} —
-                                    {{ $rental->mobil->name ?? '-' }}
-                                    ({{ $rental->mobil->plate_number ?? '-' }})
-                                </option>
-                            @endforeach
-                        </select>
+                        <div class="rental-search-wrapper">
+                            <div class="rental-search-box">
+                                <input type="text" id="createRentalSearch" class="form-control"
+                                    placeholder="Cari pelanggan, mobil, plat, atau rental..." autocomplete="off">
+                                <i class="bi bi-search rental-search-icon"></i>
+                            </div>
+                            <div id="createRentalSearchResults" class="rental-search-results"></div>
+                        </div>
+                        <div id="createRentalSelectedCard" class="rental-selected-card">
+                            <div class="d-flex align-items-start justify-content-between gap-2">
+                                <div class="flex-grow-1">
+                                    <div class="selected-title"><i class="bi bi-check-circle-fill me-1"></i> Rental
+                                        Terpilih</div>
+                                    <div class="selected-main" id="createRentalSelectedMain"></div>
+                                    <div class="selected-detail" id="createRentalSelectedDetail"></div>
+                                </div>
+                                <button type="button" class="btn-remove-rental" id="createRentalRemove"
+                                    title="Hapus pilihan rental">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" name="rental_id" id="createRentalId">
+                        <div class="form-text">Cari rental Selesai berdasarkan pelanggan, mobil, plat, atau nomor
+                            rental.</div>
 
                         <label class="form-label fw-semibold mt-3">Jenis Denda</label>
                         <select name="jenis" class="form-select" required>
@@ -421,16 +689,17 @@
 
                     <div class="modal-body">
                         <label class="form-label fw-semibold">Rental</label>
-                        <select name="rental_id" id="editRentalIdDenda" class="form-select" required>
-                            <option value="">-- Pilih Rental --</option>
-                            @foreach ($rentals as $rental)
-                                <option value="{{ $rental->id }}">
-                                    {{ $rental->user->name ?? '-' }} —
-                                    {{ $rental->mobil->name ?? '-' }}
-                                    ({{ $rental->mobil->plate_number ?? '-' }})
-                                </option>
-                            @endforeach
-                        </select>
+
+                        <div id="editRentalSelectedCard" class="rental-selected-card">
+                            <div class="d-flex align-items-start justify-content-between gap-2">
+                                <div class="flex-grow-1">
+                                    <div class="selected-main" id="editRentalSelectedMain"></div>
+                                    <div class="selected-detail" id="editRentalSelectedDetail"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="rental_id" id="editRentalId">
+                        <div class="form-text"></div>
 
                         <label class="form-label fw-semibold mt-3">Jenis Denda</label>
                         <select name="jenis" id="editJenisDenda" class="form-select" required>
@@ -463,7 +732,7 @@
                             accept=".jpg,.jpeg,.png">
                         <small class="text-muted">Kosongkan jika foto tidak diganti. Maksimal 2 MB.</small>
 
-                        
+
                         <label class="form-label fw-semibold mt-3">Status</label>
                         <select name="status" id="editStatusDenda" class="form-select" required>
                             <option value="belum bayar">Belum Bayar</option>
@@ -487,76 +756,86 @@
 
     {{-- MODAL FOTO --}}
     {{-- MODAL ZOOM FOTO DENDA --}}
-<div class="modal fade" id="fotoDendaModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content">
+    <div class="modal fade" id="fotoDendaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
 
-            @include('layouts.partials.modal-head', [
-                'title' => 'Bukti Foto Denda',
-                'icon' => 'bi-image'
-            ])
+                @include('layouts.partials.modal-head', [
+                    'title' => 'Bukti Foto Denda',
+                    'icon' => 'bi-image',
+                ])
 
-            <div class="modal-body p-3">
+                <div class="modal-body p-3">
 
-                {{-- KONTROL ZOOM --}}
-                <div class="d-flex justify-content-center gap-2 mb-3">
+                    {{-- KONTROL ZOOM --}}
+                    <div class="d-flex justify-content-center gap-2 mb-3">
 
-                    <button type="button"
-                        class="btn btn-outline-secondary btn-sm"
-                        id="fotoZoomOut"
-                        title="Perkecil">
-                        <i class="bi bi-zoom-out"></i>
-                    </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="fotoZoomOut"
+                            title="Perkecil">
+                            <i class="bi bi-zoom-out"></i>
+                        </button>
 
-                    <button type="button"
-                        class="btn btn-outline-secondary btn-sm"
-                        id="fotoZoomReset">
-                        Reset
-                    </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="fotoZoomReset">
+                            Reset
+                        </button>
 
-                    <button type="button"
-                        class="btn btn-outline-secondary btn-sm"
-                        id="fotoZoomIn"
-                        title="Perbesar">
-                        <i class="bi bi-zoom-in"></i>
-                    </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="fotoZoomIn"
+                            title="Perbesar">
+                            <i class="bi bi-zoom-in"></i>
+                        </button>
 
-                </div>
+                    </div>
 
-                {{-- AREA FOTO --}}
-                <div id="fotoDendaZoomArea"
-                    class="text-center overflow-auto rounded"
-                    style="
+                    {{-- AREA FOTO --}}
+                    <div id="fotoDendaZoomArea" class="text-center overflow-auto rounded"
+                        style="
                         height: 70vh;
                         background: #f5f5f5;
                     ">
 
-                    <img
-                        id="fotoDendaPreview"
-                        src=""
-                        class="rounded"
-                        alt="Bukti denda"
-                        style="
+                        <img id="fotoDendaPreview" src="" class="rounded" alt="Bukti denda"
+                            style="
                             max-width: 100%;
                             max-height: 65vh;
                             object-fit: contain;
                             transform: scale(1);
                             transform-origin: center center;
                             transition: transform 0.2s ease;
-                        "
-                    >
+                        ">
+
+                    </div>
+
+                    <small class="text-muted d-block text-center mt-2">
+                        Gunakan tombol zoom atau scroll mouse untuk memperbesar foto.
+                    </small>
 
                 </div>
 
-                <small class="text-muted d-block text-center mt-2">
-                    Gunakan tombol zoom atau scroll mouse untuk memperbesar foto.
-                </small>
-
             </div>
-
         </div>
     </div>
-</div>
+
+    @php
+        $rentalOptions = $rentals
+            ->loadMissing(['user', 'mobil'])
+            ->map(
+                fn($r) => [
+                    'id' => $r->id,
+                    'pelanggan' => $r->user?->name ?? '-',
+                    'mobil' => $r->mobil?->name ?? '-',
+                    'plat' => $r->mobil?->plate_number ?? '',
+                    'status' => $r->status,
+                    'mulai' => $r->tanggal_mulai?->format('d/m/Y') ?? '-',
+                    'selesai' => $r->tanggal_selesai?->format('d/m/Y') ?? '-',
+                    'jumlah_hari' => (int) $r->jumlah_hari,
+                    'harga_perhari' => (float) $r->harga_perhari,
+                    'deposit' => (float) $r->deposit,
+                    'total_harga' => (float) $r->total_harga,
+                ],
+            )
+            ->sortByDesc('id')
+            ->values();
+    @endphp
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/datatables.net@2.3.8/js/dataTables.min.js"></script>
@@ -584,36 +863,211 @@
             return String(value || '').replace(/\D/g, '');
         }
 
+        const RENTAL_OPTIONS = @json($rentalOptions);
+
+        function createRentalPicker(p, opts = {}) {
+            const $search = $('#' + p + 'RentalSearch');
+            const $results = $('#' + p + 'RentalSearchResults');
+            const $card = $('#' + p + 'RentalSelectedCard');
+            const $main = $('#' + p + 'RentalSelectedMain');
+            const $detail = $('#' + p + 'RentalSelectedDetail');
+            const $hidden = $('#' + p + 'RentalId');
+            const $wrap = $search.closest('.rental-search-wrapper');
+            let selectedId = null;
+            if (opts.locked) {
+                $wrap.hide();
+                $wrap.siblings('.form-text').hide();
+                $card.find('.btn-remove-rental').hide();
+            }
+
+            function hay(r) {
+                return [r.id, 'rental #' + r.id, r.pelanggan, r.mobil, r.plat, r.status, r.mulai, r.selesai]
+                    .join(' ').toLowerCase();
+            }
+
+            function renderResults() {
+                const q = $search.val().toLowerCase().trim();
+                const rows = RENTAL_OPTIONS.filter(r => hay(r).includes(q));
+                $results.empty();
+
+                if (!rows.length) {
+                    $results.append($('<div class="rental-search-empty">').text('Rental tidak ditemukan.'));
+                }
+
+                rows.forEach(r => {
+                    const $item = $('<div class="rental-search-item">')
+                        .toggleClass('active', String(r.id) === String(selectedId))
+                        .attr('data-id', r.id);
+                    $('<div class="rental-item-main">').text('Rental #' + r.id + ' — ' + r.pelanggan).appendTo(
+                        $item);
+                    $('<div class="rental-sub">')
+                        .text(r.mobil + (r.plat ? ' • ' + r.plat : '') + ' • ' + r.status)
+                        .appendTo($item);
+                    $('<div class="rental-sub">').text(r.mulai + ' s/d ' + r.selesai).appendTo($item);
+                    $results.append($item);
+                });
+
+                $results.addClass('show');
+            }
+
+            function renderCard(r) {
+                $main.empty();
+                const $head = $('<div class="rc-head">').appendTo($main);
+                $('<div class="rc-avatar"><i class="bi bi-person-fill"></i></div>').appendTo($head);
+
+                const $info = $('<div>').appendTo($head);
+                $('<div class="rc-name">').text(r.pelanggan).appendTo($info);
+
+                const $idRow = $('<div class="rc-id">').appendTo($info);
+                $('<span>').text('Rental #' + r.id).appendTo($idRow);
+                $('<span class="rc-badge">')
+                    .toggleClass('status-selesai', r.status === 'Selesai')
+                    .text(r.status)
+                    .appendTo($idRow);
+
+                $detail.empty();
+                const $meta = $('<div class="rc-meta">').appendTo($detail);
+
+                const metaRow = (icon, text) => {
+                    const $row = $('<div class="rc-meta-row">').appendTo($meta);
+                    $('<i>').addClass('bi ' + icon).appendTo($row);
+                    $('<span>').text(text).appendTo($row);
+                };
+
+                metaRow('bi-car-front-fill', r.mobil + ' • ' + (r.plat || 'Plat belum tersedia'));
+                metaRow('bi-calendar-range',
+                    r.mulai + ' s/d ' + r.selesai + (r.jumlah_hari ? ' • ' + r.jumlah_hari + ' hari' : ''));
+
+                if (r.harga_perhari !== undefined) {
+                    const $stats = $('<div class="rc-stats">').appendTo($detail);
+
+                    const stat = (label, value, extra) => {
+                        const $s = $('<div class="rc-stat">').addClass(extra || '').appendTo($stats);
+                        $('<div class="rc-stat-label">').text(label).appendTo($s);
+                        $('<div class="rc-stat-value">').text(value).appendTo($s);
+                    };
+
+                    stat('Harga / hari', formatRupiah(r.harga_perhari));
+                    stat('Total', formatRupiah(r.total_harga), 'total');
+                    stat('Deposit', formatRupiah(r.deposit));
+                }
+
+                $card.addClass('show');
+            }
+
+            function set(r) {
+                selectedId = r.id;
+                $hidden.val(r.id);
+                renderCard(r);
+                $search.val('');
+                $results.removeClass('show').empty();
+            }
+
+            function clear() {
+                selectedId = null;
+                $hidden.val('');
+                $card.removeClass('show');
+                $main.text('');
+                $detail.empty();
+            }
+
+            function reset() {
+                clear();
+                $search.val('');
+                $results.removeClass('show').empty();
+            }
+
+            // fallback: rental denda yang diedit tidak ada di RENTAL_OPTIONS
+            function setById(id, row) {
+                const r = RENTAL_OPTIONS.find(x => String(x.id) === String(id)) || {
+                    id: id,
+                    pelanggan: row?.pelanggan || '-',
+                    mobil: row?.mobil_name || '-',
+                    plat: row?.mobil_plate || '',
+                    status: '-',
+                    mulai: '-',
+                    selesai: '-'
+                };
+                set(r);
+            }
+
+            $search.on('focus', function() {
+                if (!selectedId) renderResults();
+            });
+
+            $search.on('input', function() {
+                if (selectedId) clear();
+                renderResults();
+            });
+
+            $results.on('click', '.rental-search-item', function() {
+                const r = RENTAL_OPTIONS.find(x => String(x.id) === String($(this).attr('data-id')));
+                if (r) set(r);
+            });
+
+            $card.find('.btn-remove-rental').on('click', function() {
+                clear();
+                $search.trigger('focus');
+            });
+
+            $(document).on('click', function(e) {
+                if ($wrap[0] && !$wrap[0].contains(e.target)) $results.removeClass('show');
+            });
+
+            $search.on('keydown', function(e) {
+                if (e.key === 'Escape' && $results.hasClass('show')) {
+                    e.stopPropagation();
+                    $results.removeClass('show');
+                }
+            });
+
+            return {
+                reset,
+                setById
+            };
+        }
+
+        let tambahPicker, editPicker;
+
+        $(function() {
+            tambahPicker = createRentalPicker('create');
+            editPicker = createRentalPicker('edit');
+
+            $('#tambahDendaModal').on('show.bs.modal', function() {
+                tambahPicker.reset();
+            });
+        });
+
         $(document).on('input', '.rupiah-input', function() {
             const rawValue = getRawRupiah(this.value);
             this.value = formatRupiahInput(rawValue);
             $('#' + $(this).data('target')).val(rawValue);
         });
 
-      let fotoDendaZoom = 1;
+        let fotoDendaZoom = 1;
 
-function updateFotoDendaZoom() {
-    $('#fotoDendaPreview').css(
-        'transform',
-        'scale(' + fotoDendaZoom + ')'
-    );
-}
+        function updateFotoDendaZoom() {
+            $('#fotoDendaPreview').css(
+                'transform',
+                'scale(' + fotoDendaZoom + ')'
+            );
+        }
 
-function openFotoDenda(url) {
-    if (!url) return;
+        function openFotoDenda(url) {
+            if (!url) return;
 
-    fotoDendaZoom = 1;
+            fotoDendaZoom = 1;
 
-    $('#fotoDendaPreview')
-        .attr('src', url)
-        .css('transform', 'scale(1)');
+            $('#fotoDendaPreview')
+                .attr('src', url)
+                .css('transform', 'scale(1)');
 
-    $('#fotoDendaZoomArea').scrollTop(0).scrollLeft(0);
+            $('#fotoDendaZoomArea').scrollTop(0).scrollLeft(0);
 
-    bootstrap.Modal.getOrCreateInstance(
-        document.getElementById('fotoDendaModal')
-    ).show();
-}
+            bootstrap.Modal.getOrCreateInstance(
+                document.getElementById('fotoDendaModal')
+            ).show();
+        }
 
         function statusBadge(status) {
             const map = {
@@ -843,35 +1297,35 @@ function openFotoDenda(url) {
                 openFotoDenda($(this).data('url'));
             });
             // ZOOM FOTO BUKTI DENDA
-$('#fotoZoomIn').on('click', function() {
-    fotoDendaZoom = Math.min(fotoDendaZoom + 0.25, 4);
-    updateFotoDendaZoom();
-});
+            $('#fotoZoomIn').on('click', function() {
+                fotoDendaZoom = Math.min(fotoDendaZoom + 0.25, 4);
+                updateFotoDendaZoom();
+            });
 
-$('#fotoZoomOut').on('click', function() {
-    fotoDendaZoom = Math.max(fotoDendaZoom - 0.25, 0.5);
-    updateFotoDendaZoom();
-});
+            $('#fotoZoomOut').on('click', function() {
+                fotoDendaZoom = Math.max(fotoDendaZoom - 0.25, 0.5);
+                updateFotoDendaZoom();
+            });
 
-$('#fotoZoomReset').on('click', function() {
-    fotoDendaZoom = 1;
-    updateFotoDendaZoom();
+            $('#fotoZoomReset').on('click', function() {
+                fotoDendaZoom = 1;
+                updateFotoDendaZoom();
 
-    $('#fotoDendaZoomArea').scrollTop(0).scrollLeft(0);
-});
+                $('#fotoDendaZoomArea').scrollTop(0).scrollLeft(0);
+            });
 
-// Zoom menggunakan scroll mouse
-$('#fotoDendaPreview').on('wheel', function(event) {
-    event.preventDefault();
+            // Zoom menggunakan scroll mouse
+            $('#fotoDendaPreview').on('wheel', function(event) {
+                event.preventDefault();
 
-    if (event.originalEvent.deltaY < 0) {
-        fotoDendaZoom = Math.min(fotoDendaZoom + 0.15, 4);
-    } else {
-        fotoDendaZoom = Math.max(fotoDendaZoom - 0.15, 0.5);
-    }
+                if (event.originalEvent.deltaY < 0) {
+                    fotoDendaZoom = Math.min(fotoDendaZoom + 0.15, 4);
+                } else {
+                    fotoDendaZoom = Math.max(fotoDendaZoom - 0.15, 0.5);
+                }
 
-    updateFotoDendaZoom();
-});
+                updateFotoDendaZoom();
+            });
         });
 
         function deleteDenda(id) {
@@ -927,24 +1381,24 @@ $('#fotoDendaPreview').on('wheel', function(event) {
                     'Bukti pembayaran disetujui dan denda menjadi lunas.' :
                     'Denda dikembalikan menjadi belum bayar agar pelanggan dapat mengunggah ulang.',
                 imageUrl: row?.bukti_bayar_url || undefined,
-               imageWidth: 320,
-imageAlt: 'Bukti pembayaran denda',
+                imageWidth: 320,
+                imageAlt: 'Bukti pembayaran denda',
 
-didOpen: function() {
-    const image = Swal.getImage();
+                didOpen: function() {
+                    const image = Swal.getImage();
 
-    if (image && row?.bukti_bayar_url) {
-        image.style.cursor = 'zoom-in';
-        image.title = 'Klik untuk memperbesar foto';
+                    if (image && row?.bukti_bayar_url) {
+                        image.style.cursor = 'zoom-in';
+                        image.title = 'Klik untuk memperbesar foto';
 
-        image.addEventListener('click', function() {
-            Swal.close();
-            openFotoDenda(row.bukti_bayar_url);
-        });
-    }
-},
+                        image.addEventListener('click', function() {
+                            Swal.close();
+                            openFotoDenda(row.bukti_bayar_url);
+                        });
+                    }
+                },
 
-icon: isLunas ? 'question' : 'warning',
+                icon: isLunas ? 'question' : 'warning',
                 showCancelButton: true,
                 confirmButtonText: isLunas ? 'Ya, Lunaskan' : 'Ya, Tolak',
                 cancelButtonText: 'Batal'
@@ -991,7 +1445,7 @@ icon: isLunas ? 'question' : 'warning',
                 return;
             }
 
-            $('#editRentalIdDenda').val(data.rental_id);
+            editPicker.setById(data.rental_id, data);
             $('#editJenisDenda').val(data.jenis);
             $('#editDeskripsiDenda').val(data.deskripsi || '');
             $('#editNominalDendaDisplay').val(formatRupiahInput(data.nominal));
@@ -1016,6 +1470,10 @@ icon: isLunas ? 'question' : 'warning',
         }
 
         function submitDendaForm(form, modalSelector, isEdit = false) {
+            if (!$(form).find('input[name="rental_id"]').val()) {
+                Swal.fire('Rental belum dipilih', 'Cari dan pilih rental terlebih dahulu.', 'warning');
+                return;
+            }
             const formData = new FormData(form);
 
             // Laravel menerima method PUT melalui POST dan _method=PUT.
