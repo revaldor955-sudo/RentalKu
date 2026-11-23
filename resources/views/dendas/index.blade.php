@@ -655,7 +655,7 @@
                         <input type="file" name="foto_bukti" class="form-control" accept=".jpg,.jpeg,.png">
                         <small class="text-muted">JPG, PNG, JPEG, maksimal 2 MB.</small>
 
-                        <label class="form-label fw-semibold mt-3">Status</label>
+                        <label class="form-label fw-semibold mt-3 d-block">Status</label>
                         <select name="status" class="form-select" required>
                             <option value="belum bayar">Belum Bayar</option>
                         </select>
@@ -733,7 +733,7 @@
                         <small class="text-muted">Kosongkan jika foto tidak diganti. Maksimal 2 MB.</small>
 
 
-                        <label class="form-label fw-semibold mt-3">Status</label>
+                        <label class="form-label fw-semibold mt-3 d-block">Status</label>
                         <select name="status" id="editStatusDenda" class="form-select" required>
                             <option value="belum bayar">Belum Bayar</option>
                             <option value="menunggu verifikasi">Menunggu Verifikasi</option>
