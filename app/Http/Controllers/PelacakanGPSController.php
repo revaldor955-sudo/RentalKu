@@ -59,7 +59,6 @@ class PelacakanGPSController extends Controller
 
         $recordsFiltered = (clone $query)->count();
 
-        // Kolom tabel: 0 No, 1 Latitude, 2 Longitude, 3 Tanggal, 4 Waktu, 5 Peta.
         $kolomUrut = [
             1 => 'latitude',
             2 => 'longitude',
@@ -103,12 +102,6 @@ class PelacakanGPSController extends Controller
         ]);
     }
 
-    /**
-     * Pencarian teks pada kolom tanggal harus memakai WIB, karena created_at
-     * tersimpan UTC sementara tabel menampilkan waktu Asia/Jakarta.
-     *
-     * @return array{0: string, 1: array<int, string>}
-     */
     private function ekspresiCariWib(string $search): array
     {
         $pola = '%' . $search . '%';
@@ -134,8 +127,6 @@ class PelacakanGPSController extends Controller
 
     public function terimaLokasi(Request $request, Rental $rental)
     {
-        // Status Berjalan tetap dihitung meski jadwal rental sudah terlewati,
-        // asalkan pemilik rental sudah memulai pelacakan.
         if (
             (int) $rental->user_id !== (int) auth()->id() ||
             $rental->status !== 'Berjalan'
@@ -232,7 +223,6 @@ class PelacakanGPSController extends Controller
 
         DB::transaction(function () use ($rentalId) {
             RiwayatLokasiMobil::where('rental_id', $rentalId)->delete();
-
             LokasiMobil::where('rental_id', $rentalId)->delete();
         });
 
