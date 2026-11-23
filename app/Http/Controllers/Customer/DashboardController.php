@@ -73,11 +73,10 @@ $rentalsAktif = $rentals->whereIn('status', [
         $totalRentals = $rentals->count();
         $rentalsTampil = $rentalsAktif->take($jumlahRental);
 
-        // Hasil verifikasi klaim yang belum dibaca customer.
+        // Kompensasi baru yang belum dibaca customer.
         $klaimUpdates = Kompensasi::with('mobil')
             ->where('customer_id', $userId)
             ->whereNull('dibaca_at')
-            ->whereIn('status', ['disetujui', 'ditolak', 'selesai'])
             ->latest()
             ->get();
 

@@ -41,11 +41,10 @@ class LaporanData
             ])
             ->get();
 
-        // Kompensasi hanya jenis pengembalian_dana (uang keluar nyata);
+        // Semua kompensasi pengembalian_dana dihitung (tanpa status);
         // diskon/gratis_sewa tidak menggerakkan kas.
         $kompensasis = Kompensasi::query()
             ->where('jenis', 'pengembalian_dana')
-            ->where('status', 'disetujui')
             ->whereBetween('tanggal', [$dari, $sampai])
             ->with([
                 'rental.user:id,name',

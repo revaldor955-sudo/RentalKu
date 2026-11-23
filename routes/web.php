@@ -148,7 +148,7 @@ Route::middleware('adminstaff')->group(function () {
 });
 
 // KOMPENSASI
-// Admin saja — klaim dibuat Admin atas nama customer; Staff tanpa akses.
+// Admin saja — kompensasi dibuat Admin atas nama customer; Staff tanpa akses.
 
 Route::get('kompensasis/data', [KompensasiController::class, 'data'])
     ->name('kompensasis.data')
@@ -159,7 +159,7 @@ Route::get('kompensasis/rentals', [KompensasiController::class, 'rentalsForCusto
     ->middleware('admin');
 
 Route::resource('kompensasis', KompensasiController::class)
-    ->except(['create', 'edit', 'show'])
+    ->except(['create', 'edit', 'show', 'update'])
     ->middleware('admin');
 
 // SERVIS MOBIL

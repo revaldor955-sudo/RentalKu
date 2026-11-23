@@ -24,8 +24,7 @@ class DendaController extends Controller
             ->latest('id')
             ->get();
 
-        return view('dendas.index', compact('rentals'))
-            ->with('pageTitle', 'Denda');
+        return view('dendas.index', compact('rentals'))->with('pageTitle', 'Denda');
     }
 
     public function data(Request $request)
@@ -46,12 +45,10 @@ class DendaController extends Controller
                     ->orWhere('dendas.status', 'like', "%{$search}%")
                     ->orWhere('dendas.deskripsi', 'like', "%{$search}%")
                     ->orWhereHas('rental.user', function ($uq) use ($search) {
-                        $uq->where('name', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%");
+                        $uq->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%");
                     })
                     ->orWhereHas('rental.mobil', function ($mq) use ($search) {
-                        $mq->where('name', 'like', "%{$search}%")
-                            ->orWhere('plate_number', 'like', "%{$search}%");
+                        $mq->where('name', 'like', "%{$search}%")->orWhere('plate_number', 'like', "%{$search}%");
                     });
             });
         }
@@ -75,22 +72,15 @@ class DendaController extends Controller
         $direction = strtolower((string) $request->input('order.0.dir', 'desc'));
         $direction = $direction === 'asc' ? 'asc' : 'desc';
 
-        if (
-            $orderColumn !== null &&
-            isset($columns[$orderColumn]) &&
-            $columns[$orderColumn] !== null
-        ) {
+        if ($orderColumn !== null && isset($columns[$orderColumn]) && $columns[$orderColumn] !== null) {
             $query->orderBy($columns[$orderColumn], $direction);
         }
 
-        $query->orderByDesc('dendas.created_at')
-            ->orderByDesc('dendas.id');
+        $query->orderByDesc('dendas.created_at')->orderByDesc('dendas.id');
 
         $start = max(0, (int) $request->input('start', 0));
         $requestedLength = (int) $request->input('length', 10);
-        $length = $requestedLength === -1
-            ? 100
-            : min(max($requestedLength, 1), 100);
+        $length = $requestedLength === -1 ? 100 : min(max($requestedLength, 1), 100);
 
         $dendas = $query->offset($start)->limit($length)->get();
 
@@ -106,15 +96,9 @@ class DendaController extends Controller
                 'deskripsi' => $item->deskripsi ?? '-',
                 'foto_bukti' => $item->foto_bukti,
                 'status' => $item->status,
-                'bukti_bayar_url' => $item->bukti_bayar
-                    ? asset('storage/' . $item->bukti_bayar)
-                    : null,
-                'tanggal_bayar' => $item->tanggal_bayar
-                    ? Carbon::parse($item->tanggal_bayar)->format('d/m/Y')
-                    : null,
-                'created_at' => $item->created_at
-                    ? $item->created_at->format('d/m/Y H:i')
-                    : '-',
+                'bukti_bayar_url' => $item->bukti_bayar ? asset('storage/' . $item->bukti_bayar) : null,
+                'tanggal_bayar' => $item->tanggal_bayar ? Carbon::parse($item->tanggal_bayar)->format('d/m/Y') : null,
+                'created_at' => $item->created_at ? $item->created_at->format('d/m/Y H:i') : '-',
             ];
         });
 
@@ -128,39 +112,43 @@ class DendaController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'rental_id' => 'required|exists:rentals,id',
-            'jenis' => 'required|in:keterlambatan,kerusakan,kehilangan',
-            'foto_bukti' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'status' => 'required|in:belum bayar',
-            'deskripsi' => 'required|string|max:2000',
-        ], [
-            'rental_id.required' => 'Rental wajib dipilih.',
-            'rental_id.exists' => 'Rental yang dipilih tidak ditemukan.',
-            'jenis.required' => 'Jenis denda wajib dipilih.',
-            'jenis.in' => 'Jenis denda tidak valid.',
-            'foto_bukti.image' => 'Foto bukti harus berupa gambar.',
-            'foto_bukti.mimes' => 'Foto bukti harus JPG, JPEG, atau PNG.',
-            'foto_bukti.max' => 'Ukuran foto maksimal 2 MB.',
-            'status.in' => 'Denda baru harus berstatus belum bayar.',
-            'deskripsi.required' => 'Deskripsi denda wajib diisi.',
-        ]);
+        $validated = $request->validate(
+            [
+                'rental_id' => 'required|exists:rentals,id',
+                'jenis' => 'required|in:keterlambatan,kerusakan,kehilangan',
+                'foto_bukti' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'status' => 'required|in:belum bayar',
+                'deskripsi' => 'required|string|max:2000',
+            ],
+            [
+                'rental_id.required' => 'Rental wajib dipilih.',
+                'rental_id.exists' => 'Rental yang dipilih tidak ditemukan.',
+                'jenis.required' => 'Jenis denda wajib dipilih.',
+                'jenis.in' => 'Jenis denda tidak valid.',
+                'foto_bukti.image' => 'Foto bukti harus berupa gambar.',
+                'foto_bukti.mimes' => 'Foto bukti harus JPG, JPEG, atau PNG.',
+                'foto_bukti.max' => 'Ukuran foto maksimal 2 MB.',
+                'status.in' => 'Denda baru harus berstatus belum bayar.',
+                'deskripsi.required' => 'Deskripsi denda wajib diisi.',
+            ],
+        );
 
         $rental = Rental::findOrFail($validated['rental_id']);
 
         if ($rental->status !== 'Selesai') {
-            return response()->json([
-                'message' => 'Denda manual hanya bisa dibuat untuk rental yang sudah selesai.',
-            ], 422);
+            return response()->json(
+                [
+                    'message' => 'Denda manual hanya bisa dibuat untuk rental yang sudah selesai.',
+                ],
+                422,
+            );
         }
 
         // Tarif ditentukan sistem, bukan dari input pengguna.
         $validated['nominal'] = self::TARIF_DENDA[$validated['jenis']];
 
         if ($validated['jenis'] === 'keterlambatan') {
-            $validated['deskripsi'] =
-                'Tarif keterlambatan Rp200.000 per hari. '
-                . $validated['deskripsi'];
+            $validated['deskripsi'] = 'Tarif keterlambatan Rp200.000 per hari. ' . $validated['deskripsi'];
         }
 
         if ($request->hasFile('foto_bukti')) {
@@ -171,8 +159,7 @@ class DendaController extends Controller
             }
 
             $file = $request->file('foto_bukti');
-            $fileName = uniqid('denda_', true)
-                . '.' . $file->getClientOriginalExtension();
+            $fileName = uniqid('denda_', true) . '.' . $file->getClientOriginalExtension();
 
             $file->move($directory, $fileName);
             $validated['foto_bukti'] = 'images/dendas/' . $fileName;
@@ -180,74 +167,54 @@ class DendaController extends Controller
 
         Denda::create($validated);
 
-        return response()->json([
-            'message' => 'Denda berhasil ditambahkan.',
-        ], 201);
+        return response()->json(
+            [
+                'message' => 'Denda berhasil ditambahkan.',
+            ],
+            201,
+        );
     }
 
     public function update(Request $request, Denda $denda)
     {
         if ($denda->status === 'lunas') {
-            return response()->json([
-                'message' => 'Denda yang sudah lunas tidak dapat diedit.',
-            ], 422);
+            return response()->json(
+                [
+                    'message' => 'Denda yang sudah lunas tidak dapat diedit.',
+                ],
+                422,
+            );
         }
 
-        $validated = $request->validate([
-            'rental_id' => 'required|exists:rentals,id',
-            'jenis' => 'required|in:keterlambatan,kerusakan,kehilangan',
-            'foto_bukti' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'status' => 'required|in:belum bayar,menunggu verifikasi',
-            'deskripsi' => 'required|string|max:2000',
-        ], [
-            'rental_id.required' => 'Rental wajib dipilih.',
-            'rental_id.exists' => 'Rental tidak ditemukan.',
-            'jenis.required' => 'Jenis denda wajib dipilih.',
-            'jenis.in' => 'Jenis denda tidak valid.',
-            'foto_bukti.image' => 'Foto bukti harus berupa gambar.',
-            'foto_bukti.mimes' => 'Foto bukti harus JPG, JPEG, atau PNG.',
-            'foto_bukti.max' => 'Ukuran foto maksimal 2 MB.',
-            'status.in' => 'Status denda tidak valid.',
-            'deskripsi.required' => 'Deskripsi denda wajib diisi.',
-        ]);
+        $validated = $request->validate(
+            [
+                'jenis' => 'required|in:keterlambatan,kerusakan,kehilangan',
+                'foto_bukti' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'status' => 'required|in:belum bayar,menunggu verifikasi',
+                'deskripsi' => 'required|string|max:2000',
+            ],
+            [
+                'deskripsi.required' => 'Deskripsi denda wajib diisi.',
+            ],
+        );
 
-        if (
-            $validated['status'] === 'menunggu verifikasi' &&
-            !$denda->bukti_bayar
-        ) {
-            return response()->json([
-                'message' => 'Status menunggu verifikasi memerlukan bukti pembayaran.',
-            ], 422);
-        }
-
-        $rental = Rental::findOrFail($validated['rental_id']);
-
-        if ($rental->status !== 'Selesai') {
-            return response()->json([
-                'message' => 'Pilih rental yang sudah selesai.',
-            ], 422);
+        if ($validated['status'] === 'menunggu verifikasi' && !$denda->bukti_bayar) {
+            return response()->json(
+                [
+                    'message' => 'Status menunggu verifikasi memerlukan bukti pembayaran.',
+                ],
+                422,
+            );
         }
 
         $jenisLama = $denda->jenis;
         $jenisBaru = $validated['jenis'];
 
         if ($jenisBaru === 'keterlambatan') {
-            // Pertahankan hasil hitung harian jika denda ini
-            // memang sudah merupakan denda keterlambatan.
-            $validated['nominal'] = $jenisLama === 'keterlambatan'
-                ? $denda->nominal
-                : self::TARIF_DENDA['keterlambatan'];
+            $validated['nominal'] = $jenisLama === 'keterlambatan' ? $denda->nominal : self::TARIF_DENDA['keterlambatan'];
 
-            if (
-                $jenisLama !== 'keterlambatan' &&
-                !str_contains(
-                    $validated['deskripsi'],
-                    'Tarif keterlambatan Rp200.000 per hari.'
-                )
-            ) {
-                $validated['deskripsi'] =
-                    'Tarif keterlambatan Rp200.000 per hari. '
-                    . $validated['deskripsi'];
+            if ($jenisLama !== 'keterlambatan' && !str_contains($validated['deskripsi'], 'Tarif keterlambatan Rp200.000 per hari.')) {
+                $validated['deskripsi'] = 'Tarif keterlambatan Rp200.000 per hari. ' . $validated['deskripsi'];
             }
         } else {
             $validated['nominal'] = self::TARIF_DENDA[$jenisBaru];
@@ -261,15 +228,11 @@ class DendaController extends Controller
             }
 
             $file = $request->file('foto_bukti');
-            $fileName = uniqid('denda_', true)
-                . '.' . $file->getClientOriginalExtension();
+            $fileName = uniqid('denda_', true) . '.' . $file->getClientOriginalExtension();
 
             $file->move($directory, $fileName);
 
-            if (
-                $denda->foto_bukti &&
-                File::exists(public_path($denda->foto_bukti))
-            ) {
+            if ($denda->foto_bukti && File::exists(public_path($denda->foto_bukti))) {
                 File::delete(public_path($denda->foto_bukti));
             }
 
@@ -286,15 +249,15 @@ class DendaController extends Controller
     public function destroy(Request $request, Denda $denda)
     {
         if ($denda->status === 'lunas') {
-            return response()->json([
-                'message' => 'Denda yang sudah lunas tidak dapat dihapus.',
-            ], 422);
+            return response()->json(
+                [
+                    'message' => 'Denda yang sudah lunas tidak dapat dihapus.',
+                ],
+                422,
+            );
         }
 
-        if (
-            $denda->foto_bukti &&
-            File::exists(public_path($denda->foto_bukti))
-        ) {
+        if ($denda->foto_bukti && File::exists(public_path($denda->foto_bukti))) {
             File::delete(public_path($denda->foto_bukti));
         }
 
@@ -313,14 +276,14 @@ class DendaController extends Controller
     {
         $denda->load('rental');
 
-        if (
-            !$denda->rental ||
-            (int) $denda->rental->user_id !== (int) auth()->id()
-        ) {
+        if (!$denda->rental || (int) $denda->rental->user_id !== (int) auth()->id()) {
             if ($request->wantsJson()) {
-                return response()->json([
-                    'message' => 'Anda tidak memiliki akses ke denda ini.',
-                ], 403);
+                return response()->json(
+                    [
+                        'message' => 'Anda tidak memiliki akses ke denda ini.',
+                    ],
+                    403,
+                );
             }
 
             abort(403, 'Anda tidak memiliki akses ke denda ini.');
@@ -328,12 +291,15 @@ class DendaController extends Controller
 
         if ($denda->status !== 'belum bayar') {
             if ($request->wantsJson()) {
-                return response()->json([
-                    'message' => 'Denda sudah dibayar atau sedang diverifikasi.',
-                    'errors' => [
-                        'denda' => ['Denda sudah dibayar atau sedang diverifikasi.'],
+                return response()->json(
+                    [
+                        'message' => 'Denda sudah dibayar atau sedang diverifikasi.',
+                        'errors' => [
+                            'denda' => ['Denda sudah dibayar atau sedang diverifikasi.'],
+                        ],
                     ],
-                ], 422);
+                    422,
+                );
             }
 
             return back()->withErrors([
@@ -341,21 +307,23 @@ class DendaController extends Controller
             ]);
         }
 
-        $validated = $request->validate([
-            'bukti_bayar' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-            'tanggal_bayar' => 'required|date|before_or_equal:today',
-        ], [
-            'bukti_bayar.required' => 'Bukti pembayaran wajib diunggah.',
-            'bukti_bayar.image' => 'Bukti harus berupa gambar.',
-            'bukti_bayar.mimes' => 'Bukti harus JPG, JPEG, atau PNG.',
-            'bukti_bayar.max' => 'Ukuran bukti maksimal 2 MB.',
-            'tanggal_bayar.required' => 'Tanggal pembayaran wajib diisi.',
-            'tanggal_bayar.date' => 'Tanggal pembayaran tidak valid.',
-            'tanggal_bayar.before_or_equal' => 'Tanggal pembayaran tidak boleh melebihi hari ini.',
-        ]);
+        $validated = $request->validate(
+            [
+                'bukti_bayar' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+                'tanggal_bayar' => 'required|date|before_or_equal:today',
+            ],
+            [
+                'bukti_bayar.required' => 'Bukti pembayaran wajib diunggah.',
+                'bukti_bayar.image' => 'Bukti harus berupa gambar.',
+                'bukti_bayar.mimes' => 'Bukti harus JPG, JPEG, atau PNG.',
+                'bukti_bayar.max' => 'Ukuran bukti maksimal 2 MB.',
+                'tanggal_bayar.required' => 'Tanggal pembayaran wajib diisi.',
+                'tanggal_bayar.date' => 'Tanggal pembayaran tidak valid.',
+                'tanggal_bayar.before_or_equal' => 'Tanggal pembayaran tidak boleh melebihi hari ini.',
+            ],
+        );
 
-        $path = $request->file('bukti_bayar')
-            ->store('bukti_denda', 'public');
+        $path = $request->file('bukti_bayar')->store('bukti_denda', 'public');
 
         $denda->update([
             'bukti_bayar' => $path,
@@ -371,8 +339,7 @@ class DendaController extends Controller
             ]);
         }
 
-        return redirect()->route('customer.dashboard')
-            ->with('success', 'Bukti pembayaran denda berhasil dikirim.');
+        return redirect()->route('customer.dashboard')->with('success', 'Bukti pembayaran denda berhasil dikirim.');
     }
 
     public function updateStatus(Request $request, Denda $denda)
@@ -387,13 +354,13 @@ class DendaController extends Controller
             'status' => 'required|in:belum bayar,lunas',
         ]);
 
-        if (
-            $validated['status'] === 'lunas' &&
-            !$denda->bukti_bayar
-        ) {
-            return response()->json([
-                'message' => 'Denda belum bisa dilunaskan karena belum ada bukti pembayaran.',
-            ], 422);
+        if ($validated['status'] === 'lunas' && !$denda->bukti_bayar) {
+            return response()->json(
+                [
+                    'message' => 'Denda belum bisa dilunaskan karena belum ada bukti pembayaran.',
+                ],
+                422,
+            );
         }
 
         $denda->update([
@@ -401,9 +368,7 @@ class DendaController extends Controller
         ]);
 
         return response()->json([
-            'message' => $validated['status'] === 'lunas'
-                ? 'Pembayaran denda berhasil diverifikasi.'
-                : 'Bukti pembayaran ditolak. Pelanggan dapat mengunggah ulang.',
+            'message' => $validated['status'] === 'lunas' ? 'Pembayaran denda berhasil diverifikasi.' : 'Bukti pembayaran ditolak. Pelanggan dapat mengunggah ulang.',
         ]);
     }
 }

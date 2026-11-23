@@ -17,7 +17,6 @@ class Kompensasi extends Model
         'nominal',
         'alasan',
         'tanggal',
-        'status',
         'catatan',
         'dibaca_at',
     ];
