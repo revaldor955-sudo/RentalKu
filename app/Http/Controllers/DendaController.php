@@ -194,12 +194,6 @@ class DendaController extends Controller
                 'deskripsi' => 'required|string|max:2000',
             ],
             [
-                'rental_id.required' => 'Rental wajib dipilih.',
-                'jenis.in' => 'Jenis denda tidak valid.',
-                'foto_bukti.image' => 'Foto bukti harus berupa gambar.',
-                'foto_bukti.mimes' => 'Foto bukti harus JPG, JPEG, atau PNG.',
-                'foto_bukti.max' => 'Ukuran foto maksimal 2 MB.',
-                'status.in' => 'Status denda tidak valid.',
                 'deskripsi.required' => 'Deskripsi denda wajib diisi.',
             ],
         );
