@@ -59,11 +59,11 @@ class KompensasiController extends Controller
             2 => 'kompensasis.jenis',
             3 => 'customer.name',
             4 => 'mobils.name',
-            5 => 'kompensasis.nominal',
-            6 => 'kompensasis.created_at',
+            5 => null,
+            6 => 'kompensasis.nominal',
         ];
 
-        $orderColumn = $request->input('order.0.column', 6);
+        $orderColumn = $request->input('order.0.column', 1);
         $orderDir = strtolower($request->input('order.0.dir', 'desc')) === 'asc' ? 'asc' : 'desc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
@@ -344,11 +344,11 @@ class KompensasiController extends Controller
             1 => 'kompensasis.tanggal',
             2 => 'kompensasis.jenis',
             3 => 'mobils.name',
-            4 => 'kompensasis.nominal',
-            5 => 'kompensasis.created_at',
+            4 => null,
+            5 => 'kompensasis.nominal',
         ];
 
-        $orderColumn = $request->input('order.0.column', 5);
+        $orderColumn = $request->input('order.0.column', 1);
         $orderDir = strtolower($request->input('order.0.dir', 'desc')) === 'asc' ? 'asc' : 'desc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
