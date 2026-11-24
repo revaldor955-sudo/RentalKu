@@ -201,10 +201,12 @@ Route::get('/katalog', [HomeController::class, 'katalog'])
 
 Route::get('/katalog/data', [HomeController::class, 'katalogData'])
     ->name('katalog.data');
-    
+
 // CONTACT
 
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+Route::post('/contact', [ContactController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('contact.store');
 
 // MANAGEMENT CONTACT / HUBUNGI KAMI
 // Admin saja
@@ -334,19 +336,28 @@ Route::middleware('customer')->group(function () {
             return redirect()->route('customer.dashboard')->with('error', 'Denda tidak ditemukan. Mungkin sudah dihapus.');
         });
 });
+
+// PELACAKAN GPS
+// Admin dan Staff
+
 Route::middleware('adminstaff')->group(function () {
     Route::get('/pelacakan-gps', [PelacakanGPSController::class, 'index'])
         ->name('pelacakan-gps.index');
 
-        Route::get('/pelacakan-gps/data', [PelacakanGPSController::class, 'data'])
-    ->name('pelacakan-gps.data');
+    Route::get('/pelacakan-gps/data', [PelacakanGPSController::class, 'data'])
+        ->name('pelacakan-gps.data');
+
     Route::delete('/pelacakan-gps/{rentalId}/hapus', [PelacakanGPSController::class, 'hapusData'])
-    ->name('pelacakan-gps.hapus');
+        ->name('pelacakan-gps.hapus');
+
     Route::get('/pelacakan-gps/{rental}/riwayat', [PelacakanGPSController::class, 'riwayat'])
         ->name('pelacakan-gps.riwayat');
+
     Route::get('/pelacakan-gps/{rental}/riwayat/data', [PelacakanGPSController::class, 'riwayatData'])
         ->name('pelacakan-gps.riwayat.data');
 });
+
+// PELACAKAN GPS - CUSTOMER
 
 Route::middleware('customer')->group(function () {
     Route::get('/customer/gps/{rental}', [PelacakanGPSController::class, 'pengirim'])
@@ -356,6 +367,7 @@ Route::middleware('customer')->group(function () {
         ->middleware('throttle:30,1')
         ->name('customer.gps.terima-lokasi');
 });
+
 // RENTAL & PEMBAYARAN
 // Admin dan Staff
 
@@ -398,23 +410,17 @@ Route::middleware('admin')->group(function () {
 // Admin dan Staff
 
 Route::middleware('adminstaff')->group(function () {
-   Route::middleware('adminstaff')->group(function () {
-
     // Menu Pengembalian
-    Route::resource('pengembalian', PengembalianController::class)
-        ->only(['index']);
+
+    Route::resource('pengembalian', PengembalianController::class)->only(['index']);
 
     // Detail rental pada menu Pengembalian
-    Route::get('/pengembalian/{rental}/detail', [
-        \App\Http\Controllers\PengembalianController::class,
-        'detail'
-    ])->name('pengembalian.detail');
+
+    Route::get('/pengembalian/{rental}/detail', [PengembalianController::class, 'detail'])->name('pengembalian.detail');
 
     // Menu Pemeriksaan Kendaraan
-    Route::resource('pemeriksaan-kendaraan', PemeriksaanKendaraanController::class)
-        ->only(['index']);
 
-});
+    Route::resource('pemeriksaan-kendaraan', PemeriksaanKendaraanController::class)->only(['index']);
 
     Route::get('/pemeriksaan-kendaraan/data', [PemeriksaanKendaraanController::class, 'data'])->name('pemeriksaan-kendaraan.data');
 
@@ -457,12 +463,15 @@ Route::middleware('admin')->group(function () {
 });
 
 // route OTP
+
 Route::middleware('auth')->group(function () {
     Route::get('/otp', [OtpController::class, 'show'])->name('otp.show');
+
     // Bucket route hanya meredam burst; cap 5 salah per user tetap penjaga utama.
     Route::post('/otp', [OtpController::class, 'verify'])
         ->middleware('throttle:10,1,otp-verify')
         ->name('otp.verify');
+
     Route::post('/otp/resend', [OtpController::class, 'resend'])
         ->middleware('throttle:3,1,otp-resend')
         ->name('otp.resend');

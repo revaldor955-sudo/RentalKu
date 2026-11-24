@@ -599,7 +599,7 @@
                                         </select>
                                         <input type="number" id="komp-pager-custom"
                                             class="form-control form-control-sm pager-jump" min="1"
-                                            max="500" value="10" aria-label="Jumlah custom per halaman">
+                                            max="100" value="10" aria-label="Jumlah custom per halaman">
                                         <span class="text-secondary" id="komp-pager-pages">
                                             Halaman 1 / 1
                                         </span>
@@ -622,72 +622,139 @@
                 </div>
             </div>
 
-            <div class="modal fade" id="detailKompensasiModal" tabindex="-1">
-                <div class="modal-dialog modal-lg modal-dialog-centered">
-                    <div class="modal-content">
-                        @include('layouts.partials.modal-head', [
-                            'title' => 'Detail Kompensasi',
-                            'icon' => 'bi-eye',
-                        ])
-                        <div class="modal-body">
-                            <div class="row g-3">
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold" for="detailTanggal">Tanggal</label>
-                                    <input type="text" id="detailTanggal" class="form-control" readonly>
-                                </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold" for="detailJenis">Jenis</label>
-                                    <input type="text" id="detailJenis" class="form-control" readonly>
-                                </div>
+        </div>
+    </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold" for="detailPelanggan">Pelanggan</label>
-                                    <input type="text" id="detailPelanggan" class="form-control" readonly>
-                                </div>
+    <div class="modal fade" id="detailKompensasiModal" tabindex="-1" aria-labelledby="detailKompensasiModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                @include('layouts.partials.modal-head', [
+                    'title' => 'Detail Kompensasi',
+                    'icon' => 'bi-eye',
+                    'titleId' => 'detailKompensasiModalLabel',
+                ])
+                <div class="modal-body">
+                    <div class="border rounded-4 p-3 mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-bold mb-0">Informasi Kompensasi</h6>
+                            <span class="rc-badge status-selesai">Tercatat</span>
+                        </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold" for="detailMobil">Mobil</label>
-                                    <input type="text" id="detailMobil" class="form-control" readonly>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold" for="detailNominal">Nominal</label>
-                                    <input type="text" id="detailNominal" class="form-control" readonly>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold" for="detailStaff">Staff</label>
-                                    <input type="text" id="detailStaff" class="form-control" readonly>
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold" for="detailAlasan">Alasan</label>
-                                    <textarea id="detailAlasan" class="form-control" rows="3" readonly></textarea>
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold" for="detailCatatan">Catatan</label>
-                                    <textarea id="detailCatatan" class="form-control" rows="3" readonly></textarea>
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="form-label fw-semibold" for="detailBuktiGrid">Bukti</label>
-                                    <div id="detailBuktiGrid" class="bukti-grid"></div>
-                                </div>
-
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <small class="text-muted d-block mb-1">Tanggal</small>
+                                <div class="fw-semibold" id="detailTanggal">-</div>
                             </div>
 
-                        </div>
+                            <div class="col-md-6">
+                                <small class="text-muted d-block mb-1">Jenis Kompensasi</small>
+                                <div class="fw-semibold" id="detailJenis">-</div>
+                            </div>
 
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                <i class="bi bi-x-circle me-1"></i>
-                                Tutup
-                            </button>
+                            <div class="col-12">
+                                <div class="bg-light rounded-3 p-3">
+                                    <small class="text-muted d-block mb-1">Nominal Kompensasi</small>
+                                    <h3 class="fw-bold text-success mb-0" id="detailNominal">-</h3>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3">Informasi Pelanggan</h6>
+
+                        <div class="border rounded-4 p-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rc-avatar"><i class="bi bi-person-fill"></i></div>
+
+                                <div class="overflow-hidden">
+                                    <div class="fw-bold text-truncate" id="detailCustomerName">-</div>
+                                    <small class="text-muted text-truncate d-block" id="detailCustomerEmail">-</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3">Informasi Rental</h6>
+
+                        <div class="border rounded-4 p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <small class="text-muted d-block">ID Rental</small>
+                                    <span class="fw-bold" id="detailRentalId">-</span>
+                                </div>
+
+                                <span class="rc-badge status-selesai">Selesai</span>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="rc-avatar"><i class="bi bi-car-front-fill"></i></div>
+
+                                <div class="overflow-hidden">
+                                    <div class="fw-bold" id="detailMobil">-</div>
+                                    <small class="text-muted" id="detailPeriodeRental">-</small>
+                                </div>
+                            </div>
+
+                            <hr class="border-secondary-subtle">
+
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Petugas</small>
+                                    <span class="fw-semibold" id="detailStaff">-</span>
+                                </div>
+
+                                <div class="col-6" id="detailDiskonWrap">
+                                    <small class="text-muted d-block">Diskon</small>
+                                    <span class="fw-semibold" id="detailDiskon">-</span>
+                                </div>
+
+                                <div class="col-4">
+                                    <small class="text-muted d-block">Harga / Hari</small>
+                                    <span class="fw-semibold small" id="detailHargaPerhari">-</span>
+                                </div>
+
+                                <div class="col-4">
+                                    <small class="text-muted d-block">Total Rental</small>
+                                    <span class="fw-semibold small" id="detailTotalHarga">-</span>
+                                </div>
+
+                                <div class="col-4">
+                                    <small class="text-muted d-block">Deposit</small>
+                                    <span class="fw-semibold small" id="detailDeposit">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3">Keterangan Kompensasi</h6>
+
+                        <div class="border rounded-4 p-3 mb-3">
+                            <small class="text-muted d-block mb-2">Alasan</small>
+                            <p class="mb-0" id="detailAlasan">-</p>
+                        </div>
+
+                        <div class="border rounded-4 p-3">
+                            <small class="text-muted d-block mb-2">Catatan Tambahan</small>
+                            <p class="mb-0" id="detailCatatan">-</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h6 class="fw-bold mb-3">Bukti Dokumentasi</h6>
+                        <div id="detailBuktiGrid" class="row g-2"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Tutup
+                    </button>
                 </div>
             </div>
         </div>
@@ -1017,7 +1084,8 @@
             var kompTable = $('#kompensasis-table').DataTable({
                 processing: true,
                 serverSide: true,
-                paging: false,
+                paging: true,
+                pageLength: 10,
                 info: false,
                 dom: 'frt',
                 ajax: {
@@ -1071,9 +1139,10 @@
                         data: 'nominal',
                         orderable: true,
                         searchable: false,
-                        render: function(data) {
-                            if (data === null || data === undefined || data === '')
+                        render: function(data, type, row) {
+                            if (row.jenis !== 'pengembalian_dana') {
                                 return '<span class="text-muted">-</span>';
+                            }
                             return '<span class="fw-semibold">' + esc(formatRupiah(data)) +
                                 '</span>';
                         },
@@ -1164,7 +1233,7 @@
             });
             $('#komp-pager-custom').on('change', function() {
                 var n = parseInt($(this).val(), 10) || 1;
-                n = Math.min(Math.max(n, 1), 500);
+                n = Math.min(Math.max(n, 1), 100);
                 $(this).val(n);
                 if (['10', '20', '50', '100'].indexOf(String(n)) !== -1) {
                     $('#komp-pager-len').val(String(n));
@@ -1176,36 +1245,103 @@
 
         });
 
+
+
+
         function openDetail(id) {
-            const data = $('#kompensasis-table').DataTable().rows().data().toArray()
-                .find(r => r.id == id);
+            const table = $('#kompensasis-table').DataTable();
+            const data = table.rows().data().toArray().find(row => row.id == id);
 
             if (!data) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Gagal',
-                    text: 'Data kompensasi tidak ditemukan.',
+                    title: 'Data tidak ditemukan',
+                    text: 'Data kompensasi tidak tersedia pada halaman ini.'
                 });
                 return;
             }
 
-            $('#detailTanggal').val(data.tanggal);
-            var jenisLabels = {
-                'pengembalian_dana': 'Pengembalian Dana',
-                'diskon': 'Diskon',
-                'gratis_sewa': 'Gratis Sewa'
-            };
-            $('#detailJenis').val(jenisLabels[data.jenis] || data.jenis || '-');
-            $('#detailPelanggan').val((data.customer_name ?? '-') + ' (' + (data.customer_email ?? '-') + ')');
-            $('#detailMobil').val((data.mobil_name ?? '-') + ' (' + (data.mobil_plate ?? '-') + ')');
-            $('#detailNominal').val(formatRupiah(data.nominal));
-            $('#detailStaff').val(data.staff_name ?? '-');
-            $('#detailAlasan').val(data.alasan);
-            $('#detailCatatan').val(data.catatan || '-');
-            renderBuktiGrid($('#detailBuktiGrid'), buktiList(data));
+            const rental = data.rental || {};
 
-            bootstrap.Modal.getOrCreateInstance($('#detailKompensasiModal')[0]).show();
+            const jenisLabels = {
+                pengembalian_dana: 'Pengembalian Dana',
+                diskon: 'Diskon',
+                gratis_sewa: 'Gratis Sewa'
+            };
+            $('#detailTanggal').text(data.tanggal || '-');
+            $('#detailJenis').text(jenisLabels[data.jenis] || data.jenis || '-');
+
+            $('#detailNominal').text(
+                data.jenis === 'pengembalian_dana' ?
+                formatRupiah(data.nominal) :
+                '-'
+            );
+            $('#detailCustomerName').text(data.customer_name || '-');
+            $('#detailCustomerEmail').text(data.customer_email || '-');
+            $('#detailRentalId').text(rental.id ? '#' + rental.id : '-');
+
+            $('#detailMobil').text(
+                data.mobil_name && data.mobil_name !== '-' ?
+                `${data.mobil_name} (${data.mobil_plate || '-'})` :
+                '-'
+            );
+
+            const periode = rental.tanggal_mulai && rental.tanggal_selesai ?
+                `${rental.tanggal_mulai} - ${rental.tanggal_selesai} (${rental.jumlah_hari || 0} hari)` :
+                '-';
+            $('#detailPeriodeRental').text(periode);
+            $('#detailStaff').text(data.staff_name || '-');
+            $('#detailDiskon').text(formatRupiah(rental.diskon));
+            $('#detailHargaPerhari').text(formatRupiah(rental.harga_perhari));
+            $('#detailTotalHarga').text(formatRupiah(rental.total_harga));
+            $('#detailDeposit').text(formatRupiah(rental.deposit));
+            $('#detailDiskonWrap').toggle(Number(rental.diskon || 0) > 0);
+            $('#detailAlasan').text(data.alasan || '-');
+            $('#detailCatatan').text(data.catatan || '-');
+
+            const $grid = $('#detailBuktiGrid');
+            const urls = buktiList(data);
+
+            $grid.empty();
+
+            if (urls.length) {
+                urls.forEach(function(url) {
+                    const $column = $('<div>').addClass('col-4 col-md-3');
+
+                    const $image = $('<img>').attr({
+                        src: url,
+                        alt: 'Bukti kompensasi'
+                    }).addClass('img-fluid rounded-3 border').css({
+                        width: '100%',
+                        height: '110px',
+                        objectFit: 'cover',
+                        cursor: 'zoom-in'
+                    });
+
+                    $image.on('click', function() {
+                        openBuktiLightbox(url);
+                    });
+
+                    $column.append($image);
+                    $grid.append($column);
+                });
+            } else {
+                $grid.append(`
+            <div class="col-12">
+                <div class="bg-light rounded-3 p-3 text-muted small">
+                    <i class="bi bi-image me-2"></i>
+                    Tidak ada bukti dokumentasi.
+                </div>
+            </div>
+        `);
+            }
+            bootstrap.Modal.getOrCreateInstance(
+                document.getElementById('detailKompensasiModal')
+            ).show();
         }
+
+
+
 
         var rentalPicker = (function() {
             var $search = $('#createRentalSearch');
@@ -1476,6 +1612,7 @@
             }
 
             var formData = new FormData(this);
+            var $btn = $(this).find('button[type=submit]');
 
             $.ajax({
                 url: '{{ route('kompensasis.store') }}',
@@ -1487,6 +1624,12 @@
                     'X-CSRF-TOKEN': CSRF_TOKEN,
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
+                },
+                beforeSend: function() {
+                    $btn.prop('disabled', true);
+                },
+                complete: function() {
+                    $btn.prop('disabled', false);
                 },
                 success: function(result) {
                     bootstrap.Modal.getOrCreateInstance($('#createKompensasiModal')[0]).hide();
