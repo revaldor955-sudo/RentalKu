@@ -574,6 +574,7 @@
                                         <th>Jenis</th>
                                         <th>Pelanggan</th>
                                         <th>Mobil</th>
+                                        <th>Rental</th>
                                         <th>Nominal</th>
                                         <th>Staff</th>
                                         <th>Bukti</th>
@@ -1133,6 +1134,20 @@
                                 '</div>' +
                                 '<small class="text-muted">' + esc(data.mobil_plate ?? '-') +
                                 '</small>';
+                        },
+                    },
+                    {
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        render: function(data) {
+                            const rental = data.rental || {};
+                            if (!rental.id) return '<span class="text-muted">-</span>';
+                            const periode = rental.tanggal_mulai && rental.tanggal_selesai ?
+                                rental.tanggal_mulai + ' s/d ' + rental.tanggal_selesai :
+                                '-';
+                            return '<div class="fw-bold">Rental #' + esc(rental.id) + '</div>' +
+                                '<small class="text-muted">' + esc(periode) + '</small>';
                         },
                     },
                     {
