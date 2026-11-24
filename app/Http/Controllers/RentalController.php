@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Denda;
 use App\Models\Mobil;
 use App\Models\Rental;
 use App\Models\Supir;
@@ -31,6 +32,10 @@ class RentalController extends Controller
             }
 
             return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        if ($blokir = $this->blokirKarenaDenda($request)) {
+            return $blokir;
         }
 
         if ($mobil->status !== 'Tersedia') {
@@ -168,7 +173,9 @@ class RentalController extends Controller
                     );
                 }
 
-                return back()->withErrors(['kode_promo' => $promoResult['message']])->withInput();
+                return back()
+                    ->withErrors(['kode_promo' => $promoResult['message']])
+                    ->withInput();
             }
 
             $kupon = $promoResult['kupon'];
@@ -406,7 +413,7 @@ class RentalController extends Controller
             ],
         ]);
 
-        $checkoutUrl = route('rentals.checkout.show', ['mobil' => $mobil->id]);
+        $checkoutUrl = route('rentals.checkout.show', ['mobil' => $mobil]);
         if ($isAjax) {
             $supirData = null;
             if ($supir) {
@@ -442,108 +449,101 @@ class RentalController extends Controller
             ]);
         }
 
-return redirect()->route('rentals.checkout.show', [
-    'mobil' => $mobil->id,
-]);    }
+        return redirect()->route('rentals.checkout.show', ['mobil' => $mobil]);
+    }
 
     /**
      * Menampilkan halaman checkout rental
      */
     public function showCheckout(Mobil $mobil)
-{
-    $checkout = session('checkout_rental');
+    {
+        $checkout = session('checkout_rental');
 
-    if (!$checkout) {
-        return redirect()->route('customer.dashboard')
-            ->with('error', 'Data checkout tidak ditemukan. Silakan ulangi proses booking.');
+        if (!$checkout) {
+            return redirect()->route('customer.dashboard')->with('error', 'Data checkout tidak ditemukan. Silakan ulangi proses booking.');
+        }
+
+        if ((int) ($checkout['mobil_id'] ?? 0) !== (int) $mobil->id) {
+            return redirect()->route('home')->with('error', 'Data checkout tidak sesuai dengan mobil.');
+        }
+
+        $supir = null;
+
+        if (!empty($checkout['supir_id'])) {
+            $supir = Supir::find($checkout['supir_id']);
+        }
+
+        $cabangAmbil = \App\Models\Cabang::find($checkout['cabang_ambil_id'] ?? null);
+        $cabangKembali = \App\Models\Cabang::find($checkout['cabang_kembali_id'] ?? null);
+
+        return view('customer.checkout', [
+            'mobil' => $mobil,
+            'checkout' => $checkout,
+            'supir' => $supir,
+            'cabangAmbil' => $cabangAmbil,
+            'cabangKembali' => $cabangKembali,
+            'jumlahHari' => $checkout['jumlah_hari'] ?? 0,
+            'subtotalMobil' => $checkout['subtotal_mobil'] ?? 0,
+            'subtotalSupir' => $checkout['subtotal_supir'] ?? 0,
+            'deposit' => $checkout['deposit'] ?? 0,
+            'diskon' => $checkout['diskon'] ?? 0,
+            'totalHarga' => $checkout['total_harga'] ?? 0,
+        ]);
     }
-
-    if ((int) ($checkout['mobil_id'] ?? 0) !== (int) $mobil->id) {
-        return redirect()->route('home')
-            ->with('error', 'Data checkout tidak sesuai dengan mobil.');
-    }
-
-    $supir = null;
-
-    if (!empty($checkout['supir_id'])) {
-        $supir = Supir::find($checkout['supir_id']);
-    }
-
-    $cabangAmbil = \App\Models\Cabang::find($checkout['cabang_ambil_id'] ?? null);
-    $cabangKembali = \App\Models\Cabang::find($checkout['cabang_kembali_id'] ?? null);
-
-    return view('customer.checkout', [
-        'mobil' => $mobil,
-        'checkout' => $checkout,
-        'supir' => $supir,
-        'cabangAmbil' => $cabangAmbil,
-        'cabangKembali' => $cabangKembali,
-        'jumlahHari' => $checkout['jumlah_hari'] ?? 0,
-        'subtotalMobil' => $checkout['subtotal_mobil'] ?? 0,
-        'subtotalSupir' => $checkout['subtotal_supir'] ?? 0,
-        'deposit' => $checkout['deposit'] ?? 0,
-        'diskon' => $checkout['diskon'] ?? 0,
-        'totalHarga' => $checkout['total_harga'] ?? 0,
-    ]);
-}
 
     /**
      * Konfirmasi checkout dan simpan rental
      */
-   /**
- * Konfirmasi checkout dan simpan rental
- */
-public function confirmCheckout(Request $request, $mobil)
-{
-    $mobil = Mobil::findOrFail($mobil);
-    if (!auth()->check()) {
-        return redirect()->route('login')
-            ->with('error', 'Silakan login terlebih dahulu.');
+    /**
+     * Konfirmasi checkout dan simpan rental
+     */
+    public function confirmCheckout(Request $request, Mobil $mobil)
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        $checkout = session('checkout_rental');
+
+        if (!$checkout) {
+            return redirect()->route('customer.dashboard')->with('error', 'Data checkout tidak ditemukan. Silakan ulangi proses booking.');
+        }
+
+        if ((int) ($checkout['mobil_id'] ?? 0) !== (int) $mobil->id) {
+            session()->forget('checkout_rental');
+
+            return redirect()->route('customer.dashboard')->with('error', 'Data checkout tidak sesuai dengan mobil.');
+        }
+
+        $request->merge([
+            'tanggal_mulai' => $checkout['tanggal_mulai'],
+            'tanggal_selesai' => $checkout['tanggal_selesai'],
+            'supir_id' => $checkout['supir_id'] ?? null,
+            'kode_promo' => $request->input('kode_promo', $checkout['kode_promo'] ?? null),
+            'catatan' => $checkout['catatan'] ?? null,
+            'cabang_ambil_id' => $checkout['cabang_ambil_id'] ?? null,
+            'cabang_kembali_id' => $checkout['cabang_kembali_id'] ?? null,
+        ]);
+
+        $response = $this->store($request, $mobil);
+
+        // Hapus session checkout hanya kalau rental benar-benar tersimpan.
+        $berhasil = $response instanceof \Illuminate\Http\JsonResponse ? $response->getData(true)['success'] ?? false : session()->has('success');
+
+        if ($berhasil) {
+            session()->forget('checkout_rental');
+        }
+
+        return $response;
     }
 
-    $checkout = session('checkout_rental');
-
-    if (!$checkout) {
-        return redirect()->route('customer.dashboard')
-            ->with('error', 'Data checkout tidak ditemukan. Silakan ulangi proses booking.');
+    /**
+     * Menampilkan halaman rental admin/staff
+     */
+    public function index()
+    {
+        return view('admin.rentals.index')->with('pageTitle', 'Transaksi Rental');
     }
-
-    if ((int) ($checkout['mobil_id'] ?? 0) !== (int) $mobil->id) {
-        session()->forget('checkout_rental');
-
-        return redirect()->route('customer.dashboard')
-            ->with('error', 'Data checkout tidak sesuai dengan mobil.');
-    }
-
-    $request->merge([
-        'tanggal_mulai' => $checkout['tanggal_mulai'],
-        'tanggal_selesai' => $checkout['tanggal_selesai'],
-        'supir_id' => $checkout['supir_id'] ?? null,
-        'kode_promo' => $request->input('kode_promo', $checkout['kode_promo'] ?? null),
-        'catatan' => $checkout['catatan'] ?? null,
-        'cabang_ambil_id' => $checkout['cabang_ambil_id'] ?? null,
-        'cabang_kembali_id' => $checkout['cabang_kembali_id'] ?? null,
-    ]);
-
-    $response = $this->store($request, $mobil);
-
-    if (
-        $response instanceof \Illuminate\Http\RedirectResponse &&
-        $response->getTargetUrl() === route('customer.dashboard')
-    ) {
-        session()->forget('checkout_rental');
-    }
-
-    return $response;
-}
-
-/**
- * Menampilkan halaman rental admin/staff
- */
-public function index()
-{
-    return view('admin.rentals.index')->with('pageTitle', 'Transaksi Rental');
-}
 
     /**
      * DataTables rental
@@ -577,7 +577,7 @@ public function index()
     | Total data sebelum pencarian
     |--------------------------------------------------------------------------
     */
-        $recordsTotal = Rental::when($statusFilter !== [], fn ($q) => $q->whereIn('status', $statusFilter))->count();
+        $recordsTotal = Rental::when($statusFilter !== [], fn($q) => $q->whereIn('status', $statusFilter))->count();
 
         /*
     |--------------------------------------------------------------------------
@@ -754,17 +754,15 @@ public function index()
             'status' => $rental->status,
             'catatan' => $rental->catatan ?? '-',
             'supirs' => $supirs,
-            'pembayaran' => $pembayaran ? [
-                'metode' => $pembayaran->metodePembayaran->name ?? '-',
-                'tanggal_bayar' => $pembayaran->tanggal_bayar
-                    ? Carbon::parse($pembayaran->tanggal_bayar)->format('d/m/Y')
-                    : '-',
-                'jumlah' => (float) $pembayaran->jumlah,
-                'status' => $pembayaran->status,
-                'bukti_url' => $pembayaran->bukti
-                    ? asset('storage/' . $pembayaran->bukti)
-                    : null,
-            ] : null,
+            'pembayaran' => $pembayaran
+                ? [
+                    'metode' => $pembayaran->metodePembayaran->name ?? '-',
+                    'tanggal_bayar' => $pembayaran->tanggal_bayar ? Carbon::parse($pembayaran->tanggal_bayar)->format('d/m/Y') : '-',
+                    'jumlah' => (float) $pembayaran->jumlah,
+                    'status' => $pembayaran->status,
+                    'bukti_url' => $pembayaran->bukti ? asset('storage/' . $pembayaran->bukti) : null,
+                ]
+                : null,
             'rating' => $rental->rating,
         ]);
     }
@@ -774,10 +772,6 @@ public function index()
      */
     public function updateStatus(Request $request, Rental $rental)
     {
-        if (auth()->user()->roles_id === 3) {
-            abort(403, 'Anda tidak berhak mengubah status rental.');
-        }
-
         $request->validate([
             'status' => ['required', 'in:Disetujui,Ditolak,Berjalan,Selesai'],
         ]);
@@ -786,11 +780,11 @@ public function index()
 
         // Transisi legal mengikuti tombol di UI: Menunggu -> Disetujui/Ditolak,
         // Disetujui -> Selesai. Status final tidak bisa diubah lagi.
-       $transisi = [
-    'Menunggu' => ['Disetujui', 'Ditolak'],
-    'Disetujui' => ['Berjalan', 'Selesai'],
-    'Berjalan' => ['Selesai'],
-];
+        $transisi = [
+            'Menunggu' => ['Disetujui', 'Ditolak'],
+            'Disetujui' => ['Berjalan', 'Selesai'],
+            'Berjalan' => ['Selesai'],
+        ];
 
         if ($rental->status !== $status && !in_array($status, $transisi[$rental->status] ?? [], true)) {
             return response()->json(
@@ -801,7 +795,6 @@ public function index()
             );
         }
 
-        // Replay status sama = no-op (jangan tembak side-effect dua kali).
         if ($rental->status === $status) {
             return response()->json([
                 'message' => 'Status rental sudah ' . $status . '.',
@@ -837,14 +830,13 @@ public function index()
 
         if ($status === 'Ditolak') {
             DB::transaction(function () use ($rental) {
-                $rental->update([
-                    'status' => 'Ditolak',
-                ]);
+                $rental->update(['status' => 'Ditolak']);
 
-                if ($rental->mobil) {
-                    $rental->mobil->update([
-                        'status' => 'Tersedia',
-                    ]);
+                // Kembalikan kuota kupon yang sempat terpakai.
+                if ($rental->kode_promo) {
+                    Kupon::whereRaw('UPPER(code) = ?', [strtoupper($rental->kode_promo)])
+                        ->where('terpakai', '>', 0)
+                        ->decrement('terpakai');
                 }
             });
 
@@ -965,6 +957,32 @@ public function index()
         }
 
         return back()->with('error', $message);
+    }
+
+    /**
+     * Blokir sewa baru selama customer punya denda yang belum lunas.
+     */
+    private function blokirKarenaDenda(Request $request)
+    {
+        $denda = Denda::belumLunas()->whereHas('rental', fn($q) => $q->where('user_id', auth()->id()))->get();
+
+        if ($denda->isEmpty()) {
+            return null;
+        }
+
+        $message = $denda->contains('status', 'belum bayar') ? 'Anda masih memiliki denda yang belum dibayar. Selesaikan pembayaran denda terlebih dahulu sebelum menyewa mobil lagi.' : 'Pembayaran denda Anda sedang menunggu verifikasi tim kami. Anda bisa menyewa mobil lagi setelah denda dinyatakan lunas.';
+
+        if ($request->expectsJson()) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => $message,
+                ],
+                422,
+            );
+        }
+
+        return redirect()->route('customer.dashboard')->with('error', $message);
     }
 
     /**
