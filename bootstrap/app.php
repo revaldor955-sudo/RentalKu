@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         'staff' => \App\Http\Middleware\StaffMiddleware::class,
         'customer' => \App\Http\Middleware\CustomerMiddleware::class,
         'adminstaff' => \App\Http\Middleware\AdminStaffMiddleware::class,
+        'blokir.denda' => \App\Http\Middleware\BlokirJikaAdaDenda::class,
     ]);
 })
     ->withExceptions(function (Exceptions $exceptions): void {

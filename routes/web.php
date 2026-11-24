@@ -193,14 +193,11 @@ Route::middleware('admin')->group(function () {
 
 // LANDING PAGE
 
-Route::get('/', [HomeController::class, 'index'])
-    ->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/katalog', [HomeController::class, 'katalog'])
-    ->name('katalog.index');
+Route::get('/katalog', [HomeController::class, 'katalog'])->name('katalog.index');
 
-Route::get('/katalog/data', [HomeController::class, 'katalogData'])
-    ->name('katalog.data');
+Route::get('/katalog/data', [HomeController::class, 'katalogData'])->name('katalog.data');
 
 // CONTACT
 
@@ -298,13 +295,14 @@ Route::middleware('customer')->group(function () {
 
     Route::get('/customer/checkout/{mobil}', [RentalController::class, 'showCheckout'])->name('rentals.checkout.show');
 
-    Route::post('/customer/checkout/{mobil}', [RentalController::class, 'checkout'])->name('rentals.checkout');
+    // diblokir selama customer punya denda belum lunas
+    Route::middleware(['customer', 'blokir.denda'])->group(function () {
+        Route::post('/customer/checkout/{mobil}', [RentalController::class, 'checkout'])->name('rentals.checkout');
 
-    Route::post('/customer/checkout/confirm/{mobil}', [RentalController::class, 'confirmCheckout'])->name('rentals.checkout.confirm');
+        Route::post('/customer/checkout/confirm/{mobil}', [RentalController::class, 'confirmCheckout'])->name('rentals.checkout.confirm');
 
-    // Rental
-
-    Route::post('/customer/rental/{mobil}', [RentalController::class, 'store'])->name('rentals.store');
+        Route::post('/customer/rental/{mobil}', [RentalController::class, 'store'])->name('rentals.store');
+    });
 
     // Pemeriksaan promo
 
@@ -341,27 +339,21 @@ Route::middleware('customer')->group(function () {
 // Admin dan Staff
 
 Route::middleware('adminstaff')->group(function () {
-    Route::get('/pelacakan-gps', [PelacakanGPSController::class, 'index'])
-        ->name('pelacakan-gps.index');
+    Route::get('/pelacakan-gps', [PelacakanGPSController::class, 'index'])->name('pelacakan-gps.index');
 
-    Route::get('/pelacakan-gps/data', [PelacakanGPSController::class, 'data'])
-        ->name('pelacakan-gps.data');
+    Route::get('/pelacakan-gps/data', [PelacakanGPSController::class, 'data'])->name('pelacakan-gps.data');
 
-    Route::delete('/pelacakan-gps/{rentalId}/hapus', [PelacakanGPSController::class, 'hapusData'])
-        ->name('pelacakan-gps.hapus');
+    Route::delete('/pelacakan-gps/{rentalId}/hapus', [PelacakanGPSController::class, 'hapusData'])->name('pelacakan-gps.hapus');
 
-    Route::get('/pelacakan-gps/{rental}/riwayat', [PelacakanGPSController::class, 'riwayat'])
-        ->name('pelacakan-gps.riwayat');
+    Route::get('/pelacakan-gps/{rental}/riwayat', [PelacakanGPSController::class, 'riwayat'])->name('pelacakan-gps.riwayat');
 
-    Route::get('/pelacakan-gps/{rental}/riwayat/data', [PelacakanGPSController::class, 'riwayatData'])
-        ->name('pelacakan-gps.riwayat.data');
+    Route::get('/pelacakan-gps/{rental}/riwayat/data', [PelacakanGPSController::class, 'riwayatData'])->name('pelacakan-gps.riwayat.data');
 });
 
 // PELACAKAN GPS - CUSTOMER
 
 Route::middleware('customer')->group(function () {
-    Route::get('/customer/gps/{rental}', [PelacakanGPSController::class, 'pengirim'])
-        ->name('customer.gps.pengirim');
+    Route::get('/customer/gps/{rental}', [PelacakanGPSController::class, 'pengirim'])->name('customer.gps.pengirim');
 
     Route::post('/customer/gps/{rental}/lokasi', [PelacakanGPSController::class, 'terimaLokasi'])
         ->middleware('throttle:30,1')
