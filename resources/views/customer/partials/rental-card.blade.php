@@ -1,16 +1,10 @@
-
 <div class="rental-card">
-    <div class="stat-card d-flex flex-column h-100">
+    <div class="stat-card d-flex flex-column">
 
         <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
-
             <div class="rental-image-thumb">
                 @if($rental->mobil && $rental->mobil->image)
-                    <img
-                        src="{{ asset($rental->mobil->image) }}"
-                        alt="{{ $rental->mobil->name }}"
-                        class="img-fluid rounded"
-                    >
+                    <img src="{{ asset($rental->mobil->image) }}" alt="{{ $rental->mobil->name }}" class="img-fluid rounded">
                 @else
                     <div class="placeholder-image rounded d-flex align-items-center justify-content-center">
                         <i class="bi bi-car-front-fill"></i>
@@ -19,25 +13,15 @@
             </div>
 
             <div class="flex-grow-1">
-                <h6 class="fw-bold mb-1">
-                    {{ $rental->mobil->name ?? 'Mobil' }}
-                </h6>
-
-                <small class="text-muted d-block">
-                    Rental #{{ $rental->id }}
-                </small>
+                <h6 class="fw-bold mb-1">{{ $rental->mobil->name ?? 'Mobil' }}</h6>
+                <small class="text-muted d-block">Rental #{{ $rental->id }}</small>
 
                 <div class="mt-2">
-                    <span class="badge
-                        {{ $rental->status === 'Selesai' ? 'bg-success' :
-                           ($rental->status === 'Disetujui' ? 'bg-primary' :
-                           ($rental->status === 'Menunggu' ? 'bg-warning text-dark' :
-                           ($rental->status === 'Ditolak' ? 'bg-danger' : 'bg-secondary'))) }}">
+                    <span class="badge {{ $rental->status === 'Selesai' ? 'bg-success' : ($rental->status === 'Disetujui' ? 'bg-primary' : ($rental->status === 'Menunggu' ? 'bg-warning text-dark' : ($rental->status === 'Ditolak' ? 'bg-danger' : 'bg-secondary'))) }}">
                         {{ $rental->status }}
                     </span>
                 </div>
             </div>
-
         </div>
 
         <div class="rental-data mb-3">
@@ -60,109 +44,81 @@
                 <i class="bi bi-wallet2 mt-1"></i>
 
                 <div class="w-100">
-
                     <div class="d-flex justify-content-between mb-1">
                         <span class="text-muted">Subtotal Rental</span>
-                        <span>
-                            Rp {{ number_format($rental->subtotal, 0, ',', '.') }}
-                        </span>
+                        <span>Rp {{ number_format($rental->subtotal, 0, ',', '.') }}</span>
                     </div>
 
                     @if(($rental->diskon ?? 0) > 0)
                         <div class="d-flex justify-content-between mb-1">
-                            <span class="text-success">
-                                Diskon ({{ $rental->kode_promo }})
-                            </span>
-
-                            <span class="text-success fw-bold">
-                                − Rp {{ number_format($rental->diskon, 0, ',', '.') }}
-                            </span>
+                            <span class="text-success">Diskon ({{ $rental->kode_promo }})</span>
+                            <span class="text-success fw-bold">− Rp {{ number_format($rental->diskon, 0, ',', '.') }}</span>
                         </div>
                     @endif
 
                     <div class="d-flex justify-content-between mb-1">
                         <span class="text-muted">Deposit</span>
-                        <span>
-                            Rp {{ number_format($rental->deposit, 0, ',', '.') }}
-                        </span>
+                        <span>Rp {{ number_format($rental->deposit, 0, ',', '.') }}</span>
                     </div>
 
                     <hr class="my-2">
 
                     <div class="d-flex justify-content-between">
                         <span class="fw-bold">Total Pembayaran</span>
-
-                        <span class="text-success fw-bold">
-                            Rp {{ number_format($rental->total_harga, 0, ',', '.') }}
-                        </span>
+                        <span class="text-success fw-bold">Rp {{ number_format($rental->total_harga, 0, ',', '.') }}</span>
                     </div>
-
                 </div>
             </div>
-
         </div>
 
-        <div class="mt-auto">
+        <div class="rental-actions">
 
             @if($rental->status === 'Disetujui')
 
                 @if(!$rental->pembayaran)
-
-                    <button
-                        type="button"
-                        class="btn btn-success w-100 btn-bayar"
+                    <button type="button" class="btn btn-success w-100 btn-bayar"
                         data-action="{{ route('pembayaran.store', $rental->id) }}"
                         data-title="Bayar Sekarang"
                         data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
                         data-rental="{{ $rental->id }}"
                         data-cabang="{{ $rental->cabang_ambil_id }}"
-                        data-total="{{ $rental->total_harga }}"
-                    >
+                        data-total="{{ $rental->total_harga }}">
                         <i class="bi bi-credit-card me-1"></i>
                         Bayar Sekarang
                     </button>
 
                 @elseif($rental->pembayaran->status === 'Menunggu')
-
                     <div class="alert alert-info mb-0 py-2 px-3">
                         <i class="bi bi-clock-history me-1"></i>
                         <small>Bukti pembayaran sedang diverifikasi.</small>
                     </div>
 
                 @elseif($rental->pembayaran->status === 'Disetujui')
-
                     <div class="alert alert-success mb-0 py-2 px-3">
                         <i class="bi bi-check-circle-fill me-1"></i>
                         <small>Pembayaran terverifikasi.</small>
                     </div>
 
                 @elseif($rental->pembayaran->status === 'Ditolak')
-
-                    <button
-                        type="button"
-                        class="btn btn-danger w-100 btn-bayar"
+                    <button type="button" class="btn btn-danger w-100 btn-bayar"
                         data-action="{{ route('pembayaran.store', $rental->id) }}"
                         data-title="Upload Ulang Pembayaran"
                         data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
                         data-rental="{{ $rental->id }}"
                         data-cabang="{{ $rental->cabang_ambil_id }}"
-                        data-total="{{ $rental->total_harga }}"
-                    >
+                        data-total="{{ $rental->total_harga }}">
                         <i class="bi bi-arrow-repeat me-1"></i>
                         Upload Ulang
                     </button>
-
                 @endif
 
             @elseif($rental->status === 'Menunggu')
-
                 <div class="alert alert-warning mb-0 py-2 px-3">
                     <i class="bi bi-hourglass-split me-1"></i>
                     <small>Menunggu persetujuan.</small>
                 </div>
 
             @elseif($rental->status === 'Ditolak')
-
                 <div class="alert alert-danger mb-0 py-2 px-3">
                     <i class="bi bi-x-circle me-1"></i>
                     <small>Pengajuan ditolak.</small>
@@ -173,61 +129,46 @@
                 <div class="d-flex flex-column gap-2">
 
                     @if(!$rental->pembayaran)
-
-                        <button
-                            type="button"
-                            class="btn btn-success w-100 btn-bayar"
+                        <button type="button" class="btn btn-success w-100 btn-bayar"
                             data-action="{{ route('pembayaran.store', $rental->id) }}"
                             data-title="Bayar Sekarang"
                             data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
                             data-rental="{{ $rental->id }}"
                             data-cabang="{{ $rental->cabang_ambil_id }}"
-                            data-total="{{ $rental->total_harga }}"
-                        >
+                            data-total="{{ $rental->total_harga }}">
                             <i class="bi bi-credit-card me-1"></i>
                             Bayar Sekarang
                         </button>
 
                     @elseif($rental->pembayaran->status === 'Menunggu')
-
                         <div class="alert alert-info mb-0 py-2 px-3">
                             <i class="bi bi-clock-history me-1"></i>
                             <small>Bukti pembayaran sedang diverifikasi.</small>
                         </div>
 
                     @elseif($rental->pembayaran->status === 'Disetujui')
-
                         <div class="alert alert-success mb-0 py-2 px-3">
                             <i class="bi bi-check-circle-fill me-1"></i>
                             <small>Pembayaran terverifikasi.</small>
                         </div>
 
                     @elseif($rental->pembayaran->status === 'Ditolak')
-
-                        <button
-                            type="button"
-                            class="btn btn-danger w-100 btn-bayar"
+                        <button type="button" class="btn btn-danger w-100 btn-bayar"
                             data-action="{{ route('pembayaran.store', $rental->id) }}"
                             data-title="Upload Ulang Pembayaran"
                             data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
                             data-rental="{{ $rental->id }}"
                             data-cabang="{{ $rental->cabang_ambil_id }}"
-                            data-total="{{ $rental->total_harga }}"
-                        >
+                            data-total="{{ $rental->total_harga }}">
                             <i class="bi bi-arrow-repeat me-1"></i>
                             Upload Ulang
                         </button>
-
                     @endif
 
-                    <a
-                        href="{{ route('customer.gps.pengirim', $rental->id) }}"
-                        class="btn btn-success w-100"
-                    >
+                    <a href="{{ route('customer.gps.pengirim', $rental->id) }}" class="btn btn-success w-100">
                         <i class="bi bi-geo-alt-fill me-1"></i>
                         Bagikan Lokasi GPS
                     </a>
-
                 </div>
 
             @elseif($rental->status === 'Selesai')
@@ -236,82 +177,43 @@
 
                     @if(!$rental->rating)
 
-                        <button
-                            type="button"
-                            class="rental-action-btn btn-rating"
-                            data-rating-modal="ratingModal{{ $rental->id }}"
-                        >
+                        <button type="button" class="rental-action-btn btn-rating"
+                            data-rating-modal="ratingModal{{ $rental->id }}">
                             <i class="bi bi-star-fill me-1"></i>
                             Rating
                         </button>
 
-                        <div
-                            class="rating-modal-custom"
-                            id="ratingModal{{ $rental->id }}"
-                            aria-hidden="true"
-                        >
+                        <div class="rating-modal-custom" id="ratingModal{{ $rental->id }}" aria-hidden="true">
 
-                            <div
-                                class="rating-modal-backdrop"
-                                data-rating-close="ratingModal{{ $rental->id }}"
-                            ></div>
+                            <div class="rating-modal-backdrop" data-rating-close="ratingModal{{ $rental->id }}"></div>
 
-                            <div
-                                class="rating-modal-box"
-                                role="dialog"
-                                aria-modal="true"
-                                aria-labelledby="ratingTitle{{ $rental->id }}"
-                                tabindex="-1"
-                            >
+                            <div class="rating-modal-box" role="dialog" aria-modal="true"
+                                aria-labelledby="ratingTitle{{ $rental->id }}" tabindex="-1">
 
-                                <form
-                                    action="{{ route('customer.ratings.store', $rental->id) }}"
-                                    method="POST"
-                                    class="rating-form"
-                                >
+                                <form action="{{ route('customer.ratings.store', $rental->id) }}" method="POST" class="rating-form">
                                     @csrf
 
                                     <div class="modal-header">
-
                                         <div>
-                                            <h5
-                                                class="modal-title fw-bold mb-1"
-                                                id="ratingTitle{{ $rental->id }}"
-                                            >
+                                            <h5 class="modal-title fw-bold mb-1" id="ratingTitle{{ $rental->id }}">
                                                 <i class="bi bi-star-fill text-warning me-1"></i>
                                                 Beri Rating
                                             </h5>
-
-                                            <small class="text-muted">
-                                                {{ $rental->mobil->name ?? 'Mobil' }}
-                                            </small>
+                                            <small class="text-muted">{{ $rental->mobil->name ?? 'Mobil' }}</small>
                                         </div>
 
-                                        <button
-                                            type="button"
-                                            class="btn-close"
+                                        <button type="button" class="btn-close"
                                             data-rating-close="ratingModal{{ $rental->id }}"
-                                            aria-label="Tutup"
-                                        ></button>
-
+                                            aria-label="Tutup"></button>
                                     </div>
 
                                     <div class="modal-body text-start">
-
                                         <div class="mb-4">
-                                            <label
-                                                for="ratingSelect{{ $rental->id }}"
-                                                class="form-label fw-semibold"
-                                            >
+                                            <label for="ratingSelect{{ $rental->id }}" class="form-label fw-semibold">
                                                 Rating
                                             </label>
 
-                                            <select
-                                                id="ratingSelect{{ $rental->id }}"
-                                                name="rating"
-                                                class="form-select"
-                                                required
-                                            >
+                                            <select id="ratingSelect{{ $rental->id }}" name="rating" class="form-select" required>
                                                 <option value="">Pilih Rating</option>
                                                 <option value="5">⭐⭐⭐⭐⭐ Sangat Baik</option>
                                                 <option value="4">⭐⭐⭐⭐ Baik</option>
@@ -322,63 +224,38 @@
                                         </div>
 
                                         <div class="mb-2">
-                                            <label
-                                                for="komentarRating{{ $rental->id }}"
-                                                class="form-label fw-semibold"
-                                            >
+                                            <label for="komentarRating{{ $rental->id }}" class="form-label fw-semibold">
                                                 Komentar
                                             </label>
 
-                                            <textarea
-                                                id="komentarRating{{ $rental->id }}"
-                                                name="komentar"
-                                                class="form-control"
-                                                rows="4"
-                                                maxlength="1000"
+                                            <textarea id="komentarRating{{ $rental->id }}" name="komentar"
+                                                class="form-control" rows="4" maxlength="1000"
                                                 placeholder="Tulis pengalaman kamu menggunakan layanan RentalKu..."
-                                                required
-                                            ></textarea>
+                                                required></textarea>
 
-                                            <div class="form-text">
-                                                Maksimal 1000 karakter.
-                                            </div>
+                                            <div class="form-text">Maksimal 1000 karakter.</div>
                                         </div>
-
                                     </div>
 
                                     <div class="modal-footer">
-
-                                        <button
-                                            type="button"
-                                            class="btn btn-secondary btn-sm"
-                                            data-rating-close="ratingModal{{ $rental->id }}"
-                                        >
+                                        <button type="button" class="btn btn-secondary btn-sm"
+                                            data-rating-close="ratingModal{{ $rental->id }}">
                                             Batal
                                         </button>
 
-                                        <button
-                                            type="submit"
-                                            class="btn btn-warning btn-sm"
-                                        >
+                                        <button type="submit" class="btn btn-warning btn-sm">
                                             <i class="bi bi-send me-1"></i>
                                             Kirim
                                         </button>
-
                                     </div>
-
                                 </form>
-
                             </div>
                         </div>
 
                     @else
 
                         <div class="rating-result">
-
-                            <div
-                                class="rating-result-stars"
-                                aria-label="Rating {{ $rental->rating->rating }} dari 5"
-                            >
+                            <div class="rating-result-stars" aria-label="Rating {{ $rental->rating->rating }} dari 5">
                                 @for($i = 1; $i <= 5; $i++)
                                     @if($i <= (int) $rental->rating->rating)
                                         <i class="bi bi-star-fill"></i>
@@ -391,190 +268,411 @@
                             <span class="rating-result-value">
                                 {{ $rental->rating->rating }}/5
                             </span>
-
                         </div>
 
                     @endif
 
-                    <a
-                        href="{{ route('customer.kompensasi.index', [
-                            'baru' => 1,
-                            'rental' => $rental->id
-                        ]) }}"
-                        class="rental-action-btn btn-kompensasi"
-                    >
+                    <a href="{{ route('customer.kompensasi.index', ['baru' => 1, 'rental' => $rental->id]) }}"
+                        class="rental-action-btn btn-kompensasi">
                         <i class="bi bi-megaphone me-1"></i>
                         Kompensasi
                     </a>
-
                 </div>
-
             @endif
-
         </div>
 
         @if($rental->dendas && $rental->dendas->count())
 
-            <div class="mt-3 pt-3 border-top">
+            <div class="rental-denda-section mt-3 pt-3 border-top">
 
-                <h6 class="fw-bold mb-2">
-                    <i class="bi bi-exclamation-triangle me-1"></i>
-                    Denda ({{ $rental->dendas->count() }})
-                </h6>
+                <div class="rental-denda-heading mb-3">
+                    <h6 class="fw-bold mb-0">
+                        <i class="bi bi-exclamation-triangle me-1 text-warning"></i>
+                        Detail Denda
+                    </h6>
 
-                @foreach($rental->dendas as $d)
+                    <span class="badge bg-warning text-dark">
+                        {{ $rental->dendas->count() }} Denda
+                    </span>
+                </div>
 
-                    <div class="border rounded-3 p-2 mb-2">
+                <div class="rental-denda-list">
 
-                        <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
+                    @foreach($rental->dendas as $d)
 
-                            <strong class="small">
-                                {{ $d->jenis ?? 'Denda' }}
-                            </strong>
+                        @php
+                            $statusDenda = strtolower(trim($d->status ?? 'belum bayar'));
 
-                            @if(strtolower($d->status ?? '') === 'lunas')
-                                <span class="badge bg-success">Lunas</span>
-                            @elseif(strtolower($d->status ?? '') === 'menunggu verifikasi')
-                                <span class="badge bg-info text-dark">Verifikasi</span>
-                            @elseif(strtolower($d->status ?? '') === 'ditolak')
-                                <span class="badge bg-danger">Ditolak</span>
-                            @else
-                                <span class="badge bg-warning text-dark">Belum</span>
-                            @endif
+                            $statusLabel = match($statusDenda) {
+                                'lunas' => 'Lunas',
+                                'menunggu verifikasi' => 'Menunggu Verifikasi',
+                                'ditolak' => 'Ditolak',
+                                default => 'Belum Bayar',
+                            };
 
-                        </div>
+                            $statusClass = match($statusDenda) {
+                                'lunas' => 'bg-success',
+                                'menunggu verifikasi' => 'bg-info text-dark',
+                                'ditolak' => 'bg-danger',
+                                default => 'bg-warning text-dark',
+                            };
 
-                        <div class="text-success fw-bold small">
-                            Rp {{ number_format($d->nominal ?? 0, 0, ',', '.') }}
-                        </div>
+                            $jenisDenda = ucfirst(str_replace('_', ' ', $d->jenis ?? 'Denda'));
 
-                        @if(($d->status ?? 'belum bayar') === 'belum bayar')
+                            $modalFotoId = 'dendaFotoModal' . $d->id;
+                            $modalBayarId = 'dendaBayarModal' . $d->id;
+                        @endphp
 
-                            <button
-                                type="button"
-                                class="btn btn-warning btn-sm w-100 mt-2"
-                                data-bs-toggle="modal"
-                                data-bs-target="#dendaBayarModal{{ $d->id }}"
-                            >
-                                <i class="bi bi-credit-card me-1"></i>
-                                Pembayaran Denda
-                            </button>
+                        <div class="denda-customer-card">
 
-                            <div
-                                class="modal fade"
-                                id="dendaBayarModal{{ $d->id }}"
-                                tabindex="-1"
-                                aria-labelledby="dendaBayarTitle{{ $d->id }}"
-                                aria-hidden="true"
-                            >
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content border-0 shadow">
+                            <div class="denda-card-header">
 
-                                        @include('layouts.partials.modal-head', [
-                                            'title' => 'Pembayaran Denda',
-                                            'icon' => 'bi-wallet2',
-                                            'titleId' => 'dendaBayarTitle'.$d->id,
-                                            'subtitle' => 'Unggah bukti transfer denda.',
-                                        ])
+                                <div class="denda-card-title">
+                                    <div class="denda-icon">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                    </div>
 
-                                        <form
-                                            method="POST"
-                                            action="{{ route('customer.dendas.bayar', $d->id) }}"
-                                            enctype="multipart/form-data"
-                                            class="denda-bayar-form"
-                                        >
-                                            @csrf
+                                    <div class="denda-title-text">
+                                        <div class="fw-bold">{{ $jenisDenda }}</div>
+                                        <small class="text-muted">Denda #{{ $d->id }}</small>
+                                    </div>
+                                </div>
 
-                                            <div class="modal-body">
+                                <span class="badge {{ $statusClass }} denda-status-badge">
+                                    {{ $statusLabel }}
+                                </span>
 
-                                                <div class="alert alert-warning">
-                                                    <small class="text-muted">
-                                                        Nominal Denda
+                            </div>
+
+                            <div class="denda-detail-list">
+
+                                <div class="denda-detail-row">
+                                    <span class="denda-label">Nominal Denda</span>
+
+                                    <span class="denda-value text-success fw-bold">
+                                        Rp {{ number_format($d->nominal ?? 0, 0, ',', '.') }}
+                                    </span>
+                                </div>
+
+                                <div class="denda-detail-row">
+                                    <span class="denda-label">Tanggal Denda</span>
+
+                                    <span class="denda-value">
+                                        {{ $d->created_at ? $d->created_at->format('d/m/Y H:i') : '-' }}
+                                    </span>
+                                </div>
+
+                                <div class="denda-detail-row">
+                                    <span class="denda-label">Nomor Rental</span>
+
+                                    <span class="denda-value">
+                                        #{{ $rental->id }}
+                                    </span>
+                                </div>
+
+                                <div class="denda-detail-row">
+                                    <span class="denda-label">Mobil</span>
+
+                                    <span class="denda-value">
+                                        {{ $rental->mobil->name ?? '-' }}
+                                    </span>
+                                </div>
+
+                                <div class="denda-detail-row">
+                                    <span class="denda-label">Tanggal Rental</span>
+
+                                    <span class="denda-value">
+                                        {{ \Carbon\Carbon::parse($rental->tanggal_mulai)->format('d/m/Y') }}
+                                        -
+                                        {{ \Carbon\Carbon::parse($rental->tanggal_selesai)->format('d/m/Y') }}
+                                    </span>
+                                </div>
+
+                            </div>
+
+                            <div class="denda-description-section">
+
+                                <div class="fw-semibold small mb-2">
+                                    <i class="bi bi-card-text me-1"></i>
+                                    Deskripsi Denda
+                                </div>
+
+                                <div class="denda-description">
+                                    {{ $d->deskripsi ?: 'Tidak ada deskripsi denda.' }}
+                                </div>
+
+                            </div>
+
+                            @if($d->foto_bukti && file_exists(public_path($d->foto_bukti)))
+
+                                <div class="denda-action-section">
+
+                                    <button type="button"
+                                        class="btn btn-outline-success btn-sm w-100"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#{{ $modalFotoId }}">
+
+                                        <i class="bi bi-images me-1"></i>
+                                        Lihat Foto Bukti
+
+                                    </button>
+
+                                </div>
+
+                                <div class="modal fade denda-foto-modal"
+                                    id="{{ $modalFotoId }}"
+                                    tabindex="-1"
+                                    aria-labelledby="{{ $modalFotoId }}Label"
+                                    aria-hidden="true">
+
+                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+
+                                        <div class="modal-content border-0 rounded-4 overflow-hidden">
+
+                                            <div class="modal-header bg-success text-white">
+
+                                                <div>
+                                                    <h5 class="modal-title fw-bold"
+                                                        id="{{ $modalFotoId }}Label">
+
+                                                        <i class="bi bi-images me-2"></i>
+                                                        Foto Bukti Denda
+
+                                                    </h5>
+
+                                                    <small>
+                                                        {{ $jenisDenda }} - Rental #{{ $rental->id }}
                                                     </small>
-
-                                                    <h4 class="fw-bold mb-0">
-                                                        Rp {{ number_format($d->nominal ?? 0, 0, ',', '.') }}
-                                                    </h4>
                                                 </div>
 
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-semibold">
-                                                        Bukti Pembayaran
-                                                    </label>
+                                                <button type="button"
+                                                    class="btn-close btn-close-white"
+                                                    data-bs-dismiss="modal"
+                                                    aria-label="Tutup">
+                                                </button>
 
-                                                    <input
-                                                        type="file"
-                                                        name="bukti_bayar"
-                                                        class="form-control"
-                                                        accept=".jpg,.jpeg,.png"
-                                                        required
-                                                    >
+                                            </div>
 
-                                                    <small class="text-muted">
-                                                        Format JPG, JPEG, PNG. Maksimal 2 MB.
-                                                    </small>
+                                            <div class="modal-body p-3">
 
-                                                    @error('bukti_bayar')
-                                                        <div class="text-danger small mt-1">
-                                                            {{ $message }}
-                                                        </div>
-                                                    @enderror
+                                                <div class="denda-foto-container">
+
+                                                    <img src="{{ asset($d->foto_bukti) }}"
+                                                        alt="Foto bukti {{ $jenisDenda }}"
+                                                        class="denda-foto-preview">
+
                                                 </div>
 
-                                                <div class="mb-2">
-                                                    <label class="form-label fw-semibold">
-                                                        Tanggal Pembayaran
-                                                    </label>
-
-                                                    <input
-                                                        type="date"
-                                                        name="tanggal_bayar"
-                                                        class="form-control"
-                                                        value="{{ old('tanggal_bayar', date('Y-m-d')) }}"
-                                                        max="{{ date('Y-m-d') }}"
-                                                        required
-                                                    >
-
-                                                    @error('tanggal_bayar')
-                                                        <div class="text-danger small mt-1">
-                                                            {{ $message }}
-                                                        </div>
-                                                    @enderror
+                                                <div class="text-center text-muted small mt-3">
+                                                    Foto bukti denda Rental #{{ $rental->id }}
                                                 </div>
 
                                             </div>
 
                                             <div class="modal-footer">
 
-                                                <button
-                                                    type="button"
+                                                <button type="button"
                                                     class="btn btn-secondary"
-                                                    data-bs-dismiss="modal"
-                                                >
-                                                    Batal
-                                                </button>
-
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-warning"
-                                                >
-                                                    <i class="bi bi-send me-1"></i>
-                                                    Kirim Pembayaran
+                                                    data-bs-dismiss="modal">
+                                                    Tutup
                                                 </button>
 
                                             </div>
 
-                                        </form>
+                                        </div>
 
                                     </div>
+
                                 </div>
-                            </div>
 
-                        @endif
+                            @else
 
-                    </div>
+                                <div class="denda-action-section">
 
-                @endforeach
+                                    <div class="alert alert-light border py-2 mb-0 small">
+                                        <i class="bi bi-image me-1 text-muted"></i>
+                                        Foto bukti denda belum tersedia.
+                                    </div>
+
+                                </div>
+
+                            @endif
+
+                            @if($statusDenda === 'belum bayar')
+
+                                <div class="denda-action-section">
+
+                                    <button type="button"
+                                        class="btn btn-warning w-100"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#{{ $modalBayarId }}">
+
+                                        <i class="bi bi-credit-card me-1"></i>
+                                        Pembayaran Denda
+
+                                    </button>
+
+                                </div>
+
+                                <div class="modal fade"
+                                    id="{{ $modalBayarId }}"
+                                    tabindex="-1"
+                                    aria-labelledby="{{ $modalBayarId }}Label"
+                                    aria-hidden="true">
+
+                                    <div class="modal-dialog modal-dialog-centered">
+
+                                        <div class="modal-content border-0 shadow">
+
+                                            @include('layouts.partials.modal-head', [
+                                                'title' => 'Pembayaran Denda',
+                                                'icon' => 'bi-wallet2',
+                                                'titleId' => $modalBayarId.'Label',
+                                                'subtitle' => 'Unggah bukti pembayaran denda.',
+                                            ])
+
+                                            <form method="POST"
+                                                action="{{ route('customer.dendas.bayar', $d->id) }}"
+                                                enctype="multipart/form-data"
+                                                class="denda-bayar-form">
+
+                                                @csrf
+
+                                                <div class="modal-body">
+
+                                                    <div class="alert alert-warning">
+
+                                                        <div class="small text-muted">
+                                                            Jenis Denda
+                                                        </div>
+
+                                                        <div class="fw-bold mb-2">
+                                                            {{ $jenisDenda }}
+                                                        </div>
+
+                                                        <div class="small text-muted">
+                                                            Nominal Denda
+                                                        </div>
+
+                                                        <h4 class="fw-bold mb-0">
+                                                            Rp {{ number_format($d->nominal ?? 0, 0, ',', '.') }}
+                                                        </h4>
+
+                                                    </div>
+
+                                                    <div class="mb-3">
+
+                                                        <label class="form-label fw-semibold">
+                                                            Bukti Pembayaran
+                                                        </label>
+
+                                                        <input type="file"
+                                                            name="bukti_bayar"
+                                                            class="form-control"
+                                                            accept=".jpg,.jpeg,.png"
+                                                            required>
+
+                                                        <small class="text-muted">
+                                                            Format JPG, JPEG, PNG. Maksimal 2 MB.
+                                                        </small>
+
+                                                        @error('bukti_bayar')
+                                                            <div class="text-danger small mt-1">
+                                                                {{ $message }}
+                                                            </div>
+                                                        @enderror
+
+                                                    </div>
+
+                                                    <div class="mb-2">
+
+                                                        <label class="form-label fw-semibold">
+                                                            Tanggal Pembayaran
+                                                        </label>
+
+                                                        <input type="date"
+                                                            name="tanggal_bayar"
+                                                            class="form-control"
+                                                            value="{{ old('tanggal_bayar', date('Y-m-d')) }}"
+                                                            max="{{ date('Y-m-d') }}"
+                                                            required>
+
+                                                        @error('tanggal_bayar')
+                                                            <div class="text-danger small mt-1">
+                                                                {{ $message }}
+                                                            </div>
+                                                        @enderror
+
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="modal-footer">
+
+                                                    <button type="button"
+                                                        class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">
+                                                        Batal
+                                                    </button>
+
+                                                    <button type="submit"
+                                                        class="btn btn-warning">
+
+                                                        <i class="bi bi-send me-1"></i>
+                                                        Kirim Pembayaran
+
+                                                    </button>
+
+                                                </div>
+
+                                            </form>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            @elseif($statusDenda === 'menunggu verifikasi')
+
+                                <div class="denda-action-section">
+
+                                    <div class="alert alert-info py-2 mb-0 small">
+                                        <i class="bi bi-clock-history me-1"></i>
+                                        Bukti pembayaran denda sedang diperiksa Admin/Staff.
+                                    </div>
+
+                                </div>
+
+                            @elseif($statusDenda === 'lunas')
+
+                                <div class="denda-action-section">
+
+                                    <div class="alert alert-success py-2 mb-0 small">
+                                        <i class="bi bi-check-circle-fill me-1"></i>
+                                        Denda telah lunas.
+                                    </div>
+
+                                </div>
+
+                            @elseif($statusDenda === 'ditolak')
+
+                                <div class="denda-action-section">
+
+                                    <div class="alert alert-danger py-2 mb-0 small">
+                                        <i class="bi bi-x-circle-fill me-1"></i>
+                                        Pembayaran denda ditolak. Silakan hubungi Admin/Staff.
+                                    </div>
+
+                                </div>
+
+                            @endif
+
+                        </div>
+
+                    @endforeach
+
+                </div>
 
             </div>
 
@@ -584,6 +682,24 @@
 </div>
 
 <style>
+.rental-card {
+    height: auto !important;
+    align-self: flex-start !important;
+}
+
+.rental-card .stat-card {
+    height: auto !important;
+    min-height: 0 !important;
+    align-self: flex-start !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.rental-actions {
+    width: 100%;
+    margin-top: 0;
+}
+
 .rating-modal-custom {
     display: none;
     position: fixed;
@@ -697,7 +813,203 @@ body.rating-modal-open {
     overflow: hidden;
 }
 
+.rental-denda-section {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.rental-denda-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.rental-denda-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    gap: 14px;
+}
+
+.denda-customer-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 15px;
+    gap: 14px;
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.denda-customer-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+}
+
+.denda-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+}
+
+.denda-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+}
+
+.denda-icon {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fff7ed;
+    color: #ea580c;
+    font-size: 17px;
+}
+
+.denda-title-text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.denda-status-badge {
+    flex-shrink: 0;
+    white-space: normal;
+    text-align: center;
+    max-width: 45%;
+}
+
+.denda-detail-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    gap: 10px;
+}
+
+.denda-detail-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    align-items: start;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+    font-size: 13px;
+}
+
+.denda-label {
+    color: #64748b;
+    min-width: 0;
+}
+
+.denda-value {
+    min-width: 0;
+    text-align: right;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.denda-description-section {
+    width: 100%;
+    min-width: 0;
+}
+
+.denda-description {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #475569;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 11px 12px;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.denda-action-section {
+    width: 100%;
+    min-width: 0;
+}
+
+.denda-action-section .btn,
+.denda-action-section .alert {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.denda-customer-card .alert {
+    overflow-wrap: anywhere;
+}
+
+.denda-foto-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    border-radius: 12px;
+    overflow: hidden;
+    min-height: 200px;
+    position: relative;
+}
+
+.denda-foto-preview {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    max-height: 75vh;
+    object-fit: contain;
+    border-radius: 10px;
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+}
+
+.denda-foto-preview:hover {
+    transform: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+}
+
+.denda-foto-modal .modal-content {
+    border-radius: 16px;
+}
+
+.denda-foto-modal .modal-header {
+    background: #198754;
+}
+
+.denda-foto-modal .modal-body {
+    background: #ffffff;
+}
+
 @media (max-width: 576px) {
+
     .rating-modal-custom {
         padding: 12px;
     }
@@ -719,6 +1031,47 @@ body.rating-modal-open {
     .rating-modal-custom .modal-footer {
         padding: 12px 18px 16px;
     }
+
+    .denda-customer-card {
+        padding: 12px;
+        gap: 12px;
+        border-radius: 12px;
+    }
+
+    .denda-card-header {
+        gap: 8px;
+    }
+
+    .denda-icon {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        font-size: 15px;
+    }
+
+    .denda-detail-row {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 8px;
+        font-size: 12px;
+    }
+
+    .denda-value {
+        text-align: right;
+    }
+
+    .denda-status-badge {
+        max-width: 48%;
+        font-size: 10px;
+    }
+
+    .denda-description {
+        font-size: 12px;
+        padding: 10px;
+    }
+
+    .denda-foto-preview {
+        max-height: 60vh;
+    }
 }
 </style>
 
@@ -733,7 +1086,10 @@ body.rating-modal-open {
             if (
                 modal &&
                 modal.id &&
-                modal.id.startsWith('dendaBayarModal')
+                (
+                    modal.id.startsWith('dendaBayarModal') ||
+                    modal.id.startsWith('dendaFotoModal')
+                )
             ) {
                 document.body.appendChild(modal);
             }
@@ -806,10 +1162,7 @@ body.rating-modal-open {
         const original = modalOriginalParents.get(modal);
 
         if (original && original.parent) {
-            if (
-                original.nextSibling &&
-                original.nextSibling.parentNode === original.parent
-            ) {
+            if (original.nextSibling && original.nextSibling.parentNode === original.parent) {
                 original.parent.insertBefore(modal, original.nextSibling);
             } else {
                 original.parent.appendChild(modal);
@@ -827,11 +1180,7 @@ body.rating-modal-open {
 
         if (openButton) {
             event.preventDefault();
-
-            openRatingModal(
-                openButton.getAttribute('data-rating-modal')
-            );
-
+            openRatingModal(openButton.getAttribute('data-rating-modal'));
             return;
         }
 
@@ -839,10 +1188,7 @@ body.rating-modal-open {
 
         if (closeButton) {
             event.preventDefault();
-
-            closeRatingModal(
-                closeButton.getAttribute('data-rating-close')
-            );
+            closeRatingModal(closeButton.getAttribute('data-rating-close'));
         }
     });
 
@@ -879,11 +1225,7 @@ body.rating-modal-open {
     document.addEventListener('submit', function (event) {
         const form = event.target;
 
-        if (
-            !form ||
-            !form.classList ||
-            !form.classList.contains('denda-bayar-form')
-        ) {
+        if (!form || !form.classList || !form.classList.contains('denda-bayar-form')) {
             return;
         }
 
@@ -897,8 +1239,7 @@ body.rating-modal-open {
 
             if (button) {
                 button.disabled = false;
-                button.innerHTML =
-                    '<i class="bi bi-cash-coin me-1"></i> Bayar';
+                button.innerHTML = '<i class="bi bi-cash-coin me-1"></i> Bayar';
             }
 
             if (window.Swal) {
@@ -931,8 +1272,7 @@ body.rating-modal-open {
 
         if (button) {
             button.disabled = true;
-            button.innerHTML =
-                '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Mengirim...';
+            button.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Mengirim...';
         }
     });
 
