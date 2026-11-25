@@ -851,8 +851,35 @@ class RentalController extends Controller
         }
 
         if ($status === 'Selesai') {
-            $dendaKeterlambatan = 'tidak_terlambat';
-            DB::transaction(function () use ($rental, &$dendaKeterlambatan) {
+            // Denda keterlambatan dibuat lebih dulu supaya tagihannya tersedia
+            // untuk dibayar; barisnya tetap tersimpan walau gate belum lolos.
+            $dendaKeterlambatan = DendaKeterlambatan::sync($rental);
+
+            $halangan = [];
+
+            if (!$rental->tanggal_dikembalikan) {
+                $halangan[] = 'Mobil belum ditandai dikembalikan oleh Staff.';
+            }
+
+            if (!$rental->pembayaranLunas()) {
+                $halangan[] = 'Biaya rental belum lunas.';
+            }
+
+            if (!$rental->semuaDendaLunas()) {
+                $halangan[] = 'Masih ada denda yang belum lunas.';
+            }
+
+            if ($halangan) {
+                $message = implode(' ', $halangan);
+
+                if (in_array($dendaKeterlambatan, ['dibuat', 'diperbarui'])) {
+                    $message .= ' Denda keterlambatan otomatis tercatat.';
+                }
+
+                return response()->json(['message' => $message], 422);
+            }
+
+            DB::transaction(function () use ($rental) {
                 $rental->update([
                     'status' => 'Selesai',
                 ]);
@@ -862,7 +889,6 @@ class RentalController extends Controller
                         'status' => 'Tersedia',
                     ]);
                 }
-                $dendaKeterlambatan = DendaKeterlambatan::sync($rental);
             });
 
             $message = 'Rental berhasil diselesaikan.';
