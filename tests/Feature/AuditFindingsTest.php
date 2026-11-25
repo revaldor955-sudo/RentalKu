@@ -291,6 +291,16 @@ class AuditFindingsTest extends TestCase
         ]))->assertStatus(422);
     }
 
+    public function test_pesan_nominal_negatif_diskon_tidak_menyebut_pengembalian_dana(): void
+    {
+        $rental = $this->buatRental($this->customer);
+
+        $this->actingAs($this->admin)->postJson('/kompensasis', $this->klaimPayload($rental, [
+            'customer_id' => $this->customer->id, 'jenis' => 'diskon', 'nominal' => -1000,
+        ]))->assertStatus(422)
+            ->assertJsonPath('errors.nominal.0', 'Nominal tidak valid: pengembalian dana minimal Rp 1, jenis lain tidak boleh negatif.');
+    }
+
     public function test_dana_tanpa_nominal_ditolak(): void
     {
         $rental = $this->buatRental($this->customer);
