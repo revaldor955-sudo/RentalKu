@@ -858,7 +858,7 @@
         $dendaJumlah = $dendaNotif->count();
         $dendaSemuaVerifikasi =
             $dendaJumlah > 0 && $dendaNotif->every(fn($d) => strtolower($d->status ?? '') === 'menunggu verifikasi');
-        $dendaBayarPertama = $dendaNotif->first(fn($d) => strtolower($d->status ?? '') === 'belum bayar');
+        $dendaBayarPertama = $dendaNotif->first(fn($d) => strtolower(trim($d->status ?? 'belum bayar')) === 'belum bayar');
         $dendaBisaBayar = (bool) $dendaBayarPertama;
 
         $klaimNotif = $klaimUpdates ?? collect();
@@ -907,11 +907,10 @@
                         <div class="cust-notif-actions">
 
                             @if ($dendaBisaBayar)
-                                <button type="button" class="cust-notif-btn cust-notif-btn-danger" data-notif-bayar
-                                    data-notif-denda-id="{{ $dendaBayarPertama->id }}"
-                                    data-notif-href="{{ route('customer.riwayat') }}">
+                                <a href="{{ route('customer.riwayat', ['denda' => $dendaBayarPertama->id]) }}"
+                                    class="cust-notif-btn cust-notif-btn-danger">
                                     Bayar denda
-                                </button>
+                                </a>
                             @else
                                 <a href="{{ route('customer.riwayat') }}" class="cust-notif-btn cust-notif-btn-danger">
                                     Lihat status
@@ -2214,21 +2213,6 @@
                         destroy(card);
                     });
                 });
-
-                var bayar = card.querySelector('[data-notif-bayar]');
-                if (bayar) {
-                    bayar.addEventListener('click', function() {
-                        destroy(card);
-
-                        var modalEl = document.getElementById('dendaBayarModal' + bayar.dataset
-                            .notifDendaId);
-                        if (modalEl) {
-                            bootstrap.Modal.getOrCreateInstance(modalEl).show();
-                        } else {
-                            window.location.href = bayar.dataset.notifHref;
-                        }
-                    });
-                }
 
                 schedule();
             });
