@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Denda;
 use App\Models\Mobil;
 use App\Models\Rental;
 use App\Models\Supir;
@@ -32,10 +31,6 @@ class RentalController extends Controller
             }
 
             return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
-        }
-
-        if ($blokir = $this->blokirKarenaDenda($request)) {
-            return $blokir;
         }
 
         if ($mobil->status !== 'Tersedia') {
@@ -957,32 +952,6 @@ class RentalController extends Controller
         }
 
         return back()->with('error', $message);
-    }
-
-    /**
-     * Blokir sewa baru selama customer punya denda yang belum lunas.
-     */
-    private function blokirKarenaDenda(Request $request)
-    {
-        $denda = Denda::belumLunas()->whereHas('rental', fn($q) => $q->where('user_id', auth()->id()))->get();
-
-        if ($denda->isEmpty()) {
-            return null;
-        }
-
-        $message = $denda->contains('status', 'belum bayar') ? 'Anda masih memiliki denda yang belum dibayar. Selesaikan pembayaran denda terlebih dahulu sebelum menyewa mobil lagi.' : 'Pembayaran denda Anda sedang menunggu verifikasi tim kami. Anda bisa menyewa mobil lagi setelah denda dinyatakan lunas.';
-
-        if ($request->expectsJson()) {
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $message,
-                ],
-                422,
-            );
-        }
-
-        return redirect()->route('customer.dashboard')->with('error', $message);
     }
 
     /**
