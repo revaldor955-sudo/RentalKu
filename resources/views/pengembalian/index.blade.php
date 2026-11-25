@@ -604,6 +604,36 @@
         });
     }
 
+    function tandaiDikembalikan(id, mobil) {
+        $.ajax({
+            url: "{{ route('pengembalian.verifikasi', '__ID__') }}"
+                .replace('__ID__', encodeURIComponent(id)),
+            method: 'PUT',
+            headers: {
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+                'Accept': 'application/json'
+            },
+            success: function(res) {
+                $('#pengembalian-table').DataTable().ajax.reload(null, false);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: res.message || 'Mobil ditandai sudah dikembalikan.'
+                });
+            },
+            error: function(xhr) {
+                const res = xhr.responseJSON || {};
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: res.message || 'Penandaan pengembalian gagal.'
+                });
+            }
+        });
+    }
+
     // Memproses pengembalian
     function prosesPengembalian(id, mobil) {
         Swal.fire({
@@ -749,6 +779,12 @@
                                     class="btn btn-sm btn-outline-primary"
                                     onclick="openPengembalianDetail(${id})">
                                     <i class="bi bi-eye"></i> Detail
+                                </button>
+
+                                <button type="button"
+                                    class="btn btn-sm btn-outline-success"
+                                    onclick="tandaiDikembalikan(${id}, '${namaMobil}')">
+                                    <i class="bi bi-check2-circle"></i> Dikembalikan
                                 </button>
 
                                 <button type="button"
