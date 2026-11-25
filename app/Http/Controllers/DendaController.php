@@ -272,7 +272,7 @@ class DendaController extends Controller
         ]);
     }
 
-    public function customerBayar(Request $request, Denda $denda)
+    public function paymentDenda(Request $request, Denda $denda)
     {
         $denda->load('rental');
 
@@ -287,6 +287,19 @@ class DendaController extends Controller
             }
 
             abort(403, 'Anda tidak memiliki akses ke denda ini.');
+        }
+
+        if (!$denda->rental->pembayaranLunas()) {
+            $message = 'Lunasi biaya rental terlebih dahulu sebelum membayar denda.';
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => $message,
+                    'errors' => ['denda' => [$message]],
+                ], 422);
+            }
+
+            return back()->withErrors(['denda' => $message]);
         }
 
         if ($denda->status !== 'belum bayar') {

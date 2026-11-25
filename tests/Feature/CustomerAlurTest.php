@@ -8,6 +8,7 @@ use App\Models\Denda;
 use App\Models\Kompensasi;
 use App\Models\MetodePembayaran;
 use App\Models\Mobil;
+use App\Models\Pembayaran;
 use App\Models\Rental;
 use App\Models\TipeMobil;
 use App\Models\User;
@@ -80,6 +81,23 @@ class CustomerAlurTest extends TestCase
         ]);
     }
 
+    private function lunasiSewa(Rental $rental): void
+    {
+        $metode = MetodePembayaran::firstOrCreate(
+            ['name' => 'Transfer Bank'],
+            ['nomor_akun' => '123', 'cabang_id' => null]
+        );
+
+        Pembayaran::create([
+            'rental_id' => $rental->id,
+            'metode_pembayaran_id' => $metode->id,
+            'tanggal_bayar' => now()->toDateString(),
+            'jumlah' => $rental->total_harga,
+            'bukti' => 'bukti_pembayaran/test.jpg',
+            'status' => 'Disetujui',
+        ]);
+    }
+
     public function test_dashboard_customer_ok(): void
     {
         $this->actingAs($this->customer)
@@ -139,8 +157,11 @@ class CustomerAlurTest extends TestCase
     {
         Storage::fake('public');
 
+        $rental = $this->buatRentalSelesai();
+        $this->lunasiSewa($rental);
+
         $denda = Denda::create([
-            'rental_id' => $this->buatRentalSelesai()->id,
+            'rental_id' => $rental->id,
             'jenis' => 'keterlambatan',
             'nominal' => 150000,
             'status' => 'belum bayar',
@@ -161,8 +182,11 @@ class CustomerAlurTest extends TestCase
     {
         Storage::fake('public');
 
+        $rental = $this->buatRentalSelesai();
+        $this->lunasiSewa($rental);
+
         $denda = Denda::create([
-            'rental_id' => $this->buatRentalSelesai()->id,
+            'rental_id' => $rental->id,
             'jenis' => 'keterlambatan',
             'nominal' => 150000,
             'status' => 'belum bayar',
@@ -225,8 +249,11 @@ class CustomerAlurTest extends TestCase
 
     public function test_bayar_denda_status_bukan_belum_bayar_ditolak(): void
     {
+        $rental = $this->buatRentalSelesai();
+        $this->lunasiSewa($rental);
+
         $denda = Denda::create([
-            'rental_id' => $this->buatRentalSelesai()->id,
+            'rental_id' => $rental->id,
             'jenis' => 'kehilangan',
             'nominal' => 500000,
             'status' => 'lunas',

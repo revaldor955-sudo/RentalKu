@@ -546,6 +546,16 @@
         document.getElementById('buktiModalImg').src = el.dataset.src;
         bootstrap.Modal.getOrCreateInstance(document.getElementById('buktiModal')).show();
     }
+
+    (function () {
+        var dendaId = new URLSearchParams(window.location.search).get('denda');
+        if (!dendaId) return;
+
+        var modalEl = document.getElementById('dendaBayarModal' + dendaId);
+        if (modalEl) {
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+        }
+    })();
 </script>
 
 </body>

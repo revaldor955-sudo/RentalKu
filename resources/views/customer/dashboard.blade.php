@@ -858,8 +858,11 @@
         $dendaJumlah = $dendaNotif->count();
         $dendaSemuaVerifikasi =
             $dendaJumlah > 0 && $dendaNotif->every(fn($d) => strtolower($d->status ?? '') === 'menunggu verifikasi');
-        $dendaBayarPertama = $dendaNotif->first(fn($d) => strtolower($d->status ?? '') === 'belum bayar');
+        $dendaBayarPertama = $dendaNotif->first(fn($d) => strtolower(trim($d->status ?? 'belum bayar')) === 'belum bayar');
         $dendaBisaBayar = (bool) $dendaBayarPertama;
+        $dendaDiDashboard = $dendaBayarPertama
+            && in_array(strtolower(trim($dendaBayarPertama->rental->status ?? '')), ['menunggu', 'disetujui', 'berjalan'], true)
+            && $rentalsTampil->contains('id', $dendaBayarPertama->rental_id);
 
         $klaimNotif = $klaimUpdates ?? collect();
         $klaimJumlah = $klaimNotif->count();
@@ -906,12 +909,17 @@
 
                         <div class="cust-notif-actions">
 
-                            @if ($dendaBisaBayar)
-                                <button type="button" class="cust-notif-btn cust-notif-btn-danger" data-notif-bayar
-                                    data-notif-denda-id="{{ $dendaBayarPertama->id }}"
-                                    data-notif-href="{{ route('customer.riwayat') }}">
+                            @if ($dendaBisaBayar && $dendaDiDashboard)
+                                <button type="button" class="cust-notif-btn cust-notif-btn-danger"
+                                    data-bayar-denda="{{ $dendaBayarPertama->id }}"
+                                    data-rental="{{ $dendaBayarPertama->rental_id }}">
                                     Bayar denda
                                 </button>
+                            @elseif ($dendaBisaBayar)
+                                <a href="{{ route('customer.riwayat', ['denda' => $dendaBayarPertama->id]) }}"
+                                    class="cust-notif-btn cust-notif-btn-danger">
+                                    Bayar denda
+                                </a>
                             @else
                                 <a href="{{ route('customer.riwayat') }}" class="cust-notif-btn cust-notif-btn-danger">
                                     Lihat status
@@ -1624,7 +1632,7 @@
             <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
 
                 @include('layouts.partials.modal-head', [
-                    'title' => 'Bayar Sekarang',
+                    'title' => 'Bayar Sewa',
                     'titleId' => 'pembayaranModalTitle',
                     'subtitle' => 'Selesaikan pembayaran rental kendaraanmu.',
                 ])
@@ -1646,6 +1654,14 @@
                             <small class="text-muted">Total dibayar</small>
 
                             <span class="pm-total" id="pmTotal">Rp 0</span>
+
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-2 d-none" id="pmDendaRow">
+
+                            <small class="text-muted">Termasuk denda</small>
+
+                            <span class="fw-bold text-warning" id="pmDenda">Rp 0</span>
 
                         </div>
 
@@ -1864,13 +1880,19 @@
                 $(this).prop('hidden', !tampil).prop('disabled', !tampil);
             });
 
-            $('#pembayaranModalTitle').text($btn.data('title') || 'Bayar Sekarang');
+            var mode = $btn.data('mode') || 'rental';
+
+            $('#pembayaranModalTitle').text($btn.data('title') || 'Bayar Sewa');
             $('#pmMobil').text($btn.data('mobil') || 'Mobil');
             $('#pmRental').text('#' + $btn.data('rental'));
 
             var total = 'Rp ' + Number($btn.data('total') || 0).toLocaleString('id-ID');
+            var denda = 'Rp ' + Number($btn.data('denda') || 0).toLocaleString('id-ID');
+
             $('#pmTotal').text(total);
             $('#pmTotalNote').text(total);
+            $('#pmDenda').text(denda);
+            $('#pmDendaRow').toggleClass('d-none', mode !== 'all');
 
             var now = new Date();
             var today = now.getFullYear() + '-' +
@@ -2209,26 +2231,32 @@
                     });
                 });
 
+                card.querySelectorAll('[data-bayar-denda]').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        var dendaId = btn.getAttribute('data-bayar-denda');
+                        var rentalId = btn.getAttribute('data-rental');
+                        var rentalEl = document.getElementById('rental-' + rentalId);
+                        var modalEl = document.getElementById('dendaBayarModal' + dendaId);
+                        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+                        if (rentalEl) {
+                            rentalEl.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+                            rentalEl.focus({ preventScroll: true });
+                        }
+
+                        if (modalEl && window.bootstrap && window.bootstrap.Modal) {
+                            window.bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                        }
+
+                        destroy(card);
+                    });
+                });
+
                 card.querySelectorAll('a[href]').forEach(function(link) {
                     link.addEventListener('click', function() {
                         destroy(card);
                     });
                 });
-
-                var bayar = card.querySelector('[data-notif-bayar]');
-                if (bayar) {
-                    bayar.addEventListener('click', function() {
-                        destroy(card);
-
-                        var modalEl = document.getElementById('dendaBayarModal' + bayar.dataset
-                            .notifDendaId);
-                        if (modalEl) {
-                            bootstrap.Modal.getOrCreateInstance(modalEl).show();
-                        } else {
-                            window.location.href = bayar.dataset.notifHref;
-                        }
-                    });
-                }
 
                 schedule();
             });

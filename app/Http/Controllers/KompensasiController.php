@@ -175,7 +175,7 @@ class KompensasiController extends Controller
             'rental_id.required' => 'Rental wajib dipilih',
             'jenis.required' => 'Jenis kompensasi wajib dipilih',
             'nominal.required_if' => 'Nominal wajib diisi untuk pengembalian dana',
-            'nominal.min' => 'Nominal pengembalian dana minimal Rp 1.',
+            'nominal.min' => 'Nominal tidak valid: pengembalian dana minimal Rp 1, jenis lain tidak boleh negatif.',
             'alasan.required' => 'Alasan wajib diisi',
             'tanggal.required' => 'Tanggal wajib diisi',
             'tanggal.before_or_equal' => 'Tanggal kejadian tidak boleh melebihi hari ini.',

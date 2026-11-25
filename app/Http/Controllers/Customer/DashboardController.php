@@ -74,6 +74,12 @@ class DashboardController extends Controller
         $totalRentals = $rentals->count();
         $rentalsTampil = $rentalsAktif->take($jumlahRental);
 
+        $dendaBayar = $dendaBelumLunas->first(fn($d) => strtolower(trim($d->status ?? 'belum bayar')) === 'belum bayar');
+
+        if ($dendaBayar && $rentalsAktif->contains('id', $dendaBayar->rental_id) && !$rentalsTampil->contains('id', $dendaBayar->rental_id)) {
+            $rentalsTampil->push($rentalsAktif->firstWhere('id', $dendaBayar->rental_id));
+        }
+
         // Kompensasi baru yang belum dibaca customer.
         $klaimUpdates = Kompensasi::with('mobil')->where('customer_id', $userId)->whereNull('dibaca_at')->latest()->get();
 
