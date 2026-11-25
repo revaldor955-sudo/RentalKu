@@ -1632,7 +1632,7 @@
             <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
 
                 @include('layouts.partials.modal-head', [
-                    'title' => 'Bayar Sekarang',
+                    'title' => 'Bayar Sewa',
                     'titleId' => 'pembayaranModalTitle',
                     'subtitle' => 'Selesaikan pembayaran rental kendaraanmu.',
                 ])
@@ -1654,6 +1654,14 @@
                             <small class="text-muted">Total dibayar</small>
 
                             <span class="pm-total" id="pmTotal">Rp 0</span>
+
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-2 d-none" id="pmDendaRow">
+
+                            <small class="text-muted">Termasuk denda</small>
+
+                            <span class="fw-bold text-warning" id="pmDenda">Rp 0</span>
 
                         </div>
 
@@ -1872,13 +1880,19 @@
                 $(this).prop('hidden', !tampil).prop('disabled', !tampil);
             });
 
-            $('#pembayaranModalTitle').text($btn.data('title') || 'Bayar Sekarang');
+            var mode = $btn.data('mode') || 'rental';
+
+            $('#pembayaranModalTitle').text($btn.data('title') || 'Bayar Sewa');
             $('#pmMobil').text($btn.data('mobil') || 'Mobil');
             $('#pmRental').text('#' + $btn.data('rental'));
 
             var total = 'Rp ' + Number($btn.data('total') || 0).toLocaleString('id-ID');
+            var denda = 'Rp ' + Number($btn.data('denda') || 0).toLocaleString('id-ID');
+
             $('#pmTotal').text(total);
             $('#pmTotalNote').text(total);
+            $('#pmDenda').text(denda);
+            $('#pmDendaRow').toggleClass('d-none', mode !== 'all');
 
             var now = new Date();
             var today = now.getFullYear() + '-' +
