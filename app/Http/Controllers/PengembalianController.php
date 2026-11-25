@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Rental;
+use Illuminate\Http\Request;
 
 class PengembalianController extends Controller
 {
@@ -56,6 +57,9 @@ class PengembalianController extends Controller
             'total_harga' => $rental->total_harga ?? 0,
 
             'status' => $rental->status,
+            'sudah_dikembalikan' => $rental->tanggal_dikembalikan !== null,
+            'pembayaran_lunas' => $rental->pembayaranLunas(),
+            'denda_belum_lunas' => !$rental->semuaDendaLunas(),
             'catatan' => $rental->catatan ?? '-',
 
             'supirs' => $rental->supirs->map(function ($supir) {
@@ -63,10 +67,28 @@ class PengembalianController extends Controller
             })->values(),
 
             'pembayaran' => $rental->pembayaran ? [
-                'metode' => $rental->pembayaran->metodePembayaran->nama ?? '-',
+                'metode' => $rental->pembayaran->metodePembayaran->name ?? '-',
                 'status' => $rental->pembayaran->status ?? '-',
                 'jumlah' => $rental->pembayaran->jumlah ?? 0,
             ] : null,
+        ]);
+    }
+
+    public function verifikasi(Request $request, Rental $rental)
+    {
+        if (!in_array($rental->status, ['Disetujui', 'Berjalan'], true)) {
+            return response()->json([
+                'message' => 'Rental ini tidak dapat ditandai dikembalikan.',
+            ], 422);
+        }
+
+        $rental->update([
+            'tanggal_dikembalikan' => now(),
+            'dikembalikan_oleh' => auth()->id(),
+        ]);
+
+        return response()->json([
+            'message' => 'Mobil ditandai sudah dikembalikan.',
         ]);
     }
 }
