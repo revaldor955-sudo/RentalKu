@@ -226,6 +226,33 @@ class DendaBlokirSewaTest extends TestCase
             ->assertSee('id="dendaBayarModal' . $denda->id . '"', false);
     }
 
+    public function test_notif_denda_aktif_membuka_form_denda_di_dashboard(): void
+    {
+        $rental = $this->buatRental($this->customer, 'Berjalan');
+        $denda = $this->buatDenda($rental);
+
+        $this->actingAs($this->customer)
+            ->get('/customer/dashboard')
+            ->assertOk()
+            ->assertSee('data-bayar-denda="' . $denda->id . '"', false)
+            ->assertSee('data-rental="' . $rental->id . '"', false)
+            ->assertSee('id="rental-' . $rental->id . '"', false)
+            ->assertSee('id="dendaBayarModal' . $denda->id . '"', false)
+            ->assertDontSee('customer/riwayat?denda=' . $denda->id, false);
+    }
+
+    public function test_notif_denda_selesai_tetap_ke_riwayat(): void
+    {
+        $rental = $this->buatRental($this->customer);
+        $denda = $this->buatDenda($rental);
+
+        $this->actingAs($this->customer)
+            ->get('/customer/dashboard')
+            ->assertOk()
+            ->assertSee('customer/riwayat?denda=' . $denda->id, false)
+            ->assertDontSee('data-bayar-denda="' . $denda->id . '"', false);
+    }
+
     public function test_buka_halaman_kompensasi_menandai_semua_dibaca(): void
     {
         $rental = $this->buatRental($this->customer);

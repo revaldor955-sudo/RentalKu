@@ -860,6 +860,9 @@
             $dendaJumlah > 0 && $dendaNotif->every(fn($d) => strtolower($d->status ?? '') === 'menunggu verifikasi');
         $dendaBayarPertama = $dendaNotif->first(fn($d) => strtolower(trim($d->status ?? 'belum bayar')) === 'belum bayar');
         $dendaBisaBayar = (bool) $dendaBayarPertama;
+        $dendaDiDashboard = $dendaBayarPertama
+            && in_array(strtolower(trim($dendaBayarPertama->rental->status ?? '')), ['menunggu', 'disetujui', 'berjalan'], true)
+            && $rentalsTampil->contains('id', $dendaBayarPertama->rental_id);
 
         $klaimNotif = $klaimUpdates ?? collect();
         $klaimJumlah = $klaimNotif->count();
@@ -906,7 +909,13 @@
 
                         <div class="cust-notif-actions">
 
-                            @if ($dendaBisaBayar)
+                            @if ($dendaBisaBayar && $dendaDiDashboard)
+                                <button type="button" class="cust-notif-btn cust-notif-btn-danger"
+                                    data-bayar-denda="{{ $dendaBayarPertama->id }}"
+                                    data-rental="{{ $dendaBayarPertama->rental_id }}">
+                                    Bayar denda
+                                </button>
+                            @elseif ($dendaBisaBayar)
                                 <a href="{{ route('customer.riwayat', ['denda' => $dendaBayarPertama->id]) }}"
                                     class="cust-notif-btn cust-notif-btn-danger">
                                     Bayar denda
@@ -2204,6 +2213,27 @@
 
                 card.querySelectorAll('[data-notif-dismiss]').forEach(function(btn) {
                     btn.addEventListener('click', function() {
+                        destroy(card);
+                    });
+                });
+
+                card.querySelectorAll('[data-bayar-denda]').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        var dendaId = btn.getAttribute('data-bayar-denda');
+                        var rentalId = btn.getAttribute('data-rental');
+                        var rentalEl = document.getElementById('rental-' + rentalId);
+                        var modalEl = document.getElementById('dendaBayarModal' + dendaId);
+                        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+                        if (rentalEl) {
+                            rentalEl.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+                            rentalEl.focus({ preventScroll: true });
+                        }
+
+                        if (modalEl && window.bootstrap && window.bootstrap.Modal) {
+                            window.bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                        }
+
                         destroy(card);
                     });
                 });

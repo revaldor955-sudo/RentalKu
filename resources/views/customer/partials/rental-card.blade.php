@@ -1,4 +1,4 @@
-<div class="rental-card">
+<div class="rental-card" id="rental-{{ $rental->id }}" tabindex="-1">
     <div class="stat-card d-flex flex-column">
 
         <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
