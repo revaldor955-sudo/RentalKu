@@ -1,4 +1,4 @@
-<div class="rental-card">
+<div class="rental-card" id="rental-{{ $rental->id }}" tabindex="-1">
     <div class="stat-card d-flex flex-column">
 
         <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
@@ -71,20 +71,91 @@
             </div>
         </div>
 
+        @php
+            $pembayaranSewa = $rental->pembayaran;
+            $statusSewa = $pembayaranSewa ? $pembayaranSewa->status : 'Belum Bayar';
+            $sewaLunas = $statusSewa === 'Disetujui';
+            $sewaDibayar = in_array($statusSewa, ['Menunggu', 'Disetujui'], true);
+            $labelSewa = match ($statusSewa) {
+                'Disetujui' => 'Lunas',
+                'Menunggu' => 'Menunggu Verifikasi',
+                'Ditolak' => 'Ditolak',
+                default => 'Belum Bayar',
+            };
+            $classSewa = match ($statusSewa) {
+                'Disetujui' => 'bg-success',
+                'Menunggu' => 'bg-info text-dark',
+                'Ditolak' => 'bg-danger',
+                default => 'bg-warning text-dark',
+            };
+
+            $dendaBelumBayar = $rental->dendas->filter(function ($d) {
+                return strtolower(trim($d->status ?? 'belum bayar')) === 'belum bayar';
+            });
+            $dendaMenunggu = $rental->dendas->contains(function ($d) {
+                return strtolower(trim($d->status ?? '')) === 'menunggu verifikasi';
+            });
+            $semuaDendaLunas = $rental->dendas->count() > 0
+                && $dendaBelumBayar->isEmpty()
+                && !$dendaMenunggu;
+            $labelDenda = $rental->dendas->count() === 0
+                ? 'Tidak Ada'
+                : ($semuaDendaLunas ? 'Lunas' : ($dendaBelumBayar->isNotEmpty() ? 'Belum Bayar' : 'Menunggu Verifikasi'));
+            $classDenda = $semuaDendaLunas ? 'bg-success' : ($dendaBelumBayar->isNotEmpty() ? 'bg-warning text-dark' : 'bg-info text-dark');
+            $totalBelumDibayar = ($sewaDibayar ? 0 : (float) $rental->total_harga) + (float) $dendaBelumBayar->sum('nominal');
+        @endphp
+
+        <div class="tagihan-ringkasan mb-3">
+            <div class="tagihan-ringkasan-title">
+                <i class="bi bi-receipt me-1"></i>
+                Ringkasan Tagihan
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <span class="small text-muted">Biaya rental</span>
+                <span class="badge {{ $classSewa }}">{{ $labelSewa }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <span class="small text-muted">Denda ({{ $rental->dendas->count() }})</span>
+                <span class="badge {{ $classDenda }}">{{ $labelDenda }}</span>
+            </div>
+
+            <div class="tagihan-ringkasan-total d-flex justify-content-between align-items-center">
+                <span class="small fw-semibold">Total belum dibayar</span>
+                <span class="fw-bold">Rp {{ number_format($totalBelumDibayar, 0, ',', '.') }}</span>
+            </div>
+
+            @if (!$sewaDibayar && $dendaBelumBayar->isNotEmpty())
+                <button type="button" class="btn btn-success w-100 mt-2 btn-bayar"
+                    data-action="{{ route('payment.all', $rental->id) }}"
+                    data-title="Bayar Semua"
+                    data-mode="all"
+                    data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
+                    data-rental="{{ $rental->id }}"
+                    data-cabang="{{ $rental->cabang_ambil_id }}"
+                    data-total="{{ (float) $rental->total_harga + (float) $dendaBelumBayar->sum('nominal') }}"
+                    data-denda="{{ (float) $dendaBelumBayar->sum('nominal') }}">
+                    <i class="bi bi-cash-stack me-1"></i>
+                    Bayar Semua
+                </button>
+            @endif
+        </div>
+
         <div class="rental-actions">
 
             @if($rental->status === 'Disetujui')
 
                 @if(!$rental->pembayaran)
                     <button type="button" class="btn btn-success w-100 btn-bayar"
-                        data-action="{{ route('pembayaran.store', $rental->id) }}"
-                        data-title="Bayar Sekarang"
+                        data-action="{{ route('payment.rental', $rental->id) }}"
+                        data-title="Bayar Sewa"
                         data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
                         data-rental="{{ $rental->id }}"
                         data-cabang="{{ $rental->cabang_ambil_id }}"
                         data-total="{{ $rental->total_harga }}">
                         <i class="bi bi-credit-card me-1"></i>
-                        Bayar Sekarang
+                        Bayar Sewa
                     </button>
 
                 @elseif($rental->pembayaran->status === 'Menunggu')
@@ -101,7 +172,7 @@
 
                 @elseif($rental->pembayaran->status === 'Ditolak')
                     <button type="button" class="btn btn-danger w-100 btn-bayar"
-                        data-action="{{ route('pembayaran.store', $rental->id) }}"
+                        data-action="{{ route('payment.rental', $rental->id) }}"
                         data-title="Upload Ulang Pembayaran"
                         data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
                         data-rental="{{ $rental->id }}"
@@ -130,14 +201,14 @@
 
                     @if(!$rental->pembayaran)
                         <button type="button" class="btn btn-success w-100 btn-bayar"
-                            data-action="{{ route('pembayaran.store', $rental->id) }}"
-                            data-title="Bayar Sekarang"
+                            data-action="{{ route('payment.rental', $rental->id) }}"
+                            data-title="Bayar Sewa"
                             data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
                             data-rental="{{ $rental->id }}"
                             data-cabang="{{ $rental->cabang_ambil_id }}"
                             data-total="{{ $rental->total_harga }}">
                             <i class="bi bi-credit-card me-1"></i>
-                            Bayar Sekarang
+                            Bayar Sewa
                         </button>
 
                     @elseif($rental->pembayaran->status === 'Menunggu')
@@ -154,7 +225,7 @@
 
                     @elseif($rental->pembayaran->status === 'Ditolak')
                         <button type="button" class="btn btn-danger w-100 btn-bayar"
-                            data-action="{{ route('pembayaran.store', $rental->id) }}"
+                            data-action="{{ route('payment.rental', $rental->id) }}"
                             data-title="Upload Ulang Pembayaran"
                             data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
                             data-rental="{{ $rental->id }}"
@@ -504,6 +575,7 @@
 
                                     <button type="button"
                                         class="btn btn-warning w-100"
+                                        {{ $sewaLunas ? '' : 'disabled' }}
                                         data-bs-toggle="modal"
                                         data-bs-target="#{{ $modalBayarId }}">
 
@@ -511,6 +583,12 @@
                                         Pembayaran Denda
 
                                     </button>
+
+                                    @if (!$sewaLunas)
+                                        <div class="small text-muted mt-1">
+                                            Lunasi biaya rental terlebih dahulu
+                                        </div>
+                                    @endif
 
                                 </div>
 
@@ -532,7 +610,7 @@
                                             ])
 
                                             <form method="POST"
-                                                action="{{ route('customer.dendas.bayar', $d->id) }}"
+                                                action="{{ route('payment.denda', $d->id) }}"
                                                 enctype="multipart/form-data"
                                                 class="denda-bayar-form">
 
@@ -698,6 +776,30 @@
 .rental-actions {
     width: 100%;
     margin-top: 0;
+}
+
+.tagihan-ringkasan {
+    background: #f8f9fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.tagihan-ringkasan-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #2C666E;
+    margin-bottom: 2px;
+}
+
+.tagihan-ringkasan-total {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 8px;
+    margin-top: 2px;
+    color: #198754;
 }
 
 .rating-modal-custom {

@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\Brand;
 use App\Models\Cabang;
 use App\Models\Denda;
+use App\Models\MetodePembayaran;
 use App\Models\Mobil;
+use App\Models\Pembayaran;
 use App\Models\Rental;
 use App\Models\TipeMobil;
 use App\Models\User;
@@ -81,30 +83,60 @@ class DendaOtomatisTest extends TestCase
         ]);
     }
 
+    private function siapkanSelesai(Rental $rental): void
+    {
+        $metode = MetodePembayaran::firstOrCreate(
+            ['name' => 'Transfer Bank'],
+            ['nomor_akun' => '123', 'cabang_id' => null]
+        );
+
+        Pembayaran::create([
+            'rental_id' => $rental->id,
+            'metode_pembayaran_id' => $metode->id,
+            'tanggal_bayar' => now()->toDateString(),
+            'jumlah' => $rental->total_harga,
+            'bukti' => 'bukti_pembayaran/test.jpg',
+            'status' => 'Disetujui',
+        ]);
+
+        $rental->update(['tanggal_dikembalikan' => now()]);
+    }
+
     public function test_menyelesaikan_rental_terlambat_membuat_denda_otomatis(): void
     {
         Carbon::setTestNow('2026-11-03 10:00:00');
         $rental = $this->buatRental('Disetujui', '2026-11-02');
+        $this->siapkanSelesai($rental);
 
         $this->actingAs($this->staff)
             ->putJson("/rentals/{$rental->id}/status", ['status' => 'Selesai'])
-            ->assertOk()
-            ->assertJsonPath('message', 'Rental berhasil diselesaikan. Denda Keterlambatan otomatis tercatat.');
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Masih ada denda yang belum lunas. Denda keterlambatan otomatis tercatat.');
 
         $denda = Denda::where('rental_id', $rental->id)->first();
 
         $this->assertNotNull($denda);
-        $this->assertSame('Selesai', $rental->fresh()->status);
+        $this->assertSame('Disetujui', $rental->fresh()->status);
         $this->assertSame('keterlambatan', $denda->jenis);
         $this->assertSame('belum bayar', $denda->status);
         $this->assertSame(200000.0, (float) $denda->nominal);
         $this->assertStringContainsString('1 hari', $denda->deskripsi);
+
+        $denda->update(['status' => 'lunas']);
+
+        $this->actingAs($this->staff)
+            ->putJson("/rentals/{$rental->id}/status", ['status' => 'Selesai'])
+            ->assertOk()
+            ->assertJsonPath('message', 'Rental berhasil diselesaikan.');
+
+        $this->assertSame('Selesai', $rental->fresh()->status);
     }
 
     public function test_menyelesaikan_rental_tepat_waktu_tidak_membuat_denda(): void
     {
         Carbon::setTestNow('2026-11-03 10:00:00');
         $rental = $this->buatRental('Disetujui', '2026-11-03');
+        $this->siapkanSelesai($rental);
 
         $this->actingAs($this->staff)
             ->putJson("/rentals/{$rental->id}/status", ['status' => 'Selesai'])
@@ -118,22 +150,31 @@ class DendaOtomatisTest extends TestCase
     {
         Carbon::setTestNow('2026-11-05 10:00:00');
         $rental = $this->buatRental('Disetujui', '2026-11-02');
+        $this->siapkanSelesai($rental);
 
         $this->actingAs($this->staff)
             ->putJson("/rentals/{$rental->id}/status", ['status' => 'Selesai'])
-            ->assertOk();
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Masih ada denda yang belum lunas. Denda keterlambatan otomatis tercatat.');
 
         $denda = Denda::where('rental_id', $rental->id)->first();
 
         $this->assertNotNull($denda);
         $this->assertSame(600000.0, (float) $denda->nominal);
         $this->assertStringContainsString('3 hari', $denda->deskripsi);
+
+        $denda->update(['status' => 'lunas']);
+
+        $this->actingAs($this->staff)
+            ->putJson("/rentals/{$rental->id}/status", ['status' => 'Selesai'])
+            ->assertOk();
     }
 
     public function test_denda_yang_sedang_diverifikasi_tidak_ditimpa(): void
     {
         Carbon::setTestNow('2026-11-05 10:00:00');
         $rental = $this->buatRental('Disetujui', '2026-11-02');
+        $this->siapkanSelesai($rental);
 
         $denda = Denda::create([
             'rental_id' => $rental->id,
@@ -144,13 +185,22 @@ class DendaOtomatisTest extends TestCase
 
         $this->actingAs($this->staff)
             ->putJson("/rentals/{$rental->id}/status", ['status' => 'Selesai'])
-            ->assertOk()
-            ->assertJsonPath('message', 'Rental berhasil diselesaikan.');
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Masih ada denda yang belum lunas.');
 
         $denda->refresh();
 
         $this->assertSame('menunggu verifikasi', $denda->status);
         $this->assertSame(200000.0, (float) $denda->nominal);
+
+        $denda->update(['status' => 'lunas']);
+
+        $this->actingAs($this->staff)
+            ->putJson("/rentals/{$rental->id}/status", ['status' => 'Selesai'])
+            ->assertOk()
+            ->assertJsonPath('message', 'Rental berhasil diselesaikan.');
+
+        $this->assertSame('Selesai', $rental->fresh()->status);
     }
 
     public function test_command_membuat_denda_untuk_rental_belum_dikembalikan(): void

@@ -314,7 +314,9 @@ Route::middleware('customer')->group(function () {
 
     Route::get('/customer/pembayaran/{rental}', [PembayaranController::class, 'create'])->name('pembayaran.create');
 
-    Route::post('/customer/pembayaran/{rental}', [PembayaranController::class, 'store'])->name('pembayaran.store');
+    Route::post('/customer/pembayaran/{rental}', [PembayaranController::class, 'paymentRental'])->name('payment.rental');
+
+    Route::post('/customer/pembayaran/{rental}/semua', [PembayaranController::class, 'paymentAll'])->name('payment.all');
 
     // Kompensasi Customer (read-only)
 
@@ -324,8 +326,8 @@ Route::middleware('customer')->group(function () {
 
     // Bayar Denda
 
-    Route::post('/customer/dendas/{denda}/bayar', [DendaController::class, 'customerBayar'])
-        ->name('customer.dendas.bayar')
+    Route::post('/customer/dendas/{denda}/bayar', [DendaController::class, 'paymentDenda'])
+        ->name('payment.denda')
         ->missing(function () {
             if (request()->wantsJson()) {
                 return response()->json(['message' => 'Denda tidak ditemukan. Mungkin sudah dihapus.'], 404);
@@ -409,6 +411,8 @@ Route::middleware('adminstaff')->group(function () {
     // Detail rental pada menu Pengembalian
 
     Route::get('/pengembalian/{rental}/detail', [PengembalianController::class, 'detail'])->name('pengembalian.detail');
+
+    Route::put('/pengembalian/{rental}/verifikasi', [PengembalianController::class, 'verifikasi'])->name('pengembalian.verifikasi');
 
     // Menu Pemeriksaan Kendaraan
 

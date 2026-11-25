@@ -345,7 +345,7 @@
                 </div>
 
                 <form
-                    action="{{ route('pembayaran.store', $rental->id) }}"
+                    action="{{ route('payment.rental', $rental->id) }}"
                     method="POST"
                     enctype="multipart/form-data"
                 >

@@ -7,6 +7,7 @@ use App\Models\Pembayaran;
 use App\Models\Rental;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PembayaranController extends Controller
 {
@@ -270,7 +271,7 @@ public function detail(Pembayaran $pembayaran)
     /**
      * Menyimpan pembayaran customer.
      */
-    public function store(Request $request, Rental $rental)
+    public function paymentRental(Request $request, Rental $rental)
     {
         if ($rental->user_id !== Auth::id()) {
             abort(403);
@@ -417,6 +418,112 @@ public function detail(Pembayaran $pembayaran)
                 'success',
                 'Bukti pembayaran berhasil dikirim.'
             );
+    }
+
+    /**
+     * Bayar sewa dan seluruh denda belum bayar dalam satu pengiriman.
+     * Catatan tetap dibuat terpisah: satu baris pembayaran + satu baris per denda.
+     */
+    public function paymentAll(Request $request, Rental $rental)
+    {
+        if ($rental->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if (!in_array($rental->status, ['Disetujui', 'Berjalan'], true)) {
+            $message = 'Pembayaran hanya tersedia untuk rental yang disetujui atau sedang berjalan.';
+
+            return $request->wantsJson()
+                ? response()->json(['message' => $message], 422)
+                : redirect()->route('customer.dashboard')->with('error', $message);
+        }
+
+        if (
+            Pembayaran::where('rental_id', $rental->id)
+                ->whereIn('status', ['Menunggu', 'Disetujui'])
+                ->exists()
+        ) {
+            $message = 'Rental ini sudah memiliki pembayaran aktif.';
+
+            return $request->wantsJson()
+                ? response()->json(['message' => $message], 422)
+                : redirect()->route('customer.dashboard')->with('error', $message);
+        }
+
+        $dendas = $rental->dendas()
+            ->whereRaw("LOWER(COALESCE(status, 'belum bayar')) = 'belum bayar'")
+            ->get();
+
+        if ($dendas->isEmpty()) {
+            $message = 'Tidak ada denda yang perlu dibayar.';
+
+            return $request->wantsJson()
+                ? response()->json(['message' => $message], 422)
+                : redirect()->route('customer.dashboard')->with('error', $message);
+        }
+
+        $validated = $request->validate([
+            'metode_pembayaran_id' => 'required|exists:metode_pembayarans,id',
+            'tanggal_bayar' => 'required|date|before_or_equal:today',
+            'bukti' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ], [
+            'metode_pembayaran_id.required' => 'Metode pembayaran wajib dipilih.',
+            'metode_pembayaran_id.exists' => 'Metode pembayaran tidak valid.',
+            'tanggal_bayar.required' => 'Tanggal pembayaran wajib diisi.',
+            'tanggal_bayar.date' => 'Tanggal pembayaran tidak valid.',
+            'tanggal_bayar.before_or_equal' => 'Tanggal pembayaran tidak boleh melebihi hari ini.',
+            'bukti.required' => 'Bukti pembayaran wajib diupload.',
+            'bukti.image' => 'File bukti harus berupa gambar.',
+            'bukti.mimes' => 'Bukti harus berformat JPG, JPEG, atau PNG.',
+            'bukti.max' => 'Ukuran bukti maksimal 2 MB.',
+        ]);
+
+        $metodeAllowed = $this->metodeUntukCabang($rental->cabang_ambil_id)
+            ->contains('id', (int) $validated['metode_pembayaran_id']);
+
+        if (! $metodeAllowed) {
+            $message = 'Metode pembayaran tidak tersedia untuk cabang ini.';
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => $message,
+                    'errors' => ['metode_pembayaran_id' => [$message]],
+                ], 422);
+            }
+
+            return back()->withErrors(['metode_pembayaran_id' => $message])->withInput();
+        }
+
+        $buktiSewa = $request->file('bukti')->store('bukti_pembayaran', 'public');
+        $buktiDenda = $request->file('bukti')->store('bukti_denda', 'public');
+
+        DB::transaction(function () use ($rental, $validated, $dendas, $buktiSewa, $buktiDenda) {
+            Pembayaran::create([
+                'rental_id' => $rental->id,
+                'metode_pembayaran_id' => $validated['metode_pembayaran_id'],
+                'tanggal_bayar' => $validated['tanggal_bayar'],
+                'jumlah' => $rental->total_harga,
+                'bukti' => $buktiSewa,
+                'status' => 'Menunggu',
+            ]);
+
+            foreach ($dendas as $denda) {
+                $denda->update([
+                    'bukti_bayar' => $buktiDenda,
+                    'tanggal_bayar' => $validated['tanggal_bayar'],
+                    'status' => 'menunggu verifikasi',
+                ]);
+            }
+        });
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Bukti pembayaran sewa dan denda berhasil dikirim.',
+            ]);
+        }
+
+        return redirect()->route('customer.dashboard')
+            ->with('success', 'Bukti pembayaran sewa dan denda berhasil dikirim.');
     }
 
     /**
