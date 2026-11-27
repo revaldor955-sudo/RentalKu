@@ -133,7 +133,7 @@
                         </label>
 
                         <form
-                            action="{{ route('rentals.checkout.confirm', $mobil->id) }}"
+                            action="{{ route('rentals.checkout.confirm', $mobil) }}"
                             method="POST"
                         >
                             @csrf
