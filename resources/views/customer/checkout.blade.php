@@ -16,6 +16,7 @@
                         Checkout RentalKu
                     </h3>
 
+                    {{-- Informasi Mobil --}}
                     <div class="d-flex align-items-center gap-3 mb-4">
                         @if($mobil->image)
                             <img
@@ -39,6 +40,7 @@
                         </div>
                     </div>
 
+                    {{-- Detail Rental --}}
                     <h5 class="fw-bold mb-3">
                         Detail Rental
                     </h5>
@@ -71,15 +73,22 @@
                         </strong>
                     </div>
 
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Jumlah Hari</span>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Durasi Rental</span>
                         <strong>
                             {{ $jumlahHari }} hari
                         </strong>
                     </div>
 
+                    <hr>
+
+                    {{-- Rincian Biaya --}}
+                    <h5 class="fw-bold mb-3">
+                        Rincian Biaya
+                    </h5>
+
                     <div class="d-flex justify-content-between mb-2">
-                        <span>Harga Mobil</span>
+                        <span>Harga Rental</span>
                         <span>
                             Rp {{ number_format($subtotalMobil, 0, ',', '.') }}
                         </span>
@@ -88,7 +97,7 @@
                     <div class="d-flex justify-content-between mb-2">
                         <span>Supir</span>
                         <span class="text-end">
-                            {{ $supir->nama ?? 'Tidak menggunakan supir' }}
+                            {{ $supir->name ?? 'Tidak menggunakan supir' }}
                         </span>
                     </div>
 
@@ -99,13 +108,14 @@
                         </span>
                     </div>
 
-                    <div class="d-flex justify-content-between mb-3">
-                        <span>Deposit</span>
+                    <div class="d-flex justify-content-between mb-3 fw-semibold">
+                        <span>Subtotal Rental</span>
                         <span>
-                            Rp {{ number_format($deposit, 0, ',', '.') }}
+                            Rp {{ number_format($subtotalMobil + $subtotalSupir, 0, ',', '.') }}
                         </span>
                     </div>
 
+                    {{-- Catatan Rental --}}
                     @if(!empty($checkout['catatan']))
                         <div class="mb-3">
                             <div class="fw-semibold mb-1">
@@ -120,6 +130,7 @@
 
                     <hr>
 
+                    {{-- Promo --}}
                     <div
                         class="p-3 rounded-3 mb-4"
                         style="background: #f0fff6; border: 1px solid #d5f5e3;"
@@ -128,12 +139,11 @@
                             for="kode_promo"
                             class="form-label fw-bold"
                         >
-                            <i class="bi bi-ticket-perforated text-success me-1"></i>
                             Gunakan Kode Promo
                         </label>
 
                         <form
-                            action="{{ route('rentals.checkout.confirm', $mobil->id) }}"
+                            action="{{ route('rentals.checkout.confirm', $mobil) }}"
                             method="POST"
                         >
                             @csrf
@@ -146,13 +156,18 @@
                                 placeholder="Contoh: HEMAT30"
                                 maxlength="50"
                                 autocomplete="off"
-                                value="{{ $checkout['kode_promo'] ?? '' }}"
+                                value="{{ old('kode_promo', $checkout['kode_promo'] ?? '') }}"
                             >
 
-                            <small class="text-muted d-block mt-2">
-                                Masukkan kode promo yang diberikan admin.
-                            </small>
+                            <div id="promo-message" class="mt-2 small"></div>
 
+                            @if($errors->has('kode_promo'))
+                                <div class="alert alert-danger mt-2 mb-0 py-2">
+                                    {{ $errors->first('kode_promo') }}
+                                </div>
+                            @endif
+
+                            {{-- Data Rental --}}
                             <input
                                 type="hidden"
                                 name="tanggal_mulai"
@@ -189,6 +204,7 @@
                                 value="{{ $checkout['catatan'] ?? '' }}"
                             >
 
+                            {{-- Diskon --}}
                             @if(isset($diskon) && $diskon > 0)
                                 <div class="d-flex justify-content-between mt-3 text-success">
                                     <span>Diskon Promo</span>
@@ -199,12 +215,43 @@
                                 </div>
                             @endif
 
-                            <div class="d-flex justify-content-between align-items-center mt-3 mb-4">
-                                <strong class="fs-5">
-                                    Total Harga
-                                </strong>
+                            {{-- Total Rental Setelah Diskon --}}
+                            <div class="d-flex justify-content-between mt-3">
+                                <span class="fw-semibold">
+                                    Total Rental Setelah Diskon
+                                </span>
 
-                                <strong class="fs-4 text-success">
+                                <strong class="text-success">
+                                    Rp {{ number_format(($subtotalMobil + $subtotalSupir) - $diskon, 0, ',', '.') }}
+                                </strong>
+                            </div>
+
+                            {{-- Deposit --}}
+                            <div class="d-flex justify-content-between mt-2 mb-3">
+                                <span>
+                                    Deposit (Uang Jaminan)
+                                </span>
+
+                                <strong>
+                                    Rp {{ number_format($deposit, 0, ',', '.') }}
+                                </strong>
+                            </div>
+
+                            <hr>
+
+                            {{-- Total Pembayaran --}}
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <strong class="fs-5">
+                                        Total Pembayaran
+                                    </strong>
+
+                                    <small class="d-block text-muted">
+                                        Rental setelah diskon + deposit
+                                    </small>
+                                </div>
+
+                                <strong class="fs-4 text-success text-end">
                                     Rp {{ number_format($totalHarga, 0, ',', '.') }}
                                 </strong>
                             </div>
@@ -219,6 +266,7 @@
                         </form>
                     </div>
 
+                    {{-- Tombol Kembali --}}
                     <a
                         href="{{ route('customer.dashboard') }}"
                         class="btn btn-light w-100 mt-2 py-2"
@@ -233,5 +281,64 @@
         </div>
     </div>
 </div>
+
+{{-- Validasi Kode Promo --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const inputPromo = document.getElementById('kode_promo');
+    const promoMessage = document.getElementById('promo-message');
+
+    if (!inputPromo || !promoMessage) return;
+
+    let timeout = null;
+
+    inputPromo.addEventListener('input', function () {
+        clearTimeout(timeout);
+
+        const kode = inputPromo.value.trim();
+
+        promoMessage.innerHTML = '';
+        inputPromo.classList.remove('is-valid', 'is-invalid');
+
+        if (kode === '') {
+            return;
+        }
+
+        timeout = setTimeout(function () {
+            fetch('{{ route('rentals.promo.check') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    kode_promo: kode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    inputPromo.classList.add('is-valid');
+
+                    promoMessage.textContent = data.message;
+                    promoMessage.className = 'mt-2 small text-success fw-semibold';
+                } else {
+                    inputPromo.classList.add('is-invalid');
+
+                    promoMessage.textContent = data.message;
+                    promoMessage.className = 'mt-2 small text-danger fw-semibold';
+                }
+            })
+            .catch(() => {
+                inputPromo.classList.add('is-invalid');
+
+                promoMessage.textContent = 'Gagal memeriksa kode promo. Silakan coba lagi.';
+                promoMessage.className = 'mt-2 small text-danger';
+            });
+        }, 500);
+    });
+});
+</script>
 
 @endsection

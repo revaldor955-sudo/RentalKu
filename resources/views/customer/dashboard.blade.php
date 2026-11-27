@@ -648,23 +648,23 @@
             color: #b02a37;
         }
 .cust-denda-container {
-    background: #fff;
+    background: #fff8f8;
     border: 1px solid #f1d5d8;
-    border-radius: 16px;
-    padding: 12px;
-    margin-top: 12px;
+    border-radius: 13px;
+    padding: 9px;
+    margin-top: 10px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    max-height: 340px;
+    gap: 8px;
+    max-height: 155px;
     overflow-y: auto;
 }
 
 .cust-denda-item {
     background: #fff;
     border: 1px solid #edf0ee;
-    border-radius: 13px;
-    padding: 13px;
+    border-radius: 10px;
+    padding: 9px 10px;
 }
 
 .cust-denda-item:last-child {

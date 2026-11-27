@@ -163,7 +163,7 @@
     </div>
 
     {{-- Actions --}}
-    <form id="checkoutConfirmForm" action="{{ route('rentals.checkout.confirm', $mobil->id) }}" method="POST" class="mt-4">
+    <form id="checkoutConfirmForm"action="{{ route('rentals.checkout.confirm', $mobil) }}" method="POST" class="mt-4">
         @csrf
         <input type="hidden" name="kode_promo" id="cs-hidden-promo" value="{{ $checkout['kode_promo'] ?? '' }}">
         <button type="submit" class="cs-btn-confirm">
