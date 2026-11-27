@@ -654,37 +654,44 @@
 
         <div class="row g-3 text-start">
 
-            <div class="col-md-6">
-                <label class="form-label fw-semibold">Cabang Ambil</label>
+        <div class="col-md-6">
+    <label class="form-label fw-semibold">Cabang Ambil</label>
 
-                <select name="cabang_ambil_id" class="form-select" required>
-                    <option value="" disabled selected>Pilih cabang ambil</option>
+    <select name="cabang_ambil_id" id="cabangAmbilSelect" class="form-select" required>
+        <option value="" disabled>Pilih cabang ambil</option>
 
-                    @foreach($cabangs as $cabang)
-                        <option
-                            value="{{ $cabang->id }}"
-                            @selected(old('cabang_ambil_id', $mobil->cabang_id) == $cabang->id)>
-                            {{ $cabang->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+        @foreach($cabangs as $cabang)
+            <option
+                value="{{ $cabang->id }}"
+                @selected(old('cabang_ambil_id', $mobil->cabang_id) == $cabang->id)>
+                {{ $cabang->name }}
+            </option>
+        @endforeach
+    </select>
+</div>
 
-            <div class="col-md-6">
-                <label class="form-label fw-semibold">Cabang Kembali</label>
+<div class="col-md-6">
+    <label class="form-label fw-semibold">Cabang Kembali</label>
 
-                <select name="cabang_kembali_id" class="form-select" required>
-                    <option value="" disabled selected>Pilih cabang kembali</option>
+    <select id="cabangKembaliSelect" class="form-select" disabled>
+        @foreach($cabangs as $cabang)
+            <option value="{{ $cabang->id }}">
+                {{ $cabang->name }}
+            </option>
+        @endforeach
+    </select>
 
-                    @foreach($cabangs as $cabang)
-                        <option
-                            value="{{ $cabang->id }}"
-                            @selected(old('cabang_kembali_id', $mobil->cabang_id) == $cabang->id)>
-                            {{ $cabang->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+    <input
+        type="hidden"
+        name="cabang_kembali_id"
+        id="cabangKembaliHidden"
+        value="{{ old('cabang_ambil_id', $mobil->cabang_id) }}"
+    >
+
+    {{-- <small class="text-muted">
+        Cabang pengembalian otomatis mengikuti cabang pengambilan.
+    </small> --}}
+</div>
 
             <div class="col-md-6">
                 <label class="form-label fw-semibold">Tanggal Mulai</label>
@@ -858,16 +865,18 @@ function openSewaPopup() {
                 updateSupirProfile(this);
             });
 
-            $form.on('change', 'select[name="cabang_ambil_id"]', function() {
-                var cabangId = this.value;
-                var kembali = $form.find('select[name="cabang_kembali_id"]');
-                var supirSelect = $form.find('select[name="supir_id"]')[0];
+          $form.on('change', 'select[name="cabang_ambil_id"]', function() {
+    var cabangId = this.value;
 
-                if (kembali.length && !kembali.val()) {
-                    kembali.val(cabangId);
-                }
+    var kembali = $form.find('#cabangKembaliSelect');
+    var kembaliHidden = $form.find('#cabangKembaliHidden');
 
-                if (supirSelect) {
+    kembali.val(cabangId);
+    kembaliHidden.val(cabangId);
+
+    var supirSelect = $form.find('select[name="supir_id"]')[0];
+
+    if (supirSelect) {
                     Array.from(supirSelect.options).forEach(function(option) {
                         if (option.value === '') return;
                         option.hidden = option.dataset.cabangId !== cabangId;
