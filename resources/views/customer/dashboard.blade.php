@@ -647,7 +647,77 @@
             background: #f8d7da;
             color: #b02a37;
         }
+.cust-denda-container {
+    background: #fff;
+    border: 1px solid #f1d5d8;
+    border-radius: 16px;
+    padding: 12px;
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 340px;
+    overflow-y: auto;
+}
 
+.cust-denda-item {
+    background: #fff;
+    border: 1px solid #edf0ee;
+    border-radius: 13px;
+    padding: 13px;
+}
+
+.cust-denda-item:last-child {
+    margin-bottom: 0;
+}
+
+.cust-denda-mobil {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.cust-denda-rental {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.cust-denda-jenis {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 8px;
+}
+
+.cust-denda-nominal {
+    font-size: 17px;
+    font-weight: 800;
+    color: #dc3545;
+    margin-top: 5px;
+}
+
+.cust-denda-status {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 9px;
+    border-radius: 50px;
+    background: #fff3cd;
+    color: #856404;
+}
+
+.cust-denda-deskripsi {
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: #6b7280;
+    margin-top: 8px;
+}
+
+.cust-denda-tanggal {
+    font-size: 11.5px;
+    color: #6b7280;
+    margin-top: 7px;
+}
         .cust-notif-icon-success {
             background: #d1e7dd;
             color: #0f5132;
@@ -881,68 +951,139 @@
 
     <div id="custNotifStack" class="cust-notif-stack" aria-live="polite">
 
-        @if ($dendaJumlah)
+       @if ($dendaJumlah)
 
-            <article class="cust-notif cust-notif-denda" role="alert" data-notif-dur="12000">
+    <article class="cust-notif cust-notif-denda" role="alert" data-notif-dur="12000">
 
-                <div class="cust-notif-row">
+        <div class="cust-notif-row">
 
-                    <span class="cust-notif-icon cust-notif-icon-danger">
-                        <i class="bi bi-exclamation-triangle-fill"></i>
-                    </span>
+            <span class="cust-notif-icon cust-notif-icon-danger">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </span>
 
-                    <div class="cust-notif-body">
+            <div class="cust-notif-body">
 
-                        <div class="cust-notif-title">Denda belum lunas</div>
+                <div class="cust-notif-title">
+                    Denda Belum Lunas
+                </div>
 
-                        <p class="cust-notif-text">
-                            @if ($dendaSemuaVerifikasi)
-                                Pembayaran denda sebesar
-                                <strong>Rp {{ number_format($dendaTotal ?? 0, 0, ',', '.') }}</strong>
-                                sedang diverifikasi tim kami. Sewa baru tetap terkunci sampai lunas.
-                            @else
-                                Ada {{ $dendaJumlah }} denda belum lunas dengan total
-                                <strong>Rp {{ number_format($dendaTotal ?? 0, 0, ',', '.') }}</strong>.
-                                Sewa baru terkunci sampai denda dilunasi.
+                <div class="cust-denda-container">
+
+                    @foreach ($dendaNotif as $denda)
+
+                        <div class="cust-denda-item">
+
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+
+                                <div>
+
+                                    <div class="cust-denda-mobil">
+                                        <i class="bi bi-car-front-fill text-success me-1"></i>
+                                        {{ $denda->rental?->mobil?->name ?? 'Mobil' }}
+                                    </div>
+
+                                    <div class="cust-denda-rental">
+                                        Rental #{{ $denda->rental_id }}
+                                    </div>
+
+                                </div>
+
+                                <span class="cust-denda-status">
+                                    {{ $denda->status }}
+                                </span>
+
+                            </div>
+
+                            <div class="cust-denda-jenis">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Jenis Denda:
+                                {{ ucfirst(str_replace('_', ' ', $denda->jenis ?? '-')) }}
+                            </div>
+
+                            <div class="cust-denda-nominal">
+                                Rp {{ number_format($denda->nominal ?? 0, 0, ',', '.') }}
+                            </div>
+
+                            <div class="cust-denda-tanggal">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                {{ $denda->created_at?->format('d/m/Y') ?? '-' }}
+                            </div>
+
+                            @if ($denda->deskripsi)
+                                <div class="cust-denda-deskripsi">
+                                    {{ $denda->deskripsi }}
+                                </div>
                             @endif
-                        </p>
-
-                        <div class="cust-notif-actions">
-
-                            @if ($dendaBisaBayar && $dendaDiDashboard)
-                                <button type="button" class="cust-notif-btn cust-notif-btn-danger"
-                                    data-bayar-denda="{{ $dendaBayarPertama->id }}"
-                                    data-rental="{{ $dendaBayarPertama->rental_id }}">
-                                    Bayar denda
-                                </button>
-                            @elseif ($dendaBisaBayar)
-                                <a href="{{ route('customer.riwayat', ['denda' => $dendaBayarPertama->id]) }}"
-                                    class="cust-notif-btn cust-notif-btn-danger">
-                                    Bayar denda
-                                </a>
-                            @else
-                                <a href="{{ route('customer.riwayat') }}" class="cust-notif-btn cust-notif-btn-danger">
-                                    Lihat status
-                                </a>
-                            @endif
-
-                            <button type="button" class="cust-notif-nanti" data-notif-dismiss>Nanti</button>
 
                         </div>
 
-                    </div>
+                    @endforeach
 
-                    <button type="button" class="cust-notif-close" aria-label="Tutup notifikasi" data-notif-dismiss>
-                        <i class="bi bi-x-lg"></i>
+                </div>
+
+                <div class="cust-notif-actions">
+
+                    @if ($dendaBisaBayar && $dendaDiDashboard)
+
+                        <button type="button"
+                            class="cust-notif-btn cust-notif-btn-danger"
+                            data-bayar-denda="{{ $dendaBayarPertama->id }}"
+                            data-rental="{{ $dendaBayarPertama->rental_id }}">
+
+                            <i class="bi bi-wallet2"></i>
+                            Bayar denda
+
+                        </button>
+
+                    @elseif ($dendaBisaBayar)
+
+                        <a href="{{ route('customer.riwayat', ['denda' => $dendaBayarPertama->id]) }}"
+                            class="cust-notif-btn cust-notif-btn-danger">
+
+                            <i class="bi bi-wallet2"></i>
+                            Bayar denda
+
+                        </a>
+
+                    @else
+
+                        <a href="{{ route('customer.riwayat') }}"
+                            class="cust-notif-btn cust-notif-btn-danger">
+
+                            Lihat status
+
+                        </a>
+
+                    @endif
+
+                    <button type="button"
+                        class="cust-notif-nanti"
+                        data-notif-dismiss>
+
+                        Nanti
+
                     </button>
 
                 </div>
 
-                <span class="cust-notif-bar" aria-hidden="true"></span>
+            </div>
 
-            </article>
+            <button type="button"
+                class="cust-notif-close"
+                aria-label="Tutup notifikasi"
+                data-notif-dismiss>
 
-        @endif
+                <i class="bi bi-x-lg"></i>
+
+            </button>
+
+        </div>
+
+        <span class="cust-notif-bar" aria-hidden="true"></span>
+
+    </article>
+
+@endif
 
         @if ($klaimJumlah)
 
