@@ -14,9 +14,7 @@ class AdminStaffMiddleware
             return redirect()->route('login');
         }
 
-        $role = auth()->user()->role;
-
-        if (!$role || !in_array($role->name, ['Admin', 'Staff'])) {
+        if (!in_array(auth()->user()->roles_id, [1, 2])) {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
         }
 

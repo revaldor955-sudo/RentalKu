@@ -16,7 +16,9 @@ class PasswordResetTest extends TestCase
     {
         $response = $this->get('/forgot-password');
 
-        $response->assertStatus(200);
+        $response->assertStatus(200)
+            ->assertSee('Lupa password?')
+            ->assertSee('Kirim tautan reset password');
     }
 
     public function test_reset_password_link_can_be_requested(): void
@@ -25,7 +27,8 @@ class PasswordResetTest extends TestCase
 
         $user = User::factory()->create();
 
-        $this->post('/forgot-password', ['email' => $user->email]);
+        $this->post('/forgot-password', ['email' => $user->email])
+            ->assertSessionHas('status', 'Tautan reset password sudah dikirim ke email Anda.');
 
         Notification::assertSentTo($user, ResetPassword::class);
     }
@@ -41,7 +44,9 @@ class PasswordResetTest extends TestCase
         Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
             $response = $this->get('/reset-password/'.$notification->token);
 
-            $response->assertStatus(200);
+            $response->assertStatus(200)
+                ->assertSee('Password baru')
+                ->assertSee('Simpan password baru');
 
             return true;
         });
@@ -65,6 +70,7 @@ class PasswordResetTest extends TestCase
 
             $response
                 ->assertSessionHasNoErrors()
+                ->assertSessionHas('status', 'Password berhasil diubah. Silakan masuk.')
                 ->assertRedirect(route('login'));
 
             return true;

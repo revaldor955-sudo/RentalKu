@@ -21,6 +21,16 @@ class LoginRequest extends FormRequest
     }
 
     /**
+     * Normalisasi email agar pencocokan kredensial tidak peka huruf besar/kecil.
+     */
+    protected function prepareForValidation(): void
+    {
+        if (is_string($this->input('email'))) {
+            $this->merge(['email' => Str::lower(trim($this->input('email')))]);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
@@ -30,6 +40,20 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+        ];
+    }
+
+    /**
+     * Pesan validasi dalam Bahasa Indonesia.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'password.required' => 'Password wajib diisi.',
         ];
     }
 
@@ -45,8 +69,9 @@ class LoginRequest extends FormRequest
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
+            // Pesan umum: jangan ungkap apakah email terdaftar atau password yang salah.
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => 'Email atau password salah.',
             ]);
         }
 
@@ -69,10 +94,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
+            'email' => "Terlalu banyak percobaan masuk. Coba lagi dalam {$seconds} detik.",
         ]);
     }
 

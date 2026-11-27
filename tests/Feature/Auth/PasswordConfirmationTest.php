@@ -16,7 +16,9 @@ class PasswordConfirmationTest extends TestCase
 
         $response = $this->actingAs($user)->get('/confirm-password');
 
-        $response->assertStatus(200);
+        $response->assertStatus(200)
+            ->assertSee('Ini area aman aplikasi.')
+            ->assertSee('Konfirmasi');
     }
 
     public function test_password_can_be_confirmed(): void
@@ -39,6 +41,8 @@ class PasswordConfirmationTest extends TestCase
             'password' => 'wrong-password',
         ]);
 
-        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors([
+            'password' => 'Password yang Anda masukkan salah.',
+        ]);
     }
 }

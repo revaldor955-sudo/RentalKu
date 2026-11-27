@@ -100,7 +100,7 @@
 
                     <div class="row g-3 align-items-end">
 
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
 
                             <div class="search-label">
                                 Lokasi Pengambilan
@@ -124,29 +124,27 @@
 
                         </div>
 
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
 
-                            <div class="search-label" id="tanggal-mulai-label">
-                                Tanggal Mulai
+                            <div class="search-label" id="status-label">
+                                Status Mobil
                             </div>
 
-                            <input type="date" name="tanggal_mulai" value="{{ $mulai?->toDateString() }}"
-                                min="{{ now()->toDateString() }}" id="tanggal_mulai" aria-labelledby="tanggal-mulai-label" class="form-control search-input">
+                            <select name="status" aria-labelledby="status-label" class="form-select search-input">
+
+                                <option value="tersedia" @selected($statusInput !== 'tidak_tersedia')>
+                                    Tersedia
+                                </option>
+
+                                <option value="tidak_tersedia" @selected($statusInput === 'tidak_tersedia')>
+                                    Tidak Tersedia
+                                </option>
+
+                            </select>
 
                         </div>
 
-                        <div class="col-lg-3">
-
-                            <div class="search-label" id="tanggal-selesai-label">
-                                Tanggal Selesai
-                            </div>
-
-                            <input type="date" name="tanggal_selesai" value="{{ $selesai?->toDateString() }}"
-                                min="{{ now()->toDateString() }}" id="tanggal_selesai" aria-labelledby="tanggal-selesai-label" class="form-control search-input">
-
-                        </div>
-
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
 
                             <button type="submit" class="btn btn-rent w-100 py-3">
                                 <i class="bi bi-search me-2"></i>
@@ -184,16 +182,15 @@
             <div class="text-center mb-5">
 
                 <div class="text-success fw-bold mb-2">
-                    BRAND PILIHAN
+                    {{ $landingSettings['brand_badge'] ?? 'BRAND PILIHAN' }}
                 </div>
 
                 <h2 class="section-title">
-                    Pilihan brand untukmu
+                    {{ $landingSettings['brand_title'] ?? 'Pilihan brand untukmu' }}
                 </h2>
 
                 <p class="section-subtitle mx-auto">
-                    Berbagai pilihan merek kendaraan tersedia
-                    untuk memenuhi kebutuhan perjalananmu.
+                    {{ $landingSettings['brand_description'] ?? 'Berbagai pilihan merek kendaraan tersedia untuk memenuhi kebutuhan perjalananmu.' }}
                 </p>
 
             </div>
@@ -240,17 +237,15 @@
                 <div class="col-lg-5">
 
                     <div class="text-success fw-bold mb-2">
-                        KENAPA RENTALKU?
+                        {{ $landingSettings['about_badge'] ?? 'KENAPA RENTALKU?' }}
                     </div>
 
                     <h2 class="section-title">
-                        Rental mobil tanpa ribet.
+                        {{ $landingSettings['about_title'] ?? 'Rental mobil tanpa ribet.' }}
                     </h2>
 
                     <p class="section-subtitle">
-                        Kami menghadirkan pengalaman rental mobil
-                        yang praktis dengan proses pemesanan yang
-                        mudah dan transparan.
+                        {{ $landingSettings['about_description'] ?? 'Kami menghadirkan pengalaman rental mobil yang praktis dengan proses pemesanan yang mudah dan transparan.' }}
                     </p>
 
                     <a href="#mobil" class="btn btn-rent mt-4">
@@ -269,16 +264,15 @@
                             <div class="feature-card">
 
                                 <div class="feature-icon">
-                                    <i class="bi bi-shield-check"></i>
+                                    <i class="bi {{ $landingSettings['about_feature_1_icon'] ?? 'bi-shield-check' }}"></i>
                                 </div>
 
                                 <h5>
-                                    Aman & Terpercaya
+                                    {{ $landingSettings['about_feature_1_title'] ?? 'Aman & Terpercaya' }}
                                 </h5>
 
                                 <p>
-                                    Data kendaraan dan proses rental
-                                    dikelola dengan sistem yang terstruktur.
+                                    {{ $landingSettings['about_feature_1_desc'] ?? 'Data kendaraan dan proses rental dikelola dengan sistem yang terstruktur.' }}
                                 </p>
 
                             </div>
@@ -290,16 +284,15 @@
                             <div class="feature-card">
 
                                 <div class="feature-icon">
-                                    <i class="bi bi-lightning-charge"></i>
+                                    <i class="bi {{ $landingSettings['about_feature_2_icon'] ?? 'bi-lightning-charge' }}"></i>
                                 </div>
 
                                 <h5>
-                                    Proses Cepat
+                                    {{ $landingSettings['about_feature_2_title'] ?? 'Proses Cepat' }}
                                 </h5>
 
                                 <p>
-                                    Rental mobil dapat dilakukan
-                                    dengan mudah melalui website.
+                                    {{ $landingSettings['about_feature_2_desc'] ?? 'Rental mobil dapat dilakukan dengan mudah melalui website.' }}
                                 </p>
 
                             </div>
@@ -311,16 +304,15 @@
                             <div class="feature-card">
 
                                 <div class="feature-icon">
-                                    <i class="bi bi-wallet2"></i>
+                                    <i class="bi {{ $landingSettings['about_feature_3_icon'] ?? 'bi-wallet2' }}"></i>
                                 </div>
 
                                 <h5>
-                                    Harga Transparan
+                                    {{ $landingSettings['about_feature_3_title'] ?? 'Harga Transparan' }}
                                 </h5>
 
                                 <p>
-                                    Kamu dapat melihat harga rental
-                                    sebelum melakukan rental.
+                                    {{ $landingSettings['about_feature_3_desc'] ?? 'Kamu dapat melihat harga rental sebelum melakukan rental.' }}
                                 </p>
 
                             </div>
@@ -332,16 +324,15 @@
                             <div class="feature-card">
 
                                 <div class="feature-icon">
-                                    <i class="bi bi-headset"></i>
+                                    <i class="bi {{ $landingSettings['about_feature_4_icon'] ?? 'bi-headset' }}"></i>
                                 </div>
 
                                 <h5>
-                                    Layanan Support
+                                    {{ $landingSettings['about_feature_4_title'] ?? 'Layanan Support' }}
                                 </h5>
 
                                 <p>
-                                    Hubungi tim Rentalku jika membutuhkan
-                                    bantuan selama proses rental.
+                                    {{ $landingSettings['about_feature_4_desc'] ?? 'Hubungi tim Rentalku jika membutuhkan bantuan selama proses rental.' }}
                                 </p>
 
                             </div>
@@ -363,21 +354,44 @@
         <div class="container">
             <div class="row text-center g-4">
             <div class="col-6 col-md-3">
-                <h2 class="fw-bold display-5 mb-1">{{ $totalMobil }}+</h2>
-                <p class="mb-0 opacity-75">Mobil Tersedia</p>
+                <h2 class="fw-bold display-5 mb-1">{{ is_numeric($landingSettings['stats_mobil_value'] ?? null) ? $landingSettings['stats_mobil_value'] . '+' : $totalMobil . '+' }}</h2>
+                <p class="mb-0 opacity-75">{{ $landingSettings['stats_mobil_label'] ?? 'Mobil Tersedia' }}</p>
             </div>
             <div class="col-6 col-md-3">
-                <h2 class="fw-bold display-5 mb-1">{{ $totalPuas }}+</h2>
-                <p class="mb-0 opacity-75">Pelanggan Puas</p>
+                <h2 class="fw-bold display-5 mb-1">{{ is_numeric($landingSettings['stats_pelanggan_value'] ?? null) ? $landingSettings['stats_pelanggan_value'] . '+' : $totalPuas . '+' }}</h2>
+                <p class="mb-0 opacity-75">{{ $landingSettings['stats_pelanggan_label'] ?? 'Pelanggan Puas' }}</p>
             </div>
-            <div class="col-6 col-md-3">
-                <h2 class="fw-bold display-5 mb-1">24/7</h2>
-                <p class="mb-0 opacity-75">Layanan Support</p>
+           <div class="col-6 col-md-3">
+    <div class="stat-item text-center">
+        <h2 class="fw-bold display-5 mb-1">24/7</h2>
+        <p>Layanan Support</p>
+    </div>
+</div>
+          <div class="col-6 col-md-3">
+            @php
+                $nilaiTampil = (float) $ratingRata;
+            @endphp
+            @if ($totalRating > 0)
+                <h2 class="fw-bold display-5 mb-1">{{ number_format($nilaiTampil, 1, ',', '.') }}</h2>
+                <div class="rating-avg" role="img" aria-label="Rating {{ number_format($nilaiTampil, 1, ',', '.') }} dari 5">
+                    <span class="rating-avg-bg">
+                    @for ($i = 0; $i < 5; $i++)<i class="bi bi-star-fill"></i>@endfor
+                    </span>
+                    <span class="rating-avg-fg" style="width: {{ ($nilaiTampil / 5) * 100 }}%;">
+                    @for ($i = 0; $i < 5; $i++)<i class="bi bi-star-fill"></i>@endfor
+                    </span>
+                </div>
+                <p class="mb-0 opacity-75 mt-1">Berdasarkan {{ $totalRating }} Ulasan</p>
+            @else
+            <h2 class="fw-bold display-5 mb-1">-</h2>
+            <div class="rating-avg" role="img" aria-label="Belum ada Ulasan">
+                <span class="rating-avg-bg">
+                    @for ($i = 0; $i < 5; $i++)<i class="bi bi-star-fill"></i>@endfor
+                </span>
             </div>
-            <div class="col-6 col-md-3">
-                <h2 class="fw-bold display-5 mb-1">{{ $ratingRata ?: '4.9' }}</h2>
-                <p class="mb-0 opacity-75">Rating Rata-rata</p>
-            </div>
+            <p class="mb-0 opacity-75 mt-1">Belum ada Ulasan</p>
+            @endif
+          </div>
             </div>
         </div>
     </section>
@@ -404,9 +418,15 @@
                     </div>
                 </div>
                 <div class="col-auto">
-                    <a href="#mobil" class="btn btn-sm fw-bold" style="background-color: var(--primary); color: white; border-radius: 20px;">
-                        Klaim Sekarang →
-                    </a>
+                    <a href="{{ $kuponAktif
+    ? route('katalog.index', ['kode_promo' => $kuponAktif->code])
+    : ($landingSettings['promo_button_url'] ?? '#mobil') }}"
+   class="btn btn-sm fw-bold"
+   style="background-color: var(--primary); color: white; border-radius: 20px;">
+
+    {{ $kuponAktif ? 'Gunakan Promo →' : ($landingSettings['promo_button_label'] ?? 'Klaim Sekarang →') }}
+
+</a>
                 </div>
             </div>
         </div>
@@ -419,16 +439,15 @@
             <div class="text-center mb-5">
 
                 <div class="text-success fw-bold mb-2">
-                    CARA RENTAL
+                    {{ $landingSettings['steps_badge'] ?? 'CARA RENTAL' }}
                 </div>
 
                 <h2 class="section-title">
-                    Rental mobil dalam beberapa langkah
+                    {{ $landingSettings['steps_title'] ?? 'Rental mobil dalam beberapa langkah' }}
                 </h2>
 
                 <p class="section-subtitle mx-auto">
-                    Proses sederhana untuk mendapatkan mobil
-                    yang kamu butuhkan.
+                    {{ $landingSettings['steps_description'] ?? 'Proses sederhana untuk mendapatkan mobil yang kamu butuhkan.' }}
                 </p>
 
             </div>
@@ -534,15 +553,15 @@
                 <div class="text-center mb-5">
 
                     <div class="text-success fw-bold mb-2">
-                        TESTIMONI
+                        {{ $landingSettings['testimonial_badge'] ?? 'TESTIMONI' }}
                     </div>
 
                     <h2 class="section-title">
-                        Apa kata pelanggan?
+                        {{ $landingSettings['testimonial_title'] ?? 'Apa kata pelanggan?' }}
                     </h2>
 
                     <p class="section-subtitle mx-auto">
-                        Ribuan pelanggan telah mempercayakan perjalanan mereka kepada Rentalku.
+                        {{ $landingSettings['testimonial_description'] ?? 'Ribuan pelanggan telah mempercayakan perjalanan mereka kepada Rentalku.' }}
                     </p>
 
                 </div>
@@ -567,7 +586,7 @@
                                 </div>
 
                                 <div class="rating-text">
-                                    "{{ $rating->ulasan ?? 'Pelayanan sangat baik.' }}"
+                                    "{{ $rating->komentar }}"
                                 </div>
 
                                 <div class="user-info">
@@ -815,11 +834,74 @@
             border-radius: 16px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
+        .contact-form .form-control {
+            min-height: 48px;
+            border-color: #d9e1e2;
+            border-radius: 10px;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+        .contact-form .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 102, 110, .15);
+        }
+        .contact-form textarea.form-control {
+            min-height: 120px;
+        }
+        .contact-form .is-invalid {
+            border-color: #dc3545;
+        }
+        .contact-form .is-valid {
+            border-color: #198754;
+            padding-right: 2.75rem;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.25l2.974 3L8 2.193z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right .75rem center;
+            background-size: 16px 16px;
+        } 
+        .contact-form textarea.is-valid {
+            background-position: right .75rem top .75rem;
+        }
+        .contact-error-summary {
+            border-left: 4px solid #dc3545;
+        }
+        .contact-error-summary a {
+            color: #842029;
+            text-decoration: underline;
+        }
+        .contact-field-error {
+            color: #b02a37;
+            font-size: .875rem;
+            margin-top: 6px;
+        }
+        .contact-form button[disabled] {
+            cursor: wait;
+            opacity: .8;
+        }
         .cta-banner {
             margin-top: 40px;
         }
         .cta {
             margin-bottom: 40px;
+        }
+
+        .rating-avg {
+            position: relative;
+            display: inline-block;
+            line-height: 1;
+            font-size: 1rem;
+        }
+        .rating-avg-bg {
+            color: rgba(255, 255, 255, 0.35);
+        }
+        .rating-avg-fg {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            color :#ffc107;
+        }
+        .rating-avg i {
+            margin-right: 2px;
         }
     </style>
 
@@ -910,19 +992,7 @@
 
 @if(session('success'))
 
-    <div class="alert alert-success alert-dismissible fade show mb-4">
-
-        <i class="bi bi-check-circle-fill me-2"></i>
-
-        {{ session('success') }}
-
-        <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="alert">
-        </button>
-
-    </div>
+    <div id="contactSuccessFlag" class="d-none" data-message="{{ session('success') }}"></div>
 
 @endif
 
@@ -960,8 +1030,20 @@
     action="{{ route('contact.store') }}"
     method="POST"
     class="contact-form"
+    novalidate
 >
                                 @csrf
+
+                                @if($errors->any())
+                                    <div id="contactErrorSummary" class="alert alert-danger contact-error-summary" role="alert" tabindex="-1" aria-labelledby="contactErrorTitle">
+                                        <h3 id="contactErrorTitle" class="h6 fw-bold">Periksa kembali data Anda</h3>
+                                        <ul class="mb-0 ps-3">
+                                            @foreach($errors->keys() as $field)
+                                                <li><a href="#contact_{{ $field }}">{{ $errors->first($field) }}</a></li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
 
                                 <div class="mb-3">
 
@@ -969,13 +1051,16 @@
 
 <input
     type="text"
-    class="form-control"
+    class="form-control @error('nama') is-invalid @enderror"
     id="contact_name"
     name="nama"
     value="{{ old('nama') }}"
     placeholder="Nama Anda"
+    autocomplete="name"
     required
+    aria-describedby="contact_name_error"
 >
+                                    <p id="contact_name_error" class="contact-field-error @if(!$errors->has('nama')) d-none @endif" role="alert">@error('nama'){{ $message }}@enderror</p>
                                 </div>
 
                                 <div class="mb-3">
@@ -984,13 +1069,16 @@
 
 <input
     type="email"
-    class="form-control"
+    class="form-control @error('email') is-invalid @enderror"
     id="contact_email"
     name="email"
     value="{{ old('email') }}"
     placeholder="Email Anda"
+    autocomplete="email"
     required
+    aria-describedby="contact_email_error"
 >
+                                    <p id="contact_email_error" class="contact-field-error @if(!$errors->has('email')) d-none @endif" role="alert">@error('email'){{ $message }}@enderror</p>
                                 </div>
 
                                 <div class="mb-3">
@@ -999,13 +1087,15 @@
 
 <input
     type="text"
-    class="form-control"
+    class="form-control @error('subjek') is-invalid @enderror"
     id="contact_subject"
     name="subjek"
     value="{{ old('subjek') }}"
     placeholder="Subjek pesan"
     required
+    aria-describedby="contact_subject_error"
 >
+                                    <p id="contact_subject_error" class="contact-field-error @if(!$errors->has('subjek')) d-none @endif" role="alert">@error('subjek'){{ $message }}@enderror</p>
                                 </div>
 
                                 <div class="mb-3">
@@ -1013,16 +1103,21 @@
                                     <label for="contact_message" class="form-label">Pesan</label>
 
 <textarea
-    class="form-control"
+    class="form-control @error('pesan') is-invalid @enderror"
     id="contact_message"
     name="pesan"
     rows="4"
     placeholder="Tuliskan pesan Anda..."
     required
+    aria-describedby="contact_message_error"
 >{{ old('pesan') }}</textarea>
+                                    <p id="contact_message_error" class="contact-field-error @if(!$errors->has('pesan')) d-none @endif" role="alert">@error('pesan'){{ $message }}@enderror</p>
                                 </div>
 
-                                <button type="submit" class="btn btn-rent w-100">Kirim Pesan</button>
+                                <button type="submit" class="btn btn-rent w-100" id="contactSubmitButton">
+                                    <span class="contact-submit-label">Kirim Pesan</span>
+                                    <span class="contact-submit-loading d-none"><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Mengirim...</span>
+                                </button>
 
                             </form>
 
@@ -1075,6 +1170,91 @@
     </section>
 
     <script>
+        (function () {
+            var form = document.getElementById('contactForm');
+            if (!form) return;
+
+            var fields = [
+                { input: 'contact_name', error: 'contact_name_error', label: 'Nama lengkap', max: 100, type: 'text' },
+                { input: 'contact_email', error: 'contact_email_error', label: 'Email', max: 150, type: 'email' },
+                { input: 'contact_subject', error: 'contact_subject_error', label: 'Subjek', max: 200, type: 'text' },
+                { input: 'contact_message', error: 'contact_message_error', label: 'Pesan', max: 5000, type: 'text' }
+            ];
+
+            function validateField(field) {
+                var input = document.getElementById(field.input);
+                var error = document.getElementById(field.error);
+                var value = input.value.trim();
+                var message = '';
+
+                if (!value) message = field.label + ' wajib diisi.';
+                else if (field.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) message = 'Format email tidak valid.';
+                else if (value.length > field.max) message = field.label + ' maksimal ' + field.max + ' karakter.';
+
+                input.classList.toggle('is-invalid', !!message);
+                input.classList.toggle('is-valid', !message && !!value);
+                error.textContent = message;
+                error.classList.toggle('d-none', !message);
+                return !message;
+            }
+
+            fields.forEach(function (field) {
+                var input = document.getElementById(field.input);
+                input.addEventListener('blur', function () { validateField(field); });
+                input.addEventListener('change', function () { validateField(field); });
+                input.addEventListener('input', function () {
+                    validateField(field);
+                });
+            });
+
+            // Browser autofill can populate values after this script starts.
+            // Removed: autofill is optional, form validates on blur/change/input
+
+            form.addEventListener('submit', function (event) {
+                var valid = fields.map(validateField).every(Boolean);
+                if (!valid) {
+                    event.preventDefault();
+                    var firstInvalid = form.querySelector('.is-invalid');
+                    if (firstInvalid) firstInvalid.focus();
+                    return;
+                }
+
+                var button = document.getElementById('contactSubmitButton');
+                button.disabled = true;
+                button.setAttribute('aria-busy', 'true');
+                button.querySelector('.contact-submit-label').classList.add('d-none');
+                button.querySelector('.contact-submit-loading').classList.remove('d-none');
+            });
+
+            var summary = document.getElementById('contactErrorSummary');
+            if (summary) summary.focus();
+
+            var success = form.parentElement.querySelector('.alert-success');
+            if (success) {
+                success.setAttribute('tabindex', '-1');
+                success.setAttribute('role', 'status');
+                success.focus();
+            }
+
+            var successFlag = document.getElementById('contactSuccessFlag');
+            if (successFlag) {
+                var msg = successFlag.getAttribute('data-message') || 'Pesan berhasil dikirim!';
+                function showSwal() {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: msg,
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#2c666e'
+                        });
+                    }
+                }
+                if (document.readyState === 'complete') showSwal();
+                else window.addEventListener('load', showSwal);
+            }
+        })();
+
         $(function () {
             // Countdown promo urgency
             function startCountdown() {
@@ -1105,48 +1285,15 @@
             if (!$form.length) return;
 
             var form = $form[0];
-            var $mulai = $(form.elements.tanggal_mulai);
-            var $selesai = $(form.elements.tanggal_selesai);
+            var $statusEl = $(form.elements.status);
             var $cabangEl = $(form.elements.cabang);
             var $tombol = $form.find('button[type="submit"]');
             var $kontainer = $('#daftar-mobil');
 
-            function sinkronMin() {
-                $selesai.attr('min', $mulai.val() || '');
-            }
-            $mulai.on('change', sinkronMin);
-            sinkronMin();
-
-            function pesanError() {
-                var adaMulai = $mulai.val() !== '';
-                var adaSelesai = $selesai.val() !== '';
-
-                $selesai[0].setCustomValidity('');
-
-                if (adaMulai !== adaSelesai) {
-                    return 'Lengkapi kedua tanggal (mulai dan selesai) atau kosongkan keduanya.';
-                }
-                if (adaSelesai && $selesai.val() < $mulai.val()) {
-                    return 'Tanggal selesai tidak boleh sebelum tanggal mulai.';
-                }
-                return '';
-            }
-
-            function valid() {
-                var pesan = pesanError();
-                if (pesan !== '') {
-                    $selesai[0].setCustomValidity(pesan);
-                    $selesai[0].reportValidity();
-                    return false;
-                }
-                return true;
-            }
-
             function bangunQuery() {
                 var params = new URLSearchParams();
                 if ($cabangEl.val() !== '') params.set('cabang', $cabangEl.val());
-                if ($mulai.val() !== '') params.set('tanggal_mulai', $mulai.val());
-                if ($selesai.val() !== '') params.set('tanggal_selesai', $selesai.val());
+                if ($statusEl.val() !== '') params.set('status', $statusEl.val());
                 return params.toString();
             }
 
@@ -1182,8 +1329,6 @@
             $form.on('submit', function (e) {
                 e.preventDefault();
 
-                if (!valid()) return;
-
                 var query = bangunQuery();
 
                 if (query === '') {
@@ -1205,126 +1350,23 @@
             });
         });
 
-        // Modal detail mobil — card + button trigger
-        $(document).on('click', '.car-card[data-mobil-id], button[data-mobil-id]', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            var mobilId = $(this).data('mobil-id');
-            var modalEl = document.getElementById('mobilDetailModal');
-            var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-            var $body = $('#mobilDetailModal .modal-body');
+        // Klik kartu mobil langsung ke halaman detail.
+       $(document).on('click', '.car-card[data-mobil-id], button[data-mobil-id]', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
 
-            $body.html('<div class="text-center py-5"><div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading...</span></div></div>');
-            modal.show();
+    const mobilId = $(this).data('mobil-id');
+    const params = new URLSearchParams(window.location.search);
+    const kodePromo = params.get('kode_promo');
 
-            $.ajax({
-                url: '/mobils/' + mobilId,
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                method: 'GET'
-            })
-            .done(function (html) {
-                $body.html(html);
-            })
-            .fail(function () {
-                $body.html('<div class="alert alert-danger m-3"><i class="bi bi-exclamation-circle me-2"></i>Gagal memuat detail mobil.</div>');
-            });
-        });
+    const tujuan = '/mobils/' + encodeURIComponent(mobilId);
 
-        // Popup form sewa (SweetAlert) — untuk user yang login
-        @auth
-        window.openSewaPopup = function() {
-            var $template = $('#sewaFormTemplate');
-            if (!$template.length) return;
-
-            if ($('.mobil-modal .mm-badge-available').length === 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal',
-                    text: 'Mobil sedang tidak tersedia.',
-                });
-                return;
-            }
-
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('mobilDetailModal')).hide();
-
-            var $carTitle = $('.mobil-modal .mm-title');
-
-            Swal.fire({
-                title: $carTitle.length ? $carTitle.text().trim() : 'Sewa Mobil',
-                html: $template.html(),
-                width: 600,
-                showConfirmButton: false,
-                didOpen: function() {
-                    var $form = $('#swal2-html-container form#sewaForm');
-                    if (!$form.length) $form = $('#swal2-html-container form').first();
-                    if (!$form.length) return;
-
-                    $form.on('submit', function(event) {
-                        event.preventDefault();
-                        var formData = new FormData($form[0]);
-                        Swal.showLoading();
-
-                        $.ajax({
-                            url: $form.attr('action'),
-                            method: 'POST',
-                            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                            data: formData,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data, textStatus, xhr) {
-                            Swal.hideLoading();
-                            if (xhr.status !== 200) {
-                                var firstError = data.errors ? Object.values(data.errors).flat()[0] : (data.message || 'Terjadi kesalahan.');
-                                Swal.fire({ icon: 'error', title: 'Gagal', text: firstError });
-                                return;
-                            }
-                            Swal.fire({ icon: 'success', title: 'Berhasil!', text: data.message || 'Pengajuan sewa berhasil.', confirmButtonText: 'OK' })
-                                .then(function() { window.location.href = '{{ route('customer.dashboard') }}'; });
-                        })
-                        .fail(function() {
-                            Swal.hideLoading();
-                            Swal.fire({ icon: 'error', title: 'Gagal', text: 'Koneksi bermasalah. Silakan coba lagi.' });
-                        });
-                    });
-
-                    // Supir profile card toggle
-                    var supirSelect = document.querySelector('#supirSelectModal');
-                    if (supirSelect) {
-                        supirSelect.addEventListener('change', function() {
-                            var card = document.querySelector('#supirProfileCardModal');
-                            var opt = this.options[this.selectedIndex];
-                            if (!card) return;
-                            if (this.value === '') {
-                                card.style.display = 'none';
-                            } else {
-                                document.querySelector('#supirNameModal').innerText = opt.dataset.name;
-                                document.querySelector('#supirPhoneModal').innerText = opt.dataset.phone;
-                                document.querySelector('#supirTarifModal').innerText = opt.dataset.tarif;
-                                document.querySelector('#supirImgModal').src = opt.dataset.image;
-                                card.style.display = 'block';
-                            }
-                        });
-                    }
-                }
-            });
-        };
-        @endauth
+    if (kodePromo) {
+        window.location.href = tujuan + '?kode_promo=' + encodeURIComponent(kodePromo);
+    } else {
+        window.location.href = tujuan;
+    }
+});
     </script>
-
-    {{-- Modal Detail Mobil --}}
-    <div class="modal fade" id="mobilDetailModal" tabindex="-1" aria-labelledby="mobilDetailLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title" id="mobilDetailLabel">Detail Mobil</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
-                    <!-- Content loaded via AJAX -->
-                </div>
-            </div>
-        </div>
-    </div>
 
 @endsection

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Staff;
 
 use App\Http\Controllers\Controller;
 use App\Models\Denda;
-use App\Models\Kompensasi;
 use App\Models\Mobil;
 use App\Models\User;
 use App\Models\Rental;
@@ -47,14 +46,12 @@ class DashboardController extends Controller
         $pendingPaymentsCount = Pembayaran::where('status', 'Menunggu')->count();
 
         $returnDueRentals = Rental::with(['user', 'mobil'])
-            ->where('status', 'Disetujui')
+            ->whereIn('status', ['Disetujui', 'Berjalan'])
             ->whereDate('tanggal_selesai', '<=', today())
             ->latest('tanggal_selesai')
             ->get();
 
         $unpaidDendasCount = Denda::where('status', 'belum bayar')->count();
-
-        $claimedKompensasisCount = Kompensasi::where('status', 'diajukan')->count();
 
         $latestRentals = Rental::with(['user', 'mobil'])
             ->latest()
@@ -76,8 +73,7 @@ class DashboardController extends Controller
             'pendingPaymentsCount',
             'returnDueRentals',
             'unpaidDendasCount',
-            'claimedKompensasisCount',
             'latestRentals'
-        ));
+        ))->with('pageTitle', 'Dashboard');
     }
 }

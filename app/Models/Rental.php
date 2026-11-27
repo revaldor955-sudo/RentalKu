@@ -18,17 +18,23 @@ class Rental extends Model
         'harga_perhari',
         'subtotal',
         'deposit',
+        'kode_promo',
+        'diskon',
         'total_harga',
         'status',
         'catatan',
+        'tanggal_dikembalikan',
+        'dikembalikan_oleh',
     ];
 
     protected $casts = [
         'tanggal_mulai' => 'date',
         'tanggal_selesai' => 'date',
+        'tanggal_dikembalikan' => 'datetime',
         'harga_perhari' => 'decimal:2',
         'subtotal' => 'decimal:2',
         'deposit' => 'decimal:2',
+        'diskon' => 'decimal:2',
         'total_harga' => 'decimal:2',
     ];
 
@@ -54,13 +60,32 @@ class Rental extends Model
 
     public function pembayaran()
     {
-        return $this->hasOne(Pembayaran::class, 'rental_id');
+        return $this->hasOne(Pembayaran::class, 'rental_id')->orderByDesc('id');
     }
 
-    public function dendas()
+    public function pembayaranLunas(): bool
     {
-        return $this->hasMany(Denda::class, 'rental_id');
+        return $this->pembayaran()
+            ->where('status', 'Disetujui')
+            ->exists();
     }
+
+    public function semuaDendaLunas(): bool
+    {
+        return !$this->dendas()
+            ->where(function ($query) {
+                $query->whereNull('status')
+                    ->orWhereRaw('LOWER(status) != ?', ['lunas']);
+            })
+            ->exists();
+    }
+
+ 
+public function dendas()
+{
+    return $this->hasMany(\App\Models\Denda::class, 'rental_id');
+}
+
 
     public function kompensasis()
     {
@@ -78,4 +103,5 @@ class Rental extends Model
             ->withPivot('tarif_perhari', 'sub_total')
             ->withTimestamps();
     }
+    
 }

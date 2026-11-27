@@ -130,6 +130,15 @@
             padding: 24px;
         }
 
+        .pager-bar{background:#fff;border:1px solid #edf0ee;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.05);padding:12px 16px;font-size:14px}
+        .pager-bar .text-secondary{font-size:14px;font-weight:500}.pager-select{width:auto;border-radius:10px;font-size:13px;height:34px;padding:6px 28px 6px 10px}
+        .pager-jump{width:72px;border-radius:10px;text-align:center;font-size:13px;height:34px;padding:6px 8px}
+        .pager-btn{border:1px solid #dee2e6;border-radius:10px;color:#1f2937;font-weight:600;background:#fff;font-size:13px;height:34px;display:inline-flex;align-items:center;padding:6px 12px}
+        .pager-btn:hover{border-color:#198754;color:#198754;background:#f5f7f6}
+        .pager-btn.disabled{opacity:0.4;pointer-events:none}
+        .pager-next{background:#198754;border-color:#198754;color:#fff}
+        .pager-next:hover{background:#146c43;border-color:#146c43;color:#fff}
+
         @media (max-width: 1024px) {
             .page-content {
                 padding: 16px;
@@ -224,26 +233,6 @@
 
             <div class="page-card">
 
-                <div class="p-4 border-bottom">
-
-                    <div class="d-flex justify-content-between align-items-center">
-
-                        <div>
-
-                            <h5 class="fw-bold mb-1">
-                                Daftar Supir
-                            </h5>
-
-                            <small class="text-muted">
-                                Seluruh supir yang terdaftar di RentalKu.
-                            </small>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
                 <div class="table-responsive">
 
                     <table class="table align-middle mb-0" id="supirs-table">
@@ -289,6 +278,27 @@
                         </tbody>
 
                     </table>
+
+                    <div class="pager-bar mt-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                        <div class="text-secondary small" id="supirs-info">Menampilkan 0–0 dari 0 data</div>
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <select id="supirs-perPage" class="form-select form-select-sm pager-select" aria-label="Jumlah per halaman">
+                                <option value="10">10 / halaman</option>
+                                <option value="20">20 / halaman</option>
+                                <option value="50">50 / halaman</option>
+                                <option value="100">100 / halaman</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                            <input type="number" id="supirs-custom" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
+                            <span class="text-secondary" id="supirs-pageLabel">Halaman 1 / 1</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-sm pager-btn" id="supirs-first">First Page</button>
+                            <button type="button" class="btn btn-sm pager-btn" id="supirs-prev" aria-label="Halaman sebelumnya"><i class="bi bi-chevron-left"></i></button>
+                            <button type="button" class="btn btn-sm pager-btn pager-next" id="supirs-next" aria-label="Halaman berikutnya"><i class="bi bi-chevron-right"></i></button>
+                            <button type="button" class="btn btn-sm pager-btn" id="supirs-last">Last Page</button>
+                        </div>
+                    </div>
 
                 </div>
 
@@ -626,12 +636,25 @@
     // FOTO SUPIR
     // ============================================================
 
+    // Sebagian data lama menyimpan URL absolut (ui-avatars), jangan
+    // ditempel lagi ke PHOTO_URL agar tidak menjadi .../https://...
+    function supirPhotoUrl(image) {
+
+        if (/^https?:\/\//i.test(image)) {
+
+            return image;
+        }
+
+        return PHOTO_URL.replace('__PHOTO__', image);
+    }
+
+
     function supirPhoto(image) {
 
         if (image) {
 
             return '<img src="' +
-                PHOTO_URL.replace('__PHOTO__', image) +
+                supirPhotoUrl(image) +
                 '" class="supir-photo" alt="Foto supir">';
 
         }
@@ -717,11 +740,17 @@
 
     $(document).ready(function() {
 
-        $('#supirs-table').DataTable({
+        var supirsTable = $('#supirs-table').DataTable({
 
             processing: true,
 
             serverSide: true,
+
+            paging: false,
+
+            info: false,
+
+            dom: 'frt',
 
             ajax: {
                 url: '{{ route('supirs.data') }}',
@@ -857,9 +886,7 @@
 
             ],
 
-            order: [
-                [1, 'asc']
-            ],
+         order: [],
 
             language: {
 
@@ -889,6 +916,54 @@
             },
 
         });
+
+        function renderSupirsPager() {
+            var info = supirsTable.page.info();
+            var pages = info.pages;
+            var total = info.recordsDisplay;
+            var start = total ? info.start + 1 : 0;
+            $('#supirs-info').text('Menampilkan '+start+'–'+info.end + ' dari ' + total + ' data');
+            $('#supirs-pageLabel').text('Halaman ' + (pages ? info.page + 1 : 0) + ' / ' + pages);
+            $('#supirs-first').toggleClass('disabled', info.page <= 0);
+            $('#supirs-prev').toggleClass('disabled', info.page <= 0);
+            $('#supirs-next').toggleClass('disabled', info.page >= pages - 1);
+            $('#supirs-last').toggleClass('disabled', info.page >= pages - 1);
+        }
+
+        $('#supirs-table').on('draw.dt', renderSupirsPager);
+
+        $('#supirs-first').on('click', function() { supirsTable.page('first').draw('page'); });
+
+        $('#supirs-prev').on('click', function() { supirsTable.page('previous').draw('page'); });
+
+        $('#supirs-next').on('click', function() { supirsTable.page('next').draw('page'); });
+
+        $('#supirs-last').on('click', function() { supirsTable.page('last').draw('page'); });
+
+        $('#supirs-perPage').on('change', function() {
+            if ($(this).val() === 'custom') { $('#supirs-custom').focus(); return; }
+            var n = Number($(this).val());
+            $('#supirs-custom').val(n);
+            supirsTable.page.len(n).draw();
+        });
+
+        $('#supirs-custom').on('change', function() {
+
+            var n = parseInt($(this).val(), 10) || 1;
+
+            n = Math.min(Math.max(n, 1), 500);
+
+            $(this).val(n);
+
+            if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#supirs-perPage').val(String(n)); }
+
+            else { $('#supirs-perPage').val('custom'); }
+
+            supirsTable.page.len(n).draw();
+
+        });
+
+        renderSupirsPager();
 
     });
 
@@ -1046,10 +1121,7 @@
             $('#editFotoPreview')
                 .attr(
                     'src',
-                    PHOTO_URL.replace(
-                        '__PHOTO__',
-                        data.image
-                    )
+                    supirPhotoUrl(data.image)
                 )
                 .show();
 

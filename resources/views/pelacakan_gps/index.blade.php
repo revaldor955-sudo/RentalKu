@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pelacakan GPS - RentalKu</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+
+    <style>
+        * {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background: #f4f7f8;
+            color: #000;
+        }
+
+        .page-content {
+            padding: 24px;
+        }
+
+        .gps-content {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .page-title {
+            font-size: 25px;
+            font-weight: 800;
+            color: #000;
+        }
+
+        .page-subtitle {
+            color: #000;
+            font-size: 13px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 22px;
+            border: 1px solid #e8eeee;
+            height: 100%;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            background: #e6f2ef;
+            color: #24776c;
+        }
+
+        .stat-number {
+            font-size: 25px;
+            font-weight: 800;
+            color: #000;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #000;
+        }
+
+        .content-card {
+            background: #fff;
+            border-radius: 18px;
+            border: 1px solid #e8eeee;
+            padding: 22px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #000;
+        }
+
+        .section-description {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        #map {
+            height: 480px;
+            width: 100%;
+            border-radius: 14px;
+            z-index: 1;
+        }
+
+        .rental-item {
+            background: #fff;
+            border: 1px solid #e9eeee;
+            border-radius: 16px;
+            padding: 18px;
+            height: 100%;
+            transition: 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .rental-item:hover {
+            border-color: #c5e0da;
+            box-shadow: 0 5px 15px rgba(36, 119, 108, 0.07);
+            transform: translateY(-2px);
+        }
+
+        .rental-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .car-icon {
+            width: 43px;
+            height: 43px;
+            min-width: 43px;
+            border-radius: 11px;
+            background: #e6f2ef;
+            color: #24776c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 21px;
+        }
+
+        .rental-header-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .car-name {
+            font-size: 14px;
+            font-weight: 800;
+            color: #000;
+            line-height: 1.5;
+            word-break: break-word;
+            margin-bottom: 7px;
+        }
+
+        .badge-running {
+            display: inline-block;
+            background: #e3f4e9;
+            color: #23834b;
+            font-size: 10px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .car-detail {
+            font-size: 11px;
+            color: #333;
+            margin-top: 8px;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .coordinate-text {
+            font-size: 11px;
+            color: #333;
+            margin-top: 8px;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .gps-status {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 6px 9px;
+            border-radius: 20px;
+        }
+
+        .gps-time {
+            font-size: 11px;
+            color: #6c757d;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+
+        .rental-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 9px;
+            margin-top: 14px;
+        }
+
+        .btn-map {
+            background: #e6f2ef;
+            color: #24776c;
+            border: none;
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.2s;
+        }
+
+        .btn-map:hover {
+            background: #d5e9e4;
+            color: #205e58;
+        }
+
+        .btn-delete-gps {
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 9px 12px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 45px 15px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 42px;
+            color: #b5c9c6;
+        }
+
+        .map-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .map-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #333;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .gps-marker-icon {
+            background: #24776c;
+            color: #fff;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            font-size: 17px;
+        }
+
+        .leaflet-popup-content {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .leaflet-popup-content strong {
+            font-size: 13px;
+        }
+
+        .leaflet-marker-icon,
+        .leaflet-marker-shadow {
+            transition: none;
+        }
+
+        @media (max-width: 1024px) {
+            .page-content {
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 991px) {
+            #map {
+                height: 380px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .page-title {
+                font-size: 21px;
+            }
+
+            .content-card {
+                padding: 15px;
+            }
+
+            .stat-card {
+                padding: 17px;
+            }
+
+            .rental-item {
+                padding: 15px;
+            }
+
+            #map {
+                height: 330px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+@include('layouts.partials.sidebar')
+
+<div class="page-content">
+    <div class="container-fluid px-4">
+        <div class="gps-content">
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+                <div>
+                    <h4 class="page-title mb-1">Pelacakan GPS</h4>
+                    <p class="page-subtitle mb-0">Pantau titik lokasi mobil yang sedang dirental.</p>
+                </div>
+
+                <div>
+                    <span class="badge text-bg-light border p-2">
+                        <i class="bi bi-geo-alt-fill text-success"></i>
+                        Sistem Pelacakan Mobil
+                    </span>
+                </div>
+            </div>
+
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="stat-label mb-2">Mobil Sedang Dirental</div>
+                                <div class="stat-number">{{ $rentals->count() }}</div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="bi bi-car-front-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="stat-label mb-2">Koordinat Tersimpan</div>
+                                <div class="stat-number">{{ $lokasis->count() }}</div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="bi bi-geo-alt-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="stat-label mb-2">Belum Ada Koordinat</div>
+                                <div class="stat-number">{{ max(0, $rentals->count() - $lokasis->count()) }}</div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="bi bi-geo"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row g-4">
+
+                <div class="col-12">
+                    <div class="content-card">
+
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                            <div>
+                                <h6 class="section-title mb-1">Peta Lokasi Mobil</h6>
+                                <p class="section-description mb-0">
+                                    Semua titik koordinat mobil rental ditampilkan pada peta.
+                                </p>
+                            </div>
+
+                            <button type="button" class="btn-map" onclick="refreshMap(true)">
+                                <i class="bi bi-arrow-clockwise"></i> Perbarui Peta
+                            </button>
+                        </div>
+
+                        <div id="map"></div>
+
+                        <div class="map-legend">
+                            <div class="map-legend-item">
+                                <span class="legend-dot" style="background:#24776c;"></span>
+                                Lokasi mobil
+                            </div>
+
+                            <div class="map-legend-item">
+                                <i class="bi bi-circle-fill text-success"></i>
+                                GPS aktif
+                            </div>
+
+                            <div class="map-legend-item">
+                                <i class="bi bi-circle-fill text-secondary"></i>
+                                Tidak ada pembaruan
+                            </div>
+                        </div>
+
+                        <div class="mt-3 d-flex align-items-center gap-2">
+                            <i class="bi bi-info-circle text-success"></i>
+                            <span class="section-description">
+                                Klik marker atau angka cluster untuk melihat lokasi kendaraan.
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="content-card">
+
+                        <div class="mb-4">
+                            <h6 class="section-title mb-1">Daftar Mobil Rental</h6>
+                            <p class="section-description mb-0">
+                                Mobil dengan status rental berjalan.
+                            </p>
+                        </div>
+
+                        <div class="row g-3">
+
+                            @forelse ($rentals as $rental)
+
+                                @php
+                                    $lokasi = $lokasis->firstWhere('rental_id', $rental->id);
+                                @endphp
+
+                                <div class="col-xl-4 col-lg-6 col-md-6 col-12">
+
+                                    <div class="rental-item">
+
+                                        <div class="rental-header">
+
+                                            <div class="car-icon">
+                                                <i class="bi bi-car-front-fill"></i>
+                                            </div>
+
+                                            <div class="rental-header-content">
+
+                                                <div class="car-name">
+                                                    {{ $rental->mobil->name ?? 'Mobil tidak tersedia' }}
+                                                </div>
+
+                                                <span class="badge-running">
+                                                    Sedang Dirental
+                                                </span>
+
+                                                <div class="car-detail">
+                                                    <i class="bi bi-person"></i>
+                                                    {{ $rental->user->name ?? '-' }}
+                                                </div>
+
+                                                <div class="car-detail">
+                                                    <i class="bi bi-card-text"></i>
+                                                    {{ $rental->mobil->plate_number ?? '-' }}
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        @if ($lokasi)
+                                            <div class="coordinate-text">
+                                                <i class="bi bi-geo-alt-fill text-success"></i>
+                                                {{ $lokasi->latitude }}, {{ $lokasi->longitude }}
+                                            </div>
+                                        @else
+                                            <div class="coordinate-text text-danger">
+                                                <i class="bi bi-exclamation-circle"></i>
+                                                Koordinat belum tersedia
+                                            </div>
+                                        @endif
+
+                                        <div>
+                                            <span
+                                                id="gps-status-{{ $rental->id }}"
+                                                class="gps-status
+                                                @if (!$lokasi)
+                                                    text-bg-warning
+                                                @elseif ($lokasi->updated_at && $lokasi->updated_at->gte(now()->subSeconds(30)))
+                                                    text-bg-success
+                                                @else
+                                                    text-bg-secondary
+                                                @endif">
+
+                                                @if (!$lokasi)
+                                                    Belum Ada Lokasi
+                                                @elseif ($lokasi->updated_at && $lokasi->updated_at->gte(now()->subSeconds(30)))
+                                                    GPS Aktif
+                                                @else
+                                                    Tidak Ada Pembaruan
+                                                @endif
+                                            </span>
+                                        </div>
+
+                                        <div class="gps-time" id="gps-time-{{ $rental->id }}">
+                                            @if ($lokasi)
+                                                Terakhir diperbarui:
+                                                {{ $lokasi->updated_at->copy()->setTimezone(\App\Http\Controllers\PelacakanGPSController::ZONA_WIB)->format('d/m/Y, H:i:s') }}
+                                            @else
+                                                Belum ada waktu pembaruan
+                                            @endif
+                                        </div>
+
+                                        <div class="rental-actions">
+
+                                            @if ($lokasi)
+                                                <button
+                                                    type="button"
+                                                    class="btn-map"
+                                                    onclick="lihatLokasi({{ (float) $lokasi->latitude }}, {{ (float) $lokasi->longitude }}, {{ $rental->id }})">
+                                                    <i class="bi bi-map"></i>
+                                                    Lihat Lokasi
+                                                </button>
+                                            @endif
+
+                                            <a
+                                                href="{{ route('pelacakan-gps.riwayat', $rental->id) }}"
+                                                class="btn-map">
+                                                <i class="bi bi-clock-history"></i>
+                                                Riwayat Lokasi
+                                            </a>
+
+                                            {{-- <form
+                                                action="{{ route('pelacakan-gps.hapus', $rental->id) }}"
+                                                method="POST"
+                                                class="form-hapus-gps">
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-danger btn-delete-gps">
+                                                    <i class="bi bi-trash3"></i>
+                                                    Hapus
+                                                </button>
+                                            </form> --}}
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            @empty
+
+                                <div class="col-12">
+                                    <div class="empty-state">
+                                        <i class="bi bi-car-front"></i>
+                                        <h6 class="mt-3 fw-bold">Belum Ada Mobil Dirental</h6>
+                                        <p class="small mb-0">
+                                            Mobil dengan status Berjalan akan muncul di sini.
+                                        </p>
+                                    </div>
+                                </div>
+
+                            @endforelse
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+<script>
+document.querySelectorAll('.form-hapus-gps').forEach(function (form) {
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        Swal.fire({
+            title: 'Hapus Data GPS?',
+            text: 'Koordinat dan seluruh riwayat lokasi rental ini akan dihapus.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal',
+            reverseButtons: true
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+});
+
+const dataUrl = @json(route('pelacakan-gps.data'));
+
+const map = L.map('map').setView([-0.0263, 109.3425], 12);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 19
+}).addTo(map);
+
+const markerGroup = L.markerClusterGroup({
+    maxClusterRadius: 60,
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true,
+    removeOutsideVisibleBounds: false
+});
+
+map.addLayer(markerGroup);
+
+const markers = {};
+let pertamaKali = true;
+
+const iconMobil = L.divIcon({
+    className: '',
+    html: '<div class="gps-marker-icon"><i class="bi bi-car-front-fill"></i></div>',
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
+    popupAnchor: [0, -18]
+});
+
+function buatPopup(lokasi) {
+    const popup = document.createElement('div');
+    popup.style.minWidth = '180px';
+
+    const nama = document.createElement('strong');
+    nama.textContent = lokasi.mobil || 'Mobil';
+
+    const plat = document.createElement('div');
+    plat.textContent = 'Plat: ' + (lokasi.plat || '-');
+
+    const customer = document.createElement('div');
+    customer.textContent = 'Customer: ' + (lokasi.customer || '-');
+
+    const koordinat = document.createElement('div');
+    koordinat.textContent =
+        'Koordinat: ' + lokasi.latitude + ', ' + lokasi.longitude;
+
+    const waktu = document.createElement('div');
+    waktu.textContent = lokasi.updated_at
+        ? 'Pembaruan: ' + new Date(lokasi.updated_at).toLocaleString('id-ID')
+        : 'Belum ada pembaruan';
+
+    popup.append(nama, plat, customer, koordinat, waktu);
+
+    return popup;
+}
+
+function perbaruiStatus(lokasi) {
+    const id = String(lokasi.rental_id);
+
+    const statusElement = document.getElementById('gps-status-' + id);
+    const waktuElement = document.getElementById('gps-time-' + id);
+
+    if (statusElement) {
+        if (lokasi.gps_status === 'aktif') {
+            statusElement.className = 'gps-status text-bg-success';
+            statusElement.textContent = 'GPS Aktif';
+        } else if (
+            lokasi.latitude !== null &&
+            lokasi.longitude !== null
+        ) {
+            statusElement.className = 'gps-status text-bg-secondary';
+            statusElement.textContent = 'Tidak Ada Pembaruan';
+        } else {
+            statusElement.className = 'gps-status text-bg-warning';
+            statusElement.textContent = 'Belum Ada Lokasi';
+        }
+    }
+
+    if (waktuElement) {
+        if (lokasi.updated_at) {
+            const waktu = new Date(lokasi.updated_at);
+
+            waktuElement.textContent =
+                'Terakhir diperbarui: ' +
+                waktu.toLocaleString('id-ID', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+        } else {
+            waktuElement.textContent = 'Belum ada waktu pembaruan';
+        }
+    }
+}
+
+function validasiKoordinat(lokasi) {
+    const latitude = Number(lokasi.latitude);
+    const longitude = Number(lokasi.longitude);
+
+    if (
+        lokasi.latitude === null ||
+        lokasi.longitude === null ||
+        lokasi.latitude === '' ||
+        lokasi.longitude === '' ||
+        !Number.isFinite(latitude) ||
+        !Number.isFinite(longitude) ||
+        latitude < -90 ||
+        latitude > 90 ||
+        longitude < -180 ||
+        longitude > 180
+    ) {
+        return null;
+    }
+
+    return [latitude, longitude];
+}
+
+function sesuaikanSemuaMarker() {
+    const markerList = markerGroup.getLayers();
+
+    if (markerList.length === 0) {
+        map.setView([-0.0263, 109.3425], 12);
+        return;
+    }
+
+    if (markerList.length === 1) {
+        map.setView(markerList[0].getLatLng(), 16);
+        return;
+    }
+
+    const bounds = markerGroup.getBounds();
+
+    if (bounds.isValid()) {
+        map.fitBounds(bounds, {
+            padding: [40, 40],
+            maxZoom: 16
+        });
+    }
+}
+
+async function refreshMap(sesuaikanPeta = false) {
+    try {
+        const response = await fetch(dataUrl, {
+            headers: {
+                Accept: 'application/json'
+            },
+            credentials: 'same-origin',
+            cache: 'no-store'
+        });
+
+        if (!response.ok) {
+            throw new Error('Gagal mengambil data koordinat.');
+        }
+
+        const data = await response.json();
+
+        const rentalAktif = new Set();
+
+        data.forEach(function (lokasi) {
+            const id = String(lokasi.rental_id);
+
+            perbaruiStatus(lokasi);
+
+            const posisi = validasiKoordinat(lokasi);
+
+            if (!posisi) {
+                return;
+            }
+
+            rentalAktif.add(id);
+
+            if (markers[id]) {
+                markers[id].setLatLng(posisi);
+                markers[id].setPopupContent(buatPopup(lokasi));
+            } else {
+                const marker = L.marker(posisi, {
+                    icon: iconMobil
+                });
+
+                marker.bindPopup(buatPopup(lokasi));
+
+                markers[id] = marker;
+                markerGroup.addLayer(marker);
+            }
+        });
+
+        Object.keys(markers).forEach(function (id) {
+            if (!rentalAktif.has(id)) {
+                markerGroup.removeLayer(markers[id]);
+                delete markers[id];
+            }
+        });
+
+        if (pertamaKali || sesuaikanPeta) {
+            sesuaikanSemuaMarker();
+            pertamaKali = false;
+        }
+
+    } catch (error) {
+        console.error('Pelacakan GPS:', error);
+    }
+}
+
+function lihatLokasi(latitude, longitude, rentalId) {
+    latitude = Number(latitude);
+    longitude = Number(longitude);
+
+    if (
+        !Number.isFinite(latitude) ||
+        !Number.isFinite(longitude) ||
+        latitude < -90 ||
+        latitude > 90 ||
+        longitude < -180 ||
+        longitude > 180
+    ) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Koordinat Tidak Valid',
+            text: 'Lokasi kendaraan tidak dapat ditampilkan.'
+        });
+
+        return;
+    }
+
+    map.invalidateSize();
+
+    const id = String(rentalId);
+    const marker = markers[id];
+
+    if (marker && markerGroup.hasLayer(marker)) {
+        markerGroup.zoomToShowLayer(marker, function () {
+            marker.openPopup();
+        });
+    } else {
+        map.setView([latitude, longitude], 17);
+    }
+}
+
+refreshMap(true);
+
+setInterval(function () {
+    refreshMap(false);
+}, 10000);
+
+setTimeout(function () {
+    map.invalidateSize();
+}, 300);
+</script>
+
+</body>
+</html>

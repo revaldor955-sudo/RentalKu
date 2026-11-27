@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Models\Role;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,11 +16,12 @@ use Illuminate\Notifications\Notifiable;
     'roles_id',
     'photo',
     'phone',
-    'address'
+    'address',
 ])]
 #[Hidden([
     'password',
-    'remember_token'
+    'remember_token',
+    'otp_code',
 ])]
 class User extends Authenticatable
 {
@@ -32,10 +32,32 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'otp_expires_at' => 'datetime',
         ];
     }
+
     public function role()
-{
-    return $this->belongsTo(Role::class, 'roles_id');
-}
+    {
+        return $this->belongsTo(Role::class, 'roles_id');
+    }
+
+    public function issueOtp(): string
+    {
+        $code = (string) random_int(100000, 999999);
+
+        $this->forceFill([
+            'otp_code' => \Illuminate\Support\Facades\Hash::make($code),
+            'otp_expires_at' => now()->addMinutes(5),
+        ])->save();
+
+        return $code;
+    }
+
+    public function clearOtp(): void
+    {
+        $this->forceFill([
+            'otp_code' => null,
+            'otp_expires_at' => null,
+        ])->save();
+    }
 }

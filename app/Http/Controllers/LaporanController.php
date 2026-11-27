@@ -26,6 +26,6 @@ class LaporanController extends Controller
         return view('laporan.index', $laporan + [
             'dari'   => $dari,
             'sampai' => $sampai,
-        ]);
+        ])->with('pageTitle', 'Laporan');
     }
 }

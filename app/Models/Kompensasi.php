@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Kompensasi extends Model
 {
@@ -16,7 +17,6 @@ class Kompensasi extends Model
         'nominal',
         'alasan',
         'tanggal',
-        'status',
         'catatan',
         'dibaca_at',
     ];
@@ -24,7 +24,21 @@ class Kompensasi extends Model
     protected $casts = [
         'tanggal' => 'date',
         'nominal' => 'decimal:2',
+        'dibaca_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        // Cascade rental/mobil/user menghapus rows buktis di DB, tapi file fisik
+        // tetap tertinggal; bersihkan di sini agar tak jadi orphan.
+        static::deleting(function (Kompensasi $kompensasi): void {
+            foreach ($kompensasi->buktis as $bukti) {
+                if ($bukti->path && Storage::disk('public')->exists($bukti->path)) {
+                    Storage::disk('public')->delete($bukti->path);
+                }
+            }
+        });
+    }
 
     public function mobil()
     {
@@ -44,5 +58,10 @@ class Kompensasi extends Model
     public function staff()
     {
         return $this->belongsTo(User::class, 'staff_id');
+    }
+
+    public function buktis()
+    {
+        return $this->hasMany(KompensasiBukti::class, 'kompensasi_id');
     }
 }

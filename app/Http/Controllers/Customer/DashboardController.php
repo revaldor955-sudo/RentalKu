@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cabang;
+use App\Models\Denda;
 use App\Models\Kompensasi;
 use App\Models\MetodePembayaran;
 use App\Models\Mobil;
@@ -32,8 +33,9 @@ class DashboardController extends Controller
 
         $rentalCount = Rental::where('user_id', $userId)->count();
 
-        $totalTransaksi = Rental::where('user_id', $userId)->sum('total_harga');
-
+        $totalTransaksi = Rental::where('user_id', $userId)
+            ->whereIn('status', ['Disetujui', 'Berjalan', 'Selesai'])
+            ->sum('total_harga');
         $filters = request()->only(['q', 'cabang', 'transmisi']);
 
         $mobils = Mobil::with(['brand', 'tipeMobil', 'cabang', 'fasilitas'])
@@ -55,13 +57,16 @@ class DashboardController extends Controller
 
         $metodePembayarans = MetodePembayaran::orderBy('name')->get();
 
+        $dendaBelumLunas = Denda::with('rental.mobil')->belumLunas()->whereHas('rental', fn($q) => $q->where('user_id', $userId))->oldest()->get();
+        $dendaTotal = $dendaBelumLunas->sum('nominal');
+
         $rentals = Rental::with(['mobil', 'pembayaran', 'dendas', 'cabangAmbil', 'cabangKembali', 'rating'])
             ->where('user_id', $userId)
             ->latest()
             ->get();
 
         // Tab: Aktivitas (Menunggu/Disetujui) vs Riwayat (Selesai/Ditolak).
-        $rentalsAktif = $rentals->whereIn('status', ['Menunggu', 'Disetujui']);
+        $rentalsAktif = $rentals->whereIn('status', ['Menunggu', 'Disetujui', 'Berjalan']);
         $rentalsRiwayat = $rentals->whereIn('status', ['Selesai', 'Ditolak']);
 
         // Grid aktivitas ala landing: tampil sebagian + tombol muat lagi.
@@ -69,35 +74,20 @@ class DashboardController extends Controller
         $totalRentals = $rentals->count();
         $rentalsTampil = $rentalsAktif->take($jumlahRental);
 
-        // Hasil verifikasi klaim yang belum dibaca customer.
-        $klaimUpdates = Kompensasi::with('mobil')
-            ->where('customer_id', $userId)
-            ->whereNull('dibaca_at')
-            ->whereIn('status', ['disetujui', 'ditolak', 'selesai'])
-            ->latest()
-            ->get();
+        $dendaBayar = $dendaBelumLunas->first(fn($d) => strtolower(trim($d->status ?? 'belum bayar')) === 'belum bayar');
+
+        if ($dendaBayar && $rentalsAktif->contains('id', $dendaBayar->rental_id) && !$rentalsTampil->contains('id', $dendaBayar->rental_id)) {
+            $rentalsTampil->push($rentalsAktif->firstWhere('id', $dendaBayar->rental_id));
+        }
+
+        // Kompensasi baru yang belum dibaca customer.
+        $klaimUpdates = Kompensasi::with('mobil')->where('customer_id', $userId)->whereNull('dibaca_at')->latest()->get();
 
         // GoodUI #4 (social proof): 3 mobil paling sering disewa.
-        $populerIds = Rental::selectRaw('mobil_id, COUNT(*) as c')->groupBy('mobil_id')->orderByDesc('c')->limit(3)->pluck('mobil_id')->all();
+        $populerIds = Rental::selectRaw('mobil_id, COUNT(*) as c')->where('status', '!=', 'Ditolak')->groupBy('mobil_id')->orderByDesc('c')->limit(3)->pluck('mobil_id')->map(fn($id) => (int) $id)->all();
         $populerIds = array_map('intval', $populerIds);
 
-        return view('customer.dashboard', compact(
-            'mobils',
-            'rentals',
-            'rentalsAktif',
-            'rentalsRiwayat',
-            'mobilTersediaCount',
-            'rentalCount',
-            'totalTransaksi',
-            'cabangs',
-            'filters',
-            'klaimUpdates',
-            'metodePembayarans',
-            'jumlahRental',
-            'totalRentals',
-            'rentalsTampil',
-            'populerIds'
-        ));
+        return view('customer.dashboard', compact('mobils', 'rentals', 'rentalsAktif', 'rentalsRiwayat', 'mobilTersediaCount', 'rentalCount', 'totalTransaksi', 'cabangs', 'filters', 'klaimUpdates', 'metodePembayarans', 'dendaBelumLunas', 'dendaTotal', 'jumlahRental', 'totalRentals', 'rentalsTampil', 'populerIds'));
     }
 
     /**
@@ -109,10 +99,9 @@ class DashboardController extends Controller
             ->where('status', 'Tersedia')
             ->when($request->input('q'), function ($query, $q) {
                 $query->where(function ($qq) use ($q) {
-                    $qq->where('mobils.name', 'like', '%' . $q . '%')
-                        ->orWhereHas('brand', function ($b) use ($q) {
-                            $b->where('name', 'like', '%' . $q . '%');
-                        });
+                    $qq->where('mobils.name', 'like', '%' . $q . '%')->orWhereHas('brand', function ($b) use ($q) {
+                        $b->where('name', 'like', '%' . $q . '%');
+                    });
                 });
             })
             ->when($request->input('cabang'), function ($query, $cabang) {
@@ -125,17 +114,22 @@ class DashboardController extends Controller
             ->take(12)
             ->get();
 
-        return response()->json($mobils->map(function ($mobil) {
-            return [
-                'id' => $mobil->id,
-                'name' => $mobil->name,
-                'image_url' => $mobil->image ? asset($mobil->image) : null,
-                'transmisi' => $mobil->transmisi,
-                'kapasitas' => $mobil->kapasitas,
-                'harga_perhari' => (float) $mobil->harga_perhari,
-                'deposit' => (float) ($mobil->deposit ?? 0),
-                'cabang' => $mobil->cabang->name ?? '-',
-            ];
-        })->values());
+        return response()->json(
+            $mobils
+                ->map(function ($mobil) {
+                    return [
+                        'id' => $mobil->id,
+                        'slug' => $mobil->slug,
+                        'name' => $mobil->name,
+                        'image_url' => $mobil->image ? asset($mobil->image) : null,
+                        'transmisi' => $mobil->transmisi,
+                        'kapasitas' => $mobil->kapasitas,
+                        'harga_perhari' => (float) $mobil->harga_perhari,
+                        'deposit' => (float) ($mobil->deposit ?? 0),
+                        'cabang' => $mobil->cabang->name ?? '-',
+                    ];
+                })
+                ->values(),
+        );
     }
 }

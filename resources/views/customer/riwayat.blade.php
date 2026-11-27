@@ -483,6 +483,13 @@
             </a>
             <h1 class="page-title">Riwayat Rental</h1>
         </div>
+
+        @if($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ $errors->first() }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+            </div>
+        @endif
     </div>
 
     @if($rentals->count())
@@ -504,9 +511,52 @@
 
 </div>
 
+{{-- Modal foto bukti yang dipanggil rental-card saat foto denda diklik --}}
+<div
+    class="modal fade"
+    id="buktiModal"
+    tabindex="-1"
+    aria-labelledby="buktiModalTitle"
+    aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+
+            @include('layouts.partials.modal-head', ['title' => 'Bukti Foto', 'icon' => 'bi-image', 'titleId' => 'buktiModalTitle'])
+
+            <div class="modal-body text-center p-3">
+
+                <img id="buktiModalImg" src="" alt="Bukti foto" class="img-fluid rounded">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
 @include('layouts.partials.customer-footer')
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function openBuktiModal(el) {
+        document.getElementById('buktiModalImg').src = el.dataset.src;
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('buktiModal')).show();
+    }
+
+    (function () {
+        var dendaId = new URLSearchParams(window.location.search).get('denda');
+        if (!dendaId) return;
+
+        var modalEl = document.getElementById('dendaBayarModal' + dendaId);
+        if (modalEl) {
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+        }
+    })();
+</script>
 
 </body>
 </html>

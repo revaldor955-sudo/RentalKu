@@ -28,18 +28,25 @@ class PasswordResetLinkController extends Controller
     {
         $request->validate([
             'email' => ['required', 'email'],
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
         $status = Password::sendResetLink(
             $request->only('email')
         );
 
-        return $status == Password::RESET_LINK_SENT
-                    ? back()->with('status', __($status))
+        $message = match ($status) {
+            Password::RESET_LINK_SENT => 'Tautan reset password sudah dikirim ke email Anda.',
+            Password::INVALID_USER => 'Email tidak terdaftar.',
+            Password::RESET_THROTTLED => 'Tunggu sebentar sebelum meminta tautan lagi.',
+            default => 'Gagal mengirim tautan reset password.',
+        };
+
+        return $status === Password::RESET_LINK_SENT
+                    ? back()->with('status', $message)
                     : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
+                        ->withErrors(['email' => $message]);
     }
 }

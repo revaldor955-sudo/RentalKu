@@ -8,6 +8,7 @@ use App\Models\Denda;
 use App\Models\Kompensasi;
 use App\Models\MetodePembayaran;
 use App\Models\Mobil;
+use App\Models\Pembayaran;
 use App\Models\Rental;
 use App\Models\TipeMobil;
 use App\Models\User;
@@ -24,6 +25,8 @@ class CustomerAlurTest extends TestCase
 
     private User $customer;
 
+    private User $admin;
+
     private Cabang $cabangA;
 
     private Cabang $cabangB;
@@ -37,6 +40,7 @@ class CustomerAlurTest extends TestCase
         $this->seed([RoleSeeder::class, UserSeeder::class]);
 
         $this->customer = User::where('email', 'customer@rentalku.test')->firstOrFail();
+        $this->admin = User::where('email', 'admin@rentalku.test')->firstOrFail();
         $this->cabangA = Cabang::create(['name' => 'A', 'address' => 'Jl A', 'phone' => '081']);
         $this->cabangB = Cabang::create(['name' => 'B', 'address' => 'Jl B', 'phone' => '082']);
 
@@ -77,6 +81,23 @@ class CustomerAlurTest extends TestCase
         ]);
     }
 
+    private function lunasiSewa(Rental $rental): void
+    {
+        $metode = MetodePembayaran::firstOrCreate(
+            ['name' => 'Transfer Bank'],
+            ['nomor_akun' => '123', 'cabang_id' => null]
+        );
+
+        Pembayaran::create([
+            'rental_id' => $rental->id,
+            'metode_pembayaran_id' => $metode->id,
+            'tanggal_bayar' => now()->toDateString(),
+            'jumlah' => $rental->total_harga,
+            'bukti' => 'bukti_pembayaran/test.jpg',
+            'status' => 'Disetujui',
+        ]);
+    }
+
     public function test_dashboard_customer_ok(): void
     {
         $this->actingAs($this->customer)
@@ -98,6 +119,8 @@ class CustomerAlurTest extends TestCase
 
     public function test_klaim_ganda_aktif_ditolak(): void
     {
+        Storage::fake('public');
+
         $rental = $this->buatRentalSelesai();
 
         Kompensasi::create([
@@ -108,20 +131,25 @@ class CustomerAlurTest extends TestCase
             'nominal' => 100000,
             'alasan' => 'Coba.',
             'tanggal' => now()->toDateString(),
-            'status' => 'diajukan',
         ]);
 
-        $res = $this->actingAs($this->customer)
-            ->postJson('/customer/kompensasi', [
+        $res = $this->actingAs($this->admin)
+            ->postJson('/kompensasis', [
+                'customer_id' => $this->customer->id,
                 'rental_id' => $rental->id,
                 'mobil_id' => $this->mobil->id,
                 'jenis' => 'pengembalian_dana',
                 'nominal' => 50000,
                 'alasan' => 'Coba lagi.',
                 'tanggal' => now()->toDateString(),
+                'bukti' => [
+                    UploadedFile::fake()->image('bukti1.jpg'),
+                    UploadedFile::fake()->image('bukti2.jpg'),
+                ],
             ]);
 
         $res->assertStatus(422);
+        $res->assertJsonPath('message', 'Rental ini sudah memiliki kompensasi.');
         $this->assertSame(1, Kompensasi::where('rental_id', $rental->id)->count());
     }
 
@@ -129,8 +157,11 @@ class CustomerAlurTest extends TestCase
     {
         Storage::fake('public');
 
+        $rental = $this->buatRentalSelesai();
+        $this->lunasiSewa($rental);
+
         $denda = Denda::create([
-            'rental_id' => $this->buatRentalSelesai()->id,
+            'rental_id' => $rental->id,
             'jenis' => 'keterlambatan',
             'nominal' => 150000,
             'status' => 'belum bayar',
@@ -145,6 +176,94 @@ class CustomerAlurTest extends TestCase
 
         $this->assertSame('menunggu verifikasi', $denda->fresh()->status);
         $this->assertNotNull($denda->fresh()->bukti_bayar);
+    }
+
+    public function test_bayar_denda_json_sukses(): void
+    {
+        Storage::fake('public');
+
+        $rental = $this->buatRentalSelesai();
+        $this->lunasiSewa($rental);
+
+        $denda = Denda::create([
+            'rental_id' => $rental->id,
+            'jenis' => 'keterlambatan',
+            'nominal' => 150000,
+            'status' => 'belum bayar',
+        ]);
+
+        $res = $this->actingAs($this->customer)->post(
+            "/customer/dendas/{$denda->id}/bayar",
+            [
+                'bukti_bayar' => UploadedFile::fake()->image('bukti.jpg'),
+                'tanggal_bayar' => now()->toDateString(),
+            ],
+            ['Accept' => 'application/json']
+        );
+
+        $res->assertOk()->assertJson([
+            'success' => true,
+            'status' => 'menunggu verifikasi',
+        ]);
+
+        $denda->refresh();
+        $this->assertSame('menunggu verifikasi', $denda->status);
+        $this->assertNotNull($denda->bukti_bayar);
+        Storage::disk('public')->assertExists($denda->bukti_bayar);
+    }
+
+    public function test_bayar_denda_json_404(): void
+    {
+        $this->actingAs($this->customer)
+            ->postJson('/customer/dendas/999999/bayar')
+            ->assertNotFound()
+            ->assertJsonPath('message', 'Denda tidak ditemukan. Mungkin sudah dihapus.');
+    }
+
+    public function test_bayar_denda_plain_404_redirect(): void
+    {
+        $this->actingAs($this->customer)
+            ->post('/customer/dendas/999999/bayar')
+            ->assertRedirect('/customer/dashboard')
+            ->assertSessionHas('error', 'Denda tidak ditemukan. Mungkin sudah dihapus.');
+    }
+
+    public function test_bayar_denda_bukan_pemilik_ditolak(): void
+    {
+        $lain = User::factory()->create([
+            'roles_id' => $this->customer->roles_id,
+        ]);
+
+        $denda = Denda::create([
+            'rental_id' => $this->buatRentalSelesai()->id,
+            'jenis' => 'kerusakan',
+            'nominal' => 300000,
+            'status' => 'belum bayar',
+        ]);
+
+        $this->actingAs($lain)
+            ->postJson("/customer/dendas/{$denda->id}/bayar")
+            ->assertForbidden()
+            ->assertJsonPath('message', 'Anda tidak memiliki akses ke denda ini.');
+    }
+
+    public function test_bayar_denda_status_bukan_belum_bayar_ditolak(): void
+    {
+        $rental = $this->buatRentalSelesai();
+        $this->lunasiSewa($rental);
+
+        $denda = Denda::create([
+            'rental_id' => $rental->id,
+            'jenis' => 'kehilangan',
+            'nominal' => 500000,
+            'status' => 'lunas',
+        ]);
+
+        $this->actingAs($this->customer)
+            ->postJson("/customer/dendas/{$denda->id}/bayar")
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Denda sudah dibayar atau sedang diverifikasi.')
+            ->assertJsonPath('errors.denda.0', 'Denda sudah dibayar atau sedang diverifikasi.');
     }
 
     public function test_metode_cabang_lain_ditolak(): void

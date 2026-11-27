@@ -1,19 +1,16 @@
 {{-- Dipakai oleh home.blade.php via @include dan HomeController::index() saat AJAX --}}
-@php
-    $bulanIndo = [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-@endphp
 
 <div class="d-flex justify-content-between align-items-end mb-5">
 
     <div>
 
-        <div class="text-success fw-bold mb-2">
-            {{ $punyaFilter ? 'HASIL PENCARIAN' : 'PILIH KENDARAAN' }}
-        </div>
+                        <div class="text-success fw-bold mb-2">
+                            {{ $punyaFilter ? 'HASIL PENCARIAN' : 'PALING DIMINATI' }}
+                        </div>
 
-        <h2 class="section-title">
-            {{ $punyaFilter ? 'Mobil yang cocok dengan pencarianmu' : 'Mobil pilihan untuk perjalananmu' }}
-        </h2>
+                        <h2 class="section-title">
+                            {{ $punyaFilter ? 'Mobil yang cocok dengan pencarianmu' : 'Mobil yang paling banyak disewa' }}
+                        </h2>
 
         @if ($punyaFilter)
 
@@ -32,13 +29,11 @@
 
                 @endif
 
-                @if ($mulai && $selesai)
+                @if ($punyaFilter)
 
-                    <span class="badge rounded-pill text-bg-light border">
-                        <i class="bi bi-calendar-event me-1"></i>
-                        {{ $mulai->day.' '.$bulanIndo[(int) $mulai->month].' '.$mulai->year }}
-                        &ndash;
-                        {{ $selesai->day.' '.$bulanIndo[(int) $selesai->month].' '.$selesai->year }}
+                    <span class="badge rounded-pill {{ $statusMobil === 'Disewa' ? 'text-bg-danger' : 'text-bg-success' }}">
+                        <i class="bi {{ $statusMobil === 'Disewa' ? 'bi-x-circle' : 'bi-check-circle' }} me-1"></i>
+                        {{ $statusMobil === 'Disewa' ? 'Tidak Tersedia' : 'Tersedia' }}
                     </span>
 
                 @endif
@@ -101,7 +96,7 @@
         <div class="col-md-6 col-lg-4">
 
             <div class="car-card" 
-                 data-mobil-id="{{ $mobil->id }}"
+                 data-mobil-id="{{ $mobil->slug }}"
                  role="button"
                  style="cursor: pointer;">
 
@@ -159,13 +154,19 @@
 
                         </div>
 
-                        <button
-                            type="button"
-                            class="btn btn-rent"
-                            data-mobil-id="{{ $mobil->id }}"
-                            style="pointer-events: none;">
-                            Detail
-                        </button>
+                        @if ($statusMobil === 'Disewa')
+                            <span class="btn btn-secondary disabled">
+                                Tidak Tersedia
+                            </span>
+                        @else
+                            <button
+                                type="button"
+                                class="btn btn-rent"
+                                data-mobil-id="{{ $mobil->slug }}"
+                                style="pointer-events: none;">
+                                Detail
+                            </button>
+                        @endif
 
                     </div>
 
@@ -215,29 +216,11 @@
 
 </div>
 
-@if (! $punyaFilter && ($mobils->count() < $totalTersedia || $jumlah > 6))
-
     <div class="text-center mt-5 d-flex flex-wrap gap-2 justify-content-center">
 
-        @if ($mobils->count() < $totalTersedia)
-
-            <a href="{{ route('home', ['jumlah' => $jumlah + 6]) }}" class="btn btn-link text-dark text-decoration-none fw-semibold" data-search-link>
-                Tampilkan Lebih Banyak
-                <small class="text-secondary ms-1">({{ $totalTersedia - $mobils->count() }} lainnya)</small>
-                <i class="bi bi-chevron-down ms-1"></i>
-            </a>
-
-        @endif
-
-        @if ($jumlah > 6)
-
-            <a href="{{ route('home') }}" class="btn btn-link text-secondary text-decoration-none fw-semibold" data-search-link data-search-top>
-                Sembunyikan
-                <i class="bi bi-chevron-up ms-1"></i>
-            </a>
-
-        @endif
+        <a href="{{ route('katalog.index') }}" class="btn btn-rent px-4 py-2">
+            Lihat Semua Mobil
+            <i class="bi bi-arrow-right ms-1"></i>
+        </a>
 
     </div>
-
-@endif

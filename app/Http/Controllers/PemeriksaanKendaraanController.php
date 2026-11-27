@@ -3,230 +3,454 @@
 namespace App\Http\Controllers;
 
 use App\Models\KerusakanMobil;
+use App\Models\Mobil;
 use App\Models\PemeriksaanMobil;
 use App\Models\Rental;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class PemeriksaanKendaraanController extends Controller
 {
     public function index()
     {
-        $rentals = Rental::with(['user', 'mobil'])
-            ->whereIn('status', ['Disetujui', 'Selesai'])
-            ->orderBy('created_at', 'desc')
+        $mobils = Mobil::whereHas('rentals', fn ($q) => $q
+            ->whereIn('status', ['Disetujui', 'Selesai']))
+            ->orderBy('name')
             ->get();
 
-        $kerusakanList = KerusakanMobil::orderBy('jenis_kerusakan')->get();
+        $rentals = Rental::with(['mobil', 'user'])
+            ->whereIn('status', ['Disetujui', 'Selesai'])
+            ->orderByDesc('tanggal_mulai')
+            ->get();
 
-        return view('pemeriksaan_kendaraan.index', compact('rentals', 'kerusakanList'));
+        $kerusakanList = KerusakanMobil::orderBy('jenis_kerusakan')
+            ->get();
+
+        return view('pemeriksaan_kendaraan.index', compact(
+            'mobils',
+            'rentals',
+            'kerusakanList'
+        ))->with('pageTitle', 'Pemeriksaan Kendaraan');
     }
 
-    /**
-     * Server-side DataTables: daftar pemeriksaan kendaraan
-     */
     public function data(Request $request)
     {
+        $recordsTotal = PemeriksaanMobil::count();
+
         $query = PemeriksaanMobil::query()
-            ->leftJoin('rentals', 'pemeriksaan_mobils.rental_id', '=', 'rentals.id')
-            ->leftJoin('users', 'rentals.user_id', '=', 'users.id')
-            ->leftJoin('mobils', 'rentals.mobil_id', '=', 'mobils.id')
+            ->leftJoin(
+                'mobils',
+                'pemeriksaan_mobils.mobil_id',
+                '=',
+                'mobils.id'
+            )
+            ->leftJoin(
+                'rentals',
+                'pemeriksaan_mobils.rental_id',
+                '=',
+                'rentals.id'
+            )
+            ->leftJoin(
+                'users',
+                'rentals.user_id',
+                '=',
+                'users.id'
+            )
             ->select(
                 'pemeriksaan_mobils.*',
-                'users.name as user_name',
-                'users.email as user_email',
                 'mobils.name as mobil_name',
-                'mobils.plate_number as mobil_plate'
+                'mobils.plate_number as mobil_plate',
+                'mobils.kode_unit as mobil_kode',
+                'rentals.status as rental_status',
+                'users.name as rental_user_name'
             );
 
-        $recordsTotal = $query->count();
+        $search = trim((string) $request->input('search.value', ''));
 
-        $search = $request->input('search.value');
-
-        if ($search) {
+        if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->where('users.name', 'like', "%{$search}%")
-                    ->orWhere('users.email', 'like', "%{$search}%")
-                    ->orWhere('mobils.name', 'like', "%{$search}%")
+                $q->where('mobils.name', 'like', "%{$search}%")
                     ->orWhere('mobils.plate_number', 'like', "%{$search}%")
-                    ->orWhere('pemeriksaan_mobils.kondisi', 'like', "%{$search}%");
+                    ->orWhere('rentals.id', 'like', "%{$search}%")
+                    ->orWhere('users.name', 'like', "%{$search}%")
+                    ->orWhere(
+                        'pemeriksaan_mobils.jenis',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'pemeriksaan_mobils.kondisi',
+                        'like',
+                        "%{$search}%"
+                    );
             });
         }
 
-        $recordsFiltered = $query->count();
+        $recordsFiltered = (clone $query)
+            ->distinct()
+            ->count('pemeriksaan_mobils.id');
 
-        $columns = [
-            0 => null,
-            1 => 'users.name',
-            2 => 'mobils.name',
-            3 => 'pemeriksaan_mobils.jenis',
-            4 => 'pemeriksaan_mobils.kondisi',
-            5 => 'pemeriksaan_mobils.tanggal',
-            6 => null,
-            7 => null,
-        ];
-
-        $orderColumn = $request->input('order.0.column', 5);
-        $orderDir = $request->input('order.0.dir', 'desc');
-
-        if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
-            $query->orderBy($columns[$orderColumn], $orderDir);
-        } else {
-            $query->orderBy('pemeriksaan_mobils.tanggal', 'desc');
-        }
-
-        $start = (int) $request->input('start', 0);
+        $start = max(0, (int) $request->input('start', 0));
         $length = (int) $request->input('length', 10);
 
-        $pemeriksaan = $query->offset($start)->limit($length)->get();
+        $length = $length === -1
+            ? 100
+            : min(max($length, 1), 100);
 
-        // Muat relasi kerusakan untuk baris di halaman ini saja
-        $ids = $pemeriksaan->pluck('id');
-        $kerusakanMap = PemeriksaanMobil::whereIn('id', $ids)
-            ->with('kerusakan')
-            ->get()
-            ->mapWithKeys(fn ($p) => [$p->id => $p->kerusakan->keyBy('id')]);
+        $pemeriksaan = $query
+            ->orderByDesc('pemeriksaan_mobils.created_at')
+            ->orderByDesc('pemeriksaan_mobils.id')
+            ->offset($start)
+            ->limit($length)
+            ->get();
+
+        $kerusakanMap = PemeriksaanMobil::whereIn(
+            'id',
+            $pemeriksaan->pluck('id')
+        )->with('kerusakan')->get()->mapWithKeys(function ($item) {
+            return [
+                $item->id => $item->kerusakan->keyBy('id')
+            ];
+        });
 
         $data = $pemeriksaan->map(function ($p) use ($kerusakanMap) {
             $kerusakan = $kerusakanMap->get($p->id, collect());
 
+            $fotoUmum = $p->foto_bukti;
+
             return [
                 'id' => $p->id,
-                'rental_id' => $p->rental_id,
-                'user_name' => $p->user_name ?? '-',
-                'user_email' => $p->user_email ?? '-',
+                'mobil_id' => $p->mobil_id,
                 'mobil_name' => $p->mobil_name ?? '-',
                 'mobil_plate' => $p->mobil_plate ?? '-',
+                'mobil_kode' => $p->mobil_kode ?? '-',
+
+                'rental_id' => $p->rental_id,
+                'rental_status' => $p->rental_status ?? '-',
+                'rental_user_name' => $p->rental_user_name ?? '-',
+
                 'jenis' => $p->jenis,
                 'kondisi' => $p->kondisi,
-                'tanggal' => $p->tanggal?->format('d/m/Y H:i'),
-                'kerusakan' => $kerusakan->pluck('jenis_kerusakan')->all(),
-                'kerusakan_ids' => $kerusakan->keys()->all(),
-                'keterangan' => $kerusakan->mapWithKeys(fn ($k) => [$k->id => $k->pivot->keterangan])->all(),
-                'catatan' => $p->catatan ?? '-',
-                'foto_bukti' => $p->foto_bukti,
+
+                'tanggal' => $p->tanggal
+                    ? Carbon::parse($p->tanggal)->format('d/m/Y H:i')
+                    : '-',
+
+                'tanggal_input' => $p->tanggal
+                    ? Carbon::parse($p->tanggal)->format('Y-m-d\TH:i')
+                    : '',
+
+                'foto_bukti' => $fotoUmum,
+                'foto_bukti_url' => $fotoUmum
+                    ? Storage::disk('public')->url($fotoUmum)
+                    : null,
+
+                'kerusakan' => $kerusakan
+                    ->pluck('jenis_kerusakan')
+                    ->values()
+                    ->all(),
+
+                'kerusakan_ids' => $kerusakan
+                    ->keys()
+                    ->values()
+                    ->all(),
+
+                'detail_kerusakan' => $kerusakan->mapWithKeys(
+                    function ($k) {
+                        $fotoBagian = $k->pivot->foto_bukti ?? null;
+
+                        return [
+                            $k->id => [
+                                'keterangan' => $k->pivot->keterangan ?? '',
+                                'catatan' => $k->pivot->catatan ?? '',
+                                'foto_bukti' => $fotoBagian,
+                                'foto_url' => $fotoBagian
+                                    ? Storage::disk('public')->url($fotoBagian)
+                                    : null,
+                            ],
+                        ];
+                    }
+                )->all(),
+
+                'keterangan' => $kerusakan->mapWithKeys(
+                    function ($k) {
+                        return [
+                            $k->id => $k->pivot->keterangan ?? ''
+                        ];
+                    }
+                )->all(),
+
+                'catatan' => $p->catatan ?? '',
             ];
         });
 
         return response()->json([
-            'draw' => (int) $request->input('draw'),
+            'draw' => (int) $request->input('draw', 0),
             'recordsTotal' => $recordsTotal,
             'recordsFiltered' => $recordsFiltered,
             'data' => $data,
         ]);
     }
 
-    /**
-     * Simpan pemeriksaan baru
-     */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'rental_id' => 'required|exists:rentals,id',
-            'jenis' => 'required|in:sebelum_sewa,setelah_sewa',
-            'kondisi' => 'required|in:baik,rusak',
-            'tanggal' => 'required|date',
-            'catatan' => 'nullable|string|max:1000',
-            'kerusakan' => 'nullable|array',
-            'kerusakan.*' => 'exists:kerusakan_mobils,id',
-            'keterangan' => 'nullable|array',
-        ], [
-            'rental_id.required' => 'Pilih rental terlebih dahulu.',
-            'jenis.required' => 'Jenis pemeriksaan wajib diisi.',
-            'kondisi.required' => 'Kondisi wajib diisi.',
-            'tanggal.required' => 'Tanggal wajib diisi.',
-        ]);
+        $validated = $this->validatePemeriksaan($request);
 
-        $fotoBukti = null;
-        if ($request->hasFile('foto_bukti')) {
-            $fotoBukti = $request->file('foto_bukti')->store('pemeriksaan', 'public');
-        }
+        DB::transaction(function () use ($request, $validated) {
+            $fotoBukti = $request->hasFile('foto_bukti')
+                ? $request->file('foto_bukti')->store(
+                    'pemeriksaan',
+                    'public'
+                )
+                : null;
 
-        $pemeriksaan = PemeriksaanMobil::create([
-            'rental_id' => $validated['rental_id'],
-            'mobil_id' => Rental::findOrFail($validated['rental_id'])->mobil_id,
-            'jenis' => $validated['jenis'],
-            'kondisi' => $validated['kondisi'],
-            'catatan' => $validated['catatan'] ?? null,
-            'foto_bukti' => $fotoBukti,
-            'tanggal' => $validated['tanggal'],
-        ]);
+            $pemeriksaan = PemeriksaanMobil::create([
+                'mobil_id' => $validated['mobil_id'],
+                'rental_id' => $validated['rental_id'],
+                'jenis' => $validated['jenis'],
+                'kondisi' => $validated['kondisi'],
+                'tanggal' => $validated['tanggal'],
+                'catatan' => $validated['catatan'] ?? null,
+                'foto_bukti' => $fotoBukti,
+            ]);
 
-        $this->syncKerusakan($pemeriksaan, $request);
+            $this->syncKerusakan($pemeriksaan, $request);
+        });
 
         return response()->json([
             'message' => 'Pemeriksaan berhasil ditambahkan.',
         ]);
     }
 
-    /**
-     * Update pemeriksaan
-     */
-    public function update(Request $request, PemeriksaanMobil $pemeriksaan)
-    {
-        $validated = $request->validate([
-            'rental_id' => 'required|exists:rentals,id',
-            'jenis' => 'required|in:sebelum_sewa,setelah_sewa',
-            'kondisi' => 'required|in:baik,rusak',
-            'tanggal' => 'required|date',
-            'catatan' => 'nullable|string|max:1000',
-            'kerusakan' => 'nullable|array',
-            'kerusakan.*' => 'exists:kerusakan_mobils,id',
-            'keterangan' => 'nullable|array',
-        ], [
-            'rental_id.required' => 'Pilih rental terlebih dahulu.',
-            'jenis.required' => 'Jenis pemeriksaan wajib diisi.',
-            'kondisi.required' => 'Kondisi wajib diisi.',
-            'tanggal.required' => 'Tanggal wajib diisi.',
-        ]);
+    public function update(
+        Request $request,
+        PemeriksaanMobil $pemeriksaan
+    ) {
+        $validated = $this->validatePemeriksaan($request);
 
-        $data = [
-            'rental_id' => $validated['rental_id'],
-            'mobil_id' => Rental::findOrFail($validated['rental_id'])->mobil_id,
-            'jenis' => $validated['jenis'],
-            'kondisi' => $validated['kondisi'],
-            'catatan' => $validated['catatan'] ?? null,
-            'tanggal' => $validated['tanggal'],
-        ];
+        DB::transaction(function () use (
+            $request,
+            $validated,
+            $pemeriksaan
+        ) {
+            $pemeriksaan = PemeriksaanMobil::whereKey($pemeriksaan->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        if ($request->hasFile('foto_bukti')) {
-            $data['foto_bukti'] = $request->file('foto_bukti')->store('pemeriksaan', 'public');
-        }
+            $data = [
+                'mobil_id' => $validated['mobil_id'],
+                'rental_id' => $validated['rental_id'],
+                'jenis' => $validated['jenis'],
+                'kondisi' => $validated['kondisi'],
+                'tanggal' => $validated['tanggal'],
+                'catatan' => $validated['catatan'] ?? null,
+            ];
 
-        $pemeriksaan->update($data);
+            if ($request->hasFile('foto_bukti')) {
+                $oldPhoto = $pemeriksaan->foto_bukti;
 
-        $this->syncKerusakan($pemeriksaan, $request);
+                $newPhoto = $request->file('foto_bukti')->store(
+                    'pemeriksaan',
+                    'public'
+                );
+
+                $data['foto_bukti'] = $newPhoto;
+
+                if ($oldPhoto) {
+                    Storage::disk('public')->delete($oldPhoto);
+                }
+            }
+
+            $pemeriksaan->update($data);
+
+            $this->syncKerusakan($pemeriksaan, $request);
+        });
 
         return response()->json([
             'message' => 'Pemeriksaan berhasil diperbarui.',
         ]);
     }
 
-    public function destroy(Request $request, PemeriksaanMobil $pemeriksaan)
-    {
-        $pemeriksaan->delete();
+    public function destroy(
+        Request $request,
+        PemeriksaanMobil $pemeriksaan
+    ) {
+        DB::transaction(function () use ($pemeriksaan) {
+            $pemeriksaan->load('kerusakan');
+
+            foreach ($pemeriksaan->kerusakan as $kerusakan) {
+                if ($kerusakan->pivot->foto_bukti) {
+                    Storage::disk('public')->delete(
+                        $kerusakan->pivot->foto_bukti
+                    );
+                }
+            }
+
+            if ($pemeriksaan->foto_bukti) {
+                Storage::disk('public')->delete(
+                    $pemeriksaan->foto_bukti
+                );
+            }
+
+            $pemeriksaan->kerusakan()->detach();
+            $pemeriksaan->delete();
+        });
 
         return response()->json([
             'message' => 'Pemeriksaan berhasil dihapus.',
         ]);
     }
 
-    /**
-     * Sinkronisasi pivot pemeriksaan_kerusakans
-     */
-    private function syncKerusakan(PemeriksaanMobil $pemeriksaan, Request $request): void
+    private function validatePemeriksaan(Request $request): array
     {
-        $kerusakanIds = $request->input('kerusakan', []);
+        $validated = $request->validate([
+            'rental_id' => 'required|exists:rentals,id',
+            'mobil_id' => 'required|exists:mobils,id',
+            'jenis' => 'required|in:sebelum_sewa,setelah_sewa',
+            'kondisi' => 'required|in:baik,rusak',
+            'tanggal' => 'required|date',
+            'catatan' => 'nullable|string|max:1000',
 
-        if (empty($kerusakanIds)) {
-            $pemeriksaan->kerusakan()->detach();
-            return;
+            'foto_bukti' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+            'kerusakan' => 'nullable|array',
+            'kerusakan.*' => 'required|integer|distinct|exists:kerusakan_mobils,id',
+
+            'keterangan' => 'nullable|array',
+            'keterangan.*' => 'nullable|string|max:1000',
+
+            'catatan_kerusakan' => 'nullable|array',
+            'catatan_kerusakan.*' => 'nullable|string|max:1000',
+
+            'foto_kerusakan' => 'nullable|array',
+            'foto_kerusakan.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ], [
+            'rental_id.required' => 'Pilih rental terlebih dahulu.',
+            'rental_id.exists' => 'Rental yang dipilih tidak ditemukan.',
+            'mobil_id.required' => 'Pilih nama mobil terlebih dahulu.',
+            'mobil_id.exists' => 'Nama mobil yang dipilih tidak ditemukan.',
+            'jenis.required' => 'Jenis pemeriksaan wajib diisi.',
+            'kondisi.required' => 'Kondisi wajib diisi.',
+            'tanggal.required' => 'Tanggal wajib diisi.',
+
+            'foto_bukti.image' => 'Foto bukti umum harus berupa gambar.',
+            'foto_bukti.mimes' => 'Foto bukti umum harus berformat JPG, JPEG, atau PNG.',
+            'foto_bukti.max' => 'Ukuran foto bukti umum maksimal 2 MB.',
+
+            'foto_kerusakan.*.image' => 'Foto setiap bagian harus berupa gambar.',
+            'foto_kerusakan.*.mimes' => 'Foto setiap bagian harus berformat JPG, JPEG, atau PNG.',
+            'foto_kerusakan.*.max' => 'Ukuran setiap foto maksimal 2 MB.',
+        ]);
+
+        $rental = Rental::findOrFail($validated['rental_id']);
+
+        if (!in_array($rental->status, ['Disetujui', 'Selesai'], true)) {
+            throw ValidationException::withMessages([
+                'rental_id' =>
+                    'Rental yang dipilih harus berstatus Disetujui atau Selesai.',
+            ]);
         }
 
+        if ((int) $rental->mobil_id !== (int) $validated['mobil_id']) {
+            throw ValidationException::withMessages([
+                'mobil_id' =>
+                    'Nama mobil tidak sesuai dengan rental yang dipilih.',
+            ]);
+        }
+
+        $validated['mobil_id'] = $rental->mobil_id;
+
+        $selectedIds = array_map(
+            'strval',
+            $validated['kerusakan'] ?? []
+        );
+
+        foreach (
+            ['keterangan', 'catatan_kerusakan', 'foto_kerusakan']
+            as $field
+        ) {
+            foreach (array_keys($request->input($field, [])) as $id) {
+                if (!in_array((string) $id, $selectedIds, true)) {
+                    throw ValidationException::withMessages([
+                        $field . '.' . $id =>
+                            'Data harus sesuai dengan bagian yang dipilih.',
+                    ]);
+                }
+            }
+
+            foreach (
+                array_keys($request->allFiles()[$field] ?? [])
+                as $id
+            ) {
+                if (!in_array((string) $id, $selectedIds, true)) {
+                    throw ValidationException::withMessages([
+                        $field . '.' . $id =>
+                            'Foto harus sesuai dengan bagian yang dipilih.',
+                    ]);
+                }
+            }
+        }
+
+        return $validated;
+    }
+
+    private function syncKerusakan(
+        PemeriksaanMobil $pemeriksaan,
+        Request $request
+    ): void {
+        $ids = array_values(array_unique(
+            array_map(
+                'intval',
+                $request->input('kerusakan', [])
+            )
+        ));
+
+        $existing = $pemeriksaan->kerusakan()
+            ->get()
+            ->keyBy('id');
+
         $pivot = [];
-        foreach ($kerusakanIds as $id) {
+
+        foreach ($ids as $id) {
+            $old = $existing->get($id);
+            $oldPhoto = $old?->pivot?->foto_bukti;
+            $newPhoto = $request->file("foto_kerusakan.{$id}");
+            $photoPath = $oldPhoto;
+
+            if ($newPhoto) {
+                $photoPath = $newPhoto->store(
+                    'pemeriksaan/kerusakan',
+                    'public'
+                );
+
+                if ($oldPhoto) {
+                    Storage::disk('public')->delete($oldPhoto);
+                }
+            }
+
             $pivot[$id] = [
-                'keterangan' => $request->input("keterangan.{$id}"),
+                'keterangan' => $request->input(
+                    "keterangan.{$id}"
+                ),
+                'catatan' => $request->input(
+                    "catatan_kerusakan.{$id}"
+                ),
+                'foto_bukti' => $photoPath,
             ];
+        }
+
+        foreach ($existing as $id => $kerusakan) {
+            if (
+                !in_array((int) $id, $ids, true)
+                && $kerusakan->pivot->foto_bukti
+            ) {
+                Storage::disk('public')->delete(
+                    $kerusakan->pivot->foto_bukti
+                );
+            }
         }
 
         $pemeriksaan->kerusakan()->sync($pivot);

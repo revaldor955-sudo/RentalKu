@@ -9,27 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class CustomerRatingController extends Controller
 {
-    public function create($rental)
-    {
-        $rental = Rental::findOrFail($rental);
-
-        if ($rental->user_id !== Auth::id()) {
-            abort(403, 'Anda tidak memiliki akses.');
-        }
-
-        if ($rental->status !== 'Selesai') {
-            abort(403, 'Rental belum selesai.');
-        }
-
-        $sudahMemberiRating = Rating::where('rental_id', $rental->id)->exists();
-
-        if ($sudahMemberiRating) {
-            return redirect()->route('customer.dashboard')->with('error', 'Rental ini sudah memiliki rating.');
-        }
-
-        return view('customer.ratings.create', compact('rental'));
-    }
-
     public function store(Request $request, $rental)
     {
         $rental = Rental::findOrFail($rental);

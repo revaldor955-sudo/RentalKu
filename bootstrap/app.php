@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -17,10 +18,24 @@ return Application::configure(basePath: dirname(__DIR__))
         'staff' => \App\Http\Middleware\StaffMiddleware::class,
         'customer' => \App\Http\Middleware\CustomerMiddleware::class,
         'adminstaff' => \App\Http\Middleware\AdminStaffMiddleware::class,
+        'blokir.denda' => \App\Http\Middleware\BlokirJikaAdaDenda::class,
     ]);
 })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->render(function (ThrottleRequestsException $e, Request $request) {
+            if (! $request->routeIs('otp.*')) {
+                return null;
+            }
+
+            $seconds = (int) ($e->getHeaders()['Retry-After'] ?? 60);
+            $key = $request->routeIs('otp.resend') ? 'resend' : 'otp_code';
+
+            return redirect()->route('otp.show')->withErrors([
+                $key => "Terlalu banyak percobaan. Coba lagi dalam {$seconds} detik.",
+            ]);
+        });
     })->create();

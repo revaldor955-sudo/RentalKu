@@ -9,14 +9,16 @@
     <title>Balasan RentalKu</title>
 </head>
 
-<body style="
+<body
+    style="
     margin: 0;
     padding: 0;
     background-color: #f4f7f6;
     font-family: Arial, Helvetica, sans-serif;
 ">
 
-    <div style="
+    <div
+        style="
         max-width: 650px;
         margin: 40px auto;
         background: #ffffff;
@@ -26,13 +28,15 @@
     ">
 
         {{-- Header --}}
-        <div style="
+        <div
+            style="
             background: #2c666e;
             padding: 30px;
             text-align: center;
         ">
 
-            <h1 style="
+            <h1
+                style="
                 color: #ffffff;
                 margin: 0;
                 font-size: 28px;
@@ -40,7 +44,8 @@
                 Rental<span style="color: #7de2a8;">ku</span>.
             </h1>
 
-            <p style="
+            <p
+                style="
                 color: #e8f5f2;
                 margin: 8px 0 0;
                 font-size: 14px;
@@ -73,7 +78,8 @@
 
 
             {{-- Subject --}}
-            <div style="
+            <div
+                style="
                 background: #f5f8f7;
                 padding: 18px;
                 border-radius: 10px;
@@ -95,7 +101,8 @@
 
 
             {{-- Balasan --}}
-            <div style="
+            <div
+                style="
                 border-left: 4px solid #2c666e;
                 padding: 15px 20px;
                 margin: 25px 0;
@@ -108,7 +115,8 @@
                     Balasan Tim RentalKu
                 </strong>
 
-                <p style="
+                <p
+                    style="
                     color: #5f6b7a;
                     line-height: 1.8;
                     white-space: pre-line;
@@ -141,7 +149,8 @@
 
 
         {{-- Footer --}}
-        <div style="
+        <div
+            style="
             background: #f4f7f6;
             padding: 20px;
             text-align: center;

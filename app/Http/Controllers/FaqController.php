@@ -9,8 +9,7 @@ class FaqController extends Controller
 {
     public function index()
     {
-        $faqs = Faq::all();
-        return view('faqs.index', compact('faqs'));
+        return view('faqs.index')->with('pageTitle', 'FAQ');
     }
 
     /**
@@ -36,11 +35,12 @@ class FaqController extends Controller
             1 => 'faqs.pertanyaan',
             2 => null,
             3 => 'faqs.urutan',
-            4 => null,
+            4 => 'faqs.is_active',
+            5 => null,
         ];
 
         $orderColumn = $request->input('order.0.column', 3);
-        $orderDir = $request->input('order.0.dir', 'asc');
+        $orderDir = strtolower($request->input('order.0.dir', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         if (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
             $query->orderBy($columns[$orderColumn], $orderDir);
@@ -48,8 +48,8 @@ class FaqController extends Controller
             $query->orderBy('faqs.urutan', 'asc');
         }
 
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $start = max(0, (int) $request->input('start', 0));
+        $length = min(max((int) $request->input('length', 10), 1), 100);
 
         $faqs = $query->offset($start)->limit($length)->get();
 
@@ -59,6 +59,7 @@ class FaqController extends Controller
                 'pertanyaan' => $item->pertanyaan,
                 'jawaban' => $item->jawaban,
                 'urutan' => $item->urutan,
+                'is_active' => (bool) $item->is_active,
             ];
         });
 
@@ -84,12 +85,21 @@ class FaqController extends Controller
             'pertanyaan' => 'required|string',
             'jawaban' => 'required|string',
             'urutan' => 'nullable|integer|min:0',
+            'is_active' => 'nullable|boolean',
         ], [
             'pertanyaan.required' => 'Pertanyaan wajib diisi',
             'jawaban.required' => 'Jawaban wajib diisi',
         ]);
 
+        $validated['is_active'] = $request->boolean('is_active');
+
         Faq::create($validated);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'FAQ berhasil ditambahkan.',
+            ]);
+        }
 
         return redirect()->route('faqs.index')
             ->with('success', 'FAQ berhasil ditambahkan.');
@@ -111,20 +121,35 @@ class FaqController extends Controller
             'pertanyaan' => 'required|string',
             'jawaban' => 'required|string',
             'urutan' => 'nullable|integer|min:0',
+            'is_active' => 'nullable|boolean',
         ], [
             'pertanyaan.required' => 'Pertanyaan wajib diisi',
             'jawaban.required' => 'Jawaban wajib diisi',
         ]);
 
+        $validated['is_active'] = $request->boolean('is_active');
+
         $faq->update($validated);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'FAQ berhasil diperbarui.',
+            ]);
+        }
 
         return redirect()->route('faqs.index')
             ->with('success', 'FAQ berhasil diperbarui.');
     }
 
-    public function destroy(Faq $faq)
+    public function destroy(Request $request, Faq $faq)
     {
         $faq->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'FAQ berhasil dihapus.',
+            ]);
+        }
 
         return redirect()->route('faqs.index')
             ->with('success', 'FAQ berhasil dihapus.');

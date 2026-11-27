@@ -14,7 +14,7 @@ class LandingSettingController extends Controller
         $settings = LandingSetting::pluck('value', 'key')->toArray();
         $faqs = DB::table('faqs')->orderBy('urutan')->get();
 
-        return view('admin.landing-settings.index', compact('settings', 'faqs'));
+        return view('admin.landing-settings.index', compact('settings', 'faqs'))->with('pageTitle', 'Pengaturan Landing');
     }
 
     public function update(Request $request)
@@ -24,24 +24,39 @@ class LandingSettingController extends Controller
             'hero_title' => 'nullable|string|max:255',
             'hero_description' => 'nullable|string',
 
+            'about_badge' => 'nullable|string|max:255',
             'about_title' => 'nullable|string|max:255',
             'about_description' => 'nullable|string',
 
-            'cta_title' => 'nullable|string|max:255',
-            'cta_description' => 'nullable|string',
+            'about_feature_1_title' => 'nullable|string|max:255',
+            'about_feature_1_desc' => 'nullable|string',
+            'about_feature_2_title' => 'nullable|string|max:255',
+            'about_feature_2_desc' => 'nullable|string',
+            'about_feature_3_title' => 'nullable|string|max:255',
+            'about_feature_3_desc' => 'nullable|string',
+            'about_feature_4_title' => 'nullable|string|max:255',
+            'about_feature_4_desc' => 'nullable|string',
 
+            'stats_mobil_value' => 'nullable|numeric|min:0|max:9999999',
+            'stats_mobil_label' => 'nullable|string|max:255',
+            'stats_pelanggan_value' => 'nullable|numeric|min:0|max:9999999',
+            'stats_pelanggan_label' => 'nullable|string|max:255',
+
+            'promo_button_label' => 'nullable|string|max:100',
+            'promo_button_url' => 'nullable|string|max:255',
+
+            'brand_badge' => 'nullable|string|max:255',
             'brand_title' => 'nullable|string|max:255',
             'brand_description' => 'nullable|string',
 
             'promo_title' => 'nullable|string|max:255',
             'promo_description' => 'nullable|string',
 
-            'feature_title' => 'nullable|string|max:255',
-            'feature_description' => 'nullable|string',
-
+            'steps_badge' => 'nullable|string|max:255',
             'steps_title' => 'nullable|string|max:255',
             'steps_description' => 'nullable|string',
 
+            'testimonial_badge' => 'nullable|string|max:255',
             'testimonial_title' => 'nullable|string|max:255',
             'testimonial_description' => 'nullable|string',
 
@@ -49,6 +64,13 @@ class LandingSettingController extends Controller
             'faq_description' => 'nullable|string',
             'selected_faq_ids' => 'nullable|array',
             'selected_faq_ids.*' => 'exists:faqs,id',
+        ], [
+            'stats_mobil_value.numeric' => 'Angka statistik mobil harus berupa angka.',
+            'stats_mobil_value.min' => 'Angka statistik mobil tidak boleh negatif.',
+            'stats_mobil_value.max' => 'Angka statistik mobil maksimal 9.999.999.',
+            'stats_pelanggan_value.numeric' => 'Angka statistik pelanggan harus berupa angka.',
+            'stats_pelanggan_value.min' => 'Angka statistik pelanggan tidak boleh negatif.',
+            'stats_pelanggan_value.max' => 'Angka statistik pelanggan maksimal 9.999.999.',
         ]);
 
         foreach ($validated as $key => $value) {

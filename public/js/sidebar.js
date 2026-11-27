@@ -13,19 +13,15 @@
     const toggleBtn = document.getElementById('sidebarToggle');
     const overlay = document.getElementById('sidebarOverlay');
 
-    if (!sidebar || !toggleBtn) return;
+    if (!sidebar) return;
 
     let isCollapsed = false;
     let isMobile = window.innerWidth < MOBILE_BREAKPOINT;
 
     function init() {
-        if (!isMobile) {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved !== null) {
-                isCollapsed = saved === 'true';
-                applyCollapsedState();
-            }
-        }
+        isCollapsed = false;
+        sidebar.classList.remove('collapsed');
+        sidebar.setAttribute('data-collapsed', 'false');
         updateAria();
     }
 
@@ -40,8 +36,10 @@
     }
 
     function updateAria() {
-        toggleBtn.setAttribute('aria-expanded', !isCollapsed);
-        toggleBtn.setAttribute('aria-label', isCollapsed ? 'Expand sidebar' : 'Collapse sidebar');
+        if (toggleBtn) {
+            toggleBtn.setAttribute('aria-expanded', !isCollapsed);
+            toggleBtn.setAttribute('aria-label', isCollapsed ? 'Expand sidebar' : 'Collapse sidebar');
+        }
     }
 
     function toggleSidebar() {
@@ -65,7 +63,9 @@
         }
     }
 
-    toggleBtn.addEventListener('click', toggleSidebar);
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', toggleSidebar);
+    }
 
     // Mobile toggle button lives in the navbar partial, which may parse after this script.
     function bindMobileToggle() {
@@ -116,7 +116,6 @@
                 sidebar.classList.remove('mobile-open');
                 if (overlay) overlay.classList.remove('visible');
                 document.body.style.overflow = '';
-                applyCollapsedState();
             } else if (!wasMobile && isMobile) {
                 // Desktop -> Mobile
                 sidebar.classList.remove('collapsed');

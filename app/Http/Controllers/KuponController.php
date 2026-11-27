@@ -3,26 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kupon;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class KuponController extends Controller
 {
+    // Form admin memakai jam lokal WIB, sedangkan DB menyimpan UTC (config app timezone).
+    private const ZONA_ADMIN = 'Asia/Jakarta';
+
     public function index()
     {
-        $kupons = Kupon::latest()->get();
-
-        return view('kupons.index', compact('kupons'));
+        return view('kupons.index')->with('pageTitle', 'Kupon');
     }
 
     /**
-     * Server-side DataTables: daftar promo (search, sort, pagination)
+     * Data promo untuk DataTables server-side.
+     * Urutan default: promo terbaru di atas.
      */
     public function data(Request $request)
     {
         $query = Kupon::query();
 
-        $recordsTotal = $query->count();
+        $recordsTotal = Kupon::count();
 
+        // Pencarian
         $search = $request->input('search.value');
 
         if ($search) {
@@ -32,8 +36,9 @@ class KuponController extends Controller
             });
         }
 
-        $recordsFiltered = $query->count();
+        $recordsFiltered = (clone $query)->count();
 
+        // Kolom yang dapat diurutkan
         $columns = [
             0 => null,
             1 => 'kupons.code',
@@ -47,35 +52,70 @@ class KuponController extends Controller
             9 => null,
         ];
 
-        $orderColumn = $request->input('order.0.column', 7);
-        $orderDir = $request->input('order.0.dir', 'asc');
-
-        if ($orderColumn == 7) {
-            // status dihitung di PHP, urutkan dengan CASE agar Aktif > Belum Aktif > Tidak Aktif
-            $query->orderByRaw("CASE
-                WHEN NOW() < active_at THEN 2
-                WHEN NOW() > expired_at OR terpakai >= kuota THEN 3
-                ELSE 1
-            END {$orderDir}")
-                ->orderBy('kupons.code', 'asc');
-        } elseif (isset($columns[$orderColumn]) && $columns[$orderColumn]) {
-            $query->orderBy($columns[$orderColumn], $orderDir);
-        } else {
-            $query->orderBy('kupons.code', 'asc');
-        }
-
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
-
-        $kupons = $query->offset($start)->limit($length)->get();
+        $orderColumn = $request->input('order.0.column');
+        $orderDirection = strtolower(
+            (string) $request->input('order.0.dir', 'desc')
+        ) === 'asc' ? 'asc' : 'desc';
 
         $now = now();
 
+        /*
+         * Jika tidak ada kolom yang dipilih untuk pengurutan,
+         * tampilkan promo terbaru berdasarkan created_at.
+         */
+        if (
+            $orderColumn === null ||
+            !isset($columns[(int) $orderColumn]) ||
+            $columns[(int) $orderColumn] === null
+        ) {
+            $query->orderByDesc('kupons.created_at')
+                ->orderByDesc('kupons.id');
+        } elseif ((int) $orderColumn === 7) {
+            // Pengurutan berdasarkan status promo.
+            $query->orderByRaw(
+                "CASE
+                    WHEN ? < kupons.active_at THEN 2
+                    WHEN ? > kupons.expired_at
+                         OR kupons.terpakai >= kupons.kuota THEN 3
+                    ELSE 1
+                END {$orderDirection}",
+                [$now->toDateTimeString(), $now->toDateTimeString()]
+            )
+                ->orderByDesc('kupons.created_at')
+                ->orderByDesc('kupons.id');
+        } else {
+            // Pengurutan berdasarkan kolom yang dipilih pengguna.
+            $query->orderBy(
+                $columns[(int) $orderColumn],
+                $orderDirection
+            )
+                ->orderByDesc('kupons.created_at')
+                ->orderByDesc('kupons.id');
+        }
+
+        // Pagination DataTables
+        $start = max(0, (int) $request->input('start', 0));
+        $length = (int) $request->input('length', 10);
+
+        if ($length === -1) {
+            $length = 100;
+        } else {
+            $length = min(max($length, 1), 100);
+        }
+
+        $kupons = $query
+            ->offset($start)
+            ->limit($length)
+            ->get();
+
         $data = $kupons->map(function ($kupon) use ($now) {
-            if ($now < $kupon->active_at) {
+            if ($kupon->active_at && $now->lt($kupon->active_at)) {
                 $status = 'waiting';
                 $statusText = 'Belum Aktif';
-            } elseif ($now > $kupon->expired_at || $kupon->terpakai >= $kupon->kuota) {
+            } elseif (
+                ($kupon->expired_at && $now->gt($kupon->expired_at)) ||
+                $kupon->terpakai >= $kupon->kuota
+            ) {
                 $status = 'expired';
                 $statusText = 'Tidak Aktif';
             } else {
@@ -91,8 +131,12 @@ class KuponController extends Controller
                 'kuota' => $kupon->kuota,
                 'terpakai' => $kupon->terpakai,
                 'minimal_pembelian' => $kupon->minimal_pembelian,
-                'active_at' => $kupon->active_at ? $kupon->active_at->format('Y-m-d\TH:i') : null,
-                'expired_at' => $kupon->expired_at ? $kupon->expired_at->format('Y-m-d\TH:i') : null,
+                'active_at' => $kupon->active_at
+                    ? $kupon->active_at->copy()->setTimezone(self::ZONA_ADMIN)->format('Y-m-d\TH:i')
+                    : null,
+                'expired_at' => $kupon->expired_at
+                    ? $kupon->expired_at->copy()->setTimezone(self::ZONA_ADMIN)->format('Y-m-d\TH:i')
+                    : null,
                 'status' => $status,
                 'status_text' => $statusText,
             ];
@@ -128,9 +172,15 @@ class KuponController extends Controller
             'minimal_pembelian.required' => 'Minimal pembelian wajib diisi.',
             'active_at.required' => 'Tanggal mulai wajib diisi.',
             'expired_at.required' => 'Tanggal berakhir wajib diisi.',
-            'expired_at.after_or_equal' => 'Tanggal berakhir harus setelah tanggal mulai.',
+            'expired_at.after_or_equal' =>
+                'Tanggal berakhir harus setelah tanggal mulai.',
         ]);
 
+        // Input datetime-local berisi jam WIB; simpan UTC agar konsisten dengan now().
+        $validated['active_at'] = Carbon::parse($validated['active_at'], self::ZONA_ADMIN)->utc();
+        $validated['expired_at'] = Carbon::parse($validated['expired_at'], self::ZONA_ADMIN)->utc();
+
+        $validated['code'] = strtoupper(trim($validated['code']));
         $validated['terpakai'] = 0;
 
         Kupon::create($validated);
@@ -141,7 +191,9 @@ class KuponController extends Controller
             ]);
         }
 
-        return redirect()->route('kupons.index')->with('success', 'Promo berhasil ditambahkan.');
+        return redirect()
+            ->route('kupons.index')
+            ->with('success', 'Promo berhasil ditambahkan.');
     }
 
     public function update(Request $request, Kupon $kupon)
@@ -154,7 +206,62 @@ class KuponController extends Controller
             'minimal_pembelian' => 'required|numeric|min:0',
             'active_at' => 'required|date',
             'expired_at' => 'required|date|after_or_equal:active_at',
+        ], [
+            'code.required' => 'Kode promo wajib diisi.',
+            'code.unique' => 'Kode promo sudah digunakan.',
+            'jenis.required' => 'Jenis promo wajib dipilih.',
+            'jenis.in' => 'Jenis promo tidak valid.',
+            'value.required' => 'Nilai promo wajib diisi.',
+            'value.min' => 'Nilai promo minimal 1.',
+            'kuota.required' => 'Kuota wajib diisi.',
+            'kuota.min' => 'Kuota minimal 1.',
+            'minimal_pembelian.required' => 'Minimal pembelian wajib diisi.',
+            'active_at.required' => 'Tanggal mulai wajib diisi.',
+            'expired_at.required' => 'Tanggal berakhir wajib diisi.',
+            'expired_at.after_or_equal' =>
+                'Tanggal berakhir harus setelah tanggal mulai.',
         ]);
+
+        // Input datetime-local berisi jam WIB; simpan UTC agar konsisten dengan now().
+        $validated['active_at'] = Carbon::parse($validated['active_at'], self::ZONA_ADMIN)->utc();
+        $validated['expired_at'] = Carbon::parse($validated['expired_at'], self::ZONA_ADMIN)->utc();
+
+        // Jumlah promo yang telah digunakan tidak boleh diubah dari form.
+        $terpakaiAktual = (int) $kupon->terpakai;
+
+        if ((int) $validated['kuota'] < $terpakaiAktual) {            $message = "Kuota tidak boleh lebih kecil dari jumlah terpakai ({$terpakaiAktual}).";
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => $message,
+                    'errors' => ['kuota' => [$message]],
+                ], 422);
+            }
+
+            return back()->withErrors([
+                'kuota' => $message,
+            ])->withInput();
+        }
+
+        // Tolak upaya mengubah terpakai melebihi kuota dari form.
+        $terpakaiInput = $request->input('terpakai');
+
+        if ($terpakaiInput !== null && (int) $terpakaiInput > (int) $validated['kuota']) {
+            $message = "Jumlah terpakai tidak boleh melebihi kuota ({$validated['kuota']}).";
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => $message,
+                    'errors' => ['terpakai' => [$message]],
+                ], 422);
+            }
+
+            return back()->withErrors([
+                'terpakai' => $message,
+            ])->withInput();
+        }
+
+        $validated['code'] = strtoupper(trim($validated['code']));
 
         $kupon->update($validated);
 
@@ -164,7 +271,9 @@ class KuponController extends Controller
             ]);
         }
 
-        return redirect()->route('kupons.index')->with('success', 'Promo berhasil diperbarui.');
+        return redirect()
+            ->route('kupons.index')
+            ->with('success', 'Promo berhasil diperbarui.');
     }
 
     public function destroy(Request $request, Kupon $kupon)
@@ -177,6 +286,8 @@ class KuponController extends Controller
             ]);
         }
 
-        return redirect()->route('kupons.index')->with('success', 'Promo berhasil dihapus.');
+        return redirect()
+            ->route('kupons.index')
+            ->with('success', 'Promo berhasil dihapus.');
     }
 }

@@ -71,6 +71,6 @@ class DashboardController extends Controller
             'laporan',
             'dari',
             'sampai'
-        ));
+        ))->with('pageTitle', 'Dashboard');
     }
 }

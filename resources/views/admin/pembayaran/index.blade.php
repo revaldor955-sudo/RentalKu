@@ -91,6 +91,15 @@
 
         /* Sidebar layout base styles are in admin-sidebar.blade.php */
 
+        .pager-bar{background:#fff;border:1px solid #edf0ee;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.05);padding:12px 16px;font-size:14px}
+        .pager-bar .text-secondary{font-size:14px;font-weight:500}.pager-select{width:auto;border-radius:10px;font-size:13px;height:34px;padding:6px 28px 6px 10px}
+        .pager-jump{width:72px;border-radius:10px;text-align:center;font-size:13px;height:34px;padding:6px 8px}
+        .pager-btn{border:1px solid #dee2e6;border-radius:10px;color:#1f2937;font-weight:600;background:#fff;font-size:13px;height:34px;display:inline-flex;align-items:center;padding:6px 12px}
+        .pager-btn:hover{border-color:#198754;color:#198754;background:#f5f7f6}
+        .pager-btn.disabled{opacity:0.4;pointer-events:none}
+        .pager-next{background:#198754;border-color:#198754;color:#fff}
+        .pager-next:hover{background:#146c43;border-color:#146c43;color:#fff}
+
         .page-content {
             padding: 24px;
         }
@@ -226,6 +235,33 @@
 
             </table>
 
+            <div class="pager-bar mt-3 d-flex flex-wrap align-items-center justify-content-between gap-3" id="pembayaran-pager">
+                <div class="text-secondary small" id="pembayaran-info">
+                    Menampilkan 0–0 dari 0 data
+                </div>
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <select id="pembayaran-len" class="form-select form-select-sm pager-select" aria-label="Jumlah per halaman">
+                        <option value="10">10 / halaman</option>
+                        <option value="20">20 / halaman</option>
+                        <option value="50">50 / halaman</option>
+                        <option value="100">100 / halaman</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                    <input type="number" id="pembayaran-custom" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
+                    <span class="text-secondary" id="pembayaran-page">Halaman 1 / 1</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-sm pager-btn" id="pembayaran-first">First</button>
+                    <button type="button" class="btn btn-sm pager-btn" id="pembayaran-prev" aria-label="Halaman sebelumnya">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm pager-btn pager-next" id="pembayaran-next" aria-label="Halaman berikutnya">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm pager-btn" id="pembayaran-last">Last</button>
+                </div>
+            </div>
+
         </div>
 
     </div>
@@ -302,7 +338,77 @@
                                 <h5 class="fw-bold text-success mb-0" id="pd-jumlah">-</h5>
                             </div>
                         </div>
+<!-- DETAIL RENTAL -->
+<div class="col-12">
+    <div class="border rounded-3 p-3">
+        <h6 class="fw-bold mb-3">
+            <i class="bi bi-car-front me-2"></i>Detail Rental
+        </h6>
 
+        <div class="row g-3">
+            <div class="col-md-6">
+                <small class="text-muted">ID Rental</small>
+                <div class="fw-semibold" id="pd-rental-id">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Status Rental</small>
+                <div class="fw-semibold" id="pd-rental-status">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Tanggal Mulai</small>
+                <div id="pd-rental-mulai">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Tanggal Selesai</small>
+                <div id="pd-rental-selesai">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Lama Sewa</small>
+                <div id="pd-rental-hari">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Harga per Hari</small>
+                <div id="pd-rental-harga">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Cabang Pengambilan</small>
+                <div id="pd-rental-cabang-ambil">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Cabang Pengembalian</small>
+                <div id="pd-rental-cabang-kembali">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Subtotal</small>
+                <div id="pd-rental-subtotal">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Deposit</small>
+                <div id="pd-rental-deposit">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Diskon</small>
+                <div id="pd-rental-diskon">-</div>
+            </div>
+
+            <div class="col-md-6">
+                <small class="text-muted">Total Rental</small>
+                <h5 class="fw-bold text-success mb-0" id="pd-rental-total">-</h5>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- AKHIR DETAIL RENTAL -->
                         <div class="col-md-6">
                             <div class="border rounded-3 p-3">
                                 <small class="text-muted fw-bold text-uppercase">Status</small>
@@ -436,6 +542,9 @@
         $('#pembayaran-table').DataTable({
                             processing: true,
                             serverSide: true,
+                            paging: false,
+                            info: false,
+                            dom: 'frt',
                             ajax: {
                                 url: "{{ route('pembayarans.data') }}",
                                 type: 'GET',
@@ -517,10 +626,8 @@
                                     },
                                 },
                             ],
-                            order: [
-                                [7, 'desc'],
-                                [5, 'desc']
-                            ],
+                           order: [],
+                            ordering: false,    
                             language: {
                                 processing: 'Memproses...',
                                 search: 'Cari:',
@@ -537,6 +644,31 @@
                                 },
                             },
                         });
+
+        var pembayaranTable = $('#pembayaran-table').DataTable();
+
+        function renderPembayaranPager() {
+            var info = pembayaranTable.page.info();
+            var total=info.recordsDisplay; var start=total?info.start+1:0;
+            $('#pembayaran-info').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
+            var pages = info.pages || 1;
+            var page = info.page + 1;
+            $('#pembayaran-page').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
+            $('#pembayaran-first').toggleClass('disabled', page <= 1);
+            $('#pembayaran-prev').toggleClass('disabled', page <= 1);
+            $('#pembayaran-next').toggleClass('disabled', page >= pages);
+            $('#pembayaran-last').toggleClass('disabled', page >= pages);
+        }
+
+        pembayaranTable.on('draw.dt', renderPembayaranPager);
+        renderPembayaranPager();
+
+        $('#pembayaran-first').on('click', function() { pembayaranTable.page('first').draw('page'); });
+        $('#pembayaran-prev').on('click', function() { pembayaranTable.page('previous').draw('page'); });
+        $('#pembayaran-next').on('click', function() { pembayaranTable.page('next').draw('page'); });
+        $('#pembayaran-last').on('click', function() { pembayaranTable.page('last').draw('page'); });
+        $('#pembayaran-len').on('change', function() { if ($(this).val() === 'custom') { $('#pembayaran-custom').focus(); return; } var n = Number($(this).val()); $('#pembayaran-custom').val(n); pembayaranTable.page.len(n).draw(); });
+        $('#pembayaran-custom').on('change', function() { var n = parseInt($(this).val(), 10) || 1; n = Math.min(Math.max(n, 1), 500); $(this).val(n); if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#pembayaran-len').val(String(n)); } else { $('#pembayaran-len').val('custom'); } pembayaranTable.page.len(n).draw(); });
 
     });
 
@@ -566,6 +698,22 @@
                 $('#pd-tanggal').text(data.tanggal_bayar);
                 $('#pd-jumlah').text(formatRupiah(data.jumlah));
                 $('#pd-status').html(statusBadge(data.status));
+                
+const rental = data.rental || {};
+
+$('#pd-rental-id').text(rental.id ?? '-');
+$('#pd-rental-status').text(rental.status ?? '-');
+$('#pd-rental-mulai').text(rental.tanggal_mulai ?? '-');
+$('#pd-rental-selesai').text(rental.tanggal_selesai ?? '-');
+$('#pd-rental-hari').text((rental.jumlah_hari ?? 0) + ' hari');
+$('#pd-rental-harga').text(formatRupiah(rental.harga_perhari ?? 0));
+$('#pd-rental-cabang-ambil').text(rental.cabang_ambil ?? '-');
+$('#pd-rental-cabang-kembali').text(rental.cabang_kembali ?? '-');
+$('#pd-rental-subtotal').text(formatRupiah(rental.subtotal ?? 0));
+$('#pd-rental-deposit').text(formatRupiah(rental.deposit ?? 0));
+$('#pd-rental-diskon').text(formatRupiah(rental.diskon ?? 0));
+$('#pd-rental-total').text(formatRupiah(rental.total_harga ?? 0));
+
 
                 var $buktiContainer = $('#pd-bukti');
                 $buktiContainer.empty();

@@ -1,11 +1,15 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\LandingSettingController;
+use App\Http\Controllers\Admin\RatingController as AdminRatingController;
+use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CabangController;
-use App\Http\Controllers\Customer\DashboardController as CustomerDashboardController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Customer\DashboardController as CustomerDashboardController;
+use App\Http\Controllers\CustomerRatingController;
 use App\Http\Controllers\DendaController;
 use App\Http\Controllers\DokumenMobilController;
 use App\Http\Controllers\FaqController;
@@ -15,19 +19,17 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KerusakanMobilController;
 use App\Http\Controllers\KompensasiController;
 use App\Http\Controllers\KuponController;
-use App\Http\Controllers\ServisMobilController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\MetodePembayaranController;
-use App\Http\Controllers\Admin\LandingSettingController;
-use App\Http\Controllers\Admin\RatingController as AdminRatingController;
-use App\Http\Controllers\CustomerRatingController;
 use App\Http\Controllers\MobilController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\PemeriksaanKendaraanController;
 use App\Http\Controllers\PengembalianController;
+use App\Http\Controllers\PelacakanGPSController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ServisMobilController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 use App\Http\Controllers\SupirController;
 use App\Http\Controllers\TipeMobilController;
@@ -35,132 +37,61 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+// MASTER DATA
+// Admin saja — data referensi (role, brand, tipe, cabang, fasilitas,
+// metode, supir, kupon) hanya boleh diubah Admin; Staff memakai lewat dropdown.
 
-/*
-|--------------------------------------------------------------------------
-| MASTER DATA
-|--------------------------------------------------------------------------
-| Admin dan Staff
-|--------------------------------------------------------------------------
-*/
+Route::middleware('admin')->group(function () {
+    // Roles
 
-Route::middleware('adminstaff')->group(function () {
+    // Route::get('roles/data', [RoleController::class, 'data'])->name('roles.data');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Roles
-    |--------------------------------------------------------------------------
-    */
+    // Route::resource('roles', RoleController::class)->except(['create', 'edit', 'show']);
 
-    Route::get('roles/data', [RoleController::class, 'data'])
-        ->name('roles.data');
+    // Brands
 
-    Route::resource('roles', RoleController::class)
-        ->except(['create', 'edit', 'show']);
+    Route::get('brands/data', [BrandController::class, 'data'])->name('brands.data');
 
+    Route::resource('brands', BrandController::class)->except(['create', 'edit']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Brands
-    |--------------------------------------------------------------------------
-    */
+    // Tipe Mobil
 
-    Route::get('brands/data', [BrandController::class, 'data'])
-        ->name('brands.data');
+    Route::get('tipe_mobils/data', [TipeMobilController::class, 'data'])->name('tipe_mobils.data');
 
-    Route::resource('brands', BrandController::class)
-        ->except(['create', 'edit']);
+    Route::resource('tipe_mobils', TipeMobilController::class)->except(['create', 'edit', 'show']);
 
+    // Cabang
 
-    /*
-    |--------------------------------------------------------------------------
-    | Tipe Mobil
-    |--------------------------------------------------------------------------
-    */
+    Route::get('cabangs/data', [CabangController::class, 'data'])->name('cabangs.data');
 
-    Route::get('tipe_mobils/data', [TipeMobilController::class, 'data'])
-        ->name('tipe_mobils.data');
+    Route::resource('cabangs', CabangController::class)->except(['create', 'edit', 'show']);
 
-    Route::resource('tipe_mobils', TipeMobilController::class)
-        ->except(['create', 'edit', 'show']);
+    // Fasilitas
 
+    Route::get('/fasilitas/data', [FasilitasController::class, 'data'])->name('fasilitas.data');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Cabang
-    |--------------------------------------------------------------------------
-    */
+    Route::resource('fasilitas', FasilitasController::class)->except(['create', 'edit', 'show']);
 
-    Route::get('cabangs/data', [CabangController::class, 'data'])
-        ->name('cabangs.data');
+    // Metode Pembayaran
 
-    Route::resource('cabangs', CabangController::class)
-        ->except(['create', 'edit', 'show']);
+    Route::get('metode_pembayarans/data', [MetodePembayaranController::class, 'data'])->name('metode_pembayarans.data');
 
+    Route::resource('metode_pembayarans', MetodePembayaranController::class)->except(['create', 'edit', 'show']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Fasilitas
-    |--------------------------------------------------------------------------
-    */
+    // Supir
 
-    Route::get('/fasilitas/data', [FasilitasController::class, 'data'])
-        ->name('fasilitas.data');
+    Route::get('supirs/data', [SupirController::class, 'data'])->name('supirs.data');
 
-    Route::resource('fasilitas', FasilitasController::class)
-        ->except(['create', 'edit', 'show']);
+    Route::resource('supirs', SupirController::class)->except(['create', 'edit', 'show']);
 
+    // Kupon
 
-    /*
-    |--------------------------------------------------------------------------
-    | Metode Pembayaran
-    |--------------------------------------------------------------------------
-    */
+    Route::get('/kupons/data', [KuponController::class, 'data'])->name('kupons.data');
 
-    Route::get(
-        'metode_pembayarans/data',
-        [MetodePembayaranController::class, 'data']
-    )->name('metode_pembayarans.data');
-
-    Route::resource(
-        'metode_pembayarans',
-        MetodePembayaranController::class
-    )->except(['create', 'edit', 'show']);
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Supir
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get('supirs/data', [SupirController::class, 'data'])
-        ->name('supirs.data');
-
-    Route::resource('supirs', SupirController::class)
-        ->except(['create', 'edit', 'show']);
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Kupon
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get('/kupons/data', [KuponController::class, 'data'])
-        ->name('kupons.data');
-
-    Route::resource('kupons', KuponController::class)
-        ->except(['create', 'edit', 'show']);
-
+    Route::resource('kupons', KuponController::class)->except(['create', 'edit', 'show']);
 });
 
-
-/*
-|--------------------------------------------------------------------------
-| MANAGEMENT MOBIL - ADMIN
-|--------------------------------------------------------------------------
-*/
+// MANAGEMENT MOBIL - ADMIN
 
 Route::resource('mobils', MobilController::class)
     ->except(['create', 'edit', 'show', 'update', 'destroy'])
@@ -170,743 +101,378 @@ Route::get('/mobils/data', [MobilController::class, 'data'])
     ->middleware('admin')
     ->name('mobils.data');
 
-Route::get('/mobils/{mobil}', [MobilController::class, 'show'])
-    ->name('mobils.show');
+Route::get('/mobils/{mobil}', [MobilController::class, 'show'])->name('mobils.show');
 
 Route::middleware('admin')->group(function () {
+    Route::put('/mobils/{mobil}', [MobilController::class, 'update'])->name('mobils.update');
 
-    Route::get('/mobils/{mobil}/edit', [MobilController::class, 'edit'])
-        ->name('mobils.edit');
-
-    Route::put('/mobils/{mobil}', [MobilController::class, 'update'])
-        ->name('mobils.update');
-
-    Route::delete('/mobils/{mobil}', [MobilController::class, 'destroy'])
-        ->name('mobils.destroy');
-
+    Route::delete('/mobils/{mobil}', [MobilController::class, 'destroy'])->name('mobils.destroy');
 });
 
-
-/*
-|--------------------------------------------------------------------------
-| MASTER PENUNJANG MOBIL
-|--------------------------------------------------------------------------
-| Admin dan Staff
-|--------------------------------------------------------------------------
-*/
+// MASTER PENUNJANG MOBIL
+// Admin dan Staff
 
 Route::middleware('adminstaff')->group(function () {
+    // Kerusakan Mobil
 
-    /*
-    |--------------------------------------------------------------------------
-    | Kerusakan Mobil
-    |--------------------------------------------------------------------------
-    */
+    Route::get('kerusakan_mobils/data', [KerusakanMobilController::class, 'data'])->name('kerusakan_mobils.data');
 
-    Route::get(
-        'kerusakan_mobils/data',
-        [KerusakanMobilController::class, 'data']
-    )->name('kerusakan_mobils.data');
+    Route::resource('kerusakan_mobils', KerusakanMobilController::class)->except(['create', 'edit', 'show']);
 
-    Route::resource(
-        'kerusakan_mobils',
-        KerusakanMobilController::class
-    )->except(['create', 'edit', 'show']);
+    // Foto Mobil
 
+    Route::get('foto_mobils/data', [FotoMobilController::class, 'data'])->name('foto_mobils.data');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Foto Mobil
-    |--------------------------------------------------------------------------
-    */
+    Route::resource('foto_mobils', FotoMobilController::class)->except(['create', 'edit', 'show']);
 
-    Route::get(
-        'foto_mobils/data',
-        [FotoMobilController::class, 'data']
-    )->name('foto_mobils.data');
+    // Dokumen Mobil
 
-    Route::resource(
-        'foto_mobils',
-        FotoMobilController::class
-    )->except(['create', 'edit', 'show']);
+    Route::get('dokumen_mobils/data', [DokumenMobilController::class, 'data'])->name('dokumen_mobils.data');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Dokumen Mobil
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        'dokumen_mobils/data',
-        [DokumenMobilController::class, 'data']
-    )->name('dokumen_mobils.data');
-
-    Route::resource(
-        'dokumen_mobils',
-        DokumenMobilController::class
-    )->except(['create', 'edit', 'show']);
-
+    Route::resource('dokumen_mobils', DokumenMobilController::class)->except(['create', 'edit', 'show']);
 });
 
+// DENDA
+// Admin dan Staff
 
-/*
-|--------------------------------------------------------------------------
-| DENDA
-|--------------------------------------------------------------------------
-| Admin dan Staff
-|--------------------------------------------------------------------------
-*/
+Route::get('dendas/data', [DendaController::class, 'data'])
+    ->name('dendas.data')
+    ->middleware('adminstaff');
 
-Route::get(
-    'dendas/data',
-    [DendaController::class, 'data']
-)->name('dendas.data')->middleware('adminstaff');
-
-Route::resource(
-    'dendas',
-    DendaController::class
-)->except(['create', 'edit', 'show'])
- ->middleware('adminstaff');
+Route::resource('dendas', DendaController::class)
+    ->except(['create', 'edit', 'show'])
+    ->middleware('adminstaff');
 
 Route::middleware('adminstaff')->group(function () {
-
-    Route::put(
-        '/dendas/{denda}/status',
-        [DendaController::class, 'updateStatus']
-    )->name('dendas.updateStatus');
-
+    Route::put('/dendas/{denda}/status', [DendaController::class, 'updateStatus'])->name('dendas.updateStatus');
 });
 
+// KOMPENSASI
+// Admin saja — kompensasi dibuat Admin atas nama customer; Staff tanpa akses.
 
-/*
-|--------------------------------------------------------------------------
-| KOMPENSASI
-|--------------------------------------------------------------------------
-| Admin dan Staff
-|--------------------------------------------------------------------------
-*/
+Route::get('kompensasis/data', [KompensasiController::class, 'data'])
+    ->name('kompensasis.data')
+    ->middleware('admin');
 
-Route::get(
-    'kompensasis/data',
-    [KompensasiController::class, 'data']
-)->name('kompensasis.data')->middleware('adminstaff');
+Route::get('kompensasis/rentals', [KompensasiController::class, 'rentalsForCustomer'])
+    ->name('kompensasis.rentals')
+    ->middleware('admin');
 
-Route::resource(
-    'kompensasis',
-    KompensasiController::class
-)->except(['create', 'edit', 'show'])
- ->middleware('adminstaff');
+Route::resource('kompensasis', KompensasiController::class)
+    ->except(['create', 'edit', 'show', 'update'])
+    ->middleware('admin');
 
+// SERVIS MOBIL
+// Admin dan Staff
 
-/*
-|--------------------------------------------------------------------------
-| SERVIS MOBIL
-|--------------------------------------------------------------------------
-| Admin dan Staff
-|--------------------------------------------------------------------------
-*/
+Route::get('servis_mobils/data', [ServisMobilController::class, 'data'])
+    ->name('servis_mobils.data')
+    ->middleware('adminstaff');
 
-Route::get(
-    'servis_mobils/data',
-    [ServisMobilController::class, 'data']
-)->name('servis_mobils.data')->middleware('adminstaff');
+Route::resource('servis_mobils', ServisMobilController::class)
+    ->except(['create', 'edit', 'show'])
+    ->middleware('adminstaff');
 
-Route::resource(
-    'servis_mobils',
-    ServisMobilController::class
-)->middleware('adminstaff');
+// MASTER KONTEN
+// Admin saja — konten landing (banner, FAQ) dikelola bersama
+// landing-settings yang sudah admin-only; Staff fokus operasional rental.
 
+Route::middleware('admin')->group(function () {
+    // BANNER
 
-/*
-|--------------------------------------------------------------------------
-| MASTER KONTEN
-|--------------------------------------------------------------------------
-| Admin saja
-|--------------------------------------------------------------------------
-*/
+    Route::get('banners/data', [BannerController::class, 'data'])->name('banners.data');
 
-Route::middleware('adminstaff')->group(function () {
+    Route::resource('banners', BannerController::class)->except(['create', 'edit']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | BANNER
-    |--------------------------------------------------------------------------
-    */
+    // FAQ
 
-    Route::resource(
-        'banners',
-        BannerController::class
-    )->except(['create', 'edit', 'show']);
+    Route::get('faqs/data', [FaqController::class, 'data'])->name('faqs.data');
 
-    Route::get(
-        'banners/data',
-        [BannerController::class, 'data']
-    )->name('banners.data');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | FAQ
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        'faqs/data',
-        [FaqController::class, 'data']
-    )->name('faqs.data');
-
-    Route::resource(
-        'faqs',
-        FaqController::class
-    )->except(['create', 'edit', 'show']);
-
+    Route::resource('faqs', FaqController::class)->except(['create', 'edit', 'show']);
 });
 
+// LANDING PAGE
 
-/*
-|--------------------------------------------------------------------------
-| LANDING PAGE
-|--------------------------------------------------------------------------
-*/
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/', [HomeController::class, 'index'])
-    ->middleware('guest')
-    ->name('home');
+Route::get('/katalog', [HomeController::class, 'katalog'])->name('katalog.index');
 
+Route::get('/katalog/data', [HomeController::class, 'katalogData'])->name('katalog.data');
 
-/*
-|--------------------------------------------------------------------------
-| CONTACT
-|--------------------------------------------------------------------------
-*/
+// CONTACT
 
 Route::post('/contact', [ContactController::class, 'store'])
+    ->middleware('throttle:5,1')
     ->name('contact.store');
 
-    /*
-|--------------------------------------------------------------------------
-| MANAGEMENT CONTACT / HUBUNGI KAMI
-|--------------------------------------------------------------------------
-| Admin saja
-|--------------------------------------------------------------------------
-*/
+// MANAGEMENT CONTACT / HUBUNGI KAMI
+// Admin saja
 
 Route::middleware('admin')->group(function () {
+    Route::get('/admin/contacts', [ContactController::class, 'index'])->name('contacts.index');
 
-    Route::get(
-        '/admin/contacts',
-        [ContactController::class, 'index']
-    )->name('contacts.index');
+    Route::get('/admin/contacts/data', [ContactController::class, 'data'])->name('contacts.data');
 
+    Route::get('/admin/contacts/{contact}/detail', [ContactController::class, 'detail'])->name('contacts.detail');
 
-    Route::get(
-        '/admin/contacts/{contact}',
-        [ContactController::class, 'show']
-    )->name('contacts.show');
+    Route::patch('/admin/contacts/{contact}/read', [ContactController::class, 'markAsRead'])->name('contacts.read');
 
+    Route::post('/admin/contacts/{contact}/reply', [ContactController::class, 'reply'])->name('contacts.reply');
 
-    Route::post(
-        '/admin/contacts/{contact}/reply',
-        [ContactController::class, 'reply']
-    )->name('contacts.reply');
-
-
-    Route::delete(
-        '/admin/contacts/{contact}',
-        [ContactController::class, 'destroy']
-    )->name('contacts.destroy');
-
+    Route::delete('/admin/contacts/{contact}', [ContactController::class, 'destroy'])->name('contacts.destroy');
 });
 
-
-/*
-|--------------------------------------------------------------------------
-| DASHBOARD REDIRECT
-|--------------------------------------------------------------------------
-*/
+// DASHBOARD REDIRECT
 
 Route::get('/dashboard', function () {
-
     return match (Auth::user()->roles_id) {
-
         1 => redirect()->route('admin.dashboard'),
 
         2 => redirect()->route('staff.dashboard'),
 
         default => redirect()->route('customer.dashboard'),
-
     };
+})
+    ->middleware('auth')
+    ->name('dashboard');
 
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-
-/*
-|--------------------------------------------------------------------------
-| PROFILE
-|--------------------------------------------------------------------------
-*/
+// PROFILE
 
 Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 
-    Route::get(
-        '/profile',
-        [ProfileController::class, 'edit']
-    )->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
-    Route::patch(
-        '/profile',
-        [ProfileController::class, 'update']
-    )->name('profile.update');
+    Route::get('/profile/email', [ProfileController::class, 'editEmail'])->name('profile.email.edit');
 
-    Route::delete(
-        '/profile',
-        [ProfileController::class, 'destroy']
-    )->name('profile.destroy');
+    Route::patch('/profile/email', [ProfileController::class, 'updateEmail'])->name('profile.email.update');
 
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// ADMIN DASHBOARD
 
-/*
-|--------------------------------------------------------------------------
-| ADMIN DASHBOARD
-|--------------------------------------------------------------------------
-*/
-
-Route::get(
-    '/admin/dashboard',
-    [AdminDashboardController::class, 'index']
-)
+Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
     ->middleware('admin')
     ->name('admin.dashboard');
 
+// STAFF DASHBOARD
 
-/*
-|--------------------------------------------------------------------------
-| STAFF DASHBOARD
-|--------------------------------------------------------------------------
-*/
-
-Route::get(
-    '/staff/dashboard',
-    [StaffDashboardController::class, 'index']
-)
+Route::get('/staff/dashboard', [StaffDashboardController::class, 'index'])
     ->middleware('staff')
     ->name('staff.dashboard');
 
-
-/*
-|--------------------------------------------------------------------------
-| STAFF MANAGEMENT MOBIL
-|--------------------------------------------------------------------------
-*/
+// STAFF MANAGEMENT MOBIL
 
 Route::middleware('staff')->group(function () {
+    Route::get('/staff/mobils', [MobilController::class, 'index'])->name('staff.mobils.index');
 
-    Route::get(
-        '/staff/mobils',
-        [MobilController::class, 'index']
-    )->name('staff.mobils.index');
+    Route::post('/staff/mobils', [MobilController::class, 'store'])->name('staff.mobils.store');
 
-    Route::get(
-        '/staff/mobils/create',
-        [MobilController::class, 'create']
-    )->name('staff.mobils.create');
+    Route::put('/staff/mobils/{mobil}', [MobilController::class, 'update'])->name('staff.mobils.update');
 
-    Route::post(
-        '/staff/mobils',
-        [MobilController::class, 'store']
-    )->name('staff.mobils.store');
-
-    Route::get(
-        '/staff/mobils/{mobil}/edit',
-        [MobilController::class, 'edit']
-    )->name('staff.mobils.edit');
-
-    Route::put(
-        '/staff/mobils/{mobil}',
-        [MobilController::class, 'update']
-    )->name('staff.mobils.update');
-
-    Route::delete(
-        '/staff/mobils/{mobil}',
-        [MobilController::class, 'destroy']
-    )->name('staff.mobils.destroy');
-
+    Route::delete('/staff/mobils/{mobil}', [MobilController::class, 'destroy'])->name('staff.mobils.destroy');
 });
 
+// CUSTOMER DASHBOARD
 
-/*
-|--------------------------------------------------------------------------
-| CUSTOMER DASHBOARD
-|--------------------------------------------------------------------------
-*/
-
-Route::get(
-    '/customer/dashboard',
-    [CustomerDashboardController::class, 'index']
-)
+Route::get('/customer/dashboard', [CustomerDashboardController::class, 'index'])
     ->middleware('customer')
     ->name('customer.dashboard');
 
-
-Route::get(
-    '/customer/riwayat',
-    [CustomerDashboardController::class, 'riwayat']
-)
+Route::get('/customer/riwayat', [CustomerDashboardController::class, 'riwayat'])
     ->middleware('customer')
     ->name('customer.riwayat');
 
-
-/*
-|--------------------------------------------------------------------------
-| CUSTOMER
-|--------------------------------------------------------------------------
-*/
+// CUSTOMER
 
 Route::middleware('customer')->group(function () {
+    // Pencarian Mobil
 
-    /*
-    |--------------------------------------------------------------------------
-    | Pencarian Mobil
-    |--------------------------------------------------------------------------
-    */
+    Route::get('/customer/mobils/search', [CustomerDashboardController::class, 'search'])->name('customer.mobils.search');
 
-    Route::get(
-        '/customer/mobils/search',
-        [CustomerDashboardController::class, 'search']
-    )->name('customer.mobils.search');
+    // Checkout
 
+    Route::get('/customer/checkout/{mobil}', [RentalController::class, 'showCheckout'])->name('rentals.checkout.show');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Checkout
-    |--------------------------------------------------------------------------
-    */
+    // diblokir selama customer punya denda belum lunas
+    Route::middleware(['customer', 'blokir.denda'])->group(function () {
+        Route::post('/customer/checkout/{mobil}', [RentalController::class, 'checkout'])->name('rentals.checkout');
 
-    Route::get(
-        '/customer/checkout/{mobil}',
-        [RentalController::class, 'showCheckout']
-    )->name('rentals.checkout.show');
+        Route::post('/customer/checkout/confirm/{mobil}', [RentalController::class, 'confirmCheckout'])->name('rentals.checkout.confirm');
 
-    Route::post(
-        '/customer/checkout/{mobil}',
-        [RentalController::class, 'checkout']
-    )->name('rentals.checkout');
+        Route::post('/customer/rental/{mobil}', [RentalController::class, 'store'])->name('rentals.store');
+    });
 
-    Route::post(
-        '/customer/checkout/confirm/{mobil}',
-        [RentalController::class, 'confirmCheckout']
-    )->name('rentals.checkout.confirm');
+    // Pemeriksaan promo
 
+    Route::post('/customer/promo/check', [RentalController::class, 'checkPromo'])
+        ->middleware('throttle:60,1')
+        ->name('rentals.promo.check');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Rental
-    |--------------------------------------------------------------------------
-    */
+    // Pembayaran
 
-    Route::post(
-        '/customer/rental/{mobil}',
-        [RentalController::class, 'store']
-    )->name('rentals.store');
+    Route::get('/customer/pembayaran/{rental}', [PembayaranController::class, 'create'])->name('pembayaran.create');
 
+    Route::post('/customer/pembayaran/{rental}', [PembayaranController::class, 'paymentRental'])->name('payment.rental');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Pembayaran
-    |--------------------------------------------------------------------------
-    */
+    Route::post('/customer/pembayaran/{rental}/semua', [PembayaranController::class, 'paymentAll'])->name('payment.all');
 
-    Route::get(
-        '/customer/pembayaran/{rental}',
-        [PembayaranController::class, 'create']
-    )->name('pembayaran.create');
+    // Kompensasi Customer (read-only)
 
-    Route::post(
-        '/customer/pembayaran/{rental}',
-        [PembayaranController::class, 'store']
-    )->name('pembayaran.store');
+    Route::get('/customer/kompensasi', [KompensasiController::class, 'customerIndex'])->name('customer.kompensasi.index');
 
+    Route::get('/customer/kompensasi/data', [KompensasiController::class, 'customerData'])->name('customer.kompensasi.data');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Kompensasi Customer
-    |--------------------------------------------------------------------------
-    */
+    // Bayar Denda
 
-    Route::get(
-        '/customer/kompensasi',
-        [KompensasiController::class, 'customerIndex']
-    )->name('customer.kompensasi.index');
+    Route::post('/customer/dendas/{denda}/bayar', [DendaController::class, 'paymentDenda'])
+        ->name('payment.denda')
+        ->missing(function () {
+            if (request()->wantsJson()) {
+                return response()->json(['message' => 'Denda tidak ditemukan. Mungkin sudah dihapus.'], 404);
+            }
 
-    Route::get(
-        '/customer/kompensasi/data',
-        [KompensasiController::class, 'customerData']
-    )->name('customer.kompensasi.data');
-
-    Route::get(
-        '/customer/kompensasi/create',
-        [KompensasiController::class, 'customerCreate']
-    )->name('customer.kompensasi.create');
-
-    Route::post(
-        '/customer/kompensasi',
-        [KompensasiController::class, 'store']
-    )->name('customer.kompensasi.store');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Bayar Denda
-    |--------------------------------------------------------------------------
-    */
-
-    Route::post(
-        '/customer/dendas/{denda}/bayar',
-        [DendaController::class, 'customerBayar']
-    )->name('customer.dendas.bayar');
-
+            return redirect()->route('customer.dashboard')->with('error', 'Denda tidak ditemukan. Mungkin sudah dihapus.');
+        });
 });
 
-
-/*
-|--------------------------------------------------------------------------
-| RENTAL & PEMBAYARAN
-|--------------------------------------------------------------------------
-| Admin dan Staff
-|--------------------------------------------------------------------------
-*/
+// PELACAKAN GPS
+// Admin dan Staff
 
 Route::middleware('adminstaff')->group(function () {
+    Route::get('/pelacakan-gps', [PelacakanGPSController::class, 'index'])->name('pelacakan-gps.index');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Rental
-    |--------------------------------------------------------------------------
-    */
+    Route::get('/pelacakan-gps/data', [PelacakanGPSController::class, 'data'])->name('pelacakan-gps.data');
 
-    Route::get(
-        '/rentals',
-        [RentalController::class, 'index']
-    )->name('rentals.index');
+    Route::delete('/pelacakan-gps/{rentalId}/hapus', [PelacakanGPSController::class, 'hapusData'])->name('pelacakan-gps.hapus');
 
-    Route::get(
-        '/rentals/data',
-        [RentalController::class, 'data']
-    )->name('rentals.data');
+    Route::get('/pelacakan-gps/{rental}/riwayat', [PelacakanGPSController::class, 'riwayat'])->name('pelacakan-gps.riwayat');
 
-    Route::get(
-        '/rentals/{rental}/detail',
-        [RentalController::class, 'detail']
-    )->name('rentals.detail');
-
-    Route::put(
-        '/rentals/{rental}/status',
-        [RentalController::class, 'updateStatus']
-    )->name('rentals.updateStatus');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Pembayaran
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/pembayaran',
-        [PembayaranController::class, 'index']
-    )->name('pembayarans.index');
-
-    Route::get(
-        '/pembayaran/data',
-        [PembayaranController::class, 'data']
-    )->name('pembayarans.data');
-
-    Route::get(
-        '/pembayaran/{pembayaran}/detail',
-        [PembayaranController::class, 'detail']
-    )->name('pembayarans.detail');
-
-    Route::put(
-        '/pembayaran/{pembayaran}/status',
-        [PembayaranController::class, 'updateStatus']
-    )->name('pembayarans.updateStatus');
-
+    Route::get('/pelacakan-gps/{rental}/riwayat/data', [PelacakanGPSController::class, 'riwayatData'])->name('pelacakan-gps.riwayat.data');
 });
 
+// PELACAKAN GPS - CUSTOMER
 
-/*
-|--------------------------------------------------------------------------
-| USERS
-|--------------------------------------------------------------------------
-| Admin dan Staff
-|--------------------------------------------------------------------------
-*/
+Route::middleware('customer')->group(function () {
+    Route::get('/customer/gps/{rental}', [PelacakanGPSController::class, 'pengirim'])->name('customer.gps.pengirim');
 
-Route::resource(
-    'users',
-    UserController::class
-)
+    Route::post('/customer/gps/{rental}/lokasi', [PelacakanGPSController::class, 'terimaLokasi'])
+        ->middleware('throttle:30,1')
+        ->name('customer.gps.terima-lokasi');
+});
+
+// RENTAL & PEMBAYARAN
+// Admin dan Staff
+
+Route::middleware('adminstaff')->group(function () {
+    // Rental
+
+    Route::get('/rentals', [RentalController::class, 'index'])->name('rentals.index');
+
+    Route::get('/rentals/data', [RentalController::class, 'data'])->name('rentals.data');
+
+    Route::get('/rentals/{rental}/detail', [RentalController::class, 'detail'])->name('rentals.detail');
+
+    Route::put('/rentals/{rental}/status', [RentalController::class, 'updateStatus'])->name('rentals.updateStatus');
+
+    // Pembayaran
+
+    Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayarans.index');
+
+    Route::get('/pembayaran/data', [PembayaranController::class, 'data'])->name('pembayarans.data');
+
+    Route::get('/pembayaran/{pembayaran}/detail', [PembayaranController::class, 'detail'])->name('pembayarans.detail');
+
+    Route::put('/pembayaran/{pembayaran}/status', [PembayaranController::class, 'updateStatus'])->name('pembayarans.updateStatus');
+});
+
+// USERS
+// Admin saja — kelola identitas dan role; satu-satunya jalur eskalasi hak.
+
+Route::resource('users', UserController::class)
     ->except(['create', 'edit', 'show'])
-    ->middleware('adminstaff');
-
-
-Route::middleware('adminstaff')->group(function () {
-
-    Route::get(
-        '/users/data',
-        [UserController::class, 'data']
-    )->name('users.data');
-
-    Route::get(
-        '/users/{user}/detail',
-        [UserController::class, 'detail']
-    )->name('users.detail');
-
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| PENGEMBALIAN & PEMERIKSAAN
-|--------------------------------------------------------------------------
-| Admin dan Staff
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware('adminstaff')->group(function () {
-
-    Route::resource(
-        'pengembalian',
-        PengembalianController::class
-    )->only(['index']);
-
-
-    Route::resource(
-        'pemeriksaan-kendaraan',
-        PemeriksaanKendaraanController::class
-    )->only(['index']);
-
-
-    Route::get(
-        '/pemeriksaan-kendaraan/data',
-        [PemeriksaanKendaraanController::class, 'data']
-    )->name('pemeriksaan-kendaraan.data');
-
-
-    Route::post(
-        '/pemeriksaan-kendaraan',
-        [PemeriksaanKendaraanController::class, 'store']
-    )->name('pemeriksaan-kendaraan.store');
-
-
-    Route::put(
-        '/pemeriksaan-kendaraan/{pemeriksaan}',
-        [PemeriksaanKendaraanController::class, 'update']
-    )->name('pemeriksaan-kendaraan.update');
-
-
-    Route::delete(
-        '/pemeriksaan-kendaraan/{pemeriksaan}',
-        [PemeriksaanKendaraanController::class, 'destroy']
-    )->name('pemeriksaan-kendaraan.destroy');
-
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| LAPORAN
-|--------------------------------------------------------------------------
-| Admin dan Staff
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware('adminstaff')->group(function () {
-
-    Route::get(
-        '/laporan',
-        [LaporanController::class, 'index']
-    )->name('laporan.index');
-
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| CUSTOMER RATING
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware(['auth', 'customer'])->group(function () {
-
-    Route::get(
-        '/customer/ratings/create/{rental}',
-        [CustomerRatingController::class, 'create']
-    )->name('customer.ratings.create');
-
-    Route::post(
-        '/customer/ratings/{rental}',
-        [CustomerRatingController::class, 'store']
-    )->name('customer.ratings.store');
-
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| ADMIN SETTINGS & RATING
-|--------------------------------------------------------------------------
-*/
+    ->middleware('admin');
 
 Route::middleware('admin')->group(function () {
+    Route::get('/users/data', [UserController::class, 'data'])->name('users.data');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Landing Settings
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/admin/landing-settings',
-        [LandingSettingController::class, 'index']
-    )->name('admin.landing-settings.index');
-
-    Route::put(
-        '/admin/landing-settings',
-        [LandingSettingController::class, 'update']
-    )->name('admin.landing-settings.update');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Rating
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/admin/ratings',
-        [AdminRatingController::class, 'index']
-    )->name('admin.ratings.index');
-
-    Route::get(
-        '/admin/ratings/data',
-        [AdminRatingController::class, 'data']
-    )->name('admin.ratings.data');
-
-    Route::delete(
-        '/admin/ratings/{rating}',
-        [AdminRatingController::class, 'destroy']
-    )->name('admin.ratings.destroy');
-
+    Route::get('/users/{user}/detail', [UserController::class, 'detail'])->name('users.detail');
 });
 
+// PENGEMBALIAN & PEMERIKSAAN
+// Admin dan Staff
 
-/*
-|--------------------------------------------------------------------------
-| AUTH
-|--------------------------------------------------------------------------
-*/
+Route::middleware('adminstaff')->group(function () {
+    // Menu Pengembalian
 
-require __DIR__.'/auth.php';
+    Route::resource('pengembalian', PengembalianController::class)->only(['index']);
+
+    // Detail rental pada menu Pengembalian
+
+    Route::get('/pengembalian/{rental}/detail', [PengembalianController::class, 'detail'])->name('pengembalian.detail');
+
+    Route::put('/pengembalian/{rental}/verifikasi', [PengembalianController::class, 'verifikasi'])->name('pengembalian.verifikasi');
+
+    // Menu Pemeriksaan Kendaraan
+
+    Route::resource('pemeriksaan-kendaraan', PemeriksaanKendaraanController::class)->only(['index']);
+
+    Route::get('/pemeriksaan-kendaraan/data', [PemeriksaanKendaraanController::class, 'data'])->name('pemeriksaan-kendaraan.data');
+
+    Route::post('/pemeriksaan-kendaraan', [PemeriksaanKendaraanController::class, 'store'])->name('pemeriksaan-kendaraan.store');
+
+    Route::put('/pemeriksaan-kendaraan/{pemeriksaan}', [PemeriksaanKendaraanController::class, 'update'])->name('pemeriksaan-kendaraan.update');
+
+    Route::delete('/pemeriksaan-kendaraan/{pemeriksaan}', [PemeriksaanKendaraanController::class, 'destroy'])->name('pemeriksaan-kendaraan.destroy');
+});
+
+// LAPORAN
+// Admin dan Staff
+
+Route::middleware('adminstaff')->group(function () {
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+});
+
+// CUSTOMER RATING
+
+Route::middleware(['auth', 'customer'])->group(function () {
+    Route::post('/customer/ratings/{rental}', [CustomerRatingController::class, 'store'])->name('customer.ratings.store');
+});
+
+// ADMIN SETTINGS & RATING
+
+Route::middleware('admin')->group(function () {
+    // Landing Settings
+
+    Route::get('/admin/landing-settings', [LandingSettingController::class, 'index'])->name('admin.landing-settings.index');
+
+    Route::put('/admin/landing-settings', [LandingSettingController::class, 'update'])->name('admin.landing-settings.update');
+
+    // Rating
+
+    Route::get('/admin/ratings', [AdminRatingController::class, 'index'])->name('admin.ratings.index');
+
+    Route::get('/admin/ratings/data', [AdminRatingController::class, 'data'])->name('admin.ratings.data');
+
+    Route::delete('/admin/ratings/{rating}', [AdminRatingController::class, 'destroy'])->name('admin.ratings.destroy');
+});
+
+// route OTP
+
+Route::middleware('auth')->group(function () {
+    Route::get('/otp', [OtpController::class, 'show'])->name('otp.show');
+
+    // Bucket route hanya meredam burst; cap 5 salah per user tetap penjaga utama.
+    Route::post('/otp', [OtpController::class, 'verify'])
+        ->middleware('throttle:10,1,otp-verify')
+        ->name('otp.verify');
+
+    Route::post('/otp/resend', [OtpController::class, 'resend'])
+        ->middleware('throttle:3,1,otp-resend')
+        ->name('otp.resend');
+});
+
+// AUTH
+
+require __DIR__ . '/auth.php';

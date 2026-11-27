@@ -87,11 +87,32 @@
         }
 
         .status-selesai {
-            background: #cff4fc;
-            color: #055160;
+            background: #d1e7dd;
+            color: #0f5132;
         }
 
+        .proof-image {
+            width: 120px;
+            height: 84px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #E5E7EB;
+            cursor: zoom-in;
+        }
+.status-berjalan {
+    background: #cfe2ff;
+    color: #084298;
+}
         /* Sidebar layout base styles are in admin-sidebar.blade.php */
+
+        .pager-bar{background:#fff;border:1px solid #edf0ee;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,0.05);padding:12px 16px;font-size:14px}
+        .pager-bar .text-secondary{font-size:14px;font-weight:500}.pager-select{width:auto;border-radius:10px;font-size:13px;height:34px;padding:6px 28px 6px 10px}
+        .pager-jump{width:72px;border-radius:10px;text-align:center;font-size:13px;height:34px;padding:6px 8px}
+        .pager-btn{border:1px solid #dee2e6;border-radius:10px;color:#1f2937;font-weight:600;background:#fff;font-size:13px;height:34px;display:inline-flex;align-items:center;padding:6px 12px}
+        .pager-btn:hover{border-color:#198754;color:#198754;background:#f5f7f6}
+        .pager-btn.disabled{opacity:0.4;pointer-events:none}
+        .pager-next{background:#198754;border-color:#198754;color:#fff}
+        .pager-next:hover{background:#146c43;border-color:#146c43;color:#fff}
 
         .page-content {
             padding: 24px;
@@ -208,6 +229,33 @@
 
                 </table>
 
+                <div class="pager-bar mt-3 d-flex flex-wrap align-items-center justify-content-between gap-3" id="rentals-pager">
+                    <div class="text-secondary small" id="rentals-info">
+                        Menampilkan 0–0 dari 0 data
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <select id="rentals-len" class="form-select form-select-sm pager-select" aria-label="Jumlah per halaman">
+                            <option value="10">10 / halaman</option>
+                            <option value="20">20 / halaman</option>
+                            <option value="50">50 / halaman</option>
+                            <option value="100">100 / halaman</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                        <input type="number" id="rentals-custom" class="form-control form-control-sm pager-jump" min="1" max="500" value="10" aria-label="Jumlah custom per halaman">
+                        <span class="text-secondary" id="rentals-page">Halaman 1 / 1</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-sm pager-btn" id="rentals-first">First</button>
+                        <button type="button" class="btn btn-sm pager-btn" id="rentals-prev" aria-label="Halaman sebelumnya">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm pager-btn pager-next" id="rentals-next" aria-label="Halaman berikutnya">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm pager-btn" id="rentals-last">Last</button>
+                    </div>
+                </div>
+
             </div>
 
         </div>
@@ -320,6 +368,47 @@
 
                         <div class="col-12">
                             <div class="border rounded-3 p-3">
+                                <small class="text-muted fw-bold text-uppercase">Pembayaran</small>
+
+                                <div id="rd-pembayaran-empty" class="text-muted small mt-2">
+                                    Belum ada pembayaran.
+                                </div>
+
+                                <div id="rd-pembayaran-content" class="d-none">
+                                    <div class="row g-2 mt-1">
+                                        <div class="col-sm-6">
+                                            <small class="text-muted d-block">Metode</small>
+                                            <span class="fw-semibold" id="rd-pembayaran-metode">-</span>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <small class="text-muted d-block">Tanggal Bayar</small>
+                                            <span class="fw-semibold" id="rd-pembayaran-tanggal">-</span>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <small class="text-muted d-block">Jumlah</small>
+                                            <span class="fw-semibold" id="rd-pembayaran-jumlah">-</span>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <small class="text-muted d-block">Status</small>
+                                            <div id="rd-pembayaran-status">-</div>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <small class="text-muted d-block">Bukti Transfer</small>
+                                            <div id="rd-pembayaran-bukti" class="mt-1">
+                                                <span class="text-muted small">Tidak ada</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="border rounded-3 p-3">
                                 <small class="text-muted fw-bold text-uppercase">Catatan</small>
                                 <p class="mb-0" id="rd-catatan">-</p>
                             </div>
@@ -329,6 +418,25 @@
 
                 </div>
 
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="modal fade" id="buktiPembayaranRentalModal" tabindex="-1"
+    aria-labelledby="buktiPembayaranRentalLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            @include('layouts.partials.modal-head', ['title' => 'Bukti Pembayaran', 'icon' => 'bi-image', 'titleId' => 'buktiPembayaranRentalLabel'])
+
+            <div class="modal-body p-3 text-center">
+                <img id="buktiPembayaranRentalImg" src="" class="img-fluid rounded" alt="Bukti pembayaran">
             </div>
 
         </div>
@@ -350,51 +458,138 @@
 <script>
     const CSRF_TOKEN = '{{ csrf_token() }}';
 
-    function updateRentalStatus(id, status) {
-        const confirmTexts = {
-            'Disetujui': 'Setujui pengajuan rental ini?',
-            'Ditolak': 'Tolak pengajuan rental ini?',
-            'Selesai': 'Selesaikan rental ini?',
+    // Mencegah HTML/script dari input pelanggan (mis. catatan) ikut tereksekusi di popup
+    function escapeHtml(str) {
+        return $('<div>').text(str == null ? '' : str).html();
+    }
+
+    // Susun isi popup konfirmasi dari detail pesanan rental
+    function buildRentalConfirmHtml(d, status) {
+        const row = function(label, value) {
+            return '<div class="d-flex justify-content-between py-1 border-bottom">' +
+                '<span class="text-muted">' + label + '</span>' +
+                '<span class="fw-semibold text-end ms-3">' + value + '</span>' +
+                '</div>';
         };
-        const text = confirmTexts[status] || 'Ubah status rental ini?';
 
+        const pesan = {
+            'Disetujui': 'Pastikan data di bawah sudah benar sebelum <b>menyetujui</b> pengajuan ini.',
+            'Ditolak': 'Periksa data di bawah sebelum <b>menolak</b> pengajuan ini.',
+            'Berjalan': 'Pastikan mobil sudah diserahkan kepada pelanggan sebelum <b>memulai rental</b>.',
+            'Selesai': 'Periksa data di bawah sebelum <b>menyelesaikan</b> rental ini.',
+        }[status] || 'Periksa data pengajuan berikut.';
+
+        return '' +
+            '<div class="text-start" style="font-size:14px;">' +
+                '<p class="mb-3">' + pesan + '</p>' +
+
+                (d.mobil_image
+                    ? '<div class="text-center mb-3"><img src="' + escapeHtml(d.mobil_image) + '" ' +
+                      'style="width:140px;height:90px;object-fit:cover;border-radius:12px;"></div>'
+                    : '') +
+
+                row('Pelanggan', escapeHtml(d.pelanggan)) +
+                row('Email', escapeHtml(d.email)) +
+                row('Mobil', escapeHtml(d.mobil)) +
+                row('Plat Nomor', escapeHtml(d.plat)) +
+                row('Tanggal Sewa', escapeHtml(d.tanggal_mulai) + ' s/d ' + escapeHtml(d.tanggal_selesai)) +
+                row('Lama Sewa', escapeHtml(d.jumlah_hari) + ' hari') +
+                row('Cabang Ambil', escapeHtml(d.cabang_ambil)) +
+                row('Cabang Kembali', escapeHtml(d.cabang_kembali)) +
+                row('Harga / Hari', formatRupiah(d.harga_perhari)) +
+                row('Subtotal', formatRupiah(d.subtotal)) +
+                row('Deposit', formatRupiah(d.deposit)) +
+                row('Total', '<span class="text-success">' + formatRupiah(d.total_harga) + '</span>') +
+                row('Status Saat Ini', statusBadge(d.status)) +
+
+                '<div class="mt-3">' +
+                    '<span class="text-muted">Catatan pelanggan</span>' +
+                    '<div class="border rounded-3 p-2 mt-1">' + escapeHtml(d.catatan || '-') + '</div>' +
+                '</div>' +
+            '</div>';
+    }
+
+    function updateRentalStatus(id, status) {
+      const titles = {
+    'Disetujui': 'Setujui Pengajuan Rental?',
+    'Ditolak': 'Tolak Pengajuan Rental?',
+    'Berjalan': 'Mulai Rental?',
+    'Selesai': 'Selesaikan Rental?',
+};
+
+const confirmColors = {
+    'Disetujui': '#198754',
+    'Ditolak': '#dc3545',
+    'Berjalan': '#0d6efd',
+    'Selesai': '#0dcaf0',
+};
+
+        // 1. Ambil detail pesanan dulu
         Swal.fire({
-            title: 'Konfirmasi',
-            text: text,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya',
-            cancelButtonText: 'Batal',
-        }).then(function(result) {
-            if (!result.isConfirmed) return;
+            title: 'Memuat detail...',
+            allowOutsideClick: false,
+            didOpen: function() { Swal.showLoading(); },
+        });
 
-            $.ajax({
-                url: "{{ route('rentals.updateStatus', '__ID__') }}".replace('__ID__', id),
-                method: 'PUT',
-                headers: {
-                    'X-CSRF-TOKEN': CSRF_TOKEN,
-                    'Accept': 'application/json',
-                },
-                data: {
-                    status: status
-                },
-                success: function(res) {
-                    $('#rentals-table').DataTable().ajax.reload();
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil',
-                        text: res.message || 'Terjadi kesalahan',
+        $.ajax({
+            url: "{{ route('rentals.detail', '__ID__') }}".replace('__ID__', id),
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            success: function(d) {
+
+                // 2. Tampilkan detail + konfirmasi
+                Swal.fire({
+                    title: titles[status] || 'Ubah Status Rental?',
+                    html: buildRentalConfirmHtml(d, status),
+                    icon: status === 'Ditolak' ? 'warning' : 'question',
+                    width: 520,
+                    showCancelButton: true,
+confirmButtonText: 'Ya, ' + ({
+    'Disetujui': 'Setujui',
+    'Ditolak': 'Tolak',
+    'Berjalan': 'Mulai Rental',
+    'Selesai': 'Selesaikan',
+}[status] || 'Ubah Status'),                    cancelButtonText: 'Batal',
+                    confirmButtonColor: confirmColors[status] || '#198754',
+                    reverseButtons: true,
+                }).then(function(result) {
+                    if (!result.isConfirmed) return;
+
+                    // 3. Kirim perubahan status
+                    $.ajax({
+                        url: "{{ route('rentals.updateStatus', '__ID__') }}".replace('__ID__', id),
+                        method: 'PUT',
+                        headers: {
+                            'X-CSRF-TOKEN': CSRF_TOKEN,
+                            'Accept': 'application/json',
+                        },
+                        data: { status: status },
+                        success: function(res) {
+                            $('#rentals-table').DataTable().ajax.reload(null, false);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: res.message || 'Status rental berhasil diperbarui',
+                            });
+                        },
+                        error: function(xhr) {
+                            const res = xhr.responseJSON || {};
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: res.message || 'Terjadi kesalahan',
+                            });
+                        },
                     });
-                },
-                error: function(xhr) {
-                    const res = xhr.responseJSON || {};
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal',
-                        text: res.message || 'Terjadi kesalahan',
-                    });
-                },
-            });
+                });
+            },
+            error: function(xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal memuat detail',
+                    text: 'Tidak dapat mengambil detail rental: ' + xhr.status + ' ' + xhr.statusText,
+                });
+            },
         });
     }
 
@@ -402,48 +597,58 @@
             return 'Rp ' + Number(value).toLocaleString('id-ID');
         }
 
-        function statusBadge(status) {
-            const map = {
-                'Menunggu': 'status-menunggu',
-                'Disetujui': 'status-disetujui',
-                'Ditolak': 'status-ditolak',
-                'Selesai': 'status-selesai',
-            };
+       function statusBadge(status) {
+    const map = {
+        'Menunggu': 'status-menunggu',
+        'Disetujui': 'status-disetujui',
+        'Berjalan': 'status-berjalan',
+        'Ditolak': 'status-ditolak',
+        'Selesai': 'status-selesai',
+    };
 
-            const cls = map[status] || 'bg-secondary text-white';
+    const cls = map[status] || 'bg-secondary text-white';
 
-            return '<span class="status ' + cls + '">' + status + '</span>';
-        }
+    return '<span class="status ' + cls + '">' + status + '</span>';
+}
+       function rentalActions(data) {
+    let html = '<div class="d-flex gap-2 justify-content-end">';
 
-        function rentalActions(data) {
-            let html = '<div class="d-flex gap-2 justify-content-end">';
+    html += '<button class="btn p-1 text-primary" style="border:none;background:none;" title="Detail" ' +
+        'onclick="openRentalDetail(' + data.id + ')">' +
+        '<i class="bi bi-eye"></i></button>';
 
-            html += '<button class="btn p-1 text-primary" style="border:none;background:none;" title="Detail" ' +
-                'onclick="openRentalDetail(' + data.id + ')">' +
-                '<i class="bi bi-eye"></i></button>';
+    if (data.status === 'Menunggu') {
+        html += '<button type="button" class="btn p-1 text-success" style="border:none;background:none;" title="Setujui" ' +
+            'onclick="updateRentalStatus(' + data.id + ', \'Disetujui\')">' +
+            '<i class="bi bi-check-circle"></i></button>';
 
-            if (data.status === 'Menunggu') {
-                html += '<button type="button" class="btn p-1 text-success" style="border:none;background:none;" title="Setujui" ' +
-                    'onclick="updateRentalStatus(' + data.id + ', \'Disetujui\')">' +
-                    '<i class="bi bi-check-circle"></i></button>';
-                html += '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" title="Tolak" ' +
-                    'onclick="updateRentalStatus(' + data.id + ', \'Ditolak\')">' +
-                    '<i class="bi bi-x-circle"></i></button>';
-            } else if (data.status === 'Disetujui') {
-                html += '<button type="button" class="btn p-1 text-info" style="border:none;background:none;" title="Selesaikan" ' +
-                    'onclick="updateRentalStatus(' + data.id + ', \'Selesai\')">' +
-                    '<i class="bi bi-check-circle"></i></button>';
-            }
+        html += '<button type="button" class="btn p-1 text-danger" style="border:none;background:none;" title="Tolak" ' +
+            'onclick="updateRentalStatus(' + data.id + ', \'Ditolak\')">' +
+            '<i class="bi bi-x-circle"></i></button>';
 
-            html += '</div>';
-            return html;
-        }
+    } else if (data.status === 'Disetujui') {
+        html += '<button type="button" class="btn p-1 text-primary" style="border:none;background:none;" title="Mulai Rental" ' +
+            'onclick="updateRentalStatus(' + data.id + ', \'Berjalan\')">' +
+            '<i class="bi bi-play-circle-fill"></i></button>';
+
+    } else if (data.status === 'Berjalan') {
+        html += '<button type="button" class="btn p-1 text-success" style="border:none;background:none;" title="Selesaikan Rental" ' +
+            'onclick="updateRentalStatus(' + data.id + ', \'Selesai\')">' +
+            '<i class="bi bi-check-circle-fill"></i></button>';
+    }
+
+    html += '</div>';
+    return html;
+}
 
         $(document).ready(function() {
 
             $('#rentals-table').DataTable({
                 processing: true,
                 serverSide: true,
+                paging: false,
+                info: false,
+                dom: 'frt',
                 ajax: {
                     url: "{{ route('rentals.data') }}",
                     type: 'GET',
@@ -541,6 +746,31 @@
                 },
             });
 
+            var rentalsTable = $('#rentals-table').DataTable();
+
+            function renderRentalsPager() {
+                var info = rentalsTable.page.info();
+                var total=info.recordsDisplay; var start=total?info.start+1:0;
+                $('#rentals-info').text('Menampilkan '+start+'–'+info.end+' dari '+total+' data');
+                var pages = info.pages || 1;
+                var page = info.page + 1;
+                $('#rentals-page').text('Halaman '+(pages?info.page+1:0)+' / '+pages);
+                $('#rentals-first').toggleClass('disabled', page <= 1);
+                $('#rentals-prev').toggleClass('disabled', page <= 1);
+                $('#rentals-next').toggleClass('disabled', page >= pages);
+                $('#rentals-last').toggleClass('disabled', page >= pages);
+            }
+
+            rentalsTable.on('draw.dt', renderRentalsPager);
+            renderRentalsPager();
+
+            $('#rentals-first').on('click', function() { rentalsTable.page('first').draw('page'); });
+            $('#rentals-prev').on('click', function() { rentalsTable.page('previous').draw('page'); });
+            $('#rentals-next').on('click', function() { rentalsTable.page('next').draw('page'); });
+            $('#rentals-last').on('click', function() { rentalsTable.page('last').draw('page'); });
+            $('#rentals-len').on('change', function() { if ($(this).val() === 'custom') { $('#rentals-custom').focus(); return; } var n = Number($(this).val()); $('#rentals-custom').val(n); rentalsTable.page.len(n).draw(); });
+            $('#rentals-custom').on('change', function() { var n = parseInt($(this).val(), 10) || 1; n = Math.min(Math.max(n, 1), 500); $(this).val(n); if (['10','20','50','100'].indexOf(String(n)) !== -1) { $('#rentals-len').val(String(n)); } else { $('#rentals-len').val('custom'); } rentalsTable.page.len(n).draw(); });
+
         });
 
         function openRentalDetail(id) {
@@ -554,6 +784,9 @@
             $loading.removeClass('d-none');
             $error.addClass('d-none');
             $content.addClass('d-none');
+            $('#rd-pembayaran-empty').removeClass('d-none');
+            $('#rd-pembayaran-content').addClass('d-none');
+            $('#rd-pembayaran-bukti').empty();
 
             $modal.show();
 
@@ -581,6 +814,35 @@
                     $('#rd-total').text(formatRupiah(data.total_harga));
                     $('#rd-status').html(statusBadge(data.status));
                     $('#rd-catatan').text(data.catatan || '-');
+
+                    var pembayaran = data.pembayaran;
+
+                    if (pembayaran) {
+                        $('#rd-pembayaran-empty').addClass('d-none');
+                        $('#rd-pembayaran-content').removeClass('d-none');
+                        $('#rd-pembayaran-metode').text(pembayaran.metode || '-');
+                        $('#rd-pembayaran-tanggal').text(pembayaran.tanggal_bayar || '-');
+                        $('#rd-pembayaran-jumlah').text(formatRupiah(pembayaran.jumlah || 0));
+                        $('#rd-pembayaran-status').html(statusBadge(pembayaran.status));
+
+                        var $bukti = $('#rd-pembayaran-bukti').empty();
+
+                        if (pembayaran.bukti_url) {
+                            $('<img>')
+                                .attr({ src: pembayaran.bukti_url, alt: 'Bukti pembayaran' })
+                                .addClass('proof-image')
+                                .on('click', function() {
+                                    $('#buktiPembayaranRentalImg').attr('src', this.src);
+                                    bootstrap.Modal.getOrCreateInstance($('#buktiPembayaranRentalModal')[0]).show();
+                                })
+                                .appendTo($bukti);
+                        } else {
+                            $bukti.html('<span class="text-muted small">Tidak ada</span>');
+                        }
+                    } else {
+                        $('#rd-pembayaran-empty').removeClass('d-none');
+                        $('#rd-pembayaran-content').addClass('d-none');
+                    }
 
                     $loading.addClass('d-none');
                     $content.removeClass('d-none');

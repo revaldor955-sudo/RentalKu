@@ -20,13 +20,16 @@
         <div class="collapse navbar-collapse" id="customerNav">
             <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center">
                 <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="{{ route('customer.dashboard') }}#mobil">Cari Mobil</a>
+                    <a class="nav-link fw-semibold{{ request()->routeIs('customer.dashboard') && !request()->has('tab') ? ' active' : '' }}" href="{{ route('customer.dashboard') }}#mobil" data-nav="mobil">Cari Mobil</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="{{ route('customer.dashboard') }}#rental-saya">Rental Saya</a>
+                    <a class="nav-link fw-semibold" href="{{ route('customer.dashboard') }}#rental-saya" data-nav="rental-saya">Rental Saya</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link fw-semibold" href="{{ route('customer.kompensasi.index') }}">Kompensasi</a>
+                    <a class="nav-link fw-semibold{{ request()->routeIs('customer.riwayat') ? ' active' : '' }}" href="{{ route('customer.riwayat') }}" @if(request()->routeIs('customer.riwayat')) aria-current="page" @endif>Riwayat Rental</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold{{ request()->routeIs('customer.kompensasi.*') ? ' active' : '' }}" href="{{ route('customer.kompensasi.index') }}" @if(request()->routeIs('customer.kompensasi.*')) aria-current="page" @endif>Kompensasi</a>
                 </li>
             </ul>
 
@@ -58,20 +61,12 @@
                             </div>
                         </li>
                         <li>
-                            <button class="dropdown-item rounded-2 py-2 d-flex align-items-center" type="button" data-bs-toggle="modal" data-bs-target="#profileModal" data-mode="edit">
+                            <button class="dropdown-item rounded-2 py-2 d-flex align-items-center" type="button" data-bs-toggle="modal" data-bs-target="#profileModal">
                                 <i class="bi bi-person-badge me-3 text-secondary"></i>
-                                Edit Profile
+                                Profile
                             </button>
                         </li>
-@unless(request()->routeIs('customer.riwayat'))
-                        <li>
-                            <a class="dropdown-item rounded-2 py-2" href="{{ route('customer.riwayat') }}">
-                                <i class="bi bi-clock-history me-3 text-primary"></i>
-                                Riwayat Rental
-                            </a>
-                        </li>
                         <li><hr class="dropdown-divider"></li>
-@endunless
                         <li>
                             <form action="{{ route('logout') }}" method="POST" class="m-0">
                                 @csrf
@@ -141,6 +136,38 @@
     .navbar-nav .nav-link.active::after {
         width: 60%;
         left: 20%;
+    }
+
+    .user-box.dropdown-toggle:hover,
+    .user-box.dropdown-toggle:focus {
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .user-box.dropdown-toggle:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+    .dropdown-item {
+        font-size: 14px;
+        padding: 10px 16px;
+        color: #1f2937;
+        transition: all 0.15s ease;
+    }
+
+    .dropdown-item:hover,
+    .dropdown-item:focus,
+    .dropdown-item:active {
+        background: #f5f7f6;
+        color: #198754;
+    }
+
+    .dropdown-item.text-danger:hover,
+    .dropdown-item.text-danger:focus,
+    .dropdown-item.text-danger:active {
+        background: #fee;
+        color: #dc3545;
     }
 
     /* Mobile bottom tab navigation */
@@ -268,20 +295,32 @@
         if (dd) dd.hide();
     }, { passive: true });
 
-    // Sync bottom tab active state
-    var tabs = document.querySelectorAll('.customer-bottom-tabs [data-tab]');
-    if(!tabs.length) return;
+    // Sync active state (bottom tabs + top nav) ikut hash dashboard.
+    // Tanpa hash: default ke Cari hanya di dashboard; di halaman lain
+    // (riwayat/kompensasi) biarkan active server-side apa adanya.
+    var navLinks = document.querySelectorAll('.customer-bottom-tabs [data-tab], #customerNavbar [data-nav]');
+    if(!navLinks.length) return;
+    function navKey(a){
+        return a.getAttribute('data-tab') || a.getAttribute('data-nav');
+    }
     function syncTabs(){
         var h = location.hash.replace('#','');
-        tabs.forEach(function(a){
-            var isActive = h === a.getAttribute('data-tab');
-            a.classList.toggle('active', isActive);
-            if(isActive) a.setAttribute('aria-current','page');
-            else if(a.hasAttribute('data-tab')) a.removeAttribute('aria-current');
-        });
-        if(!h && location.pathname.includes('dashboard')){
-            var first = document.querySelector('.customer-bottom-tabs [data-tab="mobil"]');
-            if(first) { first.classList.add('active'); first.setAttribute('aria-current','page'); }
+        if(h){
+            navLinks.forEach(function(a){
+                var isActive = h === navKey(a);
+                a.classList.toggle('active', isActive);
+                if(isActive) a.setAttribute('aria-current','page');
+                else a.removeAttribute('aria-current');
+            });
+            return;
+        }
+        if(location.pathname.includes('dashboard')){
+            navLinks.forEach(function(a){
+                var isActive = navKey(a) === 'mobil';
+                a.classList.toggle('active', isActive);
+                if(isActive) a.setAttribute('aria-current','page');
+                else a.removeAttribute('aria-current');
+            });
         }
     }
     window.addEventListener('hashchange', syncTabs);

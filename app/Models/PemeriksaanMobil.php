@@ -27,13 +27,19 @@ class PemeriksaanMobil extends Model
         return $this->belongsTo(Mobil::class, 'mobil_id');
     }
 
-    public function kerusakan()
-    {
-        return $this->belongsToMany(
-            KerusakanMobil::class,
-            'pemeriksaan_kerusakans',
-            'pemeriksaan_id',
-            'kerusakan_id'
-        )->withPivot('keterangan');
-    }
+   
+public function kerusakan()
+{
+    return $this->belongsToMany(
+        \App\Models\KerusakanMobil::class,
+        'pemeriksaan_kerusakans',
+        'pemeriksaan_id',
+        'kerusakan_id'
+    )->withPivot([
+        'keterangan',
+        'foto_bukti',
+        'catatan',
+    ])->withTimestamps();
+}
+
 }
