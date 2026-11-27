@@ -566,7 +566,7 @@
                                                 Riwayat Lokasi
                                             </a>
 
-                                            <form
+                                            {{-- <form
                                                 action="{{ route('pelacakan-gps.hapus', $rental->id) }}"
                                                 method="POST"
                                                 class="form-hapus-gps">
@@ -579,7 +579,7 @@
                                                     <i class="bi bi-trash3"></i>
                                                     Hapus
                                                 </button>
-                                            </form>
+                                            </form> --}}
 
                                         </div>
 
