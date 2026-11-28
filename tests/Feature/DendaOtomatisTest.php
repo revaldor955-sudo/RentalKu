@@ -70,8 +70,6 @@ class DendaOtomatisTest extends TestCase
         return Rental::create([
             'user_id' => $this->customer->id,
             'mobil_id' => $this->mobil->id,
-            'cabang_ambil_id' => $this->cabang->id,
-            'cabang_kembali_id' => $this->cabang->id,
             'tanggal_mulai' => Carbon::parse($tanggalSelesai)->subDays(2)->toDateString(),
             'tanggal_selesai' => $tanggalSelesai,
             'jumlah_hari' => 2,
