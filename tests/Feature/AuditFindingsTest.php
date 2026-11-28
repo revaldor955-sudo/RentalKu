@@ -76,8 +76,6 @@ class AuditFindingsTest extends TestCase
         return Rental::create([
             'user_id' => $user->id,
             'mobil_id' => $this->mobil->id,
-            'cabang_ambil_id' => $this->cabang->id,
-            'cabang_kembali_id' => $this->cabang->id,
             'tanggal_mulai' => now()->subDays(3)->toDateString(),
             'tanggal_selesai' => now()->subDay()->toDateString(),
             'jumlah_hari' => 2,
@@ -330,8 +328,6 @@ class AuditFindingsTest extends TestCase
         $this->actingAs($this->customer)->post("/customer/rental/{$this->mobil->slug}", [
             'tanggal_mulai' => now()->addDay()->toDateString(),
             'tanggal_selesai' => now()->addDays(3)->toDateString(),
-            'cabang_ambil_id' => $this->cabang->id,
-            'cabang_kembali_id' => $this->cabang->id,
             'status' => 'Selesai',
             'total_harga' => 1,
         ])->assertRedirect();
@@ -340,7 +336,7 @@ class AuditFindingsTest extends TestCase
         $this->assertEquals('Menunggu', $rental->status);
         $this->assertNotEquals(1, (int) $rental->total_harga);
         $this->assertEquals($this->customer->id, $rental->user_id);
-        $this->assertEquals($this->cabang->id, $rental->cabang_ambil_id);
+        $this->assertEquals($this->cabang->id, $rental->mobil->cabang_id);
     }
 
     public function test_admin_tolak_customer_id_bukan_customer(): void

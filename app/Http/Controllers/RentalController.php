@@ -44,8 +44,6 @@ class RentalController extends Controller
                 'supir_id' => ['nullable', 'exists:supirs,id'],
                 'kode_promo' => ['nullable', 'string', 'max:50'],
                 'catatan' => ['nullable', 'string', 'max:500'],
-                'cabang_ambil_id' => ['required', 'exists:cabangs,id'],
-                'cabang_kembali_id' => ['required', 'exists:cabangs,id'],
             ],
             [
                 'tanggal_mulai.required' => 'Tanggal mulai wajib diisi.',
@@ -54,10 +52,6 @@ class RentalController extends Controller
                 'tanggal_selesai.after' => 'Tanggal selesai harus setelah tanggal mulai.',
                 'supir_id.exists' => 'Supir yang dipilih tidak tersedia.',
                 'catatan.max' => 'Catatan maksimal 500 karakter.',
-                'cabang_ambil_id.required' => 'Cabang ambil wajib dipilih.',
-                'cabang_ambil_id.exists' => 'Cabang ambil tidak valid.',
-                'cabang_kembali_id.required' => 'Cabang kembali wajib dipilih.',
-                'cabang_kembali_id.exists' => 'Cabang kembali tidak valid.',
             ],
         );
 
@@ -189,8 +183,6 @@ class RentalController extends Controller
             $rental = Rental::create([
                 'user_id' => auth()->id(),
                 'mobil_id' => $mobil->id,
-                'cabang_ambil_id' => $validated['cabang_ambil_id'],
-                'cabang_kembali_id' => $validated['cabang_kembali_id'],
                 'tanggal_mulai' => $tanggalMulai->format('Y-m-d'),
                 'tanggal_selesai' => $tanggalSelesai->format('Y-m-d'),
                 'jumlah_hari' => $jumlahHari,
@@ -292,8 +284,6 @@ class RentalController extends Controller
                 'supir_id' => ['nullable', 'exists:supirs,id'],
                 'kode_promo' => ['nullable', 'string', 'max:50'],
                 'catatan' => ['nullable', 'string', 'max:500'],
-                'cabang_ambil_id' => ['required', 'exists:cabangs,id'],
-                'cabang_kembali_id' => ['required', 'exists:cabangs,id'],
             ],
             [
                 'tanggal_mulai.required' => 'Tanggal mulai wajib diisi.',
@@ -302,10 +292,6 @@ class RentalController extends Controller
                 'tanggal_selesai.after' => 'Tanggal selesai harus setelah tanggal mulai.',
                 'supir_id.exists' => 'Supir yang dipilih tidak tersedia.',
                 'catatan.max' => 'Catatan maksimal 500 karakter.',
-                'cabang_ambil_id.required' => 'Cabang ambil wajib dipilih.',
-                'cabang_ambil_id.exists' => 'Cabang ambil tidak valid.',
-                'cabang_kembali_id.required' => 'Cabang kembali wajib dipilih.',
-                'cabang_kembali_id.exists' => 'Cabang kembali tidak valid.',
             ],
         );
 
@@ -391,8 +377,6 @@ class RentalController extends Controller
         session([
             'checkout_rental' => [
                 'mobil_id' => $mobil->id,
-                'cabang_ambil_id' => $validated['cabang_ambil_id'],
-                'cabang_kembali_id' => $validated['cabang_kembali_id'],
                 'tanggal_mulai' => $validated['tanggal_mulai'],
                 'tanggal_selesai' => $validated['tanggal_selesai'],
                 'jumlah_hari' => $jumlahHari,
@@ -468,15 +452,13 @@ class RentalController extends Controller
             $supir = Supir::find($checkout['supir_id']);
         }
 
-        $cabangAmbil = \App\Models\Cabang::find($checkout['cabang_ambil_id'] ?? null);
-        $cabangKembali = \App\Models\Cabang::find($checkout['cabang_kembali_id'] ?? null);
+        $cabang = $mobil->cabang;
 
         return view('customer.checkout', [
             'mobil' => $mobil,
             'checkout' => $checkout,
             'supir' => $supir,
-            'cabangAmbil' => $cabangAmbil,
-            'cabangKembali' => $cabangKembali,
+            'cabang' => $cabang,
             'jumlahHari' => $checkout['jumlah_hari'] ?? 0,
             'subtotalMobil' => $checkout['subtotal_mobil'] ?? 0,
             'subtotalSupir' => $checkout['subtotal_supir'] ?? 0,
@@ -516,8 +498,6 @@ class RentalController extends Controller
             'supir_id' => $checkout['supir_id'] ?? null,
             'kode_promo' => $request->input('kode_promo', $checkout['kode_promo'] ?? null),
             'catatan' => $checkout['catatan'] ?? null,
-            'cabang_ambil_id' => $checkout['cabang_ambil_id'] ?? null,
-            'cabang_kembali_id' => $checkout['cabang_kembali_id'] ?? null,
         ]);
 
         $response = $this->store($request, $mobil);
@@ -697,7 +677,7 @@ class RentalController extends Controller
             );
         }
 
-        $rental->load(['user', 'mobil', 'cabangAmbil', 'cabangKembali', 'pembayaran.metodePembayaran', 'rating', 'supirs']);
+        $rental->load(['user', 'mobil.cabang', 'pembayaran.metodePembayaran', 'rating', 'supirs']);
 
         $supirs = $rental->supirs
             ->map(function ($supir) {
@@ -734,8 +714,7 @@ class RentalController extends Controller
             'jumlah_hari' => (int) ($rental->jumlah_hari ?? 0),
 
             // Informasi cabang
-            'cabang_ambil' => $rental->cabangAmbil->name ?? '-',
-            'cabang_kembali' => $rental->cabangKembali->name ?? '-',
+            'cabang' => $rental->mobil->cabang->name ?? '-',
 
             // Rincian biaya
             'harga_perhari' => (float) ($rental->harga_perhari ?? 0),

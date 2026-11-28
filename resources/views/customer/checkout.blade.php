@@ -46,16 +46,9 @@
                     </h5>
 
                     <div class="d-flex justify-content-between mb-2">
-                        <span>Cabang Pengambilan</span>
+                        <span>Cabang</span>
                         <strong class="text-end">
-                            {{ $cabangAmbil->name ?? '-' }}
-                        </strong>
-                    </div>
-
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Cabang Pengembalian</span>
-                        <strong class="text-end">
-                            {{ $cabangKembali->name ?? '-' }}
+                            {{ $cabang->name ?? '-' }}
                         </strong>
                     </div>
 
@@ -184,18 +177,6 @@
                                 type="hidden"
                                 name="supir_id"
                                 value="{{ $checkout['supir_id'] ?? '' }}"
-                            >
-
-                            <input
-                                type="hidden"
-                                name="cabang_ambil_id"
-                                value="{{ $checkout['cabang_ambil_id'] }}"
-                            >
-
-                            <input
-                                type="hidden"
-                                name="cabang_kembali_id"
-                                value="{{ $checkout['cabang_kembali_id'] }}"
                             >
 
                             <input

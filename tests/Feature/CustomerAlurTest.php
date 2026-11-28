@@ -68,8 +68,6 @@ class CustomerAlurTest extends TestCase
         return Rental::create([
             'user_id' => $this->customer->id,
             'mobil_id' => $this->mobil->id,
-            'cabang_ambil_id' => $this->cabangA->id,
-            'cabang_kembali_id' => $this->cabangA->id,
             'tanggal_mulai' => now()->subDays(3)->toDateString(),
             'tanggal_selesai' => now()->subDay()->toDateString(),
             'jumlah_hari' => 2,
@@ -279,8 +277,6 @@ class CustomerAlurTest extends TestCase
         $rental = Rental::create([
             'user_id' => $this->customer->id,
             'mobil_id' => $this->mobil->id,
-            'cabang_ambil_id' => $this->cabangA->id,
-            'cabang_kembali_id' => $this->cabangA->id,
             'tanggal_mulai' => now()->toDateString(),
             'tanggal_selesai' => now()->addDays(2)->toDateString(),
             'jumlah_hari' => 2,

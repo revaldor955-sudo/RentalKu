@@ -16,7 +16,7 @@ class DashboardController extends Controller
     public function riwayat()
     {
         $userId = auth()->id();
-        $rentals = Rental::with(['mobil', 'pembayaran', 'dendas', 'cabangAmbil', 'cabangKembali', 'rating'])
+        $rentals = Rental::with(['mobil', 'pembayaran', 'dendas', 'rating'])
             ->where('user_id', $userId)
             ->whereIn('status', ['Selesai', 'Ditolak'])
             ->latest()
@@ -60,7 +60,7 @@ class DashboardController extends Controller
         $dendaBelumLunas = Denda::with('rental.mobil')->belumLunas()->whereHas('rental', fn($q) => $q->where('user_id', $userId))->oldest()->get();
         $dendaTotal = $dendaBelumLunas->sum('nominal');
 
-        $rentals = Rental::with(['mobil', 'pembayaran', 'dendas', 'cabangAmbil', 'cabangKembali', 'rating'])
+        $rentals = Rental::with(['mobil', 'pembayaran', 'dendas', 'rating'])
             ->where('user_id', $userId)
             ->latest()
             ->get();

@@ -53,6 +53,36 @@ class DendaSeeder extends Seeder
                 'bukti_bayar' => 'bukti_denda/demo-denda-bayar-4.jpg',
                 'tanggal_bayar' => now()->subDays(26)->toDateString(),
             ],
+            [
+                'marker' => 'Demo: rental selesai triton',
+                'jenis' => 'keterlambatan',
+                'nominal' => 400000,
+                'status' => Denda::STATUS_BELUM_BAYAR,
+                'deskripsi' => 'Denda keterlambatan 2 hari.',
+                'foto_bukti' => null,
+                'bukti_bayar' => null,
+                'tanggal_bayar' => null,
+            ],
+            [
+                'marker' => 'Demo: rental selesai triton',
+                'jenis' => 'kerusakan',
+                'nominal' => 750000,
+                'status' => Denda::STATUS_MENUNGGU_VERIFIKASI,
+                'deskripsi' => 'Lecet bumper belakang, bukti transfer menunggu verifikasi.',
+                'foto_bukti' => 'images/dendas/demo-denda-5.jpg',
+                'bukti_bayar' => 'bukti_denda/demo-denda-bayar-5.jpg',
+                'tanggal_bayar' => now()->subDays(2)->toDateString(),
+            ],
+            [
+                'marker' => 'Demo: rental selesai triton',
+                'jenis' => 'kehilangan',
+                'nominal' => 1200000,
+                'status' => Denda::STATUS_LUNAS,
+                'deskripsi' => 'Kehilangan dongkrak dan kunci roda, sudah dibayar.',
+                'foto_bukti' => null,
+                'bukti_bayar' => 'bukti_denda/demo-denda-bayar-6.jpg',
+                'tanggal_bayar' => now()->subDays(21)->toDateString(),
+            ],
         ];
 
         $rentals = Rental::whereIn('catatan', array_column($rows, 'marker'))->get()->keyBy('catatan');
