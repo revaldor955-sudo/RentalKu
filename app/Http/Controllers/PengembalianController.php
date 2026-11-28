@@ -18,9 +18,7 @@ class PengembalianController extends Controller
     {
         $rental->load([
             'user',
-            'mobil',
-            'cabangAmbil',
-            'cabangKembali',
+            'mobil.cabang',
             'pembayaran',
             'supirs',
         ]);
@@ -46,8 +44,7 @@ class PengembalianController extends Controller
 
             'jumlah_hari' => $rental->jumlah_hari ?? 0,
 
-            'cabang_ambil' => $rental->cabangAmbil->name ?? '-',
-            'cabang_kembali' => $rental->cabangKembali->name ?? '-',
+            'cabang' => $rental->mobil->cabang->name ?? '-',
 
             'harga_perhari' => $rental->harga_perhari ?? 0,
             'subtotal' => $rental->subtotal ?? 0,
