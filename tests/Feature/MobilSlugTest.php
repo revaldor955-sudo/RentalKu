@@ -114,8 +114,6 @@ class MobilSlugTest extends TestCase
         $this->actingAs($this->customer)->post("/customer/rental/{$mobil->slug}", [
             'tanggal_mulai' => now()->addDay()->toDateString(),
             'tanggal_selesai' => now()->addDays(3)->toDateString(),
-            'cabang_ambil_id' => $this->cabang->id,
-            'cabang_kembali_id' => $this->cabang->id,
         ])->assertRedirect();
 
         $rental = Rental::latest('id')->firstOrFail();
