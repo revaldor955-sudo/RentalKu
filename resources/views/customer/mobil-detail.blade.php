@@ -654,44 +654,13 @@
 
         <div class="row g-3 text-start">
 
-        <div class="col-md-6">
-    <label class="form-label fw-semibold">Cabang Ambil</label>
+            <div class="col-12">
+                <label class="form-label fw-semibold">Cabang</label>
 
-    <select name="cabang_ambil_id" id="cabangAmbilSelect" class="form-select" required>
-        <option value="" disabled>Pilih cabang ambil</option>
-
-        @foreach($cabangs as $cabang)
-            <option
-                value="{{ $cabang->id }}"
-                @selected(old('cabang_ambil_id', $mobil->cabang_id) == $cabang->id)>
-                {{ $cabang->name }}
-            </option>
-        @endforeach
-    </select>
-</div>
-
-<div class="col-md-6">
-    <label class="form-label fw-semibold">Cabang Kembali</label>
-
-    <select id="cabangKembaliSelect" class="form-select" disabled>
-        @foreach($cabangs as $cabang)
-            <option value="{{ $cabang->id }}">
-                {{ $cabang->name }}
-            </option>
-        @endforeach
-    </select>
-
-    <input
-        type="hidden"
-        name="cabang_kembali_id"
-        id="cabangKembaliHidden"
-        value="{{ old('cabang_ambil_id', $mobil->cabang_id) }}"
-    >
-
-    {{-- <small class="text-muted">
-        Cabang pengembalian otomatis mengikuti cabang pengambilan.
-    </small> --}}
-</div>
+                <div class="form-control bg-light">
+                    {{ $mobil->cabang->name ?? '-' }}
+                </div>
+            </div>
 
             <div class="col-md-6">
                 <label class="form-label fw-semibold">Tanggal Mulai</label>
@@ -727,7 +696,6 @@
                     @foreach($supirs as $supir)
                         <option
                             value="{{ $supir->id }}"
-                            data-cabang-id="{{ $supir->cabang_id }}"
                             data-name="{{ $supir->name }}"
                             data-phone="{{ $supir->phone }}"
                             data-tarif="{{ number_format($supir->tarif_perhari, 0, ',', '.') }}"
@@ -863,33 +831,6 @@ function openSewaPopup() {
 
             $form.on('change', '#supirSelect', function() {
                 updateSupirProfile(this);
-            });
-
-          $form.on('change', 'select[name="cabang_ambil_id"]', function() {
-    var cabangId = this.value;
-
-    var kembali = $form.find('#cabangKembaliSelect');
-    var kembaliHidden = $form.find('#cabangKembaliHidden');
-
-    kembali.val(cabangId);
-    kembaliHidden.val(cabangId);
-
-    var supirSelect = $form.find('select[name="supir_id"]')[0];
-
-    if (supirSelect) {
-                    Array.from(supirSelect.options).forEach(function(option) {
-                        if (option.value === '') return;
-                        option.hidden = option.dataset.cabangId !== cabangId;
-                    });
-
-                    if (
-                        supirSelect.value &&
-                        supirSelect.options[supirSelect.selectedIndex].dataset.cabangId !== cabangId
-                    ) {
-                        supirSelect.value = '';
-                        updateSupirProfile(supirSelect);
-                    }
-                }
             });
 
             function checkPromoCode($input) {
@@ -1110,21 +1051,6 @@ function openSewaPopup() {
             element.remove();
         });
     }
-
-    document.addEventListener('change', function(event) {
-        var element = event.target;
-
-        if (!element.matches('select[name="cabang_ambil_id"]')) return;
-
-        var form = sewaFormOf(element);
-        if (!form) return;
-
-        var kembali = form.querySelector('select[name="cabang_kembali_id"]');
-
-        if (kembali && !kembali.value) {
-            kembali.value = element.value;
-        }
-    });
 
     document.addEventListener('change', function(event) {
         var element = event.target;

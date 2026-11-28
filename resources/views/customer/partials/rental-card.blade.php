@@ -133,7 +133,7 @@
                     data-mode="all"
                     data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
                     data-rental="{{ $rental->id }}"
-                    data-cabang="{{ $rental->cabang_ambil_id }}"
+                    data-cabang="{{ $rental->mobil->cabang_id }}"
                     data-total="{{ (float) $rental->total_harga + (float) $dendaBelumBayar->sum('nominal') }}"
                     data-denda="{{ (float) $dendaBelumBayar->sum('nominal') }}">
                     <i class="bi bi-cash-stack me-1"></i>
@@ -152,7 +152,7 @@
                         data-title="Bayar Sewa"
                         data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
                         data-rental="{{ $rental->id }}"
-                        data-cabang="{{ $rental->cabang_ambil_id }}"
+                        data-cabang="{{ $rental->mobil->cabang_id }}"
                         data-total="{{ $rental->total_harga }}">
                         <i class="bi bi-credit-card me-1"></i>
                         Bayar Sewa
@@ -176,7 +176,7 @@
                         data-title="Upload Ulang Pembayaran"
                         data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
                         data-rental="{{ $rental->id }}"
-                        data-cabang="{{ $rental->cabang_ambil_id }}"
+                        data-cabang="{{ $rental->mobil->cabang_id }}"
                         data-total="{{ $rental->total_harga }}">
                         <i class="bi bi-arrow-repeat me-1"></i>
                         Upload Ulang
@@ -205,7 +205,7 @@
                             data-title="Bayar Sewa"
                             data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
                             data-rental="{{ $rental->id }}"
-                            data-cabang="{{ $rental->cabang_ambil_id }}"
+                            data-cabang="{{ $rental->mobil->cabang_id }}"
                             data-total="{{ $rental->total_harga }}">
                             <i class="bi bi-credit-card me-1"></i>
                             Bayar Sewa
@@ -229,7 +229,7 @@
                             data-title="Upload Ulang Pembayaran"
                             data-mobil="{{ $rental->mobil->name ?? 'Mobil' }}"
                             data-rental="{{ $rental->id }}"
-                            data-cabang="{{ $rental->cabang_ambil_id }}"
+                            data-cabang="{{ $rental->mobil->cabang_id }}"
                             data-total="{{ $rental->total_harga }}">
                             <i class="bi bi-arrow-repeat me-1"></i>
                             Upload Ulang
