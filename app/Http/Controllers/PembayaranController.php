@@ -159,9 +159,7 @@ public function detail(Pembayaran $pembayaran)
 {
     $pembayaran->load([
         'rental.user',
-        'rental.mobil',
-        'rental.cabangAmbil',
-        'rental.cabangKembali',
+        'rental.mobil.cabang',
         'metodePembayaran',
     ]);
 
@@ -210,8 +208,7 @@ public function detail(Pembayaran $pembayaran)
                 : '-',
             'jumlah_hari' => (int) ($rental->jumlah_hari ?? 0),
             'harga_perhari' => (float) ($rental->harga_perhari ?? 0),
-            'cabang_ambil' => $rental->cabangAmbil->name ?? '-',
-            'cabang_kembali' => $rental->cabangKembali->name ?? '-',
+            'cabang' => $rental->mobil->cabang->name ?? '-',
             'subtotal' => (float) ($rental->subtotal ?? 0),
             'deposit' => (float) ($rental->deposit ?? 0),
             'diskon' => (float) ($rental->diskon ?? 0),
@@ -259,7 +256,7 @@ public function detail(Pembayaran $pembayaran)
         }
 
         $metodePembayarans = $this->metodeUntukCabang(
-            $rental->cabang_ambil_id
+            $rental->mobil->cabang_id
         );
 
         return view(
@@ -355,7 +352,7 @@ public function detail(Pembayaran $pembayaran)
 
         // Pastikan metode pembayaran sesuai cabang rental.
         $metodeAllowed = $this->metodeUntukCabang(
-            $rental->cabang_ambil_id
+            $rental->mobil->cabang_id
         )->contains(
             'id',
             (int) $validated['metode_pembayaran_id']
@@ -478,7 +475,7 @@ public function detail(Pembayaran $pembayaran)
             'bukti.max' => 'Ukuran bukti maksimal 2 MB.',
         ]);
 
-        $metodeAllowed = $this->metodeUntukCabang($rental->cabang_ambil_id)
+        $metodeAllowed = $this->metodeUntukCabang($rental->mobil->cabang_id)
             ->contains('id', (int) $validated['metode_pembayaran_id']);
 
         if (! $metodeAllowed) {

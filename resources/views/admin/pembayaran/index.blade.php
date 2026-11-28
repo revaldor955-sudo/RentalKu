@@ -377,13 +377,8 @@
             </div>
 
             <div class="col-md-6">
-                <small class="text-muted">Cabang Pengambilan</small>
-                <div id="pd-rental-cabang-ambil">-</div>
-            </div>
-
-            <div class="col-md-6">
-                <small class="text-muted">Cabang Pengembalian</small>
-                <div id="pd-rental-cabang-kembali">-</div>
+                <small class="text-muted">Cabang</small>
+                <div id="pd-rental-cabang">-</div>
             </div>
 
             <div class="col-md-6">
@@ -707,8 +702,7 @@ $('#pd-rental-mulai').text(rental.tanggal_mulai ?? '-');
 $('#pd-rental-selesai').text(rental.tanggal_selesai ?? '-');
 $('#pd-rental-hari').text((rental.jumlah_hari ?? 0) + ' hari');
 $('#pd-rental-harga').text(formatRupiah(rental.harga_perhari ?? 0));
-$('#pd-rental-cabang-ambil').text(rental.cabang_ambil ?? '-');
-$('#pd-rental-cabang-kembali').text(rental.cabang_kembali ?? '-');
+$('#pd-rental-cabang').text(rental.cabang ?? '-');
 $('#pd-rental-subtotal').text(formatRupiah(rental.subtotal ?? 0));
 $('#pd-rental-deposit').text(formatRupiah(rental.deposit ?? 0));
 $('#pd-rental-diskon').text(formatRupiah(rental.diskon ?? 0));

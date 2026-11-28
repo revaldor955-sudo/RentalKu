@@ -326,12 +326,8 @@
                             <div class="border rounded-3 p-3">
                                 <small class="text-muted fw-bold text-uppercase">Cabang</small>
                                 <div class="fw-semibold">
-                                    <i class="bi bi-box-arrow-in-right me-1"></i>
-                                    <span id="rd-cabang-ambil">-</span>
-                                </div>
-                                <div class="fw-semibold">
-                                    <i class="bi bi-box-arrow-right me-1"></i>
-                                    <span id="rd-cabang-kembali">-</span>
+                                    <i class="bi bi-geo-alt me-1"></i>
+                                    <span id="rd-cabang">-</span>
                                 </div>
                             </div>
                         </div>
@@ -494,8 +490,7 @@
                 row('Plat Nomor', escapeHtml(d.plat)) +
                 row('Tanggal Sewa', escapeHtml(d.tanggal_mulai) + ' s/d ' + escapeHtml(d.tanggal_selesai)) +
                 row('Lama Sewa', escapeHtml(d.jumlah_hari) + ' hari') +
-                row('Cabang Ambil', escapeHtml(d.cabang_ambil)) +
-                row('Cabang Kembali', escapeHtml(d.cabang_kembali)) +
+                row('Cabang', escapeHtml(d.cabang)) +
                 row('Harga / Hari', formatRupiah(d.harga_perhari)) +
                 row('Subtotal', formatRupiah(d.subtotal)) +
                 row('Deposit', formatRupiah(d.deposit)) +
@@ -806,8 +801,7 @@ confirmButtonText: 'Ya, ' + ({
                     }
                     $('#rd-tanggal').text(data.tanggal_mulai + ' s/d ' + data.tanggal_selesai);
                     $('#rd-jumlah-hari').text(data.jumlah_hari + ' hari');
-                    $('#rd-cabang-ambil').text(data.cabang_ambil);
-                    $('#rd-cabang-kembali').text(data.cabang_kembali);
+                    $('#rd-cabang').text(data.cabang);
                     $('#rd-harga-perhari').text(formatRupiah(data.harga_perhari));
                     $('#rd-subtotal').text(formatRupiah(data.subtotal));
                     $('#rd-deposit').text(formatRupiah(data.deposit));

@@ -68,8 +68,6 @@ class DendaBlokirSewaTest extends TestCase
         return Rental::create([
             'user_id' => $user->id,
             'mobil_id' => $this->mobil->id,
-            'cabang_ambil_id' => $this->cabang->id,
-            'cabang_kembali_id' => $this->cabang->id,
             'tanggal_mulai' => now()->subDays(3)->toDateString(),
             'tanggal_selesai' => now()->subDay()->toDateString(),
             'jumlah_hari' => 2,
@@ -97,8 +95,6 @@ class DendaBlokirSewaTest extends TestCase
         return [
             'tanggal_mulai' => now()->addDay()->toDateString(),
             'tanggal_selesai' => now()->addDays(3)->toDateString(),
-            'cabang_ambil_id' => $this->cabang->id,
-            'cabang_kembali_id' => $this->cabang->id,
         ];
     }
 
@@ -203,7 +199,7 @@ class DendaBlokirSewaTest extends TestCase
         $this->actingAs($this->customer)
             ->get('/customer/dashboard')
             ->assertOk()
-            ->assertSee('Denda belum lunas')
+            ->assertSee('Denda Belum Lunas')
             ->assertSee('200.000')
             ->assertSee('Kabar kompensasi')
             ->assertSee('Pengembalian Dana');

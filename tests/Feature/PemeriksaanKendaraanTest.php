@@ -95,8 +95,6 @@ class PemeriksaanKendaraanTest extends TestCase
         return Rental::create([
             'user_id' => $this->customer->id,
             'mobil_id' => $mobil->id,
-            'cabang_ambil_id' => $this->cabang->id,
-            'cabang_kembali_id' => $this->cabang->id,
             'tanggal_mulai' => now()->subDays(3)->toDateString(),
             'tanggal_selesai' => now()->subDay()->toDateString(),
             'jumlah_hari' => 2,

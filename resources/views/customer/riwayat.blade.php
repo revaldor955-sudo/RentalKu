@@ -548,8 +548,14 @@
     }
 
     (function () {
-        var dendaId = new URLSearchParams(window.location.search).get('denda');
+        var params = new URLSearchParams(window.location.search);
+        var dendaId = params.get('denda');
         if (!dendaId) return;
+
+        params.delete('denda');
+
+        var query = params.toString();
+        window.history.replaceState({}, '', window.location.pathname + (query ? '?' + query : '') + window.location.hash);
 
         var modalEl = document.getElementById('dendaBayarModal' + dendaId);
         if (modalEl) {

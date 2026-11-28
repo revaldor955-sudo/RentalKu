@@ -396,14 +396,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="detail-item">
-                                <span class="detail-label">Cabang Pengambilan</span>
-                                <div class="detail-value" id="rd-cabang-ambil">-</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <span class="detail-label">Cabang Pengembalian</span>
-                                <div class="detail-value" id="rd-cabang-kembali">-</div>
+                                <span class="detail-label">Cabang</span>
+                                <div class="detail-value" id="rd-cabang">-</div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -558,8 +552,7 @@
                 isi('rd-selesai', data.tanggal_selesai);
                 isi('rd-hari', data.jumlah_hari + ' hari');
                 isi('rd-harga', formatRupiah(data.harga_perhari));
-                isi('rd-cabang-ambil', data.cabang_ambil);
-                isi('rd-cabang-kembali', data.cabang_kembali);
+                isi('rd-cabang', data.cabang);
 
                 isi(
                     'rd-supir',

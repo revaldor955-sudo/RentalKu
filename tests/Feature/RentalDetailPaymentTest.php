@@ -48,8 +48,6 @@ class RentalDetailPaymentTest extends TestCase
         $rental = Rental::create([
             'user_id' => $customer->id,
             'mobil_id' => $mobil->id,
-            'cabang_ambil_id' => $cabang->id,
-            'cabang_kembali_id' => $cabang->id,
             'tanggal_mulai' => '2026-11-01',
             'tanggal_selesai' => '2026-11-02',
             'jumlah_hari' => 1,

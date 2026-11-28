@@ -350,9 +350,8 @@ public function show(Mobil $mobil)
         'fasilitas',
     ]);
 
-    $cabangs = Cabang::orderBy('name')->get();
-
     $supirs = Supir::where('status', 'tersedia')
+        ->where('cabang_id', $mobil->cabang_id)
         ->orderBy('name')
         ->get();
 
@@ -360,7 +359,7 @@ public function show(Mobil $mobil)
 
     return view(
         'customer.mobil-detail',
-        compact('mobil', 'cabangs', 'supirs', 'kodePromo')
+        compact('mobil', 'supirs', 'kodePromo')
     );
 }
 

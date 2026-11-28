@@ -189,8 +189,6 @@ class RentalSeeder extends Seeder
                 [
                     'user_id' => $userId,
                     'mobil_id' => $mobil->id,
-                    'cabang_ambil_id' => $mobil->cabang_id,
-                    'cabang_kembali_id' => $mobil->cabang_id,
                     'tanggal_mulai' => $mulai->toDateString(),
                     'tanggal_selesai' => $selesai->toDateString(),
                     'jumlah_hari' => $jumlahHari,
