@@ -116,15 +116,17 @@
                 <span class="badge {{ $classSewa }}">{{ $labelSewa }}</span>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center gap-2">
-                <span class="small text-muted">Denda ({{ $rental->dendas->count() }})</span>
-                <span class="badge {{ $classDenda }}">{{ $labelDenda }}</span>
-            </div>
+            @if(!$sewaLunas)
+                <div class="d-flex justify-content-between align-items-center gap-2">
+                    <span class="small text-muted">Denda ({{ $rental->dendas->count() }})</span>
+                    <span class="badge {{ $classDenda }}">{{ $labelDenda }}</span>
+                </div>
 
-            <div class="tagihan-ringkasan-total d-flex justify-content-between align-items-center">
-                <span class="small fw-semibold">Total belum dibayar</span>
-                <span class="fw-bold">Rp {{ number_format($totalBelumDibayar, 0, ',', '.') }}</span>
-            </div>
+                <div class="tagihan-ringkasan-total d-flex justify-content-between align-items-center">
+                    <span class="small fw-semibold">Total belum dibayar</span>
+                    <span class="fw-bold">Rp {{ number_format($totalBelumDibayar, 0, ',', '.') }}</span>
+                </div>
+            @endif
 
             @if (!$sewaDibayar && $dendaBelumBayar->isNotEmpty())
                 <button type="button" class="btn btn-success w-100 mt-2 btn-bayar"
@@ -394,7 +396,7 @@
                             $modalBayarId = 'dendaBayarModal' . $d->id;
                         @endphp
 
-                        <div class="denda-customer-card">
+                        <div class="denda-customer-card{{ $loop->iteration > 1 ? ' denda-extra d-none' : '' }}">
 
                             <div class="denda-card-header">
 
@@ -752,6 +754,18 @@
 
                 </div>
 
+                @if($rental->dendas->count() > 1)
+                    <button type="button"
+                        class="btn btn-outline-success btn-sm w-100 mt-3 denda-toggle-btn"
+                        data-denda-toggle
+                        data-label-more="Lihat Semua Denda ({{ $rental->dendas->count() }})"
+                        data-label-less="Sembunyikan Denda"
+                        aria-expanded="false">
+                        <i class="bi bi-chevron-down me-1"></i>
+                        <span>Lihat Semua Denda ({{ $rental->dendas->count() }})</span>
+                    </button>
+                @endif
+
             </div>
 
         @endif
@@ -936,6 +950,16 @@ body.rating-modal-open {
     width: 100%;
     min-width: 0;
     gap: 14px;
+}
+
+.denda-toggle-btn {
+    transition: all 0.2s ease;
+}
+
+.denda-toggle-btn:hover {
+    background-color: #f8f9fa;
+    color: #495057;
+    border-color: #dee2e6;
 }
 
 .denda-customer-card {
@@ -1194,6 +1218,39 @@ body.rating-modal-open {
                 )
             ) {
                 document.body.appendChild(modal);
+            }
+        });
+    }
+
+    if (!window.dendaToggleBound) {
+        window.dendaToggleBound = true;
+
+        document.addEventListener('click', function (event) {
+            const button = event.target.closest('[data-denda-toggle]');
+
+            if (!button) {
+                return;
+            }
+
+            const section = button.closest('.rental-denda-section');
+            const extras = section ? section.querySelectorAll('.denda-extra') : [];
+            const expanded = button.getAttribute('aria-expanded') === 'true';
+
+            extras.forEach(function (card) {
+                card.classList.toggle('d-none', expanded);
+            });
+
+            button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+
+            const icon = button.querySelector('i');
+            const label = button.querySelector('span');
+
+            if (icon) {
+                icon.className = expanded ? 'bi bi-chevron-down me-1' : 'bi bi-chevron-up me-1';
+            }
+
+            if (label) {
+                label.textContent = expanded ? button.dataset.labelMore : button.dataset.labelLess;
             }
         });
     }
